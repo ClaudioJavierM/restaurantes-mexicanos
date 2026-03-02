@@ -1,0 +1,177 @@
+<?php
+
+namespace App\Livewire;
+
+use App\Models\Restaurant;
+use App\Models\State;
+use App\Services\StripeService;
+use Livewire\Component;
+use Illuminate\Support\Str;
+
+class ClaimRestaurant extends Component
+{
+    public $search = '';
+    public $selectedState = '';
+    public $searchResults = [];
+    public $selectedRestaurant = null;
+    public $step = 'search'; // search, verify, select_plan, payment
+
+    // Verification fields
+    public $ownerName = '';
+    public $ownerEmail = '';
+    public $ownerPhone = '';
+    public $verificationMethod = 'email'; // email, phone, document
+
+    // Selected plan
+    public $selectedPlan = 'claimed'; // claimed, premium, elite
+
+    // Coupon code
+    public $couponCode = '';
+    public $couponApplied = false;
+    public $couponMessage = '';
+
+    public function mount()
+    {
+        $this->searchResults = collect();
+    }
+
+    public function searchRestaurants()
+    {
+        $this->validate([
+            'search' => 'required|min:3',
+        ]);
+
+        $query = Restaurant::query()
+            ->where('is_claimed', false)
+            ->where('status', 'approved');
+
+        if ($this->search) {
+            $query->where(function($q) {
+                $q->where('name', 'like', '%' . $this->search . '%')
+                  ->orWhere('address', 'like', '%' . $this->search . '%')
+                  ->orWhere('city', 'like', '%' . $this->search . '%');
+            });
+        }
+
+        if ($this->selectedState) {
+            $query->where('state_id', $this->selectedState);
+        }
+
+        $this->searchResults = $query->with('state', 'category')
+            ->limit(20)
+            ->get();
+    }
+
+    public function selectRestaurant($restaurantId)
+    {
+        $this->selectedRestaurant = Restaurant::with('state', 'category')->find($restaurantId);
+
+        if (!$this->selectedRestaurant) {
+            session()->flash('error', 'Restaurant not found');
+            return;
+        }
+
+        if ($this->selectedRestaurant->is_claimed) {
+            session()->flash('error', 'This restaurant has already been claimed');
+            return;
+        }
+
+        $this->step = 'verify';
+    }
+
+    public function backToSearch()
+    {
+        $this->step = 'search';
+        $this->selectedRestaurant = null;
+        $this->reset(['ownerName', 'ownerEmail', 'ownerPhone']);
+    }
+
+    public function submitVerification()
+    {
+        $this->validate([
+            'ownerName' => 'required|min:2',
+            'ownerEmail' => 'required|email',
+            'ownerPhone' => 'required|min:10',
+        ]);
+
+        // Generate claim token
+        $claimToken = Str::random(32);
+
+        // Save verification data (but don't claim yet)
+        $this->selectedRestaurant->update([
+            'owner_name' => $this->ownerName,
+            'owner_email' => $this->ownerEmail,
+            'owner_phone' => $this->ownerPhone,
+            'claim_token' => $claimToken,
+            'verification_method' => $this->verificationMethod,
+        ]);
+
+        // TODO: Send verification email/SMS
+
+        $this->step = 'select_plan';
+    }
+
+    public function selectPlan($plan)
+    {
+        $this->selectedPlan = $plan;
+        $this->step = 'payment';
+    }
+
+    public function applyCoupon()
+    {
+        if (empty($this->couponCode)) {
+            $this->couponMessage = 'Please enter a coupon code';
+            $this->couponApplied = false;
+            return;
+        }
+
+        $stripeService = new StripeService();
+        $promotionCode = $stripeService->validatePromotionCode($this->couponCode);
+
+        if ($promotionCode) {
+            $this->couponApplied = true;
+            $coupon = $promotionCode->coupon;
+
+            if ($coupon->percent_off) {
+                $this->couponMessage = "Coupon applied! {$coupon->percent_off}% off";
+            } elseif ($coupon->amount_off) {
+                $amount = $coupon->amount_off / 100; // Stripe stores in cents
+                $this->couponMessage = "Coupon applied! \${$amount} off";
+            }
+        } else {
+            $this->couponApplied = false;
+            $this->couponMessage = 'Invalid or expired coupon code';
+        }
+    }
+
+    public function processPayment()
+    {
+        try {
+            $stripeService = new StripeService();
+
+            // Create Stripe Checkout Session with optional coupon
+            $session = $stripeService->createCheckoutSession(
+                $this->selectedRestaurant,
+                $this->selectedPlan,
+                route('claim.success') . '?session_id={CHECKOUT_SESSION_ID}',
+                route('claim.cancel'),
+                $this->couponApplied ? $this->couponCode : null
+            );
+
+            // Redirect to Stripe Checkout
+            return redirect($session->url);
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error processing payment: ' . $e->getMessage());
+        }
+    }
+
+    public function render()
+    {
+        $states = State::where('is_active', true)->orderBy('name')->get();
+
+        return view('livewire.claim-restaurant', [
+            'states' => $states,
+            'stripeKey' => config('stripe.key'),
+        ])->layout('layouts.app', ['title' => 'Claim Your Restaurant']);
+    }
+}

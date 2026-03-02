@@ -1,0 +1,631 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\Restaurant;
+use App\Models\State;
+use App\Models\Category;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+
+class YelpImportService
+{
+    protected $yelpService;
+    protected $googlePlacesService;
+
+    public function __construct()
+    {
+        $this->yelpService = app(YelpFusionService::class);
+        $this->googlePlacesService = app(GooglePlacesService::class);
+    }
+
+    /**
+     * Import restaurants from Yelp for a specific location
+     */
+    public function importFromLocation(string $city, string $state, array $options = []): array
+    {
+        $stats = [
+            'total_found' => 0,
+            'imported' => 0,
+            'skipped_duplicates' => 0,
+            'errors' => 0,
+            'restaurants' => [],
+        ];
+
+        try {
+            $stateModel = State::where('name', 'LIKE', "%{$state}%")
+                ->orWhere('code', $state)
+                ->first();
+
+            if (!$stateModel) {
+                throw new \Exception("State '{$state}' not found in database");
+            }
+
+            $category = Category::where('slug', 'mexican')
+                ->orWhere('name', 'LIKE', '%mexican%')
+                ->first();
+
+            if (!$category) {
+                throw new \Exception("Mexican category not found in database");
+            }
+
+            $limit = $options['limit'] ?? 50;
+            $offset = $options['offset'] ?? 0;
+            $minRating = $options['min_rating'] ?? 3.0;
+            $searchTerm = $options['search_term'] ?? 'mexican restaurant';
+            $yelpCategories = $options['yelp_categories'] ?? null;
+
+            $results = $this->yelpService->searchBusinesses(
+                $searchTerm,
+                $city,
+                $state,
+                $limit,
+                $offset,
+                $yelpCategories
+            );
+
+            if (!$results || !isset($results['businesses'])) {
+                Log::warning("No results from Yelp for {$city}, {$state}");
+                return $stats;
+            }
+
+            $stats['total_found'] = count($results['businesses']);
+
+            foreach ($results['businesses'] as $yelpBusiness) {
+                if (isset($yelpBusiness['rating']) && $yelpBusiness['rating'] < $minRating) {
+                    continue;
+                }
+
+                try {
+                    $result = $this->importRestaurant($yelpBusiness, $stateModel, $category, $options);
+
+                    if ($result['status'] === 'imported') {
+                        $stats['imported']++;
+                        $stats['restaurants'][] = $result['restaurant'];
+                    } elseif ($result['status'] === 'duplicate') {
+                        $stats['skipped_duplicates']++;
+                    }
+                } catch (\Exception $e) {
+                    $stats['errors']++;
+                    Log::error("Error importing restaurant from Yelp: " . $e->getMessage(), [
+                        'yelp_id' => $yelpBusiness['id'] ?? 'unknown',
+                        'name' => $yelpBusiness['name'] ?? 'unknown',
+                    ]);
+                }
+            }
+
+        } catch (\Exception $e) {
+            Log::error("Error in Yelp import: " . $e->getMessage());
+            throw $e;
+        }
+
+        return $stats;
+    }
+
+    /**
+     * Import a single restaurant from Yelp data
+     */
+    protected function importRestaurant(array $yelpBusiness, State $state, Category $category, array $options = []): array
+    {
+        $existing = Restaurant::where('yelp_id', $yelpBusiness['id'])->first();
+
+        if ($existing) {
+            if ($options['update_existing'] ?? false) {
+                $this->updateRestaurantFromYelp($existing, $yelpBusiness);
+                return ['status' => 'updated', 'restaurant' => $existing];
+            }
+            return ['status' => 'duplicate', 'restaurant' => $existing];
+        }
+
+        $duplicateByName = Restaurant::where('name', 'LIKE', '%' . $yelpBusiness['name'] . '%')
+            ->where('city', $yelpBusiness['location']['city'] ?? '')
+            ->where('state_id', $state->id)
+            ->first();
+
+        if ($duplicateByName) {
+            return ['status' => 'duplicate', 'restaurant' => $duplicateByName];
+        }
+
+        $googleData = null;
+        if ($options['enrich_with_google'] ?? false) {
+            try {
+                $googleData = $this->googlePlacesService->findPlace(
+                    $yelpBusiness['name'],
+                    $yelpBusiness['location']['address1'] ?? '',
+                    $yelpBusiness['location']['city'] ?? '',
+                    $state->name
+                );
+
+                if ($googleData && isset($googleData['place_id'])) {
+                    $placeDetails = $this->googlePlacesService->getPlaceDetails($googleData['place_id']);
+                    if ($placeDetails) {
+                        $googleData = array_merge($googleData, $placeDetails);
+                    }
+                }
+            } catch (\Exception $e) {
+                Log::info("Could not find Google data for: " . $yelpBusiness['name']);
+            }
+        }
+
+        $restaurant = $this->createRestaurantFromYelp($yelpBusiness, $state, $category, $googleData);
+
+        return ['status' => 'imported', 'restaurant' => $restaurant];
+    }
+
+    /**
+     * Create a restaurant from Yelp data
+     */
+    protected function createRestaurantFromYelp(
+        array $yelpBusiness,
+        State $state,
+        Category $category,
+        ?array $googleData = null
+    ): Restaurant {
+        $location = $yelpBusiness['location'] ?? [];
+        $coordinates = $yelpBusiness['coordinates'] ?? [];
+
+        // Get full business details from Yelp for additional data
+        $businessDetails = null;
+        if (isset($yelpBusiness['id'])) {
+            try {
+                $businessDetails = $this->yelpService->getBusinessDetails($yelpBusiness['id']);
+                Log::info("Fetched detailed Yelp data for: " . $yelpBusiness['name']);
+            } catch (\Exception $e) {
+                Log::info("Could not fetch detailed Yelp data for: " . $yelpBusiness['name']);
+            }
+        }
+
+        $description = $this->generateDescription($yelpBusiness, $businessDetails);
+
+        // Parse Yelp categories
+        $yelpCategories = [];
+        if (isset($yelpBusiness['categories']) && is_array($yelpBusiness['categories'])) {
+            foreach ($yelpBusiness['categories'] as $cat) {
+                if (isset($cat['alias'])) {
+                    $yelpCategories[] = [
+                        'alias' => $cat['alias'],
+                        'title' => $cat['title'] ?? $cat['alias'],
+                    ];
+                }
+            }
+        }
+
+        // Parse transactions (delivery, pickup, etc.)
+        $transactions = $yelpBusiness['transactions'] ?? [];
+        if ($businessDetails && isset($businessDetails['transactions'])) {
+            $transactions = array_unique(array_merge($transactions, $businessDetails['transactions']));
+        }
+
+        // Map Yelp transactions to our services format
+        $services = $this->mapYelpTransactionsToServices($transactions);
+
+        // Parse opening hours from Yelp
+        $openingHours = null;
+        if ($businessDetails && isset($businessDetails['hours'])) {
+            $openingHours = $this->parseYelpHours($businessDetails['hours']);
+        }
+
+        $restaurantData = [
+            'state_id' => $state->id,
+            'category_id' => $category->id,
+            'name' => $yelpBusiness['name'],
+            'phone' => $this->formatPhone($yelpBusiness['phone'] ?? $yelpBusiness['display_phone'] ?? null),
+            'website' => null,
+            'address' => !empty($location['address1']) ? $location['address1'] : (!empty($location['address2']) ? $location['address2'] : 'Mobile Location'),
+            'city' => $location['city'] ?? 'Unknown',
+            'zip_code' => !empty($location['zip_code']) ? $location['zip_code'] : '00000',
+            'latitude' => $coordinates['latitude'] ?? null,
+            'longitude' => $coordinates['longitude'] ?? null,
+            'status' => 'approved',
+            'is_active' => true,
+            'is_featured' => false,
+
+            'description' => $description,
+
+            // Yelp specific data
+            'yelp_id' => $yelpBusiness['id'],
+            'yelp_rating' => $yelpBusiness['rating'] ?? null,
+            'yelp_reviews_count' => $yelpBusiness['review_count'] ?? 0,
+            'yelp_url' => $yelpBusiness['url'] ?? null,
+            'yelp_last_sync' => now(),
+
+            // NEW: Yelp categories and transactions
+            'yelp_categories' => !empty($yelpCategories) ? $yelpCategories : null,
+            'yelp_transactions' => !empty($transactions) ? $transactions : null,
+
+            // Import metadata
+            'import_source' => 'yelp',
+            'country' => $state->country ?? 'US',
+            'imported_at' => now(),
+
+            'average_rating' => $yelpBusiness['rating'] ?? 0,
+            'total_reviews' => $yelpBusiness['review_count'] ?? 0,
+            'price_range' => $this->mapPriceRange($yelpBusiness['price'] ?? null),
+
+            // NEW: Services from transactions
+            'services' => !empty($services) ? $services : null,
+
+            // NEW: Opening hours from Yelp
+            'opening_hours' => $openingHours,
+
+            // Image from Yelp
+            'image' => $yelpBusiness['image_url'] ?? null,
+        ];
+
+        // Set website from Google or Yelp details
+        if ($googleData && isset($googleData['website'])) {
+            $restaurantData['website'] = $googleData['website'];
+        } elseif ($businessDetails && isset($businessDetails['url']) && !str_contains($businessDetails['url'], 'yelp.com')) {
+            $restaurantData['website'] = $businessDetails['url'];
+        }
+
+        // Add Google data if available
+        if ($googleData) {
+            $restaurantData['google_place_id'] = $googleData['place_id'] ?? null;
+            $restaurantData['google_rating'] = $googleData['rating'] ?? null;
+            $restaurantData['google_reviews_count'] = $googleData['user_ratings_total'] ?? 0;
+            $restaurantData['google_verified'] = true;
+            $restaurantData['last_google_verification'] = now();
+
+            if (isset($googleData['url'])) {
+                $restaurantData['google_maps_url'] = $googleData['url'];
+            }
+
+            if (!$restaurantData['latitude'] && isset($googleData['geometry']['location'])) {
+                $restaurantData['latitude'] = $googleData['geometry']['location']['lat'];
+                $restaurantData['longitude'] = $googleData['geometry']['location']['lng'];
+            }
+
+            // Get additional Google data
+            if (isset($googleData['price_level'])) {
+                $restaurantData['google_price_level'] = $googleData['price_level'];
+            }
+
+            // Parse Google services
+            if ($this->googlePlacesService) {
+                $googleServices = $this->googlePlacesService->parseServices($googleData);
+                if (!empty($googleServices)) {
+                    $existingServices = $restaurantData['services'] ?? [];
+                    if (is_array($existingServices)) {
+                        $restaurantData['services'] = array_unique(array_merge($existingServices, $googleServices));
+                    }
+                }
+
+                // Opening hours from Google if not from Yelp
+                if (empty($openingHours)) {
+                    $googleHours = $this->googlePlacesService->parseOpeningHours($googleData);
+                    if (!empty($googleHours)) {
+                        $restaurantData['opening_hours'] = $googleHours;
+                    }
+                }
+
+                // Accessibility
+                $accessibility = $this->googlePlacesService->parseAccessibility($googleData);
+                if (!empty($accessibility)) {
+                    $restaurantData['accessibility'] = $accessibility;
+                }
+
+                // Payment methods
+                $paymentMethods = $this->googlePlacesService->parsePaymentMethods($googleData);
+                if (!empty($paymentMethods)) {
+                    $restaurantData['payment_methods'] = $paymentMethods;
+                }
+            }
+        }
+
+        $restaurant = Restaurant::create($restaurantData);
+
+        // Download and attach image
+        $imageUrl = null;
+        if ($businessDetails && isset($businessDetails['image_url'])) {
+            $imageUrl = $businessDetails['image_url'];
+        } elseif (isset($yelpBusiness['image_url'])) {
+            $imageUrl = $yelpBusiness['image_url'];
+        }
+
+        if ($imageUrl) {
+            try {
+                $this->attachImageFromUrl($restaurant, $imageUrl);
+            } catch (\Exception $e) {
+                $restaurant->update(['image' => $imageUrl]);
+            }
+        }
+
+        Log::info("Imported restaurant from Yelp: {$restaurant->name} in {$restaurant->city}, {$state->name}");
+
+        return $restaurant;
+    }
+
+    /**
+     * Map Yelp transactions to our services format
+     */
+    protected function mapYelpTransactionsToServices(array $transactions): array
+    {
+        $services = [];
+
+        foreach ($transactions as $transaction) {
+            switch ($transaction) {
+                case 'delivery':
+                    $services[] = 'delivery';
+                    break;
+                case 'pickup':
+                    $services[] = 'takeout';
+                    break;
+                case 'restaurant_reservation':
+                    $services[] = 'reservations';
+                    break;
+            }
+        }
+
+        // Most restaurants have dine-in
+        $services[] = 'dine_in';
+
+        return array_unique($services);
+    }
+
+    /**
+     * Parse Yelp hours to our format
+     */
+    protected function parseYelpHours(array $hours): ?array
+    {
+        if (empty($hours)) {
+            return null;
+        }
+
+        $hoursData = $hours[0] ?? null;
+        if (!$hoursData) {
+            return null;
+        }
+
+        $openHours = $hoursData['open'] ?? [];
+        $weekdayText = [];
+        $periods = [];
+
+        $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+        foreach ($openHours as $slot) {
+            $dayIndex = $slot['day'] ?? 0;
+            $dayName = $days[$dayIndex] ?? 'Unknown';
+
+            $start = $slot['start'] ?? '0000';
+            $end = $slot['end'] ?? '0000';
+
+            // Format times
+            $startFormatted = $this->formatTime($start);
+            $endFormatted = $this->formatTime($end);
+
+            $weekdayText[$dayIndex] = "{$dayName}: {$startFormatted} - {$endFormatted}";
+
+            $periods[] = [
+                'open' => [
+                    'day' => $dayIndex,
+                    'time' => $start,
+                ],
+                'close' => [
+                    'day' => $dayIndex,
+                    'time' => $end,
+                ],
+            ];
+        }
+
+        ksort($weekdayText);
+
+        return [
+            'is_open_now' => $hoursData['is_open_now'] ?? null,
+            'hours_type' => $hoursData['hours_type'] ?? 'REGULAR',
+            'weekday_text' => array_values($weekdayText),
+            'periods' => $periods,
+        ];
+    }
+
+    /**
+     * Format time from HHMM to HH:MM AM/PM
+     */
+    protected function formatTime(string $time): string
+    {
+        if (strlen($time) !== 4) {
+            return $time;
+        }
+
+        $hour = (int) substr($time, 0, 2);
+        $minute = substr($time, 2, 2);
+
+        $ampm = $hour >= 12 ? 'PM' : 'AM';
+        $hour12 = $hour % 12;
+        if ($hour12 === 0) $hour12 = 12;
+
+        return "{$hour12}:{$minute} {$ampm}";
+    }
+
+    /**
+     * Update an existing restaurant with Yelp data
+     */
+    protected function updateRestaurantFromYelp(Restaurant $restaurant, array $yelpBusiness): void
+    {
+        $updateData = [
+            'yelp_rating' => $yelpBusiness['rating'] ?? $restaurant->yelp_rating,
+            'yelp_reviews_count' => $yelpBusiness['review_count'] ?? $restaurant->yelp_reviews_count,
+            'yelp_last_sync' => now(),
+            'average_rating' => $yelpBusiness['rating'] ?? $restaurant->average_rating,
+            'total_reviews' => $yelpBusiness['review_count'] ?? $restaurant->total_reviews,
+        ];
+
+        // Update categories if available
+        if (isset($yelpBusiness['categories']) && is_array($yelpBusiness['categories'])) {
+            $yelpCategories = [];
+            foreach ($yelpBusiness['categories'] as $cat) {
+                if (isset($cat['alias'])) {
+                    $yelpCategories[] = [
+                        'alias' => $cat['alias'],
+                        'title' => $cat['title'] ?? $cat['alias'],
+                    ];
+                }
+            }
+            if (!empty($yelpCategories)) {
+                $updateData['yelp_categories'] = $yelpCategories;
+            }
+        }
+
+        // Update transactions if available
+        if (isset($yelpBusiness['transactions'])) {
+            $updateData['yelp_transactions'] = $yelpBusiness['transactions'];
+            $services = $this->mapYelpTransactionsToServices($yelpBusiness['transactions']);
+            if (!empty($services)) {
+                $existingServices = $restaurant->services ?? [];
+                if (is_string($existingServices)) {
+                    $existingServices = json_decode($existingServices, true) ?? [];
+                }
+                $updateData['services'] = array_unique(array_merge($existingServices, $services));
+            }
+        }
+
+        $restaurant->update($updateData);
+
+        Log::info("Updated restaurant from Yelp: {$restaurant->name}");
+    }
+
+    protected function mapPriceRange(?string $yelpPrice): string
+    {
+        if (!$yelpPrice) {
+            return '$$';
+        }
+        return $yelpPrice;
+    }
+
+    protected function formatPhone(?string $phone): ?string
+    {
+        if (!$phone) {
+            return null;
+        }
+
+        $cleaned = preg_replace('/\D/', '', $phone);
+
+        if (strlen($cleaned) === 10) {
+            return sprintf('(%s) %s-%s',
+                substr($cleaned, 0, 3),
+                substr($cleaned, 3, 3),
+                substr($cleaned, 6)
+            );
+        }
+
+        return $phone;
+    }
+
+    protected function attachImageFromUrl(Restaurant $restaurant, string $imageUrl): void
+    {
+        try {
+            $restaurant->addMediaFromUrl($imageUrl)
+                ->toMediaCollection('images');
+
+            Log::info("Successfully downloaded image for restaurant: {$restaurant->name}");
+        } catch (\Exception $e) {
+            Log::error("Failed to download image for restaurant: {$restaurant->name}", [
+                'error' => $e->getMessage(),
+            ]);
+
+            try {
+                $restaurant->update(['image' => $imageUrl]);
+            } catch (\Exception $updateError) {
+                Log::error("Failed to save image URL for restaurant: {$restaurant->name}");
+            }
+        }
+    }
+
+    public function importEntireState(string $state, array $options = []): array
+    {
+        $stateModel = State::where('name', 'LIKE', "%{$state}%")
+            ->orWhere('code', $state)
+            ->first();
+
+        if (!$stateModel) {
+            throw new \Exception("State '{$state}' not found");
+        }
+
+        $majorCities = $options['cities'] ?? [$stateModel->name];
+
+        $totalStats = [
+            'total_found' => 0,
+            'imported' => 0,
+            'skipped_duplicates' => 0,
+            'errors' => 0,
+            'cities_processed' => 0,
+        ];
+
+        foreach ($majorCities as $city) {
+            $stats = $this->importFromLocation($city, $state, $options);
+
+            $totalStats['total_found'] += $stats['total_found'];
+            $totalStats['imported'] += $stats['imported'];
+            $totalStats['skipped_duplicates'] += $stats['skipped_duplicates'];
+            $totalStats['errors'] += $stats['errors'];
+            $totalStats['cities_processed']++;
+
+            if (isset($options['delay_between_cities'])) {
+                sleep($options['delay_between_cities']);
+            }
+        }
+
+        return $totalStats;
+    }
+
+    protected function generateDescription(array $yelpBusiness, ?array $businessDetails = null): string
+    {
+        $parts = [];
+
+        $name = $yelpBusiness['name'] ?? 'This restaurant';
+        $city = $yelpBusiness['location']['city'] ?? '';
+        $state = $yelpBusiness['location']['state'] ?? '';
+
+        if ($city && $state) {
+            $parts[] = "{$name} is a Mexican restaurant located in {$city}, {$state}.";
+        } else {
+            $parts[] = "{$name} is an authentic Mexican restaurant.";
+        }
+
+        if (isset($yelpBusiness['rating']) && isset($yelpBusiness['review_count'])) {
+            $rating = $yelpBusiness['rating'];
+            $reviewCount = $yelpBusiness['review_count'];
+            $parts[] = "With a {$rating} star rating based on {$reviewCount} reviews, it's a popular choice for Mexican cuisine lovers.";
+        }
+
+        if (isset($yelpBusiness['categories']) && is_array($yelpBusiness['categories'])) {
+            $categories = array_map(function($cat) {
+                return $cat['title'] ?? '';
+            }, $yelpBusiness['categories']);
+            $categories = array_filter($categories);
+
+            if (count($categories) > 0) {
+                $categoriesList = implode(', ', array_slice($categories, 0, 3));
+                $parts[] = "Specializing in {$categoriesList}, this establishment offers a diverse menu of authentic flavors.";
+            }
+        }
+
+        if (isset($yelpBusiness['price'])) {
+            $priceText = match ($yelpBusiness['price']) {
+                '$' => 'budget-friendly dining',
+                '$$' => 'moderate pricing',
+                '$$$' => 'upscale dining',
+                '$$$$' => 'fine dining',
+                default => '',
+            };
+            if ($priceText) {
+                $parts[] = "Perfect for {$priceText} with family and friends.";
+            }
+        }
+
+        if ($businessDetails && isset($businessDetails['transactions']) && is_array($businessDetails['transactions'])) {
+            $services = [];
+            if (in_array('delivery', $businessDetails['transactions'])) $services[] = 'delivery';
+            if (in_array('pickup', $businessDetails['transactions'])) $services[] = 'pickup';
+            if (in_array('restaurant_reservation', $businessDetails['transactions'])) $services[] = 'reservations';
+
+            if (count($services) > 0) {
+                $servicesList = implode(', ', $services);
+                $parts[] = "Offers {$servicesList} for your convenience.";
+            }
+        }
+
+        return implode(' ', $parts);
+    }
+}

@@ -1,0 +1,127 @@
+<?php
+
+return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Stripe API Keys
+    |--------------------------------------------------------------------------
+    |
+    | The Stripe publishable key and secret key give you access to Stripe's
+    | API. The "public" key is used for client-side operations while the
+    | "secret" key is used for server-side operations.
+    |
+    */
+
+    'key' => env('STRIPE_KEY'),
+
+    'secret' => env('STRIPE_SECRET'),
+
+    'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Stripe Price IDs
+    |--------------------------------------------------------------------------
+    |
+    | These are the Price IDs created in your Stripe Dashboard for each
+    | subscription tier. You need to create recurring products and prices
+    | in Stripe Dashboard first.
+    |
+    */
+
+    'prices' => [
+        'claimed' => env('STRIPE_PRICE_CLAIMED'),
+        'premium' => env('STRIPE_PRICE_PREMIUM'),
+        'elite' => env('STRIPE_PRICE_ELITE'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Subscription Plans
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for each subscription plan including pricing and features.
+    |
+    */
+
+    'plans' => [
+        'claimed' => [
+            'name' => 'Claimed',
+            'price' => 9.99,
+            'currency' => 'usd',
+            'interval' => 'month',
+            'features' => [
+                'Perfil verificado con badge',
+                'Editar información básica',
+                'Responder a reseñas',
+                'Analíticas básicas',
+                'Hasta 10 fotos',
+            ],
+        ],
+        'premium' => [
+            'name' => 'Premium',
+            'price' => 39.00,
+            'currency' => 'usd',
+            'interval' => 'month',
+            'features' => [
+                'Todo en Claimed +',
+                '⭐ Featured Badge',
+                '🚀 Top 3 en búsquedas',
+                '🍽️ Menú Digital + QR Code',
+                '🛒 Widget de Pedidos Online',
+                '📅 Sistema de Reservas',
+                '🎁 Programa de Lealtad',
+                '👥 Programa de Referidos',
+                '💬 AI Chatbot Bilingüe (ES/EN)',
+                '📊 Dashboard de Analíticas',
+                '📈 SEO Avanzado + Google My Business',
+                '📧 Email Marketing (50k+ mensuales)',
+                '📱 Promoción en Redes Sociales',
+                '🎟️ Cupones Digitales',
+                '🔔 Notificaciones Push',
+                '📉 Análisis de Competencia',
+                '🌐 Página de Aterrizaje Personalizada',
+                '📸 Fotos y Videos Ilimitados',
+            ],
+        ],
+        'elite' => [
+            'name' => 'Elite',
+            'price' => 99.00,
+            'currency' => 'usd',
+            'interval' => 'month',
+            'features' => [
+                'Todo en Premium +',
+                '🏆 Posición #1 Garantizada',
+                '📱 App Móvil White Label',
+                '🌐 Creador de Website Completo',
+                '🤖 Asistente AI Avanzado',
+                '📢 Marketing Automatizado',
+                '📊 Analítica Predictiva',
+                '🎯 Targeting Avanzado (Geo-fencing)',
+                '📸 Fotografía Profesional (trimestral)',
+                '🎬 Producción de Video',
+                '👨‍💼 Account Manager Dedicado',
+                '🔌 Integración con POS',
+                '📡 Acceso a API',
+                '💳 Opciones de Pago Avanzadas (Crypto)',
+                '📰 PR & Cobertura de Medios',
+                '🎪 Promoción de Eventos',
+                '🎓 Capacitación y Consultoría',
+            ],
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Stripe API Version
+    |--------------------------------------------------------------------------
+    |
+    | The Stripe API version to use. This is set automatically by the SDK
+    | but you can override it here if needed.
+    |
+    */
+
+    'api_version' => '2024-11-20.acacia',
+
+];

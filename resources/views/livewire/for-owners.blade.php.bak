@@ -1,0 +1,736 @@
+<div class="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    {{-- Hero Section --}}
+    <div class="relative overflow-hidden bg-gradient-to-br from-green-600 via-green-700 to-emerald-800 text-white">
+        <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yLjIxIDEuNzktNCA0LTRzNCAxLjc5IDQgNC0xLjc5IDQtNCA0LTQtMS43OS00LTR6bS0xMCAwYzAtMi4yMSAxLjc5LTQgNC00czQgMS43OSA0IDQtMS43OSA0LTQgNC00LTEuNzktNC00em0tMTAgMGMwLTIuMjEgMS43OS00IDQtNHM0IDEuNzkgNCA0LTEuNzkgNC00IDQtNC0xLjc5LTQtNHoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-20"></div>
+
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+            <div class="text-center">
+                <h1 class="text-5xl md:text-6xl font-bold mb-6">
+                    {{ __('app.owner_hero_title') }}
+                    <span class="text-yellow-300">{{ __('app.owner_hero_highlight') }}</span>
+                </h1>
+                <p class="text-xl md:text-2xl text-green-100 mb-8 max-w-3xl mx-auto">
+                    {{ __('app.owner_hero_subtitle') }}
+                </p>
+
+                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    <a href="{{ route('claim.restaurant') }}" class="inline-flex items-center px-8 py-4 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold rounded-lg text-lg transition shadow-lg hover:shadow-xl">
+                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        {{ __('app.claim_your_restaurant') }}
+                    </a>
+                    <a href="#pricing" class="inline-flex items-center px-8 py-4 bg-white/20 hover:bg-white/30 text-white font-semibold rounded-lg text-lg transition backdrop-blur-sm border-2 border-white/30">
+                        {{ __('app.view_pricing') }}
+                        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </a>
+                </div>
+
+                {{-- Trust Indicators --}}
+                <div class="mt-12 flex flex-wrap justify-center gap-8 text-sm">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-yellow-300" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                        </svg>
+                        <span>{{ __('app.owner_trust_1') }}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-yellow-300" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span>{{ __('app.owner_trust_2') }}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-yellow-300" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z"></path>
+                        </svg>
+                        <span>{{ __('app.owner_trust_3') }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    {{-- Live Platform Stats Section --}}
+    <div class="bg-gray-900 py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <div class="inline-flex items-center px-4 py-2 bg-green-500/20 rounded-full text-green-400 text-sm font-medium mb-4">
+                    <span class="animate-pulse mr-2">●</span> Estadisticas en Vivo
+                </div>
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">
+                    Tus Clientes Te Estan Buscando
+                </h2>
+                <p class="text-gray-400 text-lg max-w-2xl mx-auto">
+                    FAMER es el directorio de restaurantes mexicanos de mas rapido crecimiento en USA. Estos son los numeros reales.
+                </p>
+            </div>
+
+            {{-- Stats Grid --}}
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-12">
+                <div class="bg-gray-800 rounded-xl p-6 text-center border border-gray-700">
+                    <div class="text-3xl md:text-4xl font-bold text-white mb-1">{{ number_format($stats['total_views'] ?? 0) }}</div>
+                    <div class="text-sm" style="color: #9ca3af;">Visitas Totales</div>
+                    <div class="text-xs mt-1" style="color: #4ade80;">Desde {{ $stats['start_date'] ?? 'Nov 2025' }}</div>
+                </div>
+                <div class="bg-gray-800 rounded-xl p-6 text-center border border-gray-700">
+                    <div class="text-3xl md:text-4xl font-bold text-yellow-400 mb-1">{{ number_format($stats['daily_avg'] ?? 0) }}</div>
+                    <div class="text-sm" style="color: #9ca3af;">Promedio Diario</div>
+                    <div class="text-xs mt-1" style="color: #fbbf24;">Visitas por dia</div>
+                </div>
+                <div class="bg-gray-800 rounded-xl p-6 text-center border border-gray-700">
+                    <div class="text-3xl md:text-4xl font-bold text-green-400 mb-1">{{ number_format($stats['total_restaurants'] ?? 0) }}</div>
+                    <div class="text-sm" style="color: #9ca3af;">Restaurantes</div>
+                    <div class="text-xs mt-1" style="color: #4ade80;">En el directorio</div>
+                </div>
+                <div class="bg-gray-800 rounded-xl p-6 text-center border border-gray-700">
+                    <div class="text-3xl md:text-4xl font-bold text-red-400 mb-1">+{{ $stats['weekly_growth'] ?? 0 }}%</div>
+                    <div class="text-sm" style="color: #9ca3af;">Crecimiento</div>
+                    <div class="text-xs mt-1" style="color: #f87171;">Semana a semana</div>
+                </div>
+            </div>
+
+            {{-- Top States --}}
+            @if(count($stateStats) > 0)
+            <div class="bg-gray-800 rounded-xl p-6 border border-gray-700 max-w-2xl mx-auto">
+                <h3 class="text-lg font-bold text-white mb-4 text-center">Top Estados por Trafico</h3>
+                <div class="space-y-3">
+                    @foreach($stateStats as $index => $state)
+                        @php
+                            $maxViews = $stateStats[0]['views'] ?? 1;
+                            $percentage = ($state['views'] / $maxViews) * 100;
+                        @endphp
+                        <div class="flex items-center gap-3">
+                            <span class="text-gray-500 w-6 text-sm">#{{ $index + 1 }}</span>
+                            <div class="flex-1">
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-sm font-medium" style="color: white;">{{ $state['state_name'] }}</span>
+                                    <span class="text-sm" style="color: #9ca3af;">{{ number_format($state['views']) }}</span>
+                                </div>
+                                <div class="h-2 bg-gray-700 rounded-full overflow-hidden">
+                                    <div class="h-full bg-gradient-to-r from-green-500 to-emerald-400 rounded-full" style="width: {{ $percentage }}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+            @endif
+
+            {{-- Value Proposition --}}
+            <div class="mt-12 grid md:grid-cols-3 gap-6 text-center">
+                <div class="bg-gray-800/50 rounded-xl p-6 border border-gray-700">
+                    <div class="text-2xl font-bold text-blue-400 mb-2">${{ number_format($stats['google_ads_value'] ?? 0) }}</div>
+                    <div class="text-sm" style="color: #d1d5db;">Valor equivalente en Google Ads</div>
+                </div>
+                <div class="bg-gray-800/50 rounded-xl p-6 border border-gray-700">
+                    <div class="text-2xl font-bold text-green-400 mb-2">$29/mes</div>
+                    <div class="text-sm" style="color: #d1d5db;">Costo del plan Premium</div>
+                </div>
+                <div class="bg-gray-800/50 rounded-xl p-6 border border-gray-700">
+                    <div class="text-2xl font-bold text-yellow-400 mb-2">1 cliente</div>
+                    <div class="text-sm" style="color: #d1d5db;">Para ROI positivo al mes</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Comparison Table: Free vs Premium --}}
+    <div id="pricing" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl font-bold text-gray-900 mb-4">
+                {{ __('app.choose_your_plan') }}
+            </h2>
+            <p class="text-xl text-gray-600">
+                {{ __('app.plan_subtitle') }}
+            </p>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {{-- Free Listing --}}
+            <div class="bg-white rounded-2xl shadow-lg p-8 border-2 border-gray-200">
+                <div class="text-center mb-8">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-2">Free Listing</h3>
+                    <div class="text-5xl font-bold text-gray-900 mb-2">$0</div>
+                    <p class="text-gray-600">Basic presence</p>
+                </div>
+
+                <ul class="space-y-4 mb-8">
+                    <li class="flex items-start gap-3">
+                        <svg class="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span class="text-gray-700">Listed in directory</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <svg class="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span class="text-gray-700">Basic info (name, address, phone)</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <svg class="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span class="text-gray-700">Google Maps integration</span>
+                    </li>
+                    <li class="flex items-start gap-3 opacity-50">
+                        <svg class="w-6 h-6 text-gray-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                        <span class="text-gray-500">No priority in search</span>
+                    </li>
+                    <li class="flex items-start gap-3 opacity-50">
+                        <svg class="w-6 h-6 text-gray-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                        <span class="text-gray-500">No analytics</span>
+                    </li>
+                </ul>
+
+                <button class="w-full py-3 px-6 bg-gray-100 hover:bg-gray-200 text-gray-900 font-semibold rounded-lg transition">
+                    Current Status
+                </button>
+            </div>
+
+            {{-- Claimed ($9.99) --}}
+            <div class="bg-white rounded-2xl shadow-lg p-8 border-2 border-blue-300">
+                <div class="text-center mb-8">
+                    <div class="inline-block px-4 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold mb-4">
+                        VERIFIED OWNER
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-2">Claimed</h3>
+                    <div class="text-5xl font-bold text-gray-900 mb-2">$9.99</div>
+                    <p class="text-gray-600">per month</p>
+                </div>
+
+                <ul class="space-y-4 mb-8">
+                    <li class="flex items-start gap-3">
+                        <svg class="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span class="text-gray-700"><strong>Everything in Free</strong></span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <svg class="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span class="text-gray-700">✓ Verified Owner badge</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <svg class="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span class="text-gray-700">Edit restaurant info</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <svg class="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span class="text-gray-700">Upload photos (up to 10)</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <svg class="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span class="text-gray-700">Respond to reviews</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <svg class="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span class="text-gray-700">Basic analytics</span>
+                    </li>
+
+                    {{-- Coupon Benefit --}}
+                    <li class="flex items-start gap-3 bg-green-50 p-3 rounded-lg border border-green-200">
+                        <svg class="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <div>
+                            <strong class="text-green-800">🎟️ 1 Annual Coupon (5% off)</strong>
+                            <p class="text-xs text-green-700 mt-1">Save up to $300/year on Mexican furniture, decoration, tableware, handicrafts, tortilla equipment, Mexican popsicle equipment, food trailers and more...</p>
+                        </div>
+                    </li>
+                </ul>
+
+                <a href="#claim" class="block w-full text-center py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition">
+                    Claim for $9.99/mo
+                </a>
+            </div>
+
+            {{-- Premium --}}
+            <div class="bg-gradient-to-br from-yellow-400 via-yellow-500 to-orange-500 rounded-2xl shadow-xl p-6 border-2 border-yellow-600 relative">
+                <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-red-600 text-white px-4 py-1 rounded-full text-xs font-bold shadow-lg">
+                    🔥 POPULAR
+                </div>
+
+                <div class="text-center mb-6">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Premium</h3>
+                    <div class="text-4xl font-bold text-gray-900 mb-1">$39</div>
+                    <p class="text-gray-900 text-sm font-semibold">per month</p>
+                </div>
+
+                <ul class="space-y-3 mb-8 text-gray-900 text-sm">
+                    <li class="flex items-start gap-2">
+                        <svg class="w-5 h-5 text-green-700 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span class="font-medium"><strong>Everything in Claimed PLUS:</strong></span>
+                    </li>
+
+                    {{-- Visibility & SEO --}}
+                    <li class="flex items-start gap-2">
+                        <svg class="w-5 h-5 text-green-700 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>⭐ <strong>Featured Badge</strong> - Stand out from competitors</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <svg class="w-5 h-5 text-green-700 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>🚀 <strong>Top 3 Priority</strong> in all local searches</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <svg class="w-5 h-5 text-green-700 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>📈 <strong>Advanced SEO</strong> - Google My Business optimization</span>
+                    </li>
+
+                    {{-- Customer Acquisition --}}
+                    <li class="flex items-start gap-2">
+                        <svg class="w-5 h-5 text-green-700 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>📧 <strong>Email Marketing</strong> to 50k+ local customers</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <svg class="w-5 h-5 text-green-700 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>📱 <strong>Social Media Promotion</strong> - Instagram & Facebook posts</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <svg class="w-5 h-5 text-green-700 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>🎟️ <strong>Digital Coupons</strong> & promotional campaigns</span>
+                    </li>
+
+                    {{-- Online Ordering & Reservations --}}
+                    <li class="flex items-start gap-2">
+                        <svg class="w-5 h-5 text-green-700 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>🍽️ <strong>Digital Menu + QR Code</strong> - update instantly</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <svg class="w-5 h-5 text-green-700 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>🛒 <strong>Online Ordering Widget</strong> - integrated checkout</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <svg class="w-5 h-5 text-green-700 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>📅 <strong>Reservation System</strong> - OpenTable integration</span>
+                    </li>
+
+                    {{-- Customer Retention --}}
+                    <li class="flex items-start gap-2">
+                        <svg class="w-5 h-5 text-green-700 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>🎁 <strong>Loyalty Program</strong> - reward repeat customers</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <svg class="w-5 h-5 text-green-700 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>👥 <strong>Referral Program</strong> - customers bring friends</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <svg class="w-5 h-5 text-green-700 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>🔔 <strong>Push Notifications</strong> - direct to customer phones</span>
+                    </li>
+
+                    {{-- Technology & Automation --}}
+                    <li class="flex items-start gap-2">
+                        <svg class="w-5 h-5 text-green-700 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>💬 <strong>AI Chatbot (ES/EN)</strong> - 24/7 customer support</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <svg class="w-5 h-5 text-green-700 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>📊 <strong>Analytics Dashboard</strong> - track views, clicks, orders</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <svg class="w-5 h-5 text-green-700 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>📉 <strong>Competitor Analysis</strong> - local market insights</span>
+                    </li>
+
+                    {{-- Branding & Content --}}
+                    <li class="flex items-start gap-2">
+                        <svg class="w-5 h-5 text-green-700 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>🌐 <strong>Custom Landing Page</strong> - yourname.famousmexican.com</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <svg class="w-5 h-5 text-green-700 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>📸 <strong>Unlimited Photos & Videos</strong> - showcase your food</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <svg class="w-5 h-5 text-green-700 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>🎖️ <strong>"Authentic" Badge</strong> - certified regional cuisine</span>
+                    </li>
+
+                    {{-- Premium Coupon Benefits --}}
+                    <li class="flex items-start gap-2 bg-white/50 p-2 rounded-lg border-2 border-gray-900">
+                        <svg class="w-5 h-5 text-green-800 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <div>
+                            <strong class="text-gray-900">💰 4 Quarterly Coupons (10% off)</strong>
+                            <p class="text-xs text-gray-900 mt-0.5">Save up to $500 per coupon ($2,000/year total) on Mexican furniture, decoration, tableware, handicrafts, tortilla equipment, Mexican popsicle equipment, food trailers and more...</p>
+                        </div>
+                    </li>
+                </ul>
+
+                <a href="#claim-premium" class="block w-full text-center py-3 px-4 bg-gray-900 hover:bg-gray-800 text-white font-bold rounded-lg transition shadow-lg">
+                    Start Premium
+                </a>
+                <p class="text-center text-xs text-gray-900 mt-2 font-medium">Cancel anytime</p>
+            </div>
+
+            {{-- Elite Plan --}}
+            <div class="bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 rounded-2xl shadow-2xl p-6 border-2 border-purple-500 transform scale-110 relative">
+                <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 px-4 py-1 rounded-full text-xs font-bold shadow-lg">
+                    👑 ELITE
+                </div>
+
+                <div class="text-center mb-6">
+                    <h3 class="text-xl font-bold text-white mb-2">Elite</h3>
+                    <div class="text-4xl font-bold text-white mb-1">$99</div>
+                    <p class="text-purple-200 text-sm font-semibold">per month</p>
+                </div>
+
+                <ul class="space-y-2 mb-6 text-white text-xs">
+                    <li class="flex items-start gap-2">
+                        <svg class="w-4 h-4 text-yellow-300 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span class="font-semibold"><strong>Everything in Premium PLUS:</strong></span>
+                    </li>
+
+                    {{-- White Label & Advanced Tech --}}
+                    <li class="flex items-start gap-2">
+                        <svg class="w-4 h-4 text-yellow-300 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>📱 <strong>White Label Mobile App</strong> - Your own iOS/Android app</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <svg class="w-4 h-4 text-yellow-300 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>🌐 <strong>Full Website Builder</strong> - Complete branded site</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <svg class="w-4 h-4 text-yellow-300 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>🤖 <strong>Advanced AI Assistant</strong> - Smart recommendations</span>
+                    </li>
+
+                    {{-- Marketing Automation --}}
+                    <li class="flex items-start gap-2">
+                        <svg class="w-4 h-4 text-yellow-300 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>📢 <strong>Automated Marketing</strong> - AI-powered campaigns</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <svg class="w-4 h-4 text-yellow-300 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>📊 <strong>Predictive Analytics</strong> - Sales forecasting</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <svg class="w-4 h-4 text-yellow-300 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>🎯 <strong>Advanced Targeting</strong> - Geo-fencing ads</span>
+                    </li>
+
+                    {{-- Premium Services --}}
+                    <li class="flex items-start gap-2">
+                        <svg class="w-4 h-4 text-yellow-300 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>📸 <strong>Professional Photography</strong> - 1x per quarter</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <svg class="w-4 h-4 text-yellow-300 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>🎬 <strong>Video Production</strong> - Professional menu videos</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <svg class="w-4 h-4 text-yellow-300 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>👨‍💼 <strong>Dedicated Account Manager</strong> - Priority support</span>
+                    </li>
+
+                    {{-- Integration & API --}}
+                    <li class="flex items-start gap-2">
+                        <svg class="w-4 h-4 text-yellow-300 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>🔌 <strong>POS Integration</strong> - Connect your system</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <svg class="w-4 h-4 text-yellow-300 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>📡 <strong>API Access</strong> - Custom integrations</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <svg class="w-4 h-4 text-yellow-300 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>💳 <strong>Advanced Payment Options</strong> - Crypto, installments</span>
+                    </li>
+
+                    {{-- Exclusive Features --}}
+                    <li class="flex items-start gap-2">
+                        <svg class="w-4 h-4 text-yellow-300 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>🏆 <strong>Premium Placement</strong> - Guaranteed #1 spot</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <svg class="w-4 h-4 text-yellow-300 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>📰 <strong>PR & Media Coverage</strong> - Featured articles</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <svg class="w-4 h-4 text-yellow-300 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>🎪 <strong>Event Promotion</strong> - Catering & special events</span>
+                    </li>
+
+                    {{-- Elite Coupon Benefits --}}
+                    <li class="flex items-start gap-2 bg-gradient-to-r from-yellow-100 to-orange-100 p-2 rounded-lg border-2 border-yellow-400">
+                        <svg class="w-4 h-4 text-orange-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <div>
+                            <strong class="text-gray-900">💎 Elite Savings Package:</strong>
+                            <p class="text-xs text-gray-900 mt-0.5"><strong>Option A:</strong> 6 coupons (15% off) - $750 each ($4,500/year)</p>
+                            <p class="text-xs text-gray-900"><strong>Option B:</strong> 1 project coupon (15% off, $1,500 cap) + 4 quarterly (10% off, $500 each)</p>
+                            <p class="text-xs text-gray-800 font-semibold mt-1">Valid for Mexican furniture, decoration, tableware, handicrafts, tortilla equipment, Mexican popsicle equipment, food trailers and more...</p>
+                        </div>
+                    </li>
+                </ul>
+
+                <a href="#claim-elite" class="block w-full text-center py-3 px-4 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-gray-900 font-bold rounded-lg transition shadow-lg">
+                    Start Elite
+                </a>
+                <p class="text-center text-xs text-purple-200 mt-2 font-medium">Premium support included</p>
+            </div>
+        </div>
+    </div>
+
+    {{-- Premium Promotion Banner --}}
+    <div class="relative bg-gradient-to-br from-red-600 via-orange-600 to-red-700 py-24 overflow-hidden">
+        <!-- Decorative Background -->
+        <div class="absolute inset-0 opacity-20" style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+
+        <!-- Floating Elements -->
+        <div class="absolute top-10 left-10 text-white/20 text-9xl animate-bounce">💎</div>
+        <div class="absolute bottom-10 right-10 text-white/20 text-9xl animate-bounce delay-300">🎉</div>
+
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <!-- Limited Time Badge -->
+                <div class="inline-flex items-center px-6 py-3 rounded-full bg-yellow-400 text-yellow-900 font-black text-lg mb-6 animate-pulse shadow-2xl">
+                    <svg class="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                    </svg>
+                    ¡OFERTA POR TIEMPO LIMITADO!
+                </div>
+
+                <!-- Main Title -->
+                <h2 class="text-5xl md:text-7xl font-display font-black text-white mb-6 leading-tight">
+                    ¿Listo para Transformar<br>
+                    <span class="bg-gradient-to-r from-yellow-200 via-yellow-300 to-yellow-200 bg-clip-text text-transparent">
+                        tu Restaurante?
+                    </span>
+                </h2>
+
+                <!-- Subtitle -->
+                <p class="text-2xl md:text-3xl text-white font-bold mb-4">
+                    🎁 Obten <span class="bg-yellow-400 text-red-700 px-4 py-1 rounded-lg">3 MESES GRATIS</span> del Plan Premium
+                </p>
+                <p class="text-xl text-white/90 max-w-3xl mx-auto mb-12">
+                    Mas de 500 restaurantes mexicanos en Estados Unidos ya confian en nosotros.<br>
+                    Unete a ellos y descubre la diferencia de trabajar directo con el fabricante.
+                </p>
+            </div>
+
+            <!-- Features Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 max-w-6xl mx-auto">
+                <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border-2 border-white/30 hover:bg-white/20 transition-all transform hover:scale-105">
+                    <div class="text-5xl mb-4">⭐</div>
+                    <h3 class="text-white font-bold text-xl mb-2">Visibilidad Maxima</h3>
+                    <p class="text-white/80">Aparece en las primeras posiciones de busqueda</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border-2 border-white/30 hover:bg-white/20 transition-all transform hover:scale-105">
+                    <div class="text-5xl mb-4">📧</div>
+                    <h3 class="text-white font-bold text-xl mb-2">Marketing Digital</h3>
+                    <p class="text-white/80">Email marketing + redes sociales + cupones</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border-2 border-white/30 hover:bg-white/20 transition-all transform hover:scale-105">
+                    <div class="text-5xl mb-4">🍽️</div>
+                    <h3 class="text-white font-bold text-xl mb-2">Menu Digital + QR</h3>
+                    <p class="text-white/80">Pedidos online + sistema de reservas incluido</p>
+                </div>
+            </div>
+
+            <!-- CTA Buttons -->
+            <div class="flex flex-col md:flex-row items-center justify-center gap-6">
+                <a href="https://wa.me/1234567890?text=Hola%2C%20quiero%20informacion%20sobre%20los%206%20meses%20gratis%20del%20Plan%20Premium"
+                   target="_blank"
+                   class="group inline-flex items-center px-10 py-6 bg-white text-red-600 font-black text-xl rounded-2xl hover:shadow-2xl transform hover:scale-110 transition-all duration-300 border-4 border-yellow-400">
+                    <svg class="w-8 h-8 mr-3 group-hover:animate-bounce" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                    </svg>
+                    Cotiza por WhatsApp Ahora
+                </a>
+
+                <a href="mailto:info@mf-imports.com?subject=Informacion Plan Premium 6 Meses Gratis"
+                   class="group inline-flex items-center px-10 py-6 bg-transparent border-4 border-white text-white font-black text-xl rounded-2xl hover:bg-white hover:text-red-600 hover:shadow-2xl transform hover:scale-110 transition-all duration-300">
+                    <svg class="w-8 h-8 mr-3 group-hover:animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                    </svg>
+                    Envia un Correo
+                </a>
+            </div>
+
+            <!-- Guarantee Text -->
+            <div class="mt-10 text-center">
+                <p class="text-white/90 text-lg font-medium">
+                    ✅ Respuesta en menos de 24 horas • 💎 Cotizacion sin compromiso • 🚀 Envio directo a todo EUA
+                </p>
+            </div>
+        </div>
+    </div>
+
+    {{-- Why Better Than Yelp --}}
+    <div class="bg-gray-900 text-white py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">
+                    Why Choose Us Over Yelp?
+                </h2>
+                <p class="text-xl text-gray-300">
+                    We're 100% focused on Mexican restaurants - not a generic directory
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Specialized Audience</h3>
+                    <p class="text-gray-400">Only Mexican food lovers visit our site</p>
+                </div>
+
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-yellow-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Lower Cost</h3>
+                    <p class="text-gray-400">$39/mo vs Yelp's $300+/mo</p>
+                </div>
+
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Authenticity Badges</h3>
+                    <p class="text-gray-400">Highlight your regional specialties</p>
+                </div>
+
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Bilingual Support</h3>
+                    <p class="text-gray-400">Reach both English & Spanish speakers</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- CTA Section --}}
+    <div id="claim" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
+        <h2 class="text-4xl font-bold text-gray-900 mb-6">
+            Ready to Grow Your Restaurant?
+        </h2>
+        <p class="text-xl text-gray-600 mb-8">
+            Join thousands of Mexican restaurants reaching more customers every day
+        </p>
+
+        <div class="bg-white rounded-2xl shadow-xl p-8 border-2 border-gray-200">
+            <h3 class="text-2xl font-bold text-gray-900 mb-6">Search for Your Restaurant</h3>
+
+            <div class="max-w-2xl mx-auto">
+                <div class="relative">
+                    <input
+                        type="text"
+                        placeholder="Enter your restaurant name or address..."
+                        class="w-full px-6 py-4 text-lg border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-2 focus:ring-green-200 outline-none"
+                    >
+                    <button class="absolute right-2 top-2 px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition">
+                        Search
+                    </button>
+                </div>
+
+                <p class="text-sm text-gray-600 mt-4">
+                    Don't see your restaurant? <a href="#" class="text-green-600 hover:text-green-700 font-semibold">Add it now</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

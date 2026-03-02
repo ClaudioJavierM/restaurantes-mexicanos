@@ -1,0 +1,131 @@
+{
+  "name": "Restaurant Campaigns - Welcome + Follow-ups",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "id": "daily-trigger",
+      "name": "Daily 8AM Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://restaurantesmexicanosfamosos.com/api/campaign/new-today",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Key",
+              "value": "SJ5bHVn5v30ONUhJTF2DNgcfEyasXRocNJLGilygjSprSpjEt4e46nfnTshweLN9"
+            }
+          ]
+        }
+      },
+      "id": "get-new-today",
+      "name": "Get New Restaurants Today",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [500, 150]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://restaurantesmexicanosfamosos.com/api/campaign/pending-followups",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Key",
+              "value": "SJ5bHVn5v30ONUhJTF2DNgcfEyasXRocNJLGilygjSprSpjEt4e46nfnTshweLN9"
+            }
+          ]
+        }
+      },
+      "id": "get-pending-followups",
+      "name": "Get Pending Follow-ups",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [500, 450]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.count }}",
+              "operation": "larger",
+              "value2": 0
+            }
+          ]
+        }
+      },
+      "id": "has-new-restaurants",
+      "name": "Has New Restaurants?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [750, 150]
+    },
+    {
+      "parameters": {},
+      "id": "no-new",
+      "name": "No New Restaurants",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1000, 250]
+    }
+  ],
+  "connections": {
+    "Daily 8AM Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get New Restaurants Today",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Pending Follow-ups",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get New Restaurants Today": {
+      "main": [
+        [
+          {
+            "node": "Has New Restaurants?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has New Restaurants?": {
+      "main": [
+        [
+          {
+            "node": "No New Restaurants",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

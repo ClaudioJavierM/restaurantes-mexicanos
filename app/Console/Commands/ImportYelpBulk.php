@@ -1,0 +1,291 @@
+<?php
+
+namespace App\Console\Commands;
+
+use App\Services\YelpImportService;
+use App\Models\State;
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
+
+class ImportYelpBulk extends Command
+{
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'yelp:import-bulk
+                            {--states=* : Specific states to import (by code or name). Leave empty for all states}
+                            {--cities-per-state=3 : Number of major cities to import per state}
+                            {--limit=50 : Maximum restaurants per city (Yelp max is 50)}
+                            {--min-rating=3.5 : Minimum Yelp rating to import}
+                            {--enrich : Enrich with Google Places data (slower but more complete)}
+                            {--delay=2 : Delay in seconds between API calls to respect rate limits}
+                            {--update : Update existing restaurants}
+                            {--dry-run : Show what would be imported without actually importing}
+                            {--search-term= : Custom Yelp search term}
+                            {--yelp-categories= : Yelp categories (e.g., mexican,tacos)}
+                            {--api-key=us1 : API key: us1, us2, us3}
+                            {--offset=0 : Pagination offset (0-950)}';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'Bulk import Mexican restaurants from Yelp for major cities across multiple states';
+
+    /**
+     * Major cities per state (top 3-5 cities by population with significant Mexican restaurant presence)
+     */
+    protected array $majorCitiesByState = [
+        'CA' => ['Los Angeles', 'San Diego', 'San Francisco', 'San Jose', 'Sacramento'],
+        'TX' => ['Houston', 'San Antonio', 'Dallas', 'Austin', 'El Paso'],
+        'AZ' => ['Phoenix', 'Tucson', 'Mesa', 'Chandler', 'Scottsdale'],
+        'NM' => ['Albuquerque', 'Las Cruces', 'Santa Fe', 'Rio Rancho'],
+        'NV' => ['Las Vegas', 'Henderson', 'Reno', 'North Las Vegas'],
+        'CO' => ['Denver', 'Colorado Springs', 'Aurora', 'Fort Collins'],
+        'IL' => ['Chicago', 'Aurora', 'Naperville', 'Joliet'],
+        'FL' => ['Miami', 'Tampa', 'Orlando', 'Jacksonville'],
+        'NY' => ['New York', 'Buffalo', 'Rochester', 'Yonkers'],
+        'GA' => ['Atlanta', 'Augusta', 'Columbus', 'Savannah'],
+        'NC' => ['Charlotte', 'Raleigh', 'Greensboro', 'Durham'],
+        'WA' => ['Seattle', 'Spokane', 'Tacoma', 'Vancouver'],
+        'OR' => ['Portland', 'Eugene', 'Salem', 'Gresham'],
+        'UT' => ['Salt Lake City', 'West Valley City', 'Provo', 'West Jordan'],
+        'OK' => ['Oklahoma City', 'Tulsa', 'Norman', 'Broken Arrow'],
+        'KS' => ['Wichita', 'Overland Park', 'Kansas City', 'Topeka'],
+        'NE' => ['Omaha', 'Lincoln', 'Bellevue', 'Grand Island'],
+        'IA' => ['Des Moines', 'Cedar Rapids', 'Davenport', 'Sioux City'],
+        'MO' => ['Kansas City', 'St. Louis', 'Springfield', 'Columbia'],
+        'AR' => ['Little Rock', 'Fort Smith', 'Fayetteville', 'Springdale'],
+        'LA' => ['New Orleans', 'Baton Rouge', 'Shreveport', 'Lafayette'],
+        'MS' => ['Jackson', 'Gulfport', 'Southaven', 'Hattiesburg'],
+        'AL' => ['Birmingham', 'Montgomery', 'Mobile', 'Huntsville'],
+        'TN' => ['Nashville', 'Memphis', 'Knoxville', 'Chattanooga'],
+        'KY' => ['Louisville', 'Lexington', 'Bowling Green', 'Owensboro'],
+        'IN' => ['Indianapolis', 'Fort Wayne', 'Evansville', 'South Bend'],
+        'OH' => ['Columbus', 'Cleveland', 'Cincinnati', 'Toledo'],
+        'MI' => ['Detroit', 'Grand Rapids', 'Warren', 'Sterling Heights'],
+        'WI' => ['Milwaukee', 'Madison', 'Green Bay', 'Kenosha'],
+        'MN' => ['Minneapolis', 'St. Paul', 'Rochester', 'Duluth'],
+        'PA' => ['Philadelphia', 'Pittsburgh', 'Allentown', 'Erie'],
+        'VA' => ['Virginia Beach', 'Norfolk', 'Chesapeake', 'Richmond'],
+        'MD' => ['Baltimore', 'Frederick', 'Rockville', 'Gaithersburg'],
+        'MA' => ['Boston', 'Worcester', 'Springfield', 'Cambridge'],
+        'CT' => ['Bridgeport', 'New Haven', 'Stamford', 'Hartford'],
+        'RI' => ['Providence', 'Warwick', 'Cranston', 'Pawtucket'],
+        'NH' => ['Manchester', 'Nashua', 'Concord', 'Derry'],
+        'VT' => ['Burlington', 'South Burlington', 'Rutland', 'Essex'],
+        'ME' => ['Portland', 'Lewiston', 'Bangor', 'South Portland'],
+        'SC' => ['Charleston', 'Columbia', 'North Charleston', 'Mount Pleasant'],
+        'WV' => ['Charleston', 'Huntington', 'Morgantown', 'Parkersburg'],
+        'DE' => ['Wilmington', 'Dover', 'Newark', 'Middletown'],
+        'ID' => ['Boise', 'Meridian', 'Nampa', 'Idaho Falls'],
+        'MT' => ['Billings', 'Missoula', 'Great Falls', 'Bozeman'],
+        'WY' => ['Cheyenne', 'Casper', 'Laramie', 'Gillette'],
+        'SD' => ['Sioux Falls', 'Rapid City', 'Aberdeen', 'Brookings'],
+        'ND' => ['Fargo', 'Bismarck', 'Grand Forks', 'Minot'],
+        'AK' => ['Anchorage', 'Fairbanks', 'Juneau', 'Sitka'],
+        'HI' => ['Honolulu', 'Pearl City', 'Hilo', 'Kailua'],
+    ];
+
+    /**
+     * Execute the console command.
+     */
+    public function handle(YelpImportService $importService)
+    {
+        $this->info('🚀 Starting bulk Yelp import for Mexican restaurants...');
+        $this->newLine();
+
+        // Get states to process
+        $statesToProcess = $this->getStatesToProcess();
+
+        if (empty($statesToProcess)) {
+            $this->error('No valid states found to process.');
+            return Command::FAILURE;
+        }
+
+        $citiesPerState = (int) $this->option('cities-per-state');
+        $delay = (int) $this->option('delay');
+        $isDryRun = $this->option('dry-run');
+
+        if ($isDryRun) {
+            $this->warn('🔍 DRY RUN MODE - No data will be imported');
+            $this->newLine();
+        }
+
+        // Global statistics
+        $globalStats = [
+            'states_processed' => 0,
+            'cities_processed' => 0,
+            'total_found' => 0,
+            'total_imported' => 0,
+            'total_duplicates' => 0,
+            'total_errors' => 0,
+            'start_time' => now(),
+        ];
+
+        $this->info("Processing {$statesToProcess->count()} states...");
+        $this->newLine();
+
+        foreach ($statesToProcess as $state) {
+            $this->line("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+            $this->info("📍 STATE: {$state->name} ({$state->code})");
+            $this->line("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+            $this->newLine();
+
+            $cities = $this->getCitiesForState($state->code, $citiesPerState);
+
+            if (empty($cities)) {
+                $this->warn("No cities configured for {$state->name}. Skipping...");
+                $this->newLine();
+                continue;
+            }
+
+            $stateStats = [
+                'cities' => 0,
+                'found' => 0,
+                'imported' => 0,
+                'duplicates' => 0,
+                'errors' => 0,
+            ];
+
+            foreach ($cities as $city) {
+                $this->info("  🏙️  Importing from: {$city}, {$state->code}");
+
+                if ($isDryRun) {
+                    $this->line("     [DRY RUN] Would search Yelp for Mexican restaurants");
+                    $globalStats['cities_processed']++;
+                    $stateStats['cities']++;
+                    continue;
+                }
+
+                try {
+                    $options = [
+                        'limit' => (int) $this->option('limit'),
+                        'min_rating' => (float) $this->option('min-rating'),
+                        'enrich_with_google' => $this->option('enrich'),
+                        'update_existing' => $this->option('update'),
+                        'offset' => (int) $this->option('offset'),
+                    ];
+
+                    $stats = $importService->importFromLocation($city, $state->code, $options);
+
+                    $stateStats['cities']++;
+                    $stateStats['found'] += $stats['total_found'];
+                    $stateStats['imported'] += $stats['imported'];
+                    $stateStats['duplicates'] += $stats['skipped_duplicates'];
+                    $stateStats['errors'] += $stats['errors'];
+
+                    $this->line("     ✅ Found: {$stats['total_found']} | Imported: {$stats['imported']} | Duplicates: {$stats['skipped_duplicates']} | Errors: {$stats['errors']}");
+
+                    // Delay to respect API rate limits
+                    if ($delay > 0) {
+                        $this->line("     ⏱️  Waiting {$delay} seconds...");
+                        sleep($delay);
+                    }
+
+                } catch (\Exception $e) {
+                    $stateStats['errors']++;
+                    $this->error("     ❌ Error importing from {$city}: " . $e->getMessage());
+                    Log::error("Bulk import error for {$city}, {$state->code}: " . $e->getMessage());
+                }
+
+                $this->newLine();
+            }
+
+            // State summary
+            $this->info("📊 {$state->name} Summary:");
+            $this->table(
+                ['Metric', 'Count'],
+                [
+                    ['Cities Processed', $stateStats['cities']],
+                    ['Total Found', $stateStats['found']],
+                    ['✅ Imported', $stateStats['imported']],
+                    ['⏭️  Skipped (duplicates)', $stateStats['duplicates']],
+                    ['❌ Errors', $stateStats['errors']],
+                ]
+            );
+
+            // Update global stats
+            $globalStats['states_processed']++;
+            $globalStats['cities_processed'] += $stateStats['cities'];
+            $globalStats['total_found'] += $stateStats['found'];
+            $globalStats['total_imported'] += $stateStats['imported'];
+            $globalStats['total_duplicates'] += $stateStats['duplicates'];
+            $globalStats['total_errors'] += $stateStats['errors'];
+
+            $this->newLine(2);
+        }
+
+        // Final global summary
+        $duration = now()->diffInSeconds($globalStats['start_time']);
+        $minutes = floor($duration / 60);
+        $seconds = $duration % 60;
+
+        $this->line("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+        $this->info("🎉 BULK IMPORT COMPLETED!");
+        $this->line("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+        $this->newLine();
+
+        $this->table(
+            ['Metric', 'Count'],
+            [
+                ['States Processed', $globalStats['states_processed']],
+                ['Cities Processed', $globalStats['cities_processed']],
+                ['Total Found on Yelp', $globalStats['total_found']],
+                ['✅ Total Imported', $globalStats['total_imported']],
+                ['⏭️  Total Skipped (duplicates)', $globalStats['total_duplicates']],
+                ['❌ Total Errors', $globalStats['total_errors']],
+                ['⏱️  Duration', "{$minutes}m {$seconds}s"],
+            ]
+        );
+
+        if (!$isDryRun && $globalStats['total_imported'] > 0) {
+            $this->newLine();
+            $this->info('💡 Tip: Run "php artisan restaurants:detect-duplicates --dry-run" to check for any remaining duplicates');
+        }
+
+        return Command::SUCCESS;
+    }
+
+    /**
+     * Get states to process based on options
+     */
+    protected function getStatesToProcess()
+    {
+        $requestedStates = $this->option('states');
+
+        if (empty($requestedStates)) {
+            // Process all states
+            return State::orderBy('name')->get();
+        }
+
+        // Process specific states
+        $states = collect();
+        foreach ($requestedStates as $stateInput) {
+            $state = State::where('code', strtoupper($stateInput))
+                ->orWhere('name', 'LIKE', "%{$stateInput}%")
+                ->first();
+
+            if ($state) {
+                $states->push($state);
+            } else {
+                $this->warn("State '{$stateInput}' not found in database. Skipping...");
+            }
+        }
+
+        return $states;
+    }
+
+    /**
+     * Get cities for a specific state
+     */
+    protected function getCitiesForState(string $stateCode, int $limit): array
+    {
+        $cities = $this->majorCitiesByState[$stateCode] ?? [];
+
+        return array_slice($cities, 0, $limit);
+    }
+}

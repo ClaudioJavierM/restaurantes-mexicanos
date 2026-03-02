@@ -1,0 +1,54 @@
+<?php
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\SitemapController;
+use App\Http\Controllers\Auth\SocialAuthController;
+use App\Http\Controllers\TeamInvitationController;
+// Public Routes
+Route::get('/', \App\Livewire\Home::class)->name('home');
+Route::get('/restaurantes', \App\Livewire\RestaurantList::class)->name('restaurants.index');
+Route::get('/restaurante/{slug}', \App\Livewire\RestaurantDetail::class)->name('restaurants.show');
+Route::get('/sugerir', \App\Livewire\SuggestionForm::class)->name('suggestions.create');
+// For Business Owners
+Route::view('/for-owners', 'for-owners')->name('for-owners');
+Route::get('/claim', \App\Livewire\ClaimRestaurant::class)->name('claim.restaurant');
+Route::get('/claim/verify/{verification}', \App\Livewire\ClaimRestaurantImproved::class)->name('claim.verify');
+Route::get('/claim/success', [\App\Http\Controllers\StripeWebhookController::class, 'success'])->name('claim.success');
+Route::get('/claim/cancel', [\App\Http\Controllers\StripeWebhookController::class, 'cancel'])->name('claim.cancel');
+// Stripe Webhook
+Route::post('/stripe/webhook', [\App\Http\Controllers\StripeWebhookController::class, 'handleWebhook'])->name('stripe.webhook');
+// Team Invitations
+Route::get('/team/accept/{token}', [TeamInvitationController::class, 'show'])->name('team.invitation.show');
+Route::post('/team/accept/{token}', [TeamInvitationController::class, 'accept'])->name('team.invitation.accept');
+Route::post('/team/decline/{token}', [TeamInvitationController::class, 'decline'])->name('team.invitation.decline');
+// SEO Routes
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
+// City Guides (SEO)
+Route::prefix('guia')->group(function () {
+    Route::get('/', [\App\Http\Controllers\CityGuideController::class, 'states'])->name('city-guides.states');
+    Route::get('/{state}', [\App\Http\Controllers\CityGuideController::class, 'state'])->name('city-guides.state');
+    Route::get('/{state}/{city}', [\App\Http\Controllers\CityGuideController::class, 'city'])->name('city-guides.city');
+});
+// Auth Routes (Breeze)
+Route::view('dashboard', 'dashboard')
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
+Route::view('profile', 'profile')
+    ->middleware(['auth'])
+    ->name('profile');
+// Favorites (requires authentication)
+Route::get('/my-favorites', \App\Livewire\MyFavorites::class)
+    ->middleware(['auth'])
+    ->name('favorites.index');
+// Social Authentication
+Route::get('auth/{provider}/redirect', [SocialAuthController::class, 'redirect'])
+    ->name('auth.social.redirect');
+Route::get('auth/{provider}/callback', [SocialAuthController::class, 'callback'])
+    ->name('auth.social.callback');
+// Legal Pages
+Route::get('/privacy', [\App\Http\Controllers\LegalController::class, 'privacy'])->name('legal.privacy');
+Route::get('/terms', [\App\Http\Controllers\LegalController::class, 'terms'])->name('legal.terms');
+Route::get('/contact', [\App\Http\Controllers\LegalController::class, 'contact'])->name('legal.contact');
+// Categories Routes
+Route::get('/categorias', \App\Livewire\Categories::class)->name('categories.index');
+Route::get('/categoria/{slug}', \App\Livewire\CategoryShow::class)->name('category.show');
+require __DIR__.'/auth.php';

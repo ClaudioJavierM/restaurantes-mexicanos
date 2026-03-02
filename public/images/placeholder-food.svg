@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+  <rect width="200" height="200" fill="#f3f4f6" rx="12"/>
+  <circle cx="100" cy="85" r="50" fill="#e5e7eb" stroke="#d1d5db" stroke-width="2"/>
+  <ellipse cx="100" cy="135" rx="55" ry="8" fill="#e5e7eb"/>
+  <path d="M70 75 Q80 45 100 55 Q120 45 130 75" fill="none" stroke="#9ca3af" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="85" cy="80" r="8" fill="#d4a54a" opacity="0.6"/>
+  <circle cx="105" cy="72" r="6" fill="#d4a54a" opacity="0.5"/>
+  <circle cx="115" cy="85" r="7" fill="#d4a54a" opacity="0.4"/>
+  <text x="100" y="170" text-anchor="middle" font-family="Arial,sans-serif" font-size="12" fill="#9ca3af">Sin imagen</text>
+</svg>

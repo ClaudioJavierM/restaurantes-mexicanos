@@ -1,0 +1,20 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fondo rojo (color tema de FMR) -->
+  <rect width="512" height="512" fill="#DC2626" rx="80"/>
+
+  <!-- Decoración mexicana - Franja verde -->
+  <rect y="0" width="170" height="512" fill="#006847" opacity="0.3" rx="80"/>
+
+  <!-- Decoración mexicana - Franja blanca -->
+  <rect x="171" y="0" width="170" height="512" fill="#FFFFFF" opacity="0.2"/>
+
+  <!-- Texto FMR -->
+  <text x="256" y="300" font-family="Arial, sans-serif" font-size="160" font-weight="bold" fill="#FFFFFF" text-anchor="middle">
+    FMR
+  </text>
+
+  <!-- Subtítulo -->
+  <text x="256" y="380" font-family="Arial, sans-serif" font-size="48" fill="#FFFFFF" text-anchor="middle" opacity="0.9">
+    Restaurantes
+  </text>
+</svg>

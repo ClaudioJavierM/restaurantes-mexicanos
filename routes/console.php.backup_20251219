@@ -1,0 +1,112 @@
+<?php
+
+use Illuminate\Foundation\Inspiring;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
+
+Artisan::command('inspire', function () {
+    $this->comment(Inspiring::quote());
+})->purpose('Display an inspiring quote');
+
+// ============================================================================
+// Scheduled Tasks for Yelp Restaurant Imports
+// ============================================================================
+
+/**
+ * DAILY bulk import of Mexican restaurants from Yelp
+ *
+ * Strategy: Import different states each day to spread API usage and keep data fresh
+ * RUNS EVERY DAY at 2:00 AM to continuously update restaurant data
+ * - Monday: CA, TX, AZ (High Mexican population states)
+ * - Tuesday: NM, NV, CO, IL
+ * - Wednesday: FL, NY, GA, NC
+ * - Thursday: WA, OR, UT, OK
+ * - Friday: KS, NE, IA, MO
+ * - Saturday: Remaining states (Part 1)
+ * - Sunday: Remaining states (Part 2)
+ *
+ * Each state is re-imported every 7 days to keep data fresh
+ */
+
+// Monday: High-volume states (CA, TX, AZ)
+Schedule::command('yelp:import-bulk --states=CA --states=TX --states=AZ --cities-per-state=3 --min-rating=3.5 --enrich --delay=3')
+    ->cron('0 2 * * 1')
+    ->timezone('America/New_York')
+    ->description('DAILY import: Mexican restaurants from CA, TX, AZ (with Google enrichment)')
+    ->onSuccess(function () {
+        \Log::info('Daily import (Monday) completed successfully');
+    })
+    ->onFailure(function () {
+        \Log::error('Daily import (Monday) failed');
+    });
+
+// Tuesday: NM, NV, CO, IL
+Schedule::command('yelp:import-bulk --states=NM --states=NV --states=CO --states=IL --cities-per-state=3 --min-rating=3.5 --enrich --delay=3')
+    ->cron('0 2 * * 2')
+    ->timezone('America/New_York')
+    ->description('DAILY import: Mexican restaurants from NM, NV, CO, IL (with Google enrichment)')
+    ->onSuccess(function () {
+        \Log::info('Daily import (Tuesday) completed successfully');
+    });
+
+// Wednesday: FL, NY, GA, NC
+Schedule::command('yelp:import-bulk --states=FL --states=NY --states=GA --states=NC --cities-per-state=3 --min-rating=3.5 --enrich --delay=3')
+    ->cron('0 2 * * 3')
+    ->timezone('America/New_York')
+    ->description('DAILY import: Mexican restaurants from FL, NY, GA, NC (with Google enrichment)')
+    ->onSuccess(function () {
+        \Log::info('Daily import (Wednesday) completed successfully');
+    });
+
+// Thursday: WA, OR, UT, OK
+Schedule::command('yelp:import-bulk --states=WA --states=OR --states=UT --states=OK --cities-per-state=3 --min-rating=3.5 --enrich --delay=3')
+    ->cron('0 2 * * 4')
+    ->timezone('America/New_York')
+    ->description('DAILY import: Mexican restaurants from WA, OR, UT, OK (with Google enrichment)')
+    ->onSuccess(function () {
+        \Log::info('Daily import (Thursday) completed successfully');
+    });
+
+// Friday: KS, NE, IA, MO
+Schedule::command('yelp:import-bulk --states=KS --states=NE --states=IA --states=MO --cities-per-state=3 --min-rating=3.5 --enrich --delay=3')
+    ->cron('0 2 * * 5')
+    ->timezone('America/New_York')
+    ->description('DAILY import: Mexican restaurants from KS, NE, IA, MO (with Google enrichment)')
+    ->onSuccess(function () {
+        \Log::info('Daily import (Friday) completed successfully');
+    });
+
+// Saturday: Remaining states (Part 1)
+Schedule::command('yelp:import-bulk --states=AR --states=LA --states=MS --states=AL --states=TN --states=KY --cities-per-state=2 --min-rating=3.5 --enrich --delay=3')
+    ->cron('0 2 * * 6')
+    ->timezone('America/New_York')
+    ->description('DAILY import: Mexican restaurants from AR, LA, MS, AL, TN, KY (with Google enrichment)')
+    ->onSuccess(function () {
+        \Log::info('Daily import (Saturday) completed successfully');
+    });
+
+// Sunday: Remaining states (Part 2)
+Schedule::command('yelp:import-bulk --states=IN --states=OH --states=MI --states=WI --states=MN --states=PA --cities-per-state=2 --min-rating=3.5 --enrich --delay=3')
+    ->cron('0 2 * * 0')
+    ->timezone('America/New_York')
+    ->description('DAILY import: Mexican restaurants from IN, OH, MI, WI, MN, PA (with Google enrichment)')
+    ->onSuccess(function () {
+        \Log::info('Daily import (Sunday) completed successfully');
+    });
+
+/**
+ * Run duplicate detection DAILY at 4:00 AM
+ * (2 hours after imports complete)
+ * This ensures we clean up any duplicates from daily imports
+ * Uses --merge to preserve valuable data from all duplicates before removing
+ */
+Schedule::command('restaurants:detect-duplicates --remove --merge --similarity=80')
+    ->cron('0 4 * * *')
+    ->timezone('America/New_York')
+    ->description('DAILY duplicate detection and cleanup')
+    ->onSuccess(function () {
+        \Log::info('Daily duplicate detection completed successfully');
+    })
+    ->onFailure(function () {
+        \Log::error('Daily duplicate detection failed');
+    });

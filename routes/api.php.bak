@@ -1,0 +1,88 @@
+<?php
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\RestaurantController;
+use App\Http\Controllers\Api\SubscriberCouponApiController;
+
+/*
+|--------------------------------------------------------------------------
+| API Routes
+|--------------------------------------------------------------------------
+*/
+
+// Public API routes (no authentication required)
+Route::prefix('v1')->group(function () {
+
+    // Restaurants
+    Route::get('/restaurants', [RestaurantController::class, 'index']);
+    Route::get('/restaurants/nearby', [RestaurantController::class, 'nearby']);
+    Route::get('/restaurants/featured', [RestaurantController::class, 'featured']);
+    Route::get('/restaurants/popular', [RestaurantController::class, 'popular']);
+    Route::get('/restaurants/search', [RestaurantController::class, 'search']);
+    Route::get('/restaurants/{id}', [RestaurantController::class, 'show']);
+
+    // Categories & States
+    Route::get('/categories', [RestaurantController::class, 'categories']);
+    Route::get('/states', [RestaurantController::class, 'states']);
+
+    // MF Group Subscriber Coupons API
+    // Used by other MF Group businesses to validate and redeem coupons
+    Route::prefix('subscriber-coupons')->group(function () {
+        Route::post('/validate', [SubscriberCouponApiController::class, 'validate']);
+        Route::post('/redeem', [SubscriberCouponApiController::class, 'redeem']);
+        Route::get('/{code}', [SubscriberCouponApiController::class, 'show']);
+    });
+
+    // Subscription Benefits
+    Route::get('/subscription-benefits/{tier}', [SubscriberCouponApiController::class, 'benefits']);
+
+    // Health check
+    Route::get('/health', function () {
+        return response()->json([
+            'success' => true,
+            'message' => 'Famer API is running',
+            'version' => 'v1',
+            'timestamp' => now()->toIso8601String(),
+        ]);
+    });
+});
+
+// Protected API routes (authentication required)
+Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
+
+    // User profile
+    Route::get('/user', function (Request $request) {
+        return response()->json([
+            'success' => true,
+            'data' => $request->user(),
+        ]);
+    });
+});
+
+/*
+|--------------------------------------------------------------------------
+| Carmen AI Assistant API Routes
+|--------------------------------------------------------------------------
+*/
+use App\Http\Controllers\Api\CarmenApiController;
+
+Route::prefix(carmen)->middleware(api)->group(function () {
+    // Order status lookup
+    Route::post(/order-status, [CarmenApiController::class, orderStatus]);
+
+    // Reservation status lookup
+    Route::post(/reservation-status, [CarmenApiController::class, reservationStatus]);
+
+    // Search restaurants
+    Route::post(/search-restaurant, [CarmenApiController::class, searchRestaurant]);
+
+    // Restaurant info
+    Route::post(/restaurant-info, [CarmenApiController::class, restaurantInfo]);
+
+    // Claim status lookup
+    Route::post(/claim-status, [CarmenApiController::class, claimStatus]);
+
+    // Owner dashboard summary
+    Route::post(/owner-summary, [CarmenApiController::class, ownerSummary]);
+});

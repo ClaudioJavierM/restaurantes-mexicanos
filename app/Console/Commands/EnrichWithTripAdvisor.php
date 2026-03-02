@@ -1,0 +1,118 @@
+<?php
+
+namespace App\Console\Commands;
+
+use App\Models\Restaurant;
+use App\Services\TripAdvisorService;
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
+
+class EnrichWithTripAdvisor extends Command
+{
+    protected $signature = 'tripadvisor:enrich-restaurants 
+                            {--limit=80 : Number of restaurants to process}
+                            {--delay=2 : Delay between API calls in seconds}
+                            {--force : Re-enrich restaurants that already have TripAdvisor data}';
+
+    protected $description = 'Enrich restaurants with TripAdvisor ratings and reviews';
+
+    protected TripAdvisorService $tripAdvisor;
+
+    public function __construct(TripAdvisorService $tripAdvisor)
+    {
+        parent::__construct();
+        $this->tripAdvisor = $tripAdvisor;
+    }
+
+    public function handle(): int
+    {
+        $limit = (int) $this->option('limit');
+        $delay = (int) $this->option('delay');
+        $force = $this->option('force');
+
+        // Check remaining API calls
+        $remaining = $this->tripAdvisor->getRemainingCalls();
+        $this->info("TripAdvisor API calls remaining today: {$remaining}");
+
+        if ($remaining < 2) {
+            $this->error('Daily API limit reached. Try again tomorrow.');
+            return 1;
+        }
+
+        // Each restaurant needs 2 API calls (search + details)
+        $maxRestaurants = min($limit, floor($remaining / 2));
+        
+        if ($maxRestaurants < 1) {
+            $this->error('Not enough API calls remaining.');
+            return 1;
+        }
+
+        $this->info("Processing up to {$maxRestaurants} restaurants...");
+
+        // Get restaurants to enrich (prioritize those with google data but no tripadvisor)
+        $query = Restaurant::where('status', 'approved')
+            ->whereNotNull('google_place_id');
+
+        if (!$force) {
+            $query->whereNull('tripadvisor_id');
+        }
+
+        $restaurants = $query->orderBy('google_rating', 'desc')
+            ->limit($maxRestaurants)
+            ->get();
+
+        if ($restaurants->isEmpty()) {
+            $this->info('No restaurants to enrich.');
+            return 0;
+        }
+
+        $enriched = 0;
+        $failed = 0;
+        $bar = $this->output->createProgressBar($restaurants->count());
+        $bar->start();
+
+        foreach ($restaurants as $restaurant) {
+            // Check if we still have API calls
+            if (!$this->tripAdvisor->canMakeCall()) {
+                $this->warn("\nDaily limit reached. Stopping.");
+                break;
+            }
+
+            try {
+                $data = $this->tripAdvisor->enrichRestaurant($restaurant);
+
+                if ($data) {
+                    $data['tripadvisor_last_sync'] = now();
+                    $restaurant->update($data);
+                    $enriched++;
+
+                    Log::info("TripAdvisor enriched: {$restaurant->name}", [
+                        'id' => $restaurant->id,
+                        'tripadvisor_id' => $data['tripadvisor_id'] ?? null,
+                        'rating' => $data['tripadvisor_rating'] ?? null,
+                    ]);
+                } else {
+                    $failed++;
+                    Log::debug("TripAdvisor not found: {$restaurant->name}");
+                }
+            } catch (\Exception $e) {
+                $failed++;
+                Log::error("TripAdvisor error for {$restaurant->name}: " . $e->getMessage());
+            }
+
+            $bar->advance();
+            
+            if ($delay > 0) {
+                sleep($delay);
+            }
+        }
+
+        $bar->finish();
+        $this->newLine(2);
+
+        $this->info("Completed: {$enriched} enriched, {$failed} not found");
+        $this->info("API calls remaining: " . $this->tripAdvisor->getRemainingCalls());
+
+        return 0;
+    }
+}

@@ -1,0 +1,14 @@
+<div>
+@if($isMexico)
+    @include("partials.mexico.hero")
+    @include("partials.mexico.top100")
+    @include("partials.mexico.top-states")
+    @include("partials.mexico.about")
+@else
+    @include("partials.usa.hero")
+    @include("partials.usa.top-restaurants")
+    @include("partials.usa.categories")
+    @include("partials.usa.top-states")
+    @include("partials.usa.about")
+@endif
+</div>

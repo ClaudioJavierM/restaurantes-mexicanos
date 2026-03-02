@@ -1,0 +1,300 @@
+<?php
+
+use Illuminate\Foundation\Inspiring;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
+
+Artisan::command('inspire', function () {
+    $this->comment(Inspiring::quote());
+})->purpose('Display an inspiring quote');
+
+// ============================================================================
+// Scheduled Tasks for Yelp Restaurant Imports - TARGET: 500/day
+// ============================================================================
+
+// Monday: High-volume states (CA, TX, AZ) - ~500 restaurants
+Schedule::command('yelp:import-bulk --states=CA --states=TX --states=AZ --cities-per-state=5 --limit=50 --min-rating=3.0 --enrich --delay=2')
+    ->cron('0 2 * * 1')
+    ->timezone('America/Mexico_City')
+    ->description('DAILY import ~500: Mexican restaurants from CA, TX, AZ');
+
+// Tuesday: NM, NV, CO, IL, FL - ~500 restaurants
+Schedule::command('yelp:import-bulk --states=NM --states=NV --states=CO --states=IL --states=FL --cities-per-state=4 --limit=50 --min-rating=3.0 --enrich --delay=2')
+    ->cron('0 2 * * 2')
+    ->timezone('America/Mexico_City')
+    ->description('DAILY import ~500: Mexican restaurants from NM, NV, CO, IL, FL');
+
+// Wednesday: NY, GA, NC, WA, OR - ~500 restaurants
+Schedule::command('yelp:import-bulk --states=NY --states=GA --states=NC --states=WA --states=OR --cities-per-state=4 --limit=50 --min-rating=3.0 --enrich --delay=2')
+    ->cron('0 2 * * 3')
+    ->timezone('America/Mexico_City')
+    ->description('DAILY import ~500: Mexican restaurants from NY, GA, NC, WA, OR');
+
+// Thursday: UT, OK, KS, NE, IA, MO - ~500 restaurants
+Schedule::command('yelp:import-bulk --states=UT --states=OK --states=KS --states=NE --states=IA --states=MO --cities-per-state=4 --limit=50 --min-rating=3.0 --enrich --delay=2')
+    ->cron('0 2 * * 4')
+    ->timezone('America/Mexico_City')
+    ->description('DAILY import ~500: Mexican restaurants from UT, OK, KS, NE, IA, MO');
+
+// Friday: AR, LA, MS, AL, TN, KY - ~500 restaurants
+Schedule::command('yelp:import-bulk --states=AR --states=LA --states=MS --states=AL --states=TN --states=KY --cities-per-state=4 --limit=50 --min-rating=3.0 --enrich --delay=2')
+    ->cron('0 2 * * 5')
+    ->timezone('America/Mexico_City')
+    ->description('DAILY import ~500: Mexican restaurants from AR, LA, MS, AL, TN, KY');
+
+// Saturday: IN, OH, MI, WI, MN, PA - ~500 restaurants
+Schedule::command('yelp:import-bulk --states=IN --states=OH --states=MI --states=WI --states=MN --states=PA --cities-per-state=4 --limit=50 --min-rating=3.0 --enrich --delay=2')
+    ->cron('0 2 * * 6')
+    ->timezone('America/Mexico_City')
+    ->description('DAILY import ~500: Mexican restaurants from IN, OH, MI, WI, MN, PA');
+
+// Sunday: Remaining states - ~500 restaurants
+Schedule::command('yelp:import-bulk --states=NJ --states=VA --states=MD --states=SC --states=MA --states=CT --cities-per-state=4 --limit=50 --min-rating=3.0 --enrich --delay=2')
+    ->cron('0 2 * * 0')
+    ->timezone('America/Mexico_City')
+    ->description('DAILY import ~500: Mexican restaurants from NJ, VA, MD, SC, MA, CT');
+
+// Duplicate detection DAILY at 4:00 AM
+Schedule::command('restaurants:detect-duplicates --remove --merge --similarity=80')
+    ->cron('0 4 * * *')
+    ->timezone('America/Mexico_City')
+    ->description('DAILY duplicate detection and cleanup');
+
+// Owner reminders - Mondays 10 AM
+Schedule::command('owners:send-reminders --days=30 --limit=100')
+    ->cron('0 10 * * 1')
+    ->timezone('America/Mexico_City')
+    ->description('WEEKLY reminder to inactive restaurant owners');
+
+// Claim invitations - Tues/Fri 11 AM
+Schedule::command('restaurants:send-claim-invitations --limit=100 --delay=3')
+    ->cron('0 11 * * *')
+    ->timezone('America/Mexico_City')
+    ->description('Send claim invitations to unclaimed restaurants');
+
+// ============================================================================
+// OTHER Mexican Business Types - Additional ~200/day
+// ============================================================================
+
+// TAQUERIAS - Daily 3 AM (rotating states)
+Schedule::command('yelp:import-bulk --states=CA --states=TX --states=AZ --states=NM --states=NV --cities-per-state=3 --limit=30 --min-rating=3.0 --delay=2 --search-term=taqueria --yelp-categories=tacos')
+    ->cron('0 3 * * *')
+    ->timezone('America/Mexico_City')
+    ->description('DAILY import Taquerias');
+
+// TORTILLERIAS - Mon/Wed/Fri 3:30 AM
+Schedule::command('yelp:import-bulk --states=CA --states=TX --states=AZ --states=IL --states=FL --cities-per-state=3 --limit=30 --min-rating=2.5 --delay=2 --search-term=tortilleria')
+    ->cron('30 3 * * 1,3,5')
+    ->timezone('America/Mexico_City')
+    ->description('Import Tortillerias');
+
+// FOOD TRUCKS - Tue/Thu/Sat 3:30 AM
+Schedule::command('yelp:import-bulk --states=CA --states=TX --states=AZ --states=CO --states=OR --cities-per-state=3 --limit=30 --min-rating=3.0 --delay=2 --search-term="mexican food truck" --yelp-categories=foodtrucks')
+    ->cron('30 3 * * 2,4,6')
+    ->timezone('America/Mexico_City')
+    ->description('Import Mexican Food Trucks');
+
+// PALETERIAS/BAKERIES - Sundays 3:30 AM
+Schedule::command('yelp:import-bulk --states=CA --states=TX --states=AZ --states=FL --states=GA --cities-per-state=3 --limit=30 --min-rating=3.0 --delay=2 --search-term="paleteria mexican bakery" --yelp-categories=icecream,bakeries')
+    ->cron('30 3 * * 0')
+    ->timezone('America/Mexico_City')
+    ->description('Import Paleterias and Mexican Bakeries');
+
+// Weekly Reports - Mondays 8 AM
+Schedule::command('reports:send-weekly')
+    ->cron('0 8 * * 1')
+    ->timezone('America/Mexico_City')
+    ->description('WEEKLY performance reports to restaurant owners');
+
+// ============================================================================
+// FAMER Awards Rankings & External Rating Sync
+// ============================================================================
+
+// Google enrichment - DAILY 4:30 AM (increased to 300/day)
+Schedule::command('google:enrich-restaurants --limit=300 --delay=1')
+    ->cron('30 4 * * *')
+    ->timezone('America/Mexico_City')
+    ->description('DAILY Google Places enrichment for 300 restaurants');
+
+// Calculate FAMER Rankings - Weekly Sundays 5 AM
+Schedule::command('rankings:calculate')
+    ->cron('0 5 * * 0')
+    ->timezone('America/Mexico_City')
+    ->description('WEEKLY FAMER Awards ranking calculation');
+
+// Full ranking recalculation with external sync - Monthly 1st at 3 AM
+Schedule::command('rankings:calculate --sync-external')
+    ->cron('0 3 1 * *')
+    ->timezone('America/Mexico_City')
+    ->description('MONTHLY full ranking calculation with external rating sync');
+
+// ============================================================================
+// Data Enrichment - ALL SOURCES
+// ============================================================================
+
+// Facebook enrichment - DAILY 6 AM (increased to 200/day)
+Schedule::command('facebook:enrich-restaurants --limit=200')
+    ->cron('0 6 * * *')
+    ->timezone('America/Mexico_City')
+    ->description('DAILY Facebook enrichment for 200 restaurants');
+// TripAdvisor enrichment - DAILY 7 AM (80 restaurants = 160 API calls, under 166 daily limit)
+Schedule::command("tripadvisor:enrich-restaurants --limit=80 --delay=2")
+    ->cron("0 7 * * *")
+    ->timezone("America/Mexico_City")
+    ->description("DAILY TripAdvisor enrichment for 80 restaurants");
+
+// Street View photos - DAILY 5:30 AM (increased to 150/day)
+Schedule::command('restaurants:download-streetview --limit=150')
+    ->cron('30 5 * * *')
+    ->timezone('America/Mexico_City')
+    ->description('DAILY Street View photo download for 150 restaurants');
+
+// Yelp ratings sync - DAILY 6:30 AM (increased to 300/day)
+Schedule::command('yelp:sync-ratings --limit=300 --days=14')
+    ->cron('30 6 * * *')
+    ->timezone('America/Mexico_City')
+    ->description('DAILY Yelp ratings sync for 300 restaurants');
+
+// Yelp photos backfill - DAILY 7 AM (increased to 150/day)
+Schedule::command('yelp:fetch-photos --limit=150')
+    ->cron('0 7 * * *')
+    ->timezone('America/Mexico_City')
+    ->description('DAILY Yelp photos fetch for 150 restaurants');
+
+// FAMER Awards 2026 - Monthly badges assignment - 1st of each month at 2 AM
+Schedule::command("famer:assign-badges")
+    ->cron("0 2 1 * *")
+    ->timezone("America/Mexico_City")
+    ->description("Assign monthly FAMER badges to top restaurants");
+
+// ============================================================================
+// Data Backfill - Link existing restaurants to external sources
+// ============================================================================
+
+// Yelp Backfill - DAILY 8 AM (link restaurants without yelp_id)
+Schedule::command("yelp:backfill --limit=300 --delay=2")
+    ->cron("0 8 * * *")
+    ->timezone("America/Mexico_City")
+    ->description("DAILY Yelp backfill for 300 restaurants without yelp_id");
+
+// ============================================================================
+// MEXICO IMPORTS - Using separate API key (5000/month limit)
+// ============================================================================
+
+/**
+ * Import MEXICO restaurants - Daily at 6:00 AM
+ * Rotates through Mexican states throughout the week
+ * Uses YELP_API_KEY_MEXICO with 5000/month limit (~160/day)
+ * 
+ * Monday: Major cities (CMX, JAL, NLE)
+ * Tuesday: Tourist destinations (ROO, BCN, BCS)
+ * Wednesday: Central states (GUA, QUE, PUE)
+ * Thursday: Northern states (SON, CHH, COA)
+ * Friday: Southern states (OAX, CHP, YUC)
+ * Saturday: Pacific coast (SIN, NAY, COL, GRO)
+ * Sunday: Remaining states
+ */
+
+// Monday: Major cities
+Schedule::command('yelp:import-mexico --states=CMX --states=JAL --states=NLE --cities-per-state=3 --limit=15 --delay=3 --enrich')
+    ->cron('0 6 * * 1')
+    ->timezone('America/Mexico_City')
+    ->description('Mexico import: Major cities (CDMX, Guadalajara, Monterrey)');
+
+// Tuesday: Tourist destinations  
+Schedule::command('yelp:import-mexico --states=ROO --states=BCN --states=BCS --cities-per-state=3 --limit=15 --delay=3 --enrich')
+    ->cron('0 6 * * 2')
+    ->timezone('America/Mexico_City')
+    ->description('Mexico import: Tourist destinations (Cancun, Tijuana, Los Cabos)');
+
+// Wednesday: Central states
+Schedule::command('yelp:import-mexico --states=GUA --states=QUE --states=PUE --states=HID --cities-per-state=2 --limit=15 --delay=3 --enrich')
+    ->cron('0 6 * * 3')
+    ->timezone('America/Mexico_City')
+    ->description('Mexico import: Central states');
+
+// Thursday: Northern states
+Schedule::command('yelp:import-mexico --states=SON --states=CHH --states=COA --states=TAM --cities-per-state=2 --limit=15 --delay=3 --enrich')
+    ->cron('0 6 * * 4')
+    ->timezone('America/Mexico_City')
+    ->description('Mexico import: Northern states');
+
+// Friday: Southern states
+Schedule::command('yelp:import-mexico --states=OAX --states=CHP --states=YUC --states=VER --cities-per-state=2 --limit=15 --delay=3 --enrich')
+    ->cron('0 6 * * 5')
+    ->timezone('America/Mexico_City')
+    ->description('Mexico import: Southern states');
+
+// Saturday: Pacific coast
+Schedule::command('yelp:import-mexico --states=SIN --states=NAY --states=COL --states=GRO --states=MIC --cities-per-state=2 --limit=15 --delay=3 --enrich')
+    ->cron('0 6 * * 6')
+    ->timezone('America/Mexico_City')
+    ->description('Mexico import: Pacific coast states');
+
+// Sunday: Remaining states
+Schedule::command('yelp:import-mexico --states=AGU --states=SLP --states=DUR --states=ZAC --states=MOR --states=MEX --cities-per-state=2 --limit=10 --delay=3 --enrich')
+    ->cron('0 6 * * 0')
+    ->timezone('America/Mexico_City')
+    ->description('Mexico import: Remaining states');
+
+// ============================================================================
+// USA ZIP CODE BASED IMPORT (~300 restaurants/day for sustainable API usage)
+// ============================================================================
+Schedule::command("yelp:import-zipcodes --api-key=us3 --limit=15 --per-city=20 --delay=2")
+    ->cron("0 1 * * *")
+    ->timezone("America/Mexico_City")
+    ->description("DAILY import from zip codes - 15 cities x 20 restaurants = ~300/day");
+
+// Foursquare enrichment - DAILY 7:30 AM (250 restaurants = 500 API calls)
+Schedule::command('foursquare:enrich-restaurants --limit=250 --delay=1')
+    ->cron('30 7 * * *')
+    ->timezone('America/Mexico_City')
+    ->description('DAILY Foursquare enrichment for 250 restaurants');
+
+// ============================================================================
+// BACKFILL REVIEW COUNTS FOR OLD RESTAURANTS
+// ============================================================================
+// Enrich restaurants that have google_place_id but no google_rating (missing data)
+Schedule::command('restaurants:enrich-review-counts --platform=google --missing-ratings --limit=200')
+    ->cron('0 5 * * *')
+    ->timezone('America/Mexico_City')
+    ->description('DAILY backfill: Enrich old restaurants with Google ratings/review counts');
+
+// ============================================================================
+// FAMER SCORE RECALCULATION - Daily update of weighted ratings
+// ============================================================================
+Schedule::command('famer:recalculate-scores')
+    ->cron('0 4 * * *')
+    ->timezone('America/Mexico_City')
+    ->description('DAILY: Recalculate FAMER Scores for all restaurants');
+
+// ============================================================================
+// FAMER EMAIL SEQUENCE - Automated email campaign
+// ============================================================================
+
+// Email 1: Introduction - Sent to new contacts DAILY at 9 AM
+// CENTRALIZED IN N8N: Schedule::command("famer:send-emails --email1 --limit=100")
+//     ->cron("0 9 * * *")
+//     ->timezone("America/Mexico_City")
+//     ->description("DAILY: Send FAMER introduction emails to new contacts");
+
+// Email 2: How It Works - 7-day follow-up DAILY at 10 AM  
+// CENTRALIZED IN N8N: Schedule::command("famer:send-emails --email2 --limit=100")
+//     ->cron("0 10 * * *")
+//     ->timezone("America/Mexico_City")
+//     ->description("DAILY: Send FAMER how-it-works emails (7-day follow-up)");
+
+// Email 3: Final Reminder - 14-day follow-up DAILY at 11 AM
+// CENTRALIZED IN N8N: Schedule::command("famer:send-emails --email3 --limit=100")
+//     ->cron("0 11 * * *")
+//     ->timezone("America/Mexico_City")
+//     ->description("DAILY: Send FAMER reminder emails (final follow-up)");
+
+
+// ============================================================================
+// SMS MARKETING AUTOMATION - Process automations every 5 minutes
+// ============================================================================
+Schedule::job(new \App\Jobs\ProcessSmsAutomations())
+    ->everyFiveMinutes()
+    ->timezone("America/Mexico_City")
+    ->description("Process SMS automations (abandoned cart, win-back, birthday, etc.)");
