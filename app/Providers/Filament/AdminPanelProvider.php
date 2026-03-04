@@ -3,65 +3,22 @@
 namespace App\Providers\Filament;
 
 use Filament\Http\Middleware\Authenticate;
-use Filament\Support\Enums\PanelsRenderHook;
-use Illuminate\Support\HtmlString;
-use Filament\Support\Enums\PanelsRenderHook;
 use Filament\Http\Middleware\AuthenticateSession;
-use Filament\Support\Enums\PanelsRenderHook;
-use Illuminate\Support\HtmlString;
-use Filament\Support\Enums\PanelsRenderHook;
 use Filament\Http\Middleware\DisableBladeIconComponents;
-use Filament\Support\Enums\PanelsRenderHook;
-use Illuminate\Support\HtmlString;
-use Filament\Support\Enums\PanelsRenderHook;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Support\Enums\PanelsRenderHook;
-use Illuminate\Support\HtmlString;
-use Filament\Support\Enums\PanelsRenderHook;
 use Filament\Pages;
-use Filament\Support\Enums\PanelsRenderHook;
-use Illuminate\Support\HtmlString;
-use Filament\Support\Enums\PanelsRenderHook;
 use Filament\Panel;
-use Filament\Support\Enums\PanelsRenderHook;
-use Illuminate\Support\HtmlString;
-use Filament\Support\Enums\PanelsRenderHook;
 use Filament\PanelProvider;
-use Filament\Support\Enums\PanelsRenderHook;
-use Illuminate\Support\HtmlString;
-use Filament\Support\Enums\PanelsRenderHook;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\PanelsRenderHook;
-use Illuminate\Support\HtmlString;
-use Filament\Support\Enums\PanelsRenderHook;
 use Filament\Widgets;
-use Filament\Support\Enums\PanelsRenderHook;
-use Illuminate\Support\HtmlString;
-use Filament\Support\Enums\PanelsRenderHook;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
-use Filament\Support\Enums\PanelsRenderHook;
-use Illuminate\Support\HtmlString;
-use Filament\Support\Enums\PanelsRenderHook;
 use Illuminate\Cookie\Middleware\EncryptCookies;
-use Filament\Support\Enums\PanelsRenderHook;
-use Illuminate\Support\HtmlString;
-use Filament\Support\Enums\PanelsRenderHook;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
-use Filament\Support\Enums\PanelsRenderHook;
-use Illuminate\Support\HtmlString;
-use Filament\Support\Enums\PanelsRenderHook;
 use Illuminate\Routing\Middleware\SubstituteBindings;
-use Filament\Support\Enums\PanelsRenderHook;
-use Illuminate\Support\HtmlString;
-use Filament\Support\Enums\PanelsRenderHook;
 use Illuminate\Session\Middleware\StartSession;
-use Filament\Support\Enums\PanelsRenderHook;
 use Illuminate\Support\HtmlString;
-use Filament\Support\Enums\PanelsRenderHook;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use Filament\Support\Enums\PanelsRenderHook;
-use Illuminate\Support\HtmlString;
-use Filament\Support\Enums\PanelsRenderHook;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -70,10 +27,6 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->default()
             ->id('admin')
-            ->renderHook(
-                'panels::body.end',
-                fn () => new HtmlString('<script src="/fix-widget.js"></script>')
-            )
             ->path('admin')
             ->login()
             ->colors([
