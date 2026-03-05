@@ -12,6 +12,7 @@ Artisan::command('inspire', function () {
 // ============================================================================
 // Helper function to notify n8n on job failure
 // ============================================================================
+if (!function_exists('notifyN8nFailure')) {
 function notifyN8nFailure(string $jobName, string $description): void
 {
     try {
@@ -21,6 +22,7 @@ function notifyN8nFailure(string $jobName, string $description): void
         \Log::error("Failed to notify n8n: " . $e->getMessage());
     }
 }
+} // end function_exists guard
 
 // ============================================================================
 // Scheduled Tasks for Yelp Restaurant Imports

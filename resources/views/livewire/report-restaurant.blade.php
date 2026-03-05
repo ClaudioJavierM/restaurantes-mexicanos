@@ -63,7 +63,7 @@
                                     @endforeach
                                 </select>
                                 @error('issue_type')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    <p class="mt-1 text-sm text-danger-600">{{ $message }}</p>
                                 @enderror
                             </div>
 
@@ -80,7 +80,7 @@
                                     placeholder="Por favor describe el problema en detalle..."
                                 ></textarea>
                                 @error('description')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    <p class="mt-1 text-sm text-danger-600">{{ $message }}</p>
                                 @enderror
                             </div>
 
@@ -97,7 +97,7 @@
                                     placeholder="Juan Pérez"
                                 />
                                 @error('name')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    <p class="mt-1 text-sm text-danger-600">{{ $message }}</p>
                                 @enderror
                             </div>
 
@@ -114,7 +114,7 @@
                                     placeholder="correo@ejemplo.com"
                                 />
                                 @error('email')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    <p class="mt-1 text-sm text-danger-600">{{ $message }}</p>
                                 @enderror
                             </div>
                         </div>

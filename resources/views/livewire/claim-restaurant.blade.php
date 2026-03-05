@@ -73,7 +73,7 @@
 
         {{-- Flash Messages --}}
         @if (session()->has('error'))
-            <div class="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+            <div class="mb-6 bg-danger-50 border border-danger-200 text-danger-700 px-4 py-3 rounded-lg">
                 {{ session('error') }}
             </div>
         @endif
@@ -134,7 +134,7 @@
                                 placeholder="{{ __('app.claim_search_placeholder') }}"
                             >
                             @error('search')
-                                <span class="text-red-600 text-sm mt-1">{{ $message }}</span>
+                                <span class="text-danger-600 text-sm mt-1">{{ $message }}</span>
                             @enderror
                         </div>
 
@@ -270,7 +270,7 @@
                             placeholder="John Smith"
                         >
                         @error('ownerName')
-                            <span class="text-red-600 text-sm mt-1">{{ $message }}</span>
+                            <span class="text-danger-600 text-sm mt-1">{{ $message }}</span>
                         @enderror
                     </div>
 
@@ -285,7 +285,7 @@
                             placeholder="john@restaurant.com"
                         >
                         @error('ownerEmail')
-                            <span class="text-red-600 text-sm mt-1">{{ $message }}</span>
+                            <span class="text-danger-600 text-sm mt-1">{{ $message }}</span>
                         @enderror
                     </div>
 
@@ -300,7 +300,7 @@
                             placeholder="(555) 123-4567"
                         >
                         @error('ownerPhone')
-                            <span class="text-red-600 text-sm mt-1">{{ $message }}</span>
+                            <span class="text-danger-600 text-sm mt-1">{{ $message }}</span>
                         @enderror
                     </div>
 
@@ -312,8 +312,8 @@
 
                         @if(count($availableMethods) === 0)
                             {{-- No methods available --}}
-                            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
-                                <p class="text-sm text-red-800">
+                            <div class="bg-danger-50 border border-danger-200 rounded-lg p-4">
+                                <p class="text-sm text-danger-800">
                                     <svg class="w-5 h-5 inline mr-2" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
                                     </svg>
@@ -494,10 +494,10 @@
                             inputmode="numeric"
                         >
                         @error('verificationCode')
-                            <span class="text-red-600 text-sm mt-1 block text-center">{{ $message }}</span>
+                            <span class="text-danger-600 text-sm mt-1 block text-center">{{ $message }}</span>
                         @enderror
                         @if($codeError)
-                            <span class="text-red-600 text-sm mt-1 block text-center">{{ $codeError }}</span>
+                            <span class="text-danger-600 text-sm mt-1 block text-center">{{ $codeError }}</span>
                         @endif
                     </div>
 
@@ -784,8 +784,8 @@
                             </div>
 
                             @if($couponMessage)
-                                <div class="mt-3 p-3 rounded-lg {{ $couponApplied ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200' }}">
-                                    <p class="text-sm {{ $couponApplied ? 'text-green-800' : 'text-red-800' }} flex items-center gap-2">
+                                <div class="mt-3 p-3 rounded-lg {{ $couponApplied ? 'bg-green-50 border border-green-200' : 'bg-danger-50 border border-danger-200' }}">
+                                    <p class="text-sm {{ $couponApplied ? 'text-green-800' : 'text-danger-800' }} flex items-center gap-2">
                                         @if($couponApplied)
                                             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>

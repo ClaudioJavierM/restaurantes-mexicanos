@@ -11,10 +11,10 @@
     @endpush
 
     <!-- Header -->
-    <div class="bg-gradient-to-r from-red-600 to-red-700 text-white">
+    <div class="bg-gradient-to-r from-gray-900 to-gray-800 border-b-4 border-[#D4A54A] text-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <h1 class="text-4xl font-bold mb-2">Restaurantes Mexicanos</h1>
-            <p class="text-red-100">Descubre los mejores restaurantes mexicanos en Estados Unidos</p>
+            <p class="text-gray-300">Descubre los mejores restaurantes mexicanos en Estados Unidos</p>
         </div>
     </div>
 
@@ -377,7 +377,7 @@
 
                                             {{-- Badge: Yelp --}}
                                             @if($restaurant->yelp_id || $restaurant->import_source === 'yelp')
-                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-600 text-white shadow-sm" title="Datos verificados con Yelp">
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#AF0606] text-white shadow-sm" title="Datos verificados con Yelp">
                                                     <svg class="w-3 h-3 mr-1" viewBox="0 0 24 24" fill="currentColor">
                                                         <path d="M20.16 12.594l-4.995 1.433c-.96.276-1.74-.8-1.176-1.63l2.905-4.308a1.072 1.072 0 011.596-.206 9.194 9.194 0 011.67 4.711zm-6.227 7.726a1.07 1.07 0 01-1.253.69 9.195 9.195 0 01-3.891-2.532c-.643-.72-.08-1.835.85-1.68l4.804.803c.984.164 1.25 1.733.49 2.719zm-6.178-2.818a1.07 1.07 0 01-.337 1.387 9.2 9.2 0 01-4.436 1.564 1.072 1.072 0 01-1.11-1.398l1.86-4.573c.36-.887 1.63-.994 1.914-.16l1.11 3.18zm-.765-4.742c.36.887-.537 1.763-1.35 1.32L1.553 11.8a1.07 1.07 0 01-.174-1.603 9.2 9.2 0 013.56-2.702c.9-.36 1.798.573 1.438 1.455l-1.388 3.41zm8.78-6.078l-3.085 3.73c-.596.72-1.76.427-1.76-.44V5.31a1.07 1.07 0 01.922-1.06 9.19 9.19 0 014.504.872 1.073 1.073 0 01-.581 1.46z"/>
                                                     </svg>

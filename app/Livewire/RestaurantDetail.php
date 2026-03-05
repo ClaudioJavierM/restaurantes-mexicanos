@@ -250,6 +250,9 @@ class RestaurantDetail extends Component
             'popularMenuItems' => $popularMenuItems,
             'availableCategories' => $availableCategories,
             'visitorStats' => $visitorStats,
-        ])->layout('layouts.app', ['title' => $this->restaurant->name]);
+        ])->layout('layouts.app', [
+            'title' => $this->restaurant->name . ' — ' . $this->restaurant->city . ', ' . ($this->restaurant->state?->name ?? ''),
+            'seoRestaurant' => $this->restaurant,
+        ]);
     }
 }

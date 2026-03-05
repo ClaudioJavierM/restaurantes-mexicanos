@@ -582,7 +582,7 @@
         <div class="mt-12 text-center">
             <div class="inline-flex items-center gap-4 bg-white rounded-full py-2 pl-6 pr-2 shadow-lg border border-gray-200">
                 <p class="text-gray-700">
-                    <strong class="text-red-600">Ahorra hasta $3,000/año</strong> comparado con Yelp Premium
+                    <strong class="text-[#AF0606]">Ahorra hasta $3,000/año</strong> comparado con Yelp Premium
                 </p>
                 <a href="{{ route('claim.restaurant') }}" class="bg-red-600 text-white px-6 py-2 rounded-full font-bold hover:bg-red-700 transition">
                     Empezar Gratis

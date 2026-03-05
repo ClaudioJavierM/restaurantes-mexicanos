@@ -122,6 +122,9 @@ Route::get("/menu/{slug}", [App\Http\Controllers\DeepLinkController::class, "men
 Route::get("/app/{slug}", [App\Http\Controllers\DeepLinkController::class, "pwaApp"])->name("deeplink.pwa");
 
 
+// Restaurant Website (Premium/Elite - standalone website)
+Route::get("/sitio/{slug}", App\Livewire\RestaurantWebsite::class)->name("restaurant.website");
+
 // PWA Restaurant View (Elite White-Label)
 Route::get("/pwa/{slug}", App\Livewire\PwaRestaurant::class)->name("pwa.restaurant");
 
