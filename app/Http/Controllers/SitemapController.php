@@ -7,118 +7,247 @@ use App\Models\State;
 use App\Models\Category;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class SitemapController extends Controller
 {
     /**
-     * Generate dynamic sitemap.xml
+     * Sitemap index — links to sub-sitemaps.
+     * Google recommends splitting large sitemaps for faster processing.
      */
     public function index(): Response
     {
-        // Use domain-specific cache key so each domain gets its own sitemap
-        $currentDomain = request()->getHost();
-        $cacheKey = 'sitemap_xml_' . md5($currentDomain);
+        $baseUrl = $this->getBaseUrl();
+        $cacheKey = 'sitemap_index_' . md5($baseUrl);
 
-        $xml = Cache::remember($cacheKey, 3600, function () use ($currentDomain) {
-            return $this->generateSitemap($currentDomain);
+        $xml = Cache::remember($cacheKey, 3600, function () use ($baseUrl) {
+            $xml = '<?xml version="1.0" encoding="UTF-8"?>';
+            $xml .= '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+
+            $xml .= '<sitemap>';
+            $xml .= '<loc>' . $baseUrl . '/sitemap-main.xml</loc>';
+            $xml .= '<lastmod>' . now()->format('Y-m-d') . '</lastmod>';
+            $xml .= '</sitemap>';
+
+            // Split restaurants into chunks of 5,000
+            $totalRestaurants = Restaurant::approved()->count();
+            $chunks = ceil($totalRestaurants / 5000);
+
+            for ($i = 1; $i <= $chunks; $i++) {
+                $xml .= '<sitemap>';
+                $xml .= '<loc>' . $baseUrl . '/sitemap-restaurants-' . $i . '.xml</loc>';
+                $xml .= '<lastmod>' . now()->format('Y-m-d') . '</lastmod>';
+                $xml .= '</sitemap>';
+            }
+
+            $xml .= '<sitemap>';
+            $xml .= '<loc>' . $baseUrl . '/sitemap-guides.xml</loc>';
+            $xml .= '<lastmod>' . now()->format('Y-m-d') . '</lastmod>';
+            $xml .= '</sitemap>';
+
+            $xml .= '<sitemap>';
+            $xml .= '<loc>' . $baseUrl . '/sitemap-rankings.xml</loc>';
+            $xml .= '<lastmod>' . now()->format('Y-m-d') . '</lastmod>';
+            $xml .= '</sitemap>';
+
+            $xml .= '</sitemapindex>';
+
+            return $xml;
         });
 
-        return response($xml, 200)
-            ->header('Content-Type', 'application/xml');
+        return $this->xmlResponse($xml);
     }
 
     /**
-     * Generate sitemap XML content
+     * Main pages sitemap (homepage, static pages, categories).
      */
-    protected function generateSitemap(string $currentDomain): string
+    public function main(): Response
     {
-        // Set base URL based on domain - handle .com.mx BEFORE .com
-        $baseUrl = match(true) {
+        $baseUrl = $this->getBaseUrl();
+        $cacheKey = 'sitemap_main_' . md5($baseUrl);
+
+        $xml = Cache::remember($cacheKey, 3600, function () use ($baseUrl) {
+            $xml = $this->openUrlset();
+
+            // Homepage
+            $xml .= $this->addUrl($baseUrl . '/', now(), 'daily', '1.0');
+
+            // Restaurant listing
+            $xml .= $this->addUrl($baseUrl . '/restaurantes', now(), 'daily', '0.9');
+
+            // Suggest page
+            $xml .= $this->addUrl($baseUrl . '/sugerir', now()->subMonth(), 'monthly', '0.5');
+
+            // Category pages (clean URLs, not query strings)
+            $categories = Category::has('restaurants')->select('slug', 'updated_at')->get();
+            foreach ($categories as $category) {
+                $xml .= $this->addUrl(
+                    $baseUrl . '/restaurantes/categoria/' . $category->slug,
+                    $category->updated_at ?? now()->subWeek(),
+                    'daily',
+                    '0.7'
+                );
+            }
+
+            $xml .= '</urlset>';
+            return $xml;
+        });
+
+        return $this->xmlResponse($xml);
+    }
+
+    /**
+     * Restaurant pages sitemap (paginated, 5,000 per file).
+     */
+    public function restaurants(int $page = 1): Response
+    {
+        $baseUrl = $this->getBaseUrl();
+        $cacheKey = 'sitemap_restaurants_' . $page . '_' . md5($baseUrl);
+
+        $xml = Cache::remember($cacheKey, 3600, function () use ($baseUrl, $page) {
+            $xml = $this->openUrlset();
+
+            $restaurants = Restaurant::approved()
+                ->select('slug', 'updated_at')
+                ->orderBy('id')
+                ->offset(($page - 1) * 5000)
+                ->limit(5000)
+                ->get();
+
+            foreach ($restaurants as $restaurant) {
+                $xml .= $this->addUrl(
+                    $baseUrl . '/restaurante/' . $restaurant->slug,
+                    $restaurant->updated_at,
+                    'weekly',
+                    '0.8'
+                );
+            }
+
+            $xml .= '</urlset>';
+            return $xml;
+        });
+
+        return $this->xmlResponse($xml);
+    }
+
+    /**
+     * City guides sitemap.
+     */
+    public function guides(): Response
+    {
+        $baseUrl = $this->getBaseUrl();
+        $cacheKey = 'sitemap_guides_' . md5($baseUrl);
+
+        $xml = Cache::remember($cacheKey, 3600, function () use ($baseUrl) {
+            $xml = $this->openUrlset();
+
+            // Guides index
+            $xml .= $this->addUrl($baseUrl . '/guia', now(), 'weekly', '0.8');
+
+            $states = State::has('restaurants')
+                ->select('id', 'name', 'code', 'slug', 'updated_at')
+                ->get();
+
+            // State guide pages
+            foreach ($states as $state) {
+                $xml .= $this->addUrl(
+                    $baseUrl . '/guia/' . strtolower($state->code ?? $state->name),
+                    $state->updated_at ?? now()->subWeek(),
+                    'weekly',
+                    '0.7'
+                );
+            }
+
+            // City guide pages
+            $cities = $this->getTopCities(500);
+            foreach ($cities as $city) {
+                if ($city->state_code && $city->city) {
+                    $xml .= $this->addUrl(
+                        $baseUrl . '/guia/' . strtolower($city->state_code) . '/' . Str::slug($city->city),
+                        $city->last_updated ? Carbon::parse($city->last_updated) : now()->subWeek(),
+                        'weekly',
+                        '0.7'
+                    );
+                }
+            }
+
+            $xml .= '</urlset>';
+            return $xml;
+        });
+
+        return $this->xmlResponse($xml);
+    }
+
+    /**
+     * Rankings sitemap ("mejores restaurantes mexicanos en...").
+     */
+    public function rankings(): Response
+    {
+        $baseUrl = $this->getBaseUrl();
+        $cacheKey = 'sitemap_rankings_' . md5($baseUrl);
+
+        $xml = Cache::remember($cacheKey, 3600, function () use ($baseUrl) {
+            $xml = $this->openUrlset();
+
+            // Top-level ranking pages
+            $xml .= $this->addUrl($baseUrl . '/mejores-restaurantes-mexicanos', now(), 'weekly', '0.9');
+            $xml .= $this->addUrl($baseUrl . '/top-10-restaurantes-mexicanos', now(), 'weekly', '0.9');
+
+            $states = State::has('restaurants')
+                ->select('id', 'name', 'code', 'slug', 'updated_at')
+                ->get();
+
+            // State ranking pages
+            foreach ($states as $state) {
+                $stateSlug = $state->slug ?? strtolower($state->code ?? '');
+                if ($stateSlug) {
+                    $xml .= $this->addUrl(
+                        $baseUrl . '/mejores/' . $stateSlug,
+                        $state->updated_at ?? now()->subWeek(),
+                        'weekly',
+                        '0.8'
+                    );
+                }
+            }
+
+            // City ranking pages (top 100)
+            $cities = $this->getTopCities(100);
+            foreach ($cities as $city) {
+                if ($city->state_code && $city->city) {
+                    $xml .= $this->addUrl(
+                        $baseUrl . '/mejores/' . strtolower($city->state_code) . '/' . Str::slug($city->city),
+                        $city->last_updated ? Carbon::parse($city->last_updated) : now()->subWeek(),
+                        'weekly',
+                        '0.8'
+                    );
+                }
+            }
+
+            $xml .= '</urlset>';
+            return $xml;
+        });
+
+        return $this->xmlResponse($xml);
+    }
+
+    // ─── Helpers ──────────────────────────────────────────
+
+    protected function getBaseUrl(): string
+    {
+        $currentDomain = request()->getHost();
+
+        return match (true) {
             str_contains($currentDomain, 'famousmexicanrestaurants') => 'https://famousmexicanrestaurants.com',
             str_contains($currentDomain, '.com.mx') => 'https://restaurantesmexicanosfamosos.com.mx',
             str_contains($currentDomain, 'restaurantesmexicanosfamosos') => 'https://restaurantesmexicanosfamosos.com',
             default => url('/'),
         };
+    }
 
-        $xml = '<?xml version="1.0" encoding="UTF-8"?>';
-        $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
-
-        // Homepage
-        $xml .= $this->addUrl($baseUrl . '/', now(), 'daily', '1.0');
-
-        // Restaurants index
-        $xml .= $this->addUrl($baseUrl . '/restaurantes', now(), 'daily', '0.9');
-
-        // Suggest page
-        $xml .= $this->addUrl($baseUrl . '/sugerir', now()->subMonth(), 'monthly', '0.5');
-
-        // Individual restaurants
-        $restaurants = Restaurant::approved()
-            ->select('slug', 'updated_at')
-            ->get();
-
-        foreach ($restaurants as $restaurant) {
-            $xml .= $this->addUrl(
-                $baseUrl . '/restaurante/' . $restaurant->slug,
-                $restaurant->updated_at,
-                'weekly',
-                '0.8'
-            );
-        }
-
-        // States pages (restaurants filtered by state)
-        $states = State::has('restaurants')
-            ->select('id', 'name', 'code', 'slug', 'updated_at')
-            ->get();
-
-        foreach ($states as $state) {
-            $xml .= $this->addUrl(
-                $baseUrl . '/restaurantes?state=' . urlencode($state->name),
-                $state->updated_at ?? now()->subWeek(),
-                'daily',
-                '0.7'
-            );
-        }
-
-        // Categories pages (restaurants filtered by category)
-        $categories = Category::has('restaurants')
-            ->select('slug', 'updated_at')
-            ->get();
-
-        foreach ($categories as $category) {
-            $xml .= $this->addUrl(
-                $baseUrl . '/restaurantes?category=' . $category->slug,
-                $category->updated_at ?? now()->subWeek(),
-                'daily',
-                '0.7'
-            );
-        }
-
-        // Advanced filter combinations (most common searches)
-        // Mexican regions
-        $regions = ['oaxaca', 'jalisco', 'michoacan', 'veracruz', 'yucatan', 'sinaloa'];
-        foreach ($regions as $region) {
-            $xml .= $this->addUrl(
-                $baseUrl . '/restaurantes?region=' . $region,
-                now()->subWeek(),
-                'weekly',
-                '0.6'
-            );
-        }
-
-        // Price ranges
-        $priceRanges = ['$', '$$', '$$$'];
-        foreach ($priceRanges as $price) {
-            $xml .= $this->addUrl(
-                $baseUrl . '/restaurantes?price=' . urlencode($price),
-                now()->subWeek(),
-                'weekly',
-                '0.6'
-            );
-        }
-
-        // City Guides - Individual city pages (top cities with restaurants)
-        $cities = Restaurant::query()
+    protected function getTopCities(int $limit): \Illuminate\Support\Collection
+    {
+        return Restaurant::query()
             ->join('states', 'restaurants.state_id', '=', 'states.id')
             ->where('restaurants.status', 'approved')
             ->where('restaurants.is_active', true)
@@ -129,82 +258,31 @@ class SitemapController extends Controller
             ->groupBy('restaurants.city', 'states.code')
             ->having('restaurant_count', '>=', 1)
             ->orderByDesc('restaurant_count')
-            ->limit(500) // Top 500 cities
+            ->limit($limit)
             ->get();
-
-        // SEO Ranking Pages (high priority for competitive keywords)
-        $xml .= $this->addUrl($baseUrl . '/mejores-restaurantes-mexicanos', now(), 'weekly', '0.9');
-        $xml .= $this->addUrl($baseUrl . '/top-10-restaurantes-mexicanos', now(), 'weekly', '0.9');
-
-        // Ranking pages by state
-        foreach ($states as $state) {
-            $stateSlug = $state->slug ?? strtolower($state->code ?? '');
-            if ($stateSlug) {
-                $xml .= $this->addUrl(
-                    $baseUrl . '/mejores/' . $stateSlug,
-                    $state->updated_at ?? now()->subWeek(),
-                    'weekly',
-                    '0.8'
-                );
-            }
-        }
-
-        // Ranking pages by city (top 100 cities for "mejores restaurantes mexicanos en [ciudad]")
-        foreach ($cities->take(100) as $city) {
-            if ($city->state_code && $city->city) {
-                $citySlug = \Str::slug($city->city);
-                $xml .= $this->addUrl(
-                    $baseUrl . '/mejores/' . strtolower($city->state_code) . '/' . $citySlug,
-                    $city->last_updated ? \Carbon\Carbon::parse($city->last_updated) : now()->subWeek(),
-                    'weekly',
-                    '0.8'
-                );
-            }
-        }
-
-        // City Guides - States listing page
-        $xml .= $this->addUrl($baseUrl . '/guia', now(), 'weekly', '0.8');
-
-        // City Guides - Individual state pages
-        foreach ($states as $state) {
-            $xml .= $this->addUrl(
-                $baseUrl . '/guia/' . strtolower($state->code ?? $state->name),
-                $state->updated_at ?? now()->subWeek(),
-                'weekly',
-                '0.7'
-            );
-        }
-
-        // City Guides - Individual city pages (reuse $cities from above)
-        foreach ($cities as $city) {
-            if ($city->state_code && $city->city) {
-                $citySlug = \Str::slug($city->city);
-                $xml .= $this->addUrl(
-                    $baseUrl . '/guia/' . strtolower($city->state_code) . '/' . $citySlug,
-                    $city->last_updated ? \Carbon\Carbon::parse($city->last_updated) : now()->subWeek(),
-                    'weekly',
-                    '0.7'
-                );
-            }
-        }
-
-        $xml .= '</urlset>';
-
-        return $xml;
     }
 
-    /**
-     * Add URL to sitemap
-     */
+    protected function openUrlset(): string
+    {
+        return '<?xml version="1.0" encoding="UTF-8"?>'
+            . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+    }
+
     protected function addUrl(string $url, $lastmod, string $changefreq, string $priority): string
     {
-        $xml = '<url>';
-        $xml .= '<loc>' . htmlspecialchars($url) . '</loc>';
-        $xml .= '<lastmod>' . $lastmod->format('Y-m-d') . '</lastmod>';
-        $xml .= '<changefreq>' . $changefreq . '</changefreq>';
-        $xml .= '<priority>' . $priority . '</priority>';
-        $xml .= '</url>';
+        return '<url>'
+            . '<loc>' . htmlspecialchars($url) . '</loc>'
+            . '<lastmod>' . $lastmod->format('Y-m-d') . '</lastmod>'
+            . '<changefreq>' . $changefreq . '</changefreq>'
+            . '<priority>' . $priority . '</priority>'
+            . '</url>';
+    }
 
-        return $xml;
+    protected function xmlResponse(string $xml): Response
+    {
+        return response($xml, 200)
+            ->header('Content-Type', 'application/xml')
+            ->header('Cache-Control', 'public, max-age=3600, s-maxage=86400')
+            ->header('Content-Encoding', 'identity');
     }
 }
