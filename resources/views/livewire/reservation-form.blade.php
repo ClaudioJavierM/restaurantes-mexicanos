@@ -107,7 +107,7 @@
                                 min="{{ now()->format('Y-m-d') }}"
                                 class="w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500"
                             >
-                            @error('reservationDate') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                            @error('reservationDate') <span class="text-danger-500 text-sm">{{ $message }}</span> @enderror
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Hora</label>
@@ -120,7 +120,7 @@
                                     <option value="{{ $value }}">{{ $label }}</option>
                                 @endforeach
                             </select>
-                            @error('reservationTime') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                            @error('reservationTime') <span class="text-danger-500 text-sm">{{ $message }}</span> @enderror
                         </div>
                     </div>
 
@@ -136,7 +136,7 @@
                                     <option value="{{ $value }}">{{ $label }}</option>
                                 @endforeach
                             </select>
-                            @error('partySize') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                            @error('partySize') <span class="text-danger-500 text-sm">{{ $message }}</span> @enderror
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Ocasión (opcional)</label>
@@ -164,7 +164,7 @@
                                         placeholder="Tu nombre"
                                         class="w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500"
                                     >
-                                    @error('guestName') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                    @error('guestName') <span class="text-danger-500 text-sm">{{ $message }}</span> @enderror
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
@@ -174,7 +174,7 @@
                                         placeholder="tu@email.com"
                                         class="w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500"
                                     >
-                                    @error('guestEmail') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                                    @error('guestEmail') <span class="text-danger-500 text-sm">{{ $message }}</span> @enderror
                                 </div>
                             </div>
                         </div>
@@ -189,7 +189,7 @@
                             placeholder="(555) 123-4567"
                             class="w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500"
                         >
-                        @error('guestPhone') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        @error('guestPhone') <span class="text-danger-500 text-sm">{{ $message }}</span> @enderror
                     </div>
 
                     <!-- Special Requests -->

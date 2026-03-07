@@ -30,8 +30,12 @@ Route::get('/team/accept/{token}', [TeamInvitationController::class, 'show'])->n
 Route::post('/team/accept/{token}', [TeamInvitationController::class, 'accept'])->name('team.invitation.accept');
 Route::post('/team/decline/{token}', [TeamInvitationController::class, 'decline'])->name('team.invitation.decline');
 
-// SEO Routes
+// SEO Routes — Sitemap index + sub-sitemaps
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
+Route::get('/sitemap-main.xml', [SitemapController::class, 'main'])->name('sitemap.main');
+Route::get('/sitemap-restaurants-{page}.xml', [SitemapController::class, 'restaurants'])->where('page', '[0-9]+')->name('sitemap.restaurants');
+Route::get('/sitemap-guides.xml', [SitemapController::class, 'guides'])->name('sitemap.guides');
+Route::get('/sitemap-rankings.xml', [SitemapController::class, 'rankings'])->name('sitemap.rankings');
 
 // City Guides (SEO)
 Route::prefix('guia')->group(function () {
@@ -121,6 +125,9 @@ Route::get("/r/{slug}", [App\Http\Controllers\DeepLinkController::class, "restau
 Route::get("/menu/{slug}", [App\Http\Controllers\DeepLinkController::class, "menu"])->name("deeplink.menu");
 Route::get("/app/{slug}", [App\Http\Controllers\DeepLinkController::class, "pwaApp"])->name("deeplink.pwa");
 
+
+// Restaurant Website (Premium/Elite - standalone website)
+Route::get("/sitio/{slug}", App\Livewire\RestaurantWebsite::class)->name("restaurant.website");
 
 // PWA Restaurant View (Elite White-Label)
 Route::get("/pwa/{slug}", App\Livewire\PwaRestaurant::class)->name("pwa.restaurant");

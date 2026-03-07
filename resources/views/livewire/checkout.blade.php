@@ -13,7 +13,7 @@
         </div>
 
         @if(session('error'))
-        <div class="mb-6 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg">
+        <div class="mb-6 bg-danger-100 border border-danger-400 text-danger-700 px-4 py-3 rounded-lg">
             {{ session('error') }}
         </div>
         @endif
@@ -35,7 +35,7 @@
                             <input type="text" wire:model="customerName"
                                    class="w-full rounded-lg border-gray-300 focus:border-red-500 focus:ring-red-500"
                                    placeholder="Tu nombre completo">
-                            @error('customerName') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+                            @error('customerName') <span class="text-danger-600 text-sm">{{ $message }}</span> @enderror
                         </div>
 
                         <div>
@@ -43,7 +43,7 @@
                             <input type="tel" wire:model="customerPhone"
                                    class="w-full rounded-lg border-gray-300 focus:border-red-500 focus:ring-red-500"
                                    placeholder="(123) 456-7890">
-                            @error('customerPhone') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+                            @error('customerPhone') <span class="text-danger-600 text-sm">{{ $message }}</span> @enderror
                         </div>
 
                         <div class="md:col-span-2">
@@ -51,7 +51,7 @@
                             <input type="email" wire:model="customerEmail"
                                    class="w-full rounded-lg border-gray-300 focus:border-red-500 focus:ring-red-500"
                                    placeholder="tu@email.com">
-                            @error('customerEmail') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+                            @error('customerEmail') <span class="text-danger-600 text-sm">{{ $message }}</span> @enderror
                         </div>
                     </div>
                 </div>
@@ -93,7 +93,7 @@
                             <input type="text" wire:model="deliveryAddress"
                                    class="w-full rounded-lg border-gray-300 focus:border-red-500 focus:ring-red-500"
                                    placeholder="123 Main St, Apt 4B">
-                            @error('deliveryAddress') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+                            @error('deliveryAddress') <span class="text-danger-600 text-sm">{{ $message }}</span> @enderror
                         </div>
 
                         <div class="grid grid-cols-2 gap-4">
@@ -101,13 +101,13 @@
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Ciudad *</label>
                                 <input type="text" wire:model="deliveryCity"
                                        class="w-full rounded-lg border-gray-300 focus:border-red-500 focus:ring-red-500">
-                                @error('deliveryCity') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+                                @error('deliveryCity') <span class="text-danger-600 text-sm">{{ $message }}</span> @enderror
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">ZIP *</label>
                                 <input type="text" wire:model="deliveryZip"
                                        class="w-full rounded-lg border-gray-300 focus:border-red-500 focus:ring-red-500">
-                                @error('deliveryZip') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+                                @error('deliveryZip') <span class="text-danger-600 text-sm">{{ $message }}</span> @enderror
                             </div>
                         </div>
 
@@ -204,7 +204,7 @@
                         <div class="mb-4">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Datos de la Tarjeta</label>
                             <div id="card-element" class="p-4 border border-gray-300 rounded-lg bg-white"></div>
-                            <div id="card-errors" class="mt-2 text-red-600 text-sm" role="alert"></div>
+                            <div id="card-errors" class="mt-2 text-danger-600 text-sm" role="alert"></div>
                         </div>
 
                         <div class="flex items-center gap-2 text-sm text-gray-500">

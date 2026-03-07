@@ -105,7 +105,7 @@
                                     @elseif($key === 'facebook')
                                         <i class="fab fa-facebook text-blue-600 w-6"></i>
                                     @elseif($key === 'yelp')
-                                        <i class="fab fa-yelp text-red-600 w-6"></i>
+                                        <i class="fab fa-yelp text-[#AF0606] w-6"></i>
                                     @else
                                         <i class="fab fa-tripadvisor text-green-600 w-6"></i>
                                     @endif
@@ -157,7 +157,7 @@
                                     @elseif($review->platform === 'facebook')
                                         <i class="fab fa-facebook text-blue-600 mr-2"></i>
                                     @elseif($review->platform === 'yelp')
-                                        <i class="fab fa-yelp text-red-600 mr-2"></i>
+                                        <i class="fab fa-yelp text-[#AF0606] mr-2"></i>
                                     @else
                                         <i class="fab fa-tripadvisor text-green-600 mr-2"></i>
                                     @endif
@@ -246,8 +246,8 @@
                                         <i class="fab fa-facebook text-blue-600 text-xl"></i>
                                     </div>
                                 @elseif($review->platform === 'yelp')
-                                    <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                                        <i class="fab fa-yelp text-red-600 text-xl"></i>
+                                    <div class="w-12 h-12 bg-[#AF0606]/10 rounded-full flex items-center justify-center">
+                                        <i class="fab fa-yelp text-[#AF0606] text-xl"></i>
                                     </div>
                                 @else
                                     <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
@@ -419,7 +419,7 @@
                     <div class="flex items-center justify-between mb-4">
                         <div class="flex items-center">
                             <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                                <i class="fab fa-yelp text-red-600 text-xl"></i>
+                                <i class="fab fa-yelp text-[#AF0606] text-xl"></i>
                             </div>
                             <div class="ml-4">
                                 <h3 class="font-semibold text-gray-900">Yelp</h3>

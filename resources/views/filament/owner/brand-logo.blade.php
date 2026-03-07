@@ -1,6 +1,6 @@
 @php
     $logoUrl = null;
-    $siteLogo = asset('images/branding/icon.png');
+    $siteLogo = asset('images/branding/sombrero-icon.png');
 
     if (auth()->check()) {
         $restaurant = auth()->user()->restaurants()->first();

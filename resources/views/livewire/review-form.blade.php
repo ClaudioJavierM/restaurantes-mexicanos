@@ -33,7 +33,7 @@
                 <span class="ml-2 text-sm text-gray-600">{{ $rating }} de 5 estrellas</span>
             </div>
             @error('rating')
-                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                <p class="mt-1 text-sm text-danger-600">{{ $message }}</p>
             @enderror
         </div>
 
@@ -50,7 +50,7 @@
                 placeholder="Resume tu experiencia en pocas palabras"
             >
             @error('title')
-                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                <p class="mt-1 text-sm text-danger-600">{{ $message }}</p>
             @enderror
         </div>
 
@@ -67,7 +67,7 @@
                 placeholder="Cuéntanos sobre tu experiencia: comida, servicio, ambiente, etc."
             ></textarea>
             @error('comment')
-                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                <p class="mt-1 text-sm text-danger-600">{{ $message }}</p>
             @enderror
             <p class="mt-1 text-xs text-gray-500">Mínimo 10 caracteres</p>
         </div>
@@ -87,7 +87,7 @@
                         placeholder="Tu nombre completo"
                     >
                     @error('guest_name')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        <p class="mt-1 text-sm text-danger-600">{{ $message }}</p>
                     @enderror
                 </div>
 
@@ -103,7 +103,7 @@
                         placeholder="tu@email.com"
                     >
                     @error('guest_email')
-                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        <p class="mt-1 text-sm text-danger-600">{{ $message }}</p>
                     @enderror
                     <p class="mt-1 text-xs text-gray-500">No será publicado</p>
                 </div>

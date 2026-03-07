@@ -32,12 +32,12 @@
 
     <!-- Error Message -->
     @if(session()->has('photo-error'))
-        <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+        <div class="mb-6 p-4 bg-danger-50 border border-danger-200 rounded-lg">
             <div class="flex items-center">
-                <svg class="w-5 h-5 text-red-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 text-danger-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
-                <p class="text-red-700">{{ session('photo-error') }}</p>
+                <p class="text-danger-700">{{ session('photo-error') }}</p>
             </div>
         </div>
     @endif
@@ -123,7 +123,7 @@
                         <span>Cargando fotos...</span>
                     </div>
 
-                    @error('photos.*') <span class="text-red-500 text-sm mt-1 block">{{ $message }}</span> @enderror
+                    @error('photos.*') <span class="text-danger-500 text-sm mt-1 block">{{ $message }}</span> @enderror
 
                     <!-- Preview using Alpine.js local URLs -->
                     <template x-if="previews.length > 0">
@@ -167,7 +167,7 @@
                         placeholder="Agrega una descripcion para tus fotos..."
                         class="w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500"
                     ></textarea>
-                    @error('caption') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                    @error('caption') <span class="text-danger-500 text-sm">{{ $message }}</span> @enderror
                 </div>
 
                 <!-- Actions -->
@@ -234,7 +234,7 @@
                     <div class="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors">
                         <div class="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
                             <div class="flex items-center justify-end text-white text-xs">
-                                <span class="px-2 py-0.5 bg-red-600 rounded-full flex items-center gap-1">
+                                <span class="px-2 py-0.5 bg-[#AF0606] rounded-full flex items-center gap-1">
                                     <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
                                         <path d="M20.16 12.594l-4.995 1.433c-.96.276-1.74-.8-1.176-1.63l2.905-4.308a1.072 1.072 0 011.596-.206 9.194 9.194 0 011.67 4.711z"/>
                                     </svg>
@@ -457,7 +457,7 @@
                         @endforeach
                     </div>
                     @error('reportReason')
-                        <p class="text-red-500 text-sm mb-4">{{ $message }}</p>
+                        <p class="text-danger-500 text-sm mb-4">{{ $message }}</p>
                     @enderror
 
                     <!-- Additional Description -->
@@ -473,7 +473,7 @@
                             class="w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500"
                         ></textarea>
                         @error('reportDescription')
-                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            <p class="text-danger-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>
 

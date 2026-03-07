@@ -32,7 +32,7 @@
     </nav>
 
     <!-- Hero Section -->
-    <section class="bg-gradient-to-r from-red-600 to-orange-600 text-white">
+    <section class="bg-gradient-to-r from-gray-900 to-gray-800 text-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
             <div class="text-center">
                 <h1 class="text-4xl md:text-6xl font-bold mb-6">
@@ -260,7 +260,7 @@
                 </div>
 
                 <!-- Premium Plan -->
-                <div class="bg-gradient-to-br from-red-600 to-orange-600 p-8 rounded-xl shadow-2xl transform scale-105 relative">
+                <div class="bg-gradient-to-br from-gray-900 to-gray-800 p-8 rounded-xl shadow-2xl transform scale-105 relative">
                     <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-gray-900 px-4 py-1 rounded-full text-sm font-bold">
                         MÁS POPULAR
                     </div>
@@ -553,7 +553,7 @@
     </section>
 
     <!-- Final CTA Section -->
-    <section class="bg-gradient-to-r from-red-600 to-orange-600 text-white py-20">
+    <section class="bg-gradient-to-r from-gray-900 to-gray-800 text-white py-20">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 class="text-4xl md:text-5xl font-bold mb-6">
                 ¿Listo Para Crecer Tu Negocio?

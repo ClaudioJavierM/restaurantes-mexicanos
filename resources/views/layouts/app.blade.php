@@ -290,18 +290,12 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 overflow-visible">
             <div class="flex justify-between h-20 overflow-visible">
                 <div class="flex items-center">
-                    <a href="/" class="flex items-center group">
-                        <!-- Logo Image -->
-                        <img src="/images/branding/icon.png" alt="FAMER" class="h-10 w-10 rounded-full shadow-lg border-2 border-yellow-600/50 group-hover:border-yellow-500 transition-all duration-300 group-hover:scale-105" style="max-width: 40px; max-height: 40px;">
-                        <div class="ml-3 hidden sm:block">
-                            <span class="text-xl font-display font-bold text-gold-gradient">
-                                {{ app()->getLocale() === 'en' ? 'Famous Mexican' : 'Restaurantes' }}
-                            </span>
-                            <div class="text-xs font-semibold tracking-wider">
-                                <span class="text-green-500">MEXICAN</span>
-                                <span class="text-gray-300">OS</span>
-                                <span class="text-red-500 ml-1">FAMOSOS</span>
-                            </div>
+                    <a href="/" class="flex items-center gap-3 group">
+                        <img src="/images/branding/logo.png?v=3" alt="FAMER USA" class="h-14 w-auto group-hover:scale-105 transition-all duration-300" style="max-height: 56px;">
+                        <div class="hidden sm:flex flex-col leading-none" style="gap: 2px;">
+                            <span class="text-yellow-500 font-bold text-sm tracking-wide" style="line-height: 1;">Restaurantes</span>
+                            <span class="text-white font-bold text-sm tracking-wide" style="line-height: 1;">Mexicanos</span>
+                            <span class="text-yellow-500 font-bold text-sm tracking-wide" style="line-height: 1;">Famosos</span>
                         </div>
                     </a>
                 </div>
@@ -585,8 +579,13 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
                 <!-- Logo & About -->
                 <div class="md:col-span-1">
-                    <div class="flex items-center mb-4">
-                        <img src="/images/branding/icon.png" alt="FAMER" class="h-12 w-12 rounded-full border-2 border-yellow-600/50" style="max-width: 48px; max-height: 48px;">
+                    <div class="flex items-center gap-3 mb-4">
+                        <img src="/images/branding/logo.png?v=3" alt="FAMER USA" class="h-16 w-auto" style="max-height: 64px;">
+                        <div class="flex flex-col leading-none" style="gap: 2px;">
+                            <span class="text-yellow-500 font-bold text-sm tracking-wide" style="line-height: 1;">Restaurantes</span>
+                            <span class="text-white font-bold text-sm tracking-wide" style="line-height: 1;">Mexicanos</span>
+                            <span class="text-yellow-500 font-bold text-sm tracking-wide" style="line-height: 1;">Famosos</span>
+                        </div>
                     </div>
                     <p class="text-gray-400 text-sm leading-relaxed">
                         El directorio más completo de restaurantes mexicanos auténticos en Estados Unidos.

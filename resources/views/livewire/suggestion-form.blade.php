@@ -35,7 +35,7 @@
                                     placeholder="Tu nombre completo"
                                 >
                                 @error('submitter_name')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    <p class="mt-1 text-sm text-danger-600">{{ $message }}</p>
                                 @enderror
                             </div>
 
@@ -51,7 +51,7 @@
                                     placeholder="tu@email.com"
                                 >
                                 @error('submitter_email')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    <p class="mt-1 text-sm text-danger-600">{{ $message }}</p>
                                 @enderror
                             </div>
 
@@ -67,7 +67,7 @@
                                     placeholder="(123) 456-7890"
                                 >
                                 @error('submitter_phone')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    <p class="mt-1 text-sm text-danger-600">{{ $message }}</p>
                                 @enderror
                             </div>
                         </div>
@@ -126,7 +126,7 @@
                                     💡 <strong>Tip:</strong> Usa el autocompletado de Google para rellenar automáticamente todos los campos
                                 </p>
                                 @error('restaurant_name')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    <p class="mt-1 text-sm text-danger-600">{{ $message }}</p>
                                 @enderror
                             </div>
 
@@ -142,7 +142,7 @@
                                     placeholder="123 Main Street"
                                 >
                                 @error('restaurant_address')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    <p class="mt-1 text-sm text-danger-600">{{ $message }}</p>
                                 @enderror
                             </div>
 
@@ -159,7 +159,7 @@
                                         placeholder="Los Angeles"
                                     >
                                     @error('restaurant_city')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                        <p class="mt-1 text-sm text-danger-600">{{ $message }}</p>
                                     @enderror
                                 </div>
 
@@ -178,7 +178,7 @@
                                         @endforeach
                                     </select>
                                     @error('restaurant_state')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                        <p class="mt-1 text-sm text-danger-600">{{ $message }}</p>
                                     @enderror
                                 </div>
 
@@ -194,7 +194,7 @@
                                         placeholder="90001"
                                     >
                                     @error('restaurant_zip_code')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                        <p class="mt-1 text-sm text-danger-600">{{ $message }}</p>
                                     @enderror
                                 </div>
                             </div>
@@ -231,7 +231,7 @@
                                         placeholder="(123) 456-7890"
                                     >
                                     @error('restaurant_phone')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                        <p class="mt-1 text-sm text-danger-600">{{ $message }}</p>
                                     @enderror
                                 </div>
 
@@ -247,7 +247,7 @@
                                         placeholder="https://ejemplo.com"
                                     >
                                     @error('restaurant_website')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                        <p class="mt-1 text-sm text-danger-600">{{ $message }}</p>
                                     @enderror
                                 </div>
                             </div>
@@ -267,7 +267,7 @@
                                     @endforeach
                                 </select>
                                 @error('category_id')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    <p class="mt-1 text-sm text-danger-600">{{ $message }}</p>
                                 @enderror
                             </div>
 
@@ -283,7 +283,7 @@
                                     placeholder="Cuéntanos sobre este restaurante, sus especialidades, ambiente, etc."
                                 ></textarea>
                                 @error('description')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    <p class="mt-1 text-sm text-danger-600">{{ $message }}</p>
                                 @enderror
                             </div>
 
@@ -299,7 +299,7 @@
                                     placeholder="Cualquier información adicional que quieras compartir..."
                                 ></textarea>
                                 @error('notes')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    <p class="mt-1 text-sm text-danger-600">{{ $message }}</p>
                                 @enderror
                             </div>
                         </div>

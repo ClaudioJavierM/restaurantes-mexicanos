@@ -1,12 +1,12 @@
 {{-- Hero Section for Mexico --}}
 <div class="relative overflow-hidden">
     {{-- Dark gradient background --}}
-    <div class="absolute inset-0 bg-gradient-to-br from-gray-900 via-red-900 to-green-900"></div>
+    <div class="absolute inset-0 bg-gradient-to-br from-gray-950 via-amber-950/50 to-gray-950"></div>
     <div class="absolute inset-0 bg-black/30"></div>
     
     {{-- Mexican flag accent bars --}}
     <div class="absolute top-0 left-0 w-2 h-full bg-green-600"></div>
-    <div class="absolute top-0 right-0 w-2 h-full bg-red-600"></div>
+    <div class="absolute top-0 right-0 w-2 h-full bg-[#CE1126]"></div>
     
     {{-- Pattern overlay --}}
     <div class="absolute inset-0 opacity-5" style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.4\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
@@ -33,7 +33,7 @@
             <p class="text-xl md:text-2xl text-gray-200 mb-8 max-w-4xl mx-auto font-medium leading-relaxed">
                 Reunimos los <strong class="text-white">mejores restaurantes de Mexico</strong> basandonos en las resenas de 
                 <span class="text-yellow-400 font-bold">Google</span>, 
-                <span class="text-red-400 font-bold">Yelp</span>, 
+                <span class="text-[#AF0606] font-bold">Yelp</span>, 
                 <span class="text-green-400 font-bold">TripAdvisor</span> y mas.
                 <br class="hidden md:block">
                 Encuentra los <strong class="text-white">Top 10</strong> de cada ciudad y estado.
@@ -80,7 +80,7 @@
         <p class="text-center text-gray-500 text-sm mb-4">Resenas verificadas de las mejores plataformas</p>
         <div class="flex flex-wrap justify-center items-center gap-8">
             <span class="text-2xl font-bold text-gray-700">Google</span>
-            <span class="text-2xl font-bold text-red-600">Yelp</span>
+            <span class="text-2xl font-bold text-[#AF0606]">Yelp</span>
             <span class="text-2xl font-bold text-green-600">TripAdvisor</span>
             <span class="text-2xl font-bold text-blue-600">Facebook</span>
             <span class="text-2xl font-bold text-purple-600">Foursquare</span>

@@ -50,7 +50,7 @@
                 @endif
 
                 @if (session()->has('error'))
-                    <div class="mb-6 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">
+                    <div class="mb-6 bg-danger-50 border border-danger-200 text-danger-800 px-4 py-3 rounded-lg">
                         <div class="flex items-center">
                             <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
@@ -94,7 +94,7 @@
                                     autofocus
                                 >
                                 @error('searchName')
-                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    <p class="mt-1 text-sm text-danger-600">{{ $message }}</p>
                                 @enderror
                             </div>
 
@@ -112,7 +112,7 @@
                                         placeholder="Ej: Los Angeles"
                                     >
                                     @error('searchCity')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                        <p class="mt-1 text-sm text-danger-600">{{ $message }}</p>
                                     @enderror
                                 </div>
 
@@ -181,7 +181,7 @@
                                                             <h4 class="font-semibold text-gray-900">{{ $result['name'] }}</h4>
                                                             <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium
                                                                 @if($result['source'] === 'database') bg-green-100 text-green-800
-                                                                @elseif($result['source'] === 'yelp') bg-red-100 text-red-800
+                                                                @elseif($result['source'] === 'yelp') bg-[#AF0606]/10 text-[#AF0606]
                                                                 @else bg-blue-100 text-blue-800
                                                                 @endif
                                                             ">
@@ -319,7 +319,7 @@
                                         placeholder="Tu nombre completo"
                                     >
                                     @error('submitter_name')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                        <p class="mt-1 text-sm text-danger-600">{{ $message }}</p>
                                     @enderror
                                 </div>
 
@@ -336,7 +336,7 @@
                                             placeholder="tu@email.com"
                                         >
                                         @error('submitter_email')
-                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                            <p class="mt-1 text-sm text-danger-600">{{ $message }}</p>
                                         @enderror
                                     </div>
 
@@ -383,7 +383,7 @@
                                         placeholder="Nombre del restaurante"
                                     >
                                     @error('restaurant_name')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                        <p class="mt-1 text-sm text-danger-600">{{ $message }}</p>
                                     @enderror
                                 </div>
 
@@ -399,7 +399,7 @@
                                         placeholder="123 Main Street"
                                     >
                                     @error('restaurant_address')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                        <p class="mt-1 text-sm text-danger-600">{{ $message }}</p>
                                     @enderror
                                 </div>
 
@@ -416,7 +416,7 @@
                                             placeholder="Los Angeles"
                                         >
                                         @error('restaurant_city')
-                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                            <p class="mt-1 text-sm text-danger-600">{{ $message }}</p>
                                         @enderror
                                     </div>
 
@@ -435,7 +435,7 @@
                                             @endforeach
                                         </select>
                                         @error('restaurant_state')
-                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                            <p class="mt-1 text-sm text-danger-600">{{ $message }}</p>
                                         @enderror
                                     </div>
 
@@ -466,7 +466,7 @@
                                             placeholder="(123) 456-7890"
                                         >
                                         @error('restaurant_phone')
-                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                            <p class="mt-1 text-sm text-danger-600">{{ $message }}</p>
                                         @enderror
                                     </div>
 
@@ -482,7 +482,7 @@
                                             placeholder="https://ejemplo.com"
                                         >
                                         @error('restaurant_website')
-                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                            <p class="mt-1 text-sm text-danger-600">{{ $message }}</p>
                                         @enderror
                                     </div>
                                 </div>
@@ -502,7 +502,7 @@
                                         @endforeach
                                     </select>
                                     @error('category_id')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                        <p class="mt-1 text-sm text-danger-600">{{ $message }}</p>
                                     @enderror
                                 </div>
 

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Restaurant;
 use App\Models\Category;
 use App\Models\State;
+use App\Models\MenuItem;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
@@ -282,6 +283,82 @@ class RestaurantController extends Controller
         return response()->json([
             'success' => true,
             'data' => $states,
+        ]);
+    }
+
+    /**
+     * GET /v1/restaurants/{id}/menu
+     * Returns the public menu for a restaurant, grouped by category.
+     */
+    public function menu(Request $request, int $id): JsonResponse
+    {
+        $restaurant = Restaurant::approved()->findOrFail($id);
+
+        $categories = $restaurant->menuCategories()
+            ->active()
+            ->ordered()
+            ->with(['items' => function ($q) {
+                $q->where('is_available', true)->orderBy('sort_order')->orderBy('name');
+            }])
+            ->whereHas('items', fn($q) => $q->where('is_available', true))
+            ->get();
+
+        $popularItems = $restaurant->menuItems()
+            ->where('is_available', true)
+            ->where('is_popular', true)
+            ->orderBy('sort_order')
+            ->limit(10)
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data'    => [
+                'restaurant_id' => $restaurant->id,
+                'categories'    => $categories,
+                'popular_items' => $popularItems,
+            ],
+        ]);
+    }
+
+    /**
+     * GET /v1/restaurants/{id}/photos
+     * Returns a list of photo URLs for a restaurant.
+     */
+    public function photos(Request $request, int $id): JsonResponse
+    {
+        $restaurant = Restaurant::approved()->findOrFail($id);
+
+        $photos = [];
+
+        if ($restaurant->image) {
+            $photos[] = ['url' => $restaurant->image, 'type' => 'main'];
+        }
+
+        foreach (['gallery', 'ambiance', 'menu', 'default'] as $collection) {
+            try {
+                foreach ($restaurant->getMedia($collection) as $media) {
+                    $photos[] = ['url' => $media->getUrl(), 'type' => $collection];
+                }
+            } catch (\Exception $e) {
+                // collection may not exist
+            }
+        }
+
+        if (!empty($restaurant->yelp_photos)) {
+            $yelpPhotos = is_array($restaurant->yelp_photos)
+                ? $restaurant->yelp_photos
+                : json_decode($restaurant->yelp_photos, true);
+            if (is_array($yelpPhotos)) {
+                foreach ($yelpPhotos as $url) {
+                    $photos[] = ['url' => $url, 'type' => 'yelp'];
+                }
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'data'    => $photos,
+            'meta'    => ['count' => count($photos)],
         ]);
     }
 

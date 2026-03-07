@@ -23,6 +23,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             \App\Http\Middleware\SetLocaleFromDomain::class,
         ]);
+
+        // Public cache headers: prepend globally so it runs LAST on response
+        // (after Livewire's DisableBackButtonCache overwrites cache-control)
+        $middleware->prepend(\App\Http\Middleware\PublicCacheHeaders::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // Log all 403 errors for debugging

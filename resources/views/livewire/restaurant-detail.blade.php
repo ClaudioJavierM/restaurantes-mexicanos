@@ -155,21 +155,6 @@
     }
 @endphp
 <div>
-    <!-- SEO Meta Tags -->
-    <!-- SEO Open Graph -->
-        <x-open-graph
-            :restaurant="$restaurant"
-            :image="$seoImage"
-        />
-    <!-- end seo -->
-
-    <!-- Schema.org -->
-        <x-schema-org
-            type="Restaurant"
-            :restaurant="$restaurant"
-            :reviews="$restaurant->reviews()->approved()->latest()->take(5)->get()"
-        />
-    <!-- end seo -->
 
     <!-- Cover Image Banner -->
     @php
@@ -189,7 +174,7 @@
             @endif
         </div>
     @else
-        <div style="position:relative; height:200px; background:linear-gradient(135deg, #dc2626, #ea580c); display:flex; align-items:center; justify-content:center;">
+        <div style="position:relative; height:200px; background:linear-gradient(135deg, #1F2937, #111827); display:flex; align-items:center; justify-content:center;">
             <div style="text-align:center; color:white;">
                 <span style="font-size:64px; display:block; margin-bottom:8px;">🍽️</span>
                 <p style="font-size:16px; opacity:0.8;">{{ $restaurant->name }}</p>
@@ -231,7 +216,7 @@
                             </span>
                         @endif
                         @if($restaurant->yelp_id && $restaurant->yelp_rating)
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-600 text-white shadow-sm">
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-[#AF0606] text-white shadow-sm">
                                 <svg class="w-3.5 h-3.5 mr-1" viewBox="0 0 24 24" fill="currentColor"><path d="M20.16 12.594l-4.995 1.433c-.96.276-1.74-.8-1.176-1.63l2.905-4.308a1.072 1.072 0 011.596-.206 9.194 9.194 0 011.67 4.711z"/></svg>
                                 Yelp
                             </span>
@@ -287,8 +272,8 @@
                             </div>
                         @endif
                         @if($yelpReviews > 0)
-                            <div class="flex items-center gap-1.5 bg-red-50 px-3 py-1.5 rounded-full">
-                                <svg class="w-4 h-4 text-red-600" viewBox="0 0 24 24" fill="currentColor"><path d="M20.16 12.594l-4.995 1.433c-.96.276-1.74-.8-1.176-1.63l2.905-4.308a1.072 1.072 0 011.596-.206 9.194 9.194 0 011.67 4.711zm-6.728 6.272a1.07 1.07 0 01-.18 1.602 9.2 9.2 0 01-4.638 1.838 1.073 1.073 0 01-1.143-.857l-.887-5.166c-.171-1.001.956-1.65 1.705-1.006l3.143 2.589zm-8.476-2.612a9.2 9.2 0 01-.934-4.98 1.072 1.072 0 011.32-.897l5.022 1.524c.97.294.97 1.69 0 1.984l-5.022 1.524a1.07 1.07 0 01-.386-.155zm3.042-8.476l.887-5.166a1.073 1.073 0 011.143-.857 9.2 9.2 0 014.638 1.838 1.07 1.07 0 01.18 1.602L11.7 8.784c-.749.643-1.876-.005-1.705-1.006zm.84-6.184a1.072 1.072 0 011.596.206l2.905 4.308c.564.83-.216 1.906-1.176 1.63l-4.995-1.433a1.073 1.073 0 01-.426-1.808 9.19 9.19 0 012.096-2.903z"/></svg>
+                            <div class="flex items-center gap-1.5 bg-[#AF0606]/10 px-3 py-1.5 rounded-full">
+                                <svg class="w-4 h-4 text-[#AF0606]" viewBox="0 0 24 24" fill="currentColor"><path d="M20.16 12.594l-4.995 1.433c-.96.276-1.74-.8-1.176-1.63l2.905-4.308a1.072 1.072 0 011.596-.206 9.194 9.194 0 011.67 4.711zm-6.728 6.272a1.07 1.07 0 01-.18 1.602 9.2 9.2 0 01-4.638 1.838 1.073 1.073 0 01-1.143-.857l-.887-5.166c-.171-1.001.956-1.65 1.705-1.006l3.143 2.589zm-8.476-2.612a9.2 9.2 0 01-.934-4.98 1.072 1.072 0 011.32-.897l5.022 1.524c.97.294.97 1.69 0 1.984l-5.022 1.524a1.07 1.07 0 01-.386-.155zm3.042-8.476l.887-5.166a1.073 1.073 0 011.143-.857 9.2 9.2 0 014.638 1.838 1.07 1.07 0 01.18 1.602L11.7 8.784c-.749.643-1.876-.005-1.705-1.006zm.84-6.184a1.072 1.072 0 011.596.206l2.905 4.308c.564.83-.216 1.906-1.176 1.63l-4.995-1.433a1.073 1.073 0 01-.426-1.808 9.19 9.19 0 012.096-2.903z"/></svg>
                                 <span class="text-gray-700"><strong>{{ number_format($yelpRating, 1) }}</strong> ({{ number_format($yelpReviews) }})</span>
                             </div>
                         @endif
@@ -306,7 +291,7 @@
                             @if($isOpenNow)
                                 <span class="text-green-600 font-semibold">Abierto</span>
                             @else
-                                <span class="text-red-600 font-semibold">Cerrado</span>
+                                <span class="text-danger-600 font-semibold">Cerrado</span>
                             @endif
                             <span class="text-gray-600">{{ preg_replace('/^[^:]+:\s*/', '', $todayHours) }}</span>
                             <button onclick="document.getElementById('hours-section').scrollIntoView({behavior: 'smooth'})" class="text-blue-600 hover:underline">Ver horarios</button>
@@ -315,7 +300,7 @@
 
                     <!-- Action Buttons - Yelp Style -->
                     <div class="flex flex-wrap gap-3 pt-4 border-t border-gray-100">
-                        <a href="#write-review" wire:click="switchTab('reviews')" class="inline-flex items-center px-4 py-2.5 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors">
+                        <a href="#write-review" wire:click="switchTab('reviews')" class="inline-flex items-center px-4 py-2.5 bg-[#AF0606] text-white font-semibold rounded-lg hover:bg-[#8B0505] transition-colors">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
                             Escribir reseña
                         </a>
@@ -665,7 +650,7 @@
                         <div class="flex divide-x divide-gray-100">
                             @if($restaurant->yelp_url || $restaurant->yelp_id)
                                 <a href="{{ $restaurant->yelp_url ?: 'https://www.yelp.com/biz/' . $restaurant->yelp_id }}" target="_blank" rel="nofollow noopener" class="flex-1 flex items-center justify-center gap-2 p-4 hover:bg-gray-50 transition-colors">
-                                    <svg class="w-5 h-5 text-red-600" viewBox="0 0 24 24" fill="currentColor"><path d="M20.16 12.594l-4.995 1.433c-.96.276-1.74-.8-1.176-1.63l2.905-4.308a1.072 1.072 0 011.596-.206 9.194 9.194 0 011.67 4.711z"/></svg>
+                                    <svg class="w-5 h-5 text-[#AF0606]" viewBox="0 0 24 24" fill="currentColor"><path d="M20.16 12.594l-4.995 1.433c-.96.276-1.74-.8-1.176-1.63l2.905-4.308a1.072 1.072 0 011.596-.206 9.194 9.194 0 011.67 4.711z"/></svg>
                                     <span class="text-sm font-medium text-gray-700">Yelp</span>
                                 </a>
                             @endif
@@ -758,11 +743,6 @@
                 </div>
             </div>
         </div>
-    @endif
-
-        <!-- AI Chatbot (Premium/Elite only) -->
-    @if(in_array($restaurant->subscription_tier, ['premium', 'elite']))
-        @include("partials.chat-widget")
     @endif
 
     <!-- Menu Item Modal -->
