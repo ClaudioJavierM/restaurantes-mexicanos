@@ -19,9 +19,9 @@ class AppleMapsService
 
     public function __construct()
     {
-        $this->keyId = config('services.apple_maps.key_id');
-        $this->teamId = config('services.apple_maps.team_id');
-        $this->privateKeyPath = config('services.apple_maps.private_key_path');
+        $this->keyId = config('services.apple_maps.key_id') ?? '';
+        $this->teamId = config('services.apple_maps.team_id') ?? '';
+        $this->privateKeyPath = config('services.apple_maps.private_key_path') ?? '';
         $this->dailyLimit = (int) config('services.apple_maps.daily_limit', 500);
     }
 
