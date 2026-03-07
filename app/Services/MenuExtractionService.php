@@ -17,8 +17,8 @@ class MenuExtractionService
 
     public function __construct()
     {
-        $this->ocrApiKey = config('services.ocr_space.api_key');
-        $this->openaiApiKey = config('services.openai.api_key');
+        $this->ocrApiKey = config('services.ocr_space.api_key') ?? '';
+        $this->openaiApiKey = config('services.openai.api_key') ?? '';
     }
 
     /**

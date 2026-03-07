@@ -17,8 +17,8 @@ class FacebookPlacesService
 
     public function __construct()
     {
-        $this->appId = config('services.facebook.client_id');
-        $this->appSecret = config('services.facebook.client_secret');
+        $this->appId = config('services.facebook.client_id') ?? '';
+        $this->appSecret = config('services.facebook.client_secret') ?? '';
         $this->accessToken = $this->appId . '|' . $this->appSecret;
     }
 

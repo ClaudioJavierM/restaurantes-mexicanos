@@ -14,7 +14,7 @@ class YelpService
 
     public function __construct()
     {
-        $this->apiKey = config('services.yelp.api_key', '');
+        $this->apiKey = config('services.yelp.api_key') ?? '';
     }
 
     /**
