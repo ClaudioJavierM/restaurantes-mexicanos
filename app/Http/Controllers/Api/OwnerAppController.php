@@ -10,6 +10,10 @@ use App\Models\AnalyticsEvent;
 use App\Models\Coupon;
 use App\Models\MenuCategory;
 use App\Models\MenuItem;
+use App\Models\Order;
+use App\Models\SmsAutomation;
+use App\Models\SmsLog;
+use App\Models\RestaurantCustomer;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -27,6 +31,53 @@ class OwnerAppController extends Controller
     private function getRestaurant(Request $request): ?Restaurant
     {
         return $request->user()->restaurants()->first();
+    }
+
+    /**
+     * Returns a 403 response if the restaurant's tier is not in the allowed list.
+     * Returns null if the tier is allowed (pass-through).
+     */
+    private function requireTier(Restaurant $restaurant, array $tiers): ?JsonResponse
+    {
+        if (!in_array($restaurant->subscription_tier ?? 'free', $tiers)) {
+            $tierNames = ['premium' => 'Premium ($29/mo)', 'elite' => 'Elite ($79/mo)'];
+            $required  = implode(' o ', array_map(fn($t) => $tierNames[$t] ?? ucfirst($t), $tiers));
+            return response()->json([
+                'success'          => false,
+                'upgrade_required' => true,
+                'required_tier'    => $tiers[0],
+                'message'          => "Esta función requiere plan $required. Actualiza tu suscripción para acceder.",
+                'upgrade_url'      => url('/owner/upgrade-subscription'),
+            ], 403);
+        }
+        return null;
+    }
+
+    /**
+     * Returns a map of feature availability based on subscription tier.
+     */
+    private function getTierFeatures(string $tier): array
+    {
+        $isPremium = in_array($tier, ['premium', 'elite']);
+        $isElite   = $tier === 'elite';
+        return [
+            'analytics'        => $isPremium,
+            'coupons'          => $isPremium,
+            'menu_edit'        => $isPremium,
+            'chatbot'          => $isPremium,
+            'reservations'     => $isPremium,
+            'orders'           => $isElite,
+            'sms_marketing'    => $isElite,
+            'team_management'  => $isElite,
+            'white_label'      => $isElite,
+            'priority_support' => $isElite,
+            'unlimited_photos' => $isElite,
+            'email_marketing'  => false,   // Coming soon
+            'flash_deals'      => false,   // Coming soon
+            'loyalty_program'  => false,   // Coming soon
+            'widget_embed'     => false,   // Coming soon
+            'photo_limit'      => $isElite ? null : ($isPremium ? 25 : 5),
+        ];
     }
 
     /**
@@ -97,11 +148,12 @@ class OwnerAppController extends Controller
         return response()->json([
             'success' => true,
             'data' => [
-                'restaurant' => $restaurant->only([
+                'restaurant'    => $restaurant->only([
                     'id', 'name', 'slug', 'image', 'average_rating',
-                    'total_reviews', 'subscription_plan', 'subscription_status',
-                    'city', 'phone',
+                    'total_reviews', 'subscription_tier', 'subscription_status',
+                    'city', 'phone', 'is_claimed',
                 ]),
+                'tier_features' => $this->getTierFeatures($restaurant->subscription_tier ?? 'free'),
                 'total_reviews' => $restaurant->total_reviews ?? 0,
                 'average_rating' => (float) ($restaurant->average_rating ?? 0),
                 'pending_reservations' => $pendingReservations,
@@ -432,6 +484,9 @@ class OwnerAppController extends Controller
             return response()->json(['success' => false, 'message' => 'Restaurante no encontrado'], 404);
         }
 
+        $tierError = $this->requireTier($restaurant, ['premium', 'elite']);
+        if ($tierError) return $tierError;
+
         $coupons = Coupon::where('restaurant_id', $restaurant->id)
             ->orderBy('created_at', 'desc')
             ->get();
@@ -453,6 +508,9 @@ class OwnerAppController extends Controller
         if (!$restaurant) {
             return response()->json(['success' => false, 'message' => 'Restaurante no encontrado'], 404);
         }
+
+        $tierError = $this->requireTier($restaurant, ['premium', 'elite']);
+        if ($tierError) return $tierError;
 
         $validated = $request->validate([
             'code'           => 'required|string|max:50|unique:coupons,code',
@@ -499,6 +557,9 @@ class OwnerAppController extends Controller
             return response()->json(['success' => false, 'message' => 'Restaurante no encontrado'], 404);
         }
 
+        $tierError = $this->requireTier($restaurant, ['premium', 'elite']);
+        if ($tierError) return $tierError;
+
         $coupon = Coupon::where('id', $couponId)
             ->where('restaurant_id', $restaurant->id)
             ->firstOrFail();
@@ -531,6 +592,9 @@ class OwnerAppController extends Controller
         if (!$restaurant) {
             return response()->json(['success' => false, 'message' => 'Restaurante no encontrado'], 404);
         }
+
+        $tierError = $this->requireTier($restaurant, ['premium', 'elite']);
+        if ($tierError) return $tierError;
 
         $coupon = Coupon::where('id', $couponId)
             ->where('restaurant_id', $restaurant->id)
@@ -652,6 +716,9 @@ class OwnerAppController extends Controller
             return response()->json(['success' => false, 'message' => 'Restaurante no encontrado'], 404);
         }
 
+        $tierError = $this->requireTier($restaurant, ['premium', 'elite']);
+        if ($tierError) return $tierError;
+
         $request->validate(['period' => 'nullable|in:7d,30d,90d,1y']);
         $period = $request->get('period', '30d');
         $days = match($period) {
@@ -747,6 +814,9 @@ class OwnerAppController extends Controller
             return response()->json(['success' => false, 'message' => 'Restaurante no encontrado'], 404);
         }
 
+        $tierError = $this->requireTier($restaurant, ['premium', 'elite']);
+        if ($tierError) return $tierError;
+
         $request->validate([
             'categories'             => 'required|array',
             'categories.*.name'      => 'required|string|max:100',
@@ -832,6 +902,180 @@ class OwnerAppController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Cuenta eliminada exitosamente',
+        ]);
+    }
+
+    /**
+     * GET /v1/owner/orders
+     * Returns active orders for the owner's restaurant (Elite only).
+     */
+    public function orders(Request $request): JsonResponse
+    {
+        $restaurant = $this->getRestaurant($request);
+        if (!$restaurant) {
+            return response()->json(['success' => false, 'message' => 'Restaurante no encontrado'], 404);
+        }
+
+        $tierError = $this->requireTier($restaurant, ['elite']);
+        if ($tierError) return $tierError;
+
+        $query = Order::where('restaurant_id', $restaurant->id)->with(['items']);
+
+        if ($request->has('status')) {
+            $query->where('status', $request->status);
+        } elseif (!$request->has('all')) {
+            $query->whereIn('status', ['pending', 'confirmed', 'preparing', 'ready']);
+        }
+
+        $orders = $query->orderBy('created_at', 'desc')->paginate(20);
+
+        return response()->json([
+            'success' => true,
+            'data'    => $orders->items(),
+            'meta'    => [
+                'current_page' => $orders->currentPage(),
+                'last_page'    => $orders->lastPage(),
+                'total'        => $orders->total(),
+                'new_count'    => Order::where('restaurant_id', $restaurant->id)
+                    ->where('status', 'pending')->count(),
+            ],
+        ]);
+    }
+
+    /**
+     * PUT /v1/owner/orders/{orderId}
+     * Updates an order status (Elite only).
+     */
+    public function updateOrder(Request $request, int $orderId): JsonResponse
+    {
+        $restaurant = $this->getRestaurant($request);
+        if (!$restaurant) {
+            return response()->json(['success' => false, 'message' => 'Restaurante no encontrado'], 404);
+        }
+
+        $tierError = $this->requireTier($restaurant, ['elite']);
+        if ($tierError) return $tierError;
+
+        $order = Order::where('id', $orderId)
+            ->where('restaurant_id', $restaurant->id)
+            ->firstOrFail();
+
+        $validated = $request->validate([
+            'status'              => 'required|in:confirmed,preparing,ready,completed,cancelled',
+            'cancellation_reason' => 'required_if:status,cancelled|nullable|string|max:500',
+        ]);
+
+        $updateData = ['status' => $validated['status']];
+        if ($validated['status'] === 'completed')  $updateData['completed_at'] = now();
+        if ($validated['status'] === 'confirmed')   $updateData['confirmed_at'] = now();
+        if ($validated['status'] === 'cancelled') {
+            $updateData['cancelled_at']       = now();
+            $updateData['cancellation_reason'] = $validated['cancellation_reason'] ?? null;
+        }
+
+        $order->update($updateData);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Pedido actualizado exitosamente',
+            'data'    => $order->fresh()->load('items'),
+        ]);
+    }
+
+    /**
+     * GET /v1/owner/subscription
+     * Returns subscription plan info and feature availability.
+     */
+    public function subscription(Request $request): JsonResponse
+    {
+        $restaurant = $this->getRestaurant($request);
+        if (!$restaurant) {
+            return response()->json(['success' => false, 'message' => 'Restaurante no encontrado'], 404);
+        }
+
+        $tier = $restaurant->subscription_tier ?? 'free';
+
+        $plans = [
+            'free'    => ['name' => 'Gratis',   'price' => 0,  'currency' => 'USD', 'interval' => null],
+            'premium' => ['name' => 'Premium',  'price' => 29, 'currency' => 'USD', 'interval' => 'month'],
+            'elite'   => ['name' => 'Elite',    'price' => 79, 'currency' => 'USD', 'interval' => 'month'],
+        ];
+
+        return response()->json([
+            'success' => true,
+            'data'    => [
+                'tier'               => $tier,
+                'plan'               => $plans[$tier] ?? $plans['free'],
+                'status'             => $restaurant->subscription_status ?? 'active',
+                'started_at'         => $restaurant->subscription_started_at,
+                'expires_at'         => $restaurant->subscription_expires_at,
+                'has_stripe'         => !empty($restaurant->stripe_customer_id),
+                'features'           => $this->getTierFeatures($tier),
+                'upgrade_url'        => url('/owner/upgrade-subscription'),
+            ],
+        ]);
+    }
+
+    /**
+     * GET /v1/owner/sms/stats
+     * Returns SMS marketing stats for the last 30 days (Elite only).
+     */
+    public function smsStats(Request $request): JsonResponse
+    {
+        $restaurant = $this->getRestaurant($request);
+        if (!$restaurant) {
+            return response()->json(['success' => false, 'message' => 'Restaurante no encontrado'], 404);
+        }
+
+        $tierError = $this->requireTier($restaurant, ['elite']);
+        if ($tierError) return $tierError;
+
+        $since = Carbon::now()->subDays(30);
+
+        $totalSent      = SmsLog::where('restaurant_id', $restaurant->id)->where('created_at', '>=', $since)->count();
+        $totalDelivered = SmsLog::where('restaurant_id', $restaurant->id)->where('created_at', '>=', $since)->where('status', 'delivered')->count();
+        $totalClicked   = SmsLog::where('restaurant_id', $restaurant->id)->where('created_at', '>=', $since)->where('clicked', true)->count();
+
+        $subscribedCustomers = RestaurantCustomer::where('restaurant_id', $restaurant->id)
+            ->where('sms_opted_in', true)->count();
+
+        return response()->json([
+            'success' => true,
+            'data'    => [
+                'total_sent'           => $totalSent,
+                'total_delivered'      => $totalDelivered,
+                'delivery_rate'        => $totalSent > 0 ? round(($totalDelivered / $totalSent) * 100, 1) : 0,
+                'total_clicked'        => $totalClicked,
+                'click_rate'           => $totalSent > 0 ? round(($totalClicked / $totalSent) * 100, 1) : 0,
+                'subscribed_customers' => $subscribedCustomers,
+                'period_days'          => 30,
+            ],
+        ]);
+    }
+
+    /**
+     * GET /v1/owner/sms/automations
+     * Returns SMS automations for the owner's restaurant (Elite only).
+     */
+    public function smsAutomations(Request $request): JsonResponse
+    {
+        $restaurant = $this->getRestaurant($request);
+        if (!$restaurant) {
+            return response()->json(['success' => false, 'message' => 'Restaurante no encontrado'], 404);
+        }
+
+        $tierError = $this->requireTier($restaurant, ['elite']);
+        if ($tierError) return $tierError;
+
+        $automations = SmsAutomation::where('restaurant_id', $restaurant->id)
+            ->orderByDesc('is_active')
+            ->orderBy('name')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data'    => $automations,
+            'trigger_types' => SmsAutomation::triggerTypes(),
         ]);
     }
 }
