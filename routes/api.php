@@ -9,6 +9,8 @@ use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\ReservationController;
 use App\Http\Controllers\Api\OwnerController;
 use App\Http\Controllers\Api\OwnerAppController;
+use App\Http\Controllers\Api\CouponController;
+use App\Http\Controllers\Api\CheckInController;
 use App\Http\Controllers\Api\SubscriberCouponApiController;
 use App\Http\Controllers\Api\CarmenApiController;
 
@@ -61,6 +63,11 @@ Route::prefix('v1')->group(function () {
     Route::get('/categories', [RestaurantController::class, 'categories']);
     Route::get('/states', [RestaurantController::class, 'states']);
 
+    // Coupons (public browse)
+    Route::get('/coupons', [CouponController::class, 'index']);
+    Route::get('/restaurants/{restaurantId}/coupons', [CouponController::class, 'restaurantCoupons']);
+    Route::get('/restaurants/{restaurantId}/check-ins/count', [CheckInController::class, 'count']);
+
     // MF Group Subscriber Coupons API
     Route::prefix('subscriber-coupons')->group(function () {
         Route::post('/validate', [SubscriberCouponApiController::class, 'validate']);
@@ -101,7 +108,17 @@ Route::prefix('v1')->group(function () {
 
             // User's reviews
             Route::get('/reviews', [UserController::class, 'reviews']);
+
+            // User's coupons & check-ins
+            Route::get('/coupons', [CouponController::class, 'userCoupons']);
+            Route::get('/check-ins', [CheckInController::class, 'userCheckIns']);
         });
+
+        // Claim a coupon
+        Route::post('/coupons/{id}/claim', [CouponController::class, 'claim']);
+
+        // Check-in at a restaurant
+        Route::post('/restaurants/{restaurantId}/check-in', [CheckInController::class, 'checkIn']);
 
         // Reviews (authenticated)
         Route::prefix('restaurants/{restaurantId}')->group(function () {
@@ -157,6 +174,13 @@ Route::prefix('v1')->group(function () {
             Route::post('/coupons', [OwnerAppController::class, 'createCoupon']);
             Route::put('/coupons/{couponId}', [OwnerAppController::class, 'updateCoupon']);
             Route::delete('/coupons/{couponId}', [OwnerAppController::class, 'deleteCoupon']);
+
+            // Menu management
+            Route::get('/menu', [OwnerAppController::class, 'menu']);
+            Route::put('/menu', [OwnerAppController::class, 'saveMenu']);
+
+            // Hours
+            Route::put('/hours', [OwnerAppController::class, 'updateHours']);
 
             // FAMER Score & Analytics
             Route::get('/score', [OwnerAppController::class, 'score']);

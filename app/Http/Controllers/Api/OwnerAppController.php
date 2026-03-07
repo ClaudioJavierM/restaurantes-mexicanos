@@ -8,8 +8,11 @@ use App\Models\Review;
 use App\Models\Reservation;
 use App\Models\AnalyticsEvent;
 use App\Models\Coupon;
+use App\Models\MenuCategory;
+use App\Models\MenuItem;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 /**
@@ -704,6 +707,115 @@ class OwnerAppController extends Controller
                 'total_reservations' => $totalReservations,
                 'daily_stats'        => $dailyStats,
             ],
+        ]);
+    }
+
+    /**
+     * GET /v1/owner/menu
+     * Returns the full menu (categories + items) for the owner's restaurant.
+     */
+    public function menu(Request $request): JsonResponse
+    {
+        $restaurant = $this->getRestaurant($request);
+
+        if (!$restaurant) {
+            return response()->json(['success' => false, 'message' => 'Restaurante no encontrado'], 404);
+        }
+
+        $categories = MenuCategory::where('restaurant_id', $restaurant->id)
+            ->with(['items' => fn($q) => $q->orderBy('sort_order')->orderBy('name')])
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data'    => $categories,
+        ]);
+    }
+
+    /**
+     * PUT /v1/owner/menu
+     * Saves the full menu structure. Syncs categories and items.
+     * Expects: { categories: [ { name, items: [ { name, price, description, ... } ] } ] }
+     */
+    public function saveMenu(Request $request): JsonResponse
+    {
+        $restaurant = $this->getRestaurant($request);
+
+        if (!$restaurant) {
+            return response()->json(['success' => false, 'message' => 'Restaurante no encontrado'], 404);
+        }
+
+        $request->validate([
+            'categories'             => 'required|array',
+            'categories.*.name'      => 'required|string|max:100',
+            'categories.*.items'     => 'sometimes|array',
+            'categories.*.items.*.name'  => 'required|string|max:255',
+            'categories.*.items.*.price' => 'required|numeric|min:0',
+            'categories.*.items.*.description' => 'nullable|string|max:500',
+            'categories.*.items.*.is_available' => 'sometimes|boolean',
+            'categories.*.items.*.is_popular'   => 'sometimes|boolean',
+        ]);
+
+        DB::transaction(function () use ($request, $restaurant) {
+            // Remove old menu
+            $oldCategoryIds = MenuCategory::where('restaurant_id', $restaurant->id)->pluck('id');
+            MenuItem::whereIn('menu_category_id', $oldCategoryIds)->delete();
+            MenuCategory::where('restaurant_id', $restaurant->id)->delete();
+
+            // Insert new structure
+            foreach ($request->categories as $sortOrder => $catData) {
+                $category = MenuCategory::create([
+                    'restaurant_id' => $restaurant->id,
+                    'name'          => $catData['name'],
+                    'sort_order'    => $sortOrder,
+                    'is_active'     => true,
+                ]);
+
+                foreach ($catData['items'] ?? [] as $itemSort => $itemData) {
+                    MenuItem::create([
+                        'menu_category_id' => $category->id,
+                        'name'             => $itemData['name'],
+                        'description'      => $itemData['description'] ?? null,
+                        'price'            => $itemData['price'],
+                        'is_available'     => $itemData['is_available'] ?? true,
+                        'is_popular'       => $itemData['is_popular'] ?? false,
+                        'sort_order'       => $itemSort,
+                    ]);
+                }
+            }
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Menú guardado exitosamente',
+        ]);
+    }
+
+    /**
+     * PUT /v1/owner/hours
+     * Dedicated endpoint to update business hours.
+     * Accepts: { hours: { "lunes": "9:00-21:00", "martes": "9:00-21:00", ... } }
+     */
+    public function updateHours(Request $request): JsonResponse
+    {
+        $restaurant = $this->getRestaurant($request);
+
+        if (!$restaurant) {
+            return response()->json(['success' => false, 'message' => 'Restaurante no encontrado'], 404);
+        }
+
+        $request->validate([
+            'hours' => 'required|array',
+        ]);
+
+        $restaurant->update(['hours' => $request->hours]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Horarios actualizados exitosamente',
+            'data'    => ['hours' => $restaurant->fresh()->hours],
         ]);
     }
 
