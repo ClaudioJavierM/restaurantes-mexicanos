@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\ReservationController;
 use App\Http\Controllers\Api\OwnerController;
+use App\Http\Controllers\Api\OwnerAppController;
 use App\Http\Controllers\Api\SubscriberCouponApiController;
 use App\Http\Controllers\Api\CarmenApiController;
 
@@ -35,8 +36,8 @@ Route::prefix('v1')->group(function () {
         ]);
     });
 
-    // Authentication
-    Route::prefix('auth')->group(function () {
+    // Authentication (rate limited)
+    Route::prefix('auth')->middleware('throttle:10,1')->group(function () {
         Route::post('/register', [AuthController::class, 'register']);
         Route::post('/login', [AuthController::class, 'login']);
         Route::post('/social', [AuthController::class, 'socialLogin']);
@@ -52,6 +53,8 @@ Route::prefix('v1')->group(function () {
         Route::get('/search', [RestaurantController::class, 'search']);
         Route::get('/{id}', [RestaurantController::class, 'show']);
         Route::get('/{id}/reviews', [ReviewController::class, 'index']);
+        Route::get('/{id}/menu', [RestaurantController::class, 'menu']);
+        Route::get('/{id}/photos', [RestaurantController::class, 'photos']);
     });
 
     // Categories & States (public)
@@ -126,7 +129,46 @@ Route::prefix('v1')->group(function () {
 
         /*
         |--------------------------------------------------------------------------
-        | Owner Routes (restaurant owner app)
+        | Owner App Routes (simplified, auto-detect restaurant from token)
+        | Used by the FAMER Owners Flutter mobile app
+        |--------------------------------------------------------------------------
+        */
+
+        Route::prefix('owner')->middleware('throttle:60,1')->group(function () {
+            // Dashboard & restaurant (auto-detect from auth user)
+            Route::get('/dashboard', [OwnerAppController::class, 'dashboard']);
+            Route::get('/restaurant', [OwnerAppController::class, 'show']);
+            Route::put('/restaurant', [OwnerAppController::class, 'update']);
+
+            // Reviews
+            Route::get('/reviews', [OwnerAppController::class, 'reviews']);
+            Route::post('/reviews/{reviewId}/respond', [OwnerAppController::class, 'respondToReview']);
+
+            // Reservations
+            Route::get('/reservations', [OwnerAppController::class, 'reservations']);
+            Route::put('/reservations/{reservationId}', [OwnerAppController::class, 'updateReservation']);
+
+            // Photos
+            Route::get('/photos', [OwnerAppController::class, 'photos']);
+            Route::delete('/photos', [OwnerAppController::class, 'deletePhoto']);
+
+            // Coupons
+            Route::get('/coupons', [OwnerAppController::class, 'coupons']);
+            Route::post('/coupons', [OwnerAppController::class, 'createCoupon']);
+            Route::put('/coupons/{couponId}', [OwnerAppController::class, 'updateCoupon']);
+            Route::delete('/coupons/{couponId}', [OwnerAppController::class, 'deleteCoupon']);
+
+            // FAMER Score & Analytics
+            Route::get('/score', [OwnerAppController::class, 'score']);
+            Route::get('/analytics', [OwnerAppController::class, 'analytics']);
+
+            // Account
+            Route::delete('/account', [OwnerAppController::class, 'deleteAccount']);
+        });
+
+        /*
+        |--------------------------------------------------------------------------
+        | Owner Routes (restaurant owner app — legacy with explicit restaurantId)
         |--------------------------------------------------------------------------
         */
 
