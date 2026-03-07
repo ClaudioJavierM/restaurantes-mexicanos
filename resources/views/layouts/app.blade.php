@@ -6,15 +6,12 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- PWA Meta Tags -->
-    <meta name="theme-color" content="#111827">
+    <meta name="theme-color" content="#1F2937">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="FAMER">
-    <link rel="apple-touch-icon" sizes="180x180" href="/images/branding/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/images/branding/favicon-32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/images/branding/favicon-16.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="/images/branding/icon-192.png">
-    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" href="/images/branding/icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/images/branding/icon.png">
 
     <!-- SEO: Dynamic Title and Description -->
     <title>@yield('title', ($title ?? __('app.site_name')) . ' - ' . __('app.tagline'))</title>
@@ -34,46 +31,6 @@
 
     <!-- Dynamic Meta Tags (Open Graph, Twitter Cards) -->
     @stack('meta')
-
-    {{-- Restaurant-specific SEO (from Livewire page components) --}}
-    @if(isset($seoRestaurant))
-        <x-og-meta :restaurant="$seoRestaurant" />
-        @php
-            $seoSchemaData = [
-                'name' => $seoRestaurant->name,
-                'description' => Str::limit(strip_tags($seoRestaurant->description), 250),
-                'url' => url('/restaurante/' . $seoRestaurant->slug),
-                'image' => $seoRestaurant->image ? (str_starts_with($seoRestaurant->image, 'http') ? $seoRestaurant->image : asset('storage/' . $seoRestaurant->image)) : null,
-                'address' => [
-                    '@type' => 'PostalAddress',
-                    'streetAddress' => $seoRestaurant->address,
-                    'addressLocality' => $seoRestaurant->city,
-                    'addressRegion' => $seoRestaurant->state?->code,
-                    'postalCode' => $seoRestaurant->zip_code,
-                    'addressCountry' => 'US',
-                ],
-                'telephone' => $seoRestaurant->phone,
-                'priceRange' => $seoRestaurant->price_range,
-                'servesCuisine' => 'Mexican',
-            ];
-            if ($seoRestaurant->average_rating > 0) {
-                $seoSchemaData['aggregateRating'] = [
-                    '@type' => 'AggregateRating',
-                    'ratingValue' => number_format($seoRestaurant->average_rating, 1),
-                    'reviewCount' => $seoRestaurant->total_reviews ?? 0,
-                    'bestRating' => '5',
-                ];
-            }
-            if ($seoRestaurant->latitude && $seoRestaurant->longitude) {
-                $seoSchemaData['geo'] = [
-                    '@type' => 'GeoCoordinates',
-                    'latitude' => $seoRestaurant->latitude,
-                    'longitude' => $seoRestaurant->longitude,
-                ];
-            }
-        @endphp
-        <x-schema-org type="Restaurant" :data="$seoSchemaData" />
-    @endif
 
     <!-- Fonts - Elegantes -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -333,11 +290,13 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 overflow-visible">
             <div class="flex justify-between h-20 overflow-visible">
                 <div class="flex items-center">
-                    <a href="/" class="flex items-center group">
-                        <!-- Logo -->
-                        <img src="/images/branding/logo-horizontal.png" alt="Restaurantes Mexicanos Famosos" class="h-12 hidden sm:block group-hover:scale-105 transition-transform duration-300 drop-shadow-lg" style="max-height: 48px;">
-                        <!-- Mobile: just sombrero icon -->
-                        <img src="/images/branding/sombrero-icon.png" alt="FAMER" class="h-10 w-10 sm:hidden group-hover:scale-105 transition-transform duration-300 drop-shadow-lg" style="max-width: 40px; max-height: 40px;">
+                    <a href="/" class="flex items-center gap-3 group">
+                        <img src="/images/branding/logo.png?v=3" alt="FAMER USA" class="h-14 w-auto group-hover:scale-105 transition-all duration-300" style="max-height: 56px;">
+                        <div class="hidden sm:flex flex-col leading-none" style="gap: 2px;">
+                            <span class="text-yellow-500 font-bold text-sm tracking-wide" style="line-height: 1;">Restaurantes</span>
+                            <span class="text-white font-bold text-sm tracking-wide" style="line-height: 1;">Mexicanos</span>
+                            <span class="text-yellow-500 font-bold text-sm tracking-wide" style="line-height: 1;">Famosos</span>
+                        </div>
                     </a>
                 </div>
 
@@ -620,8 +579,13 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
                 <!-- Logo & About -->
                 <div class="md:col-span-1">
-                    <div class="flex items-center mb-4">
-                        <img src="/images/branding/logo-horizontal-lg.png" alt="Restaurantes Mexicanos Famosos" class="h-16 drop-shadow-lg" style="max-height: 64px;">
+                    <div class="flex items-center gap-3 mb-4">
+                        <img src="/images/branding/logo.png?v=3" alt="FAMER USA" class="h-16 w-auto" style="max-height: 64px;">
+                        <div class="flex flex-col leading-none" style="gap: 2px;">
+                            <span class="text-yellow-500 font-bold text-sm tracking-wide" style="line-height: 1;">Restaurantes</span>
+                            <span class="text-white font-bold text-sm tracking-wide" style="line-height: 1;">Mexicanos</span>
+                            <span class="text-yellow-500 font-bold text-sm tracking-wide" style="line-height: 1;">Famosos</span>
+                        </div>
                     </div>
                     <p class="text-gray-400 text-sm leading-relaxed">
                         El directorio más completo de restaurantes mexicanos auténticos en Estados Unidos.
@@ -679,7 +643,7 @@
             <div class="mt-6 pt-4 border-t border-gray-800">
                 <p class="text-gray-600 text-xs text-center leading-relaxed max-w-4xl mx-auto">
                     <strong class="text-gray-500">Disclaimer:</strong> Restaurant information is compiled from public sources including
-                    <a href="https://www.yelp.com" target="_blank" rel="noopener" class="text-[#AF0606] hover:text-[#D32323]">Yelp</a> and
+                    <a href="https://www.yelp.com" target="_blank" rel="noopener" class="text-red-400 hover:text-red-300">Yelp</a> and
                     <a href="https://www.google.com/maps" target="_blank" rel="noopener" class="text-blue-400 hover:text-blue-300">Google</a>.
                     Restaurant owners can <a href="/claim" class="text-yellow-500 hover:text-yellow-400 underline">claim and verify their listing</a>.
                 </p>
