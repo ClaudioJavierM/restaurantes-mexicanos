@@ -51,7 +51,7 @@ class CreateMyPhoto extends CreateRecord
     {
         $currentCount = MyPhotosResource::getCurrentPhotoCount();
         $maxPhotos = MyPhotosResource::getMaxPhotos();
-        $restaurant = auth()->user()->restaurants()->first();
+        $restaurant = auth()->user()->allAccessibleRestaurants()->first();
         $plan = $restaurant?->subscription_tier ?? 'free';
         $isFree = !in_array($plan, ['premium', 'elite']);
 

@@ -14,7 +14,7 @@
                     <!-- Header -->
                     <tr>
                         <td style="background: linear-gradient(135deg, {{ $plan === 'elite' ? '#b45309' : '#dc2626' }} 0%, {{ $plan === 'elite' ? '#d97706' : '#ef4444' }} 100%); padding: 30px 40px; border-radius: 12px 12px 0 0; text-align: center;">
-                            <img src="https://restaurantesmexicanosfamosos.com/images/branding/icon.png" alt="Restaurantes Mexicanos Famosos" style="width: 70px; height: 70px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.3); margin-bottom: 15px;" />
+                            <img src="https://restaurantesmexicanosfamosos.com/images/branding/logo.png?v=3" alt="Restaurantes Mexicanos Famosos" style="max-height: 50px; width: auto; margin-bottom: 12px;" />
                             @if($plan === 'elite')
                                 <p style="color: #fcd34d; margin: 0 0 8px 0; font-size: 40px;">&#127942;</p>
                             @elseif($plan === 'premium')

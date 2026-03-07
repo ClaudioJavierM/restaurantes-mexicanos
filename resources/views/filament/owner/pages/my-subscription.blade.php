@@ -1,7 +1,7 @@
 <x-filament-panels::page>
     @php
         $restaurant = auth()->user()->restaurants->first();
-        $plan = $restaurant->subscription_plan ?? 'free';
+        $plan = $restaurant->subscription_tier ?? 'free';
         $famerDiscount = $plan === 'elite' ? '15%' : ($plan === 'premium' ? '10%' : '5%');
     @endphp
 
@@ -70,7 +70,7 @@
                     @php
                         $features = [
                             'free' => ['Perfil verificado', 'Editar informacion', 'Responder resenas', 'Horarios y contacto', 'Hasta 5 fotos', '5% descuento FAMER'],
-                            'premium' => ['Todo de Gratis', 'Insignia Destacada', 'Analytics Completos', 'Menu Digital + QR', 'Widget Pedidos', 'Reservaciones', 'Chatbot IA', 'Hasta 25 fotos', '10% descuento FAMER'],
+                            'premium' => ['Todo lo del plan Gratis', 'Badge Premium verificado', 'Galeria de fotos ilimitada', 'Menu digital completo', 'Analiticas basicas', '10% descuento en negocios FAMER'],
                             'elite' => ['Todo de Premium', 'Posicion #1 en ciudad', 'Sitio Web Completo', 'Fotografia Profesional', 'Gerente Dedicado', 'Fotos Ilimitadas', '15% descuento FAMER'],
                         ];
                     @endphp

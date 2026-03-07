@@ -26,9 +26,29 @@ class Analytics extends Page
     public $comparison = [];
     public $isPremium = false;
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        $user = auth()->user();
+        if (!$user) return false;
+        $teamMember = \App\Models\RestaurantTeamMember::where('user_id', $user->id)
+            ->where('status', 'active')->first();
+        if ($teamMember && $teamMember->role !== 'admin') {
+            $permissions = $teamMember->permissions ?? [];
+            if (!($permissions['analytics'] ?? false)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static function canAccess(): bool
+    {
+        return static::shouldRegisterNavigation();
+    }
+
     public function mount(): void
     {
-        $this->restaurant = Auth::user()->restaurants()->first();
+        $this->restaurant = Auth::user()->allAccessibleRestaurants()->first();
         $this->isPremium = $this->restaurant && in_array($this->restaurant->subscription_tier, ['premium', 'elite']);
         $this->loadStats();
         $this->loadComparison();
@@ -128,14 +148,6 @@ class Analytics extends Page
         $this->loadComparison();
     }
 
-    public static function shouldRegisterNavigation(): bool
-    {
-        $user = Auth::user();
-        if (!$user) return false;
-        
-        $restaurant = $user->restaurants()->first();
-        return $restaurant && $restaurant->is_claimed;
-    }
 
 
     public function loadComparison(): void
@@ -243,7 +255,7 @@ class Analytics extends Page
         $user = Auth::user();
         if (!$user) return null;
         
-        $restaurant = $user->restaurants()->first();
+        $restaurant = $user->allAccessibleRestaurants()->first();
         if ($restaurant && !in_array($restaurant->subscription_tier, ["premium", "elite"])) {
             return "PRO";
         }

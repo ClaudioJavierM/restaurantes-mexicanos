@@ -30,13 +30,26 @@ class MyReservationsResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        $restaurant = auth()->user()?->restaurants()->first();
+        // Check team member permissions
+        $user2 = auth()->user();
+        if ($user2) {
+            $teamMember = \App\Models\RestaurantTeamMember::where('user_id', $user2->id)
+                ->where('status', 'active')->first();
+            if ($teamMember && $teamMember->role !== 'admin') {
+                $permissions = $teamMember->permissions ?? [];
+                if (!($permissions['reservations'] ?? false)) {
+                    return false;
+                }
+            }
+        }
+
+        $restaurant = auth()->user()?->allAccessibleRestaurants()->first();
         return $restaurant && $restaurant->is_claimed;
     }
 
     public static function canAccess(): bool
     {
-        $restaurant = auth()->user()?->restaurants()->first();
+        $restaurant = auth()->user()?->allAccessibleRestaurants()->first();
         return $restaurant && $restaurant->is_claimed;
     }
 
@@ -69,7 +82,7 @@ class MyReservationsResource extends Resource
 
     public static function canCreate(): bool
     {
-        $restaurant = auth()->user()?->restaurants()->first();
+        $restaurant = auth()->user()?->allAccessibleRestaurants()->first();
         return $restaurant && in_array($restaurant->subscription_tier, ["premium", "elite"]);
     }
 

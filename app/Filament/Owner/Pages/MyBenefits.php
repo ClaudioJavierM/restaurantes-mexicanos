@@ -24,7 +24,7 @@ class MyBenefits extends Page
     public function mount(): void
     {
         $user = Auth::user();
-        $this->restaurant = $user->restaurants()->first();
+        $this->restaurant = $user->allAccessibleRestaurants()->first();
 
         if ($this->restaurant) {
             // Get or create subscriber coupon
@@ -34,7 +34,7 @@ class MyBenefits extends Page
 
             // If no coupon exists, create one
             if (!$this->subscriberCoupon && $this->restaurant->is_claimed) {
-                $tier = $this->restaurant->subscription_plan ?? 'free';
+                $tier = $this->restaurant->subscription_tier ?? 'free';
                 $this->subscriberCoupon = SubscriberCoupon::createForRestaurant(
                     $this->restaurant,
                     $user,
@@ -60,7 +60,7 @@ class MyBenefits extends Page
         $user = Auth::user();
         if (!$user) return false;
 
-        $restaurant = $user->restaurants()->first();
+        $restaurant = $user->allAccessibleRestaurants()->first();
         return $restaurant && $restaurant->is_claimed;
     }
 }

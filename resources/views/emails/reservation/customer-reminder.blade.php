@@ -18,6 +18,7 @@
     </style>
 </head>
 <body>
+    <div style="text-align: center; padding: 20px 0 0 0;"><img src="https://restaurantesmexicanosfamosos.com/images/branding/logo.png?v=3" alt="Restaurantes Mexicanos Famosos" style="max-height: 50px; width: auto; margin-bottom: 12px;" /></div>
     <div class="container">
         <div class="header">
             <div class="bell-icon">&#128276;</div>

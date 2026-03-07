@@ -12,7 +12,7 @@ class StatsOverview extends BaseWidget
 {
     protected function getStats(): array
     {
-        $restaurant = auth()->user()->restaurants()->first();
+        $restaurant = auth()->user()->allAccessibleRestaurants()->first();
 
         if (!$restaurant) {
             return [

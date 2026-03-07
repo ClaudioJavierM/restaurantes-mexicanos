@@ -41,7 +41,8 @@ class TeamInvitationController extends Controller
         }
 
         // Check if user needs to set password (new user)
-        $needsPassword = !$member->user->password || $member->user->password === '';
+        // User needs password if they never logged in (created via team invitation)
+        $needsPassword = !$member->user->last_login_at;
 
         return view('team.accept-invitation', [
             'member' => $member,
@@ -72,7 +73,7 @@ class TeamInvitationController extends Controller
         $user = $member->user;
 
         // If user needs to set a password
-        if ($request->has('password')) {
+        if ($request->filled('password')) {
             $request->validate([
                 'password' => 'required|min:8|confirmed',
             ], [
@@ -81,14 +82,24 @@ class TeamInvitationController extends Controller
                 'password.confirmed' => 'Las contrasenas no coinciden.',
             ]);
 
-            $user->update([
-                'password' => Hash::make($request->password),
-                'email_verified_at' => $user->email_verified_at ?? now(),
-            ]);
+            $user->password = Hash::make($request->password);
         }
+
+        // Always ensure email is verified for team members
+        $user->email_verified_at = $user->email_verified_at ?? now();
+        $user->last_login_at = now();
+        $user->save();
 
         // Accept the invitation
         $member->accept();
+
+        \Log::info('Team invitation accepted', [
+            'user_id' => $user->id,
+            'email' => $user->email,
+            'member_id' => $member->id,
+            'restaurant' => $member->restaurant->name,
+            'email_verified' => $user->email_verified_at,
+        ]);
 
         // Log in the user
         Auth::login($user);
@@ -97,7 +108,7 @@ class TeamInvitationController extends Controller
             ->with('success', "Bienvenido al equipo de {$member->restaurant->name}!");
     }
 
-    /**
+        /**
      * Decline the invitation
      */
     public function decline(string $token)

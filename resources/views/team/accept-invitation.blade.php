@@ -29,8 +29,11 @@
                 <!-- Restaurant Info -->
                 <div class="bg-gray-50 rounded-lg p-4 mb-6">
                     <div class="flex items-center space-x-4">
-                        @if($member->restaurant->photos->first())
-                            <img src="{{ $member->restaurant->photos->first()->url }}"
+                        @php
+                            $photo = $member->restaurant->getMedia('photos')->first();
+                        @endphp
+                        @if($photo)
+                            <img src="{{ $photo->getUrl() }}"
                                  alt="{{ $member->restaurant->name }}"
                                  class="w-16 h-16 rounded-lg object-cover">
                         @else
@@ -42,7 +45,7 @@
                         @endif
                         <div>
                             <h3 class="font-bold text-lg text-gray-900">{{ $member->restaurant->name }}</h3>
-                            <p class="text-gray-600 text-sm">{{ $member->restaurant->city }}, {{ $member->restaurant->state?->name }}</p>
+                            <p class="text-gray-600 text-sm">{{ $member->restaurant->city }}{{ $member->restaurant->state ? ', ' . $member->restaurant->state->name : '' }}</p>
                         </div>
                     </div>
                 </div>
@@ -52,38 +55,46 @@
                     <div class="flex justify-between items-center py-2 border-b">
                         <span class="text-gray-600">Tu rol:</span>
                         <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
-                            @if($member->role === 'owner') bg-red-100 text-red-800
+                            @if($member->role === 'admin') bg-red-100 text-red-800
                             @elseif($member->role === 'manager') bg-yellow-100 text-yellow-800
-                            @else bg-blue-100 text-blue-800 @endif">
-                            {{ $member->getRoleLabel() }}
+                            @elseif($member->role === 'editor') bg-blue-100 text-blue-800
+                            @else bg-gray-100 text-gray-800 @endif">
+                            {{ \App\Models\RestaurantTeamMember::getRoleLabel($member->role) }}
                         </span>
                     </div>
                     <div class="flex justify-between items-center py-2 border-b">
                         <span class="text-gray-600">Invitado por:</span>
                         <span class="text-gray-900">{{ $member->inviter?->name ?? 'El propietario' }}</span>
                     </div>
+                    @if($member->invitation_expires_at)
                     <div class="flex justify-between items-center py-2">
                         <span class="text-gray-600">Expira:</span>
                         <span class="text-gray-900">{{ $member->invitation_expires_at->format('d/m/Y') }}</span>
                     </div>
+                    @endif
                 </div>
 
                 <!-- Role Description -->
                 <div class="mb-6 p-4 rounded-lg
-                    @if($member->role === 'owner') bg-red-50
+                    @if($member->role === 'admin') bg-red-50
                     @elseif($member->role === 'manager') bg-yellow-50
-                    @else bg-blue-50 @endif">
-                    @if($member->role === 'owner')
+                    @elseif($member->role === 'editor') bg-blue-50
+                    @else bg-gray-50 @endif">
+                    @if($member->role === 'admin')
                         <p class="text-sm text-red-800">
-                            <strong>Como propietario</strong> tendras acceso completo al restaurante, incluyendo la gestion del equipo, finanzas y todas las configuraciones.
+                            <strong>Como administrador</strong> tendras acceso completo al restaurante, incluyendo la gestion del equipo y todas las configuraciones.
                         </p>
                     @elseif($member->role === 'manager')
                         <p class="text-sm text-yellow-800">
                             <strong>Como gerente</strong> podras gestionar reservaciones, responder resenas, actualizar el menu y ver estadisticas del restaurante.
                         </p>
-                    @else
+                    @elseif($member->role === 'editor')
                         <p class="text-sm text-blue-800">
-                            <strong>Como staff</strong> podras ver y gestionar las reservaciones del dia asignadas.
+                            <strong>Como editor</strong> podras editar el menu, gestionar fotos y actualizar el contenido del restaurante.
+                        </p>
+                    @else
+                        <p class="text-sm text-gray-800">
+                            <strong>Como visor</strong> podras ver la informacion y estadisticas del restaurante.
                         </p>
                     @endif
                 </div>

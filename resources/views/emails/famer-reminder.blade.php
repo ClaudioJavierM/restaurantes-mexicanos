@@ -6,6 +6,7 @@
     <title>Ultima Oportunidad - FAMER Awards</title>
 </head>
 <body style="margin: 0; padding: 0; font-family: Georgia, Times, serif; background-color: #000000;">
+    <div style="text-align: center; padding: 20px 0 0 0;"><img src="https://restaurantesmexicanosfamosos.com/images/branding/logo.png?v=3" alt="Restaurantes Mexicanos Famosos" style="max-height: 50px; width: auto; margin-bottom: 12px;" /></div>
     <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #000000; padding: 20px 0;">
         <tr>
             <td align="center">

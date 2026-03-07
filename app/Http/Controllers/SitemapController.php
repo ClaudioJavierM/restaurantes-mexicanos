@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Restaurant;
 use App\Models\State;
-use App\Models\Category;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
@@ -13,84 +12,48 @@ use Carbon\Carbon;
 class SitemapController extends Controller
 {
     /**
-     * Sitemap index — links to sub-sitemaps.
-     * Google recommends splitting large sitemaps for faster processing.
+     * Sitemap Index - points to all sub-sitemaps
      */
     public function index(): Response
     {
-        $baseUrl = $this->getBaseUrl();
-        $cacheKey = 'sitemap_index_' . md5($baseUrl);
+        $currentDomain = request()->getHost();
+        $baseUrl = $this->getBaseUrl($currentDomain);
 
-        $xml = Cache::remember($cacheKey, 3600, function () use ($baseUrl) {
-            $xml = '<?xml version="1.0" encoding="UTF-8"?>';
-            $xml .= '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+        $xml = '<?xml version="1.0" encoding="UTF-8"?>';
+        $xml .= '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
 
+        $sitemaps = ['sitemap-pages.xml', 'sitemap-restaurants.xml', 'sitemap-guides.xml', 'sitemap-rankings.xml'];
+        foreach ($sitemaps as $sitemap) {
             $xml .= '<sitemap>';
-            $xml .= '<loc>' . $baseUrl . '/sitemap-main.xml</loc>';
+            $xml .= '<loc>' . $baseUrl . '/' . $sitemap . '</loc>';
             $xml .= '<lastmod>' . now()->format('Y-m-d') . '</lastmod>';
             $xml .= '</sitemap>';
+        }
 
-            // Split restaurants into chunks of 5,000
-            $totalRestaurants = Restaurant::approved()->count();
-            $chunks = ceil($totalRestaurants / 5000);
-
-            for ($i = 1; $i <= $chunks; $i++) {
-                $xml .= '<sitemap>';
-                $xml .= '<loc>' . $baseUrl . '/sitemap-restaurants-' . $i . '.xml</loc>';
-                $xml .= '<lastmod>' . now()->format('Y-m-d') . '</lastmod>';
-                $xml .= '</sitemap>';
-            }
-
-            $xml .= '<sitemap>';
-            $xml .= '<loc>' . $baseUrl . '/sitemap-guides.xml</loc>';
-            $xml .= '<lastmod>' . now()->format('Y-m-d') . '</lastmod>';
-            $xml .= '</sitemap>';
-
-            $xml .= '<sitemap>';
-            $xml .= '<loc>' . $baseUrl . '/sitemap-rankings.xml</loc>';
-            $xml .= '<lastmod>' . now()->format('Y-m-d') . '</lastmod>';
-            $xml .= '</sitemap>';
-
-            $xml .= '</sitemapindex>';
-
-            return $xml;
-        });
+        $xml .= '</sitemapindex>';
 
         return $this->xmlResponse($xml);
     }
 
     /**
-     * Main pages sitemap (homepage, static pages, categories).
+     * Static pages sitemap
      */
-    public function main(): Response
+    public function pages(): Response
     {
-        $baseUrl = $this->getBaseUrl();
-        $cacheKey = 'sitemap_main_' . md5($baseUrl);
+        $currentDomain = request()->getHost();
+        $cacheKey = 'sitemap_pages_' . md5($currentDomain);
 
-        $xml = Cache::remember($cacheKey, 3600, function () use ($baseUrl) {
+        $xml = Cache::remember($cacheKey, 3600, function () use ($currentDomain) {
+            $baseUrl = $this->getBaseUrl($currentDomain);
+
             $xml = $this->openUrlset();
-
-            // Homepage
             $xml .= $this->addUrl($baseUrl . '/', now(), 'daily', '1.0');
-
-            // Restaurant listing
             $xml .= $this->addUrl($baseUrl . '/restaurantes', now(), 'daily', '0.9');
-
-            // Suggest page
             $xml .= $this->addUrl($baseUrl . '/sugerir', now()->subMonth(), 'monthly', '0.5');
-
-            // Category pages (clean URLs, not query strings)
-            $categories = Category::has('restaurants')->select('slug', 'updated_at')->get();
-            foreach ($categories as $category) {
-                $xml .= $this->addUrl(
-                    $baseUrl . '/restaurantes/categoria/' . $category->slug,
-                    $category->updated_at ?? now()->subWeek(),
-                    'daily',
-                    '0.7'
-                );
-            }
-
+            $xml .= $this->addUrl($baseUrl . '/mejores-restaurantes-mexicanos', now(), 'weekly', '0.9');
+            $xml .= $this->addUrl($baseUrl . '/top-10-restaurantes-mexicanos', now(), 'weekly', '0.9');
             $xml .= '</urlset>';
+
             return $xml;
         });
 
@@ -98,33 +61,34 @@ class SitemapController extends Controller
     }
 
     /**
-     * Restaurant pages sitemap (paginated, 5,000 per file).
+     * Restaurants sitemap
      */
-    public function restaurants(int $page = 1): Response
+    public function restaurants(): Response
     {
-        $baseUrl = $this->getBaseUrl();
-        $cacheKey = 'sitemap_restaurants_' . $page . '_' . md5($baseUrl);
+        $currentDomain = request()->getHost();
+        $cacheKey = 'sitemap_restaurants_' . md5($currentDomain);
 
-        $xml = Cache::remember($cacheKey, 3600, function () use ($baseUrl, $page) {
+        $xml = Cache::remember($cacheKey, 3600, function () use ($currentDomain) {
+            $baseUrl = $this->getBaseUrl($currentDomain);
+
             $xml = $this->openUrlset();
 
-            $restaurants = Restaurant::approved()
+            Restaurant::approved()
                 ->select('slug', 'updated_at')
                 ->orderBy('id')
-                ->offset(($page - 1) * 5000)
-                ->limit(5000)
-                ->get();
-
-            foreach ($restaurants as $restaurant) {
-                $xml .= $this->addUrl(
-                    $baseUrl . '/restaurante/' . $restaurant->slug,
-                    $restaurant->updated_at,
-                    'weekly',
-                    '0.8'
-                );
-            }
+                ->chunk(1000, function ($restaurants) use (&$xml, $baseUrl) {
+                    foreach ($restaurants as $restaurant) {
+                        $xml .= $this->addUrl(
+                            $baseUrl . '/restaurante/' . $restaurant->slug,
+                            $restaurant->updated_at,
+                            'weekly',
+                            '0.8'
+                        );
+                    }
+                });
 
             $xml .= '</urlset>';
+
             return $xml;
         });
 
@@ -132,24 +96,23 @@ class SitemapController extends Controller
     }
 
     /**
-     * City guides sitemap.
+     * City guides sitemap
      */
     public function guides(): Response
     {
-        $baseUrl = $this->getBaseUrl();
-        $cacheKey = 'sitemap_guides_' . md5($baseUrl);
+        $currentDomain = request()->getHost();
+        $cacheKey = 'sitemap_guides_' . md5($currentDomain);
 
-        $xml = Cache::remember($cacheKey, 3600, function () use ($baseUrl) {
+        $xml = Cache::remember($cacheKey, 3600, function () use ($currentDomain) {
+            $baseUrl = $this->getBaseUrl($currentDomain);
+
             $xml = $this->openUrlset();
 
             // Guides index
             $xml .= $this->addUrl($baseUrl . '/guia', now(), 'weekly', '0.8');
 
-            $states = State::has('restaurants')
-                ->select('id', 'name', 'code', 'slug', 'updated_at')
-                ->get();
-
-            // State guide pages
+            // State pages
+            $states = State::has('restaurants')->select('id', 'name', 'code', 'slug', 'updated_at')->get();
             foreach ($states as $state) {
                 $xml .= $this->addUrl(
                     $baseUrl . '/guia/' . strtolower($state->code ?? $state->name),
@@ -159,7 +122,7 @@ class SitemapController extends Controller
                 );
             }
 
-            // City guide pages
+            // City pages
             $cities = $this->getTopCities(500);
             foreach ($cities as $city) {
                 if ($city->state_code && $city->city) {
@@ -173,6 +136,7 @@ class SitemapController extends Controller
             }
 
             $xml .= '</urlset>';
+
             return $xml;
         });
 
@@ -180,25 +144,20 @@ class SitemapController extends Controller
     }
 
     /**
-     * Rankings sitemap ("mejores restaurantes mexicanos en...").
+     * Rankings sitemap
      */
     public function rankings(): Response
     {
-        $baseUrl = $this->getBaseUrl();
-        $cacheKey = 'sitemap_rankings_' . md5($baseUrl);
+        $currentDomain = request()->getHost();
+        $cacheKey = 'sitemap_rankings_' . md5($currentDomain);
 
-        $xml = Cache::remember($cacheKey, 3600, function () use ($baseUrl) {
+        $xml = Cache::remember($cacheKey, 3600, function () use ($currentDomain) {
+            $baseUrl = $this->getBaseUrl($currentDomain);
+
             $xml = $this->openUrlset();
 
-            // Top-level ranking pages
-            $xml .= $this->addUrl($baseUrl . '/mejores-restaurantes-mexicanos', now(), 'weekly', '0.9');
-            $xml .= $this->addUrl($baseUrl . '/top-10-restaurantes-mexicanos', now(), 'weekly', '0.9');
-
-            $states = State::has('restaurants')
-                ->select('id', 'name', 'code', 'slug', 'updated_at')
-                ->get();
-
             // State ranking pages
+            $states = State::has('restaurants')->select('id', 'name', 'code', 'slug', 'updated_at')->get();
             foreach ($states as $state) {
                 $stateSlug = $state->slug ?? strtolower($state->code ?? '');
                 if ($stateSlug) {
@@ -225,27 +184,17 @@ class SitemapController extends Controller
             }
 
             $xml .= '</urlset>';
+
             return $xml;
         });
 
         return $this->xmlResponse($xml);
     }
 
-    // ─── Helpers ──────────────────────────────────────────
-
-    protected function getBaseUrl(): string
-    {
-        $currentDomain = request()->getHost();
-
-        return match (true) {
-            str_contains($currentDomain, 'famousmexicanrestaurants') => 'https://famousmexicanrestaurants.com',
-            str_contains($currentDomain, '.com.mx') => 'https://restaurantesmexicanosfamosos.com.mx',
-            str_contains($currentDomain, 'restaurantesmexicanosfamosos') => 'https://restaurantesmexicanosfamosos.com',
-            default => url('/'),
-        };
-    }
-
-    protected function getTopCities(int $limit): \Illuminate\Support\Collection
+    /**
+     * Get top cities with restaurants
+     */
+    protected function getTopCities(int $limit)
     {
         return Restaurant::query()
             ->join('states', 'restaurants.state_id', '=', 'states.id')
@@ -262,12 +211,31 @@ class SitemapController extends Controller
             ->get();
     }
 
+    /**
+     * Get base URL from domain
+     */
+    protected function getBaseUrl(string $domain): string
+    {
+        return match (true) {
+            str_contains($domain, 'famousmexicanrestaurants') => 'https://famousmexicanrestaurants.com',
+            str_contains($domain, '.com.mx') => 'https://restaurantesmexicanosfamosos.com.mx',
+            str_contains($domain, 'restaurantesmexicanosfamosos') => 'https://restaurantesmexicanosfamosos.com',
+            default => url('/'),
+        };
+    }
+
+    /**
+     * Open urlset XML tag
+     */
     protected function openUrlset(): string
     {
         return '<?xml version="1.0" encoding="UTF-8"?>'
             . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
     }
 
+    /**
+     * Add URL entry to sitemap
+     */
     protected function addUrl(string $url, $lastmod, string $changefreq, string $priority): string
     {
         return '<url>'
@@ -278,11 +246,13 @@ class SitemapController extends Controller
             . '</url>';
     }
 
+    /**
+     * Return XML response with proper cache headers
+     */
     protected function xmlResponse(string $xml): Response
     {
         return response($xml, 200)
-            ->header('Content-Type', 'application/xml')
-            ->header('Cache-Control', 'public, max-age=3600, s-maxage=86400')
-            ->header('Content-Encoding', 'identity');
+            ->header('Content-Type', 'application/xml; charset=UTF-8')
+            ->header('Cache-Control', 'public, max-age=3600, s-maxage=86400');
     }
 }

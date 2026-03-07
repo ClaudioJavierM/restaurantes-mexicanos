@@ -30,15 +30,35 @@ class MyPhotosResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        $restaurantIds = auth()->user()->restaurants()->pluck('id');
+        $restaurantIds = auth()->user()->allAccessibleRestaurants()->pluck('id');
         
         return parent::getEloquentQuery()
             ->whereIn('restaurant_id', $restaurantIds);
     }
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        $user = auth()->user();
+        if (!$user) return false;
+        $teamMember = \App\Models\RestaurantTeamMember::where('user_id', $user->id)
+            ->where('status', 'active')->first();
+        if ($teamMember && $teamMember->role !== 'admin') {
+            $permissions = $teamMember->permissions ?? [];
+            if (!($permissions['photos'] ?? false)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static function canAccess(): bool
+    {
+        return static::shouldRegisterNavigation();
+    }
+
     public static function form(Form $form): Form
     {
-        $restaurant = auth()->user()->restaurants()->first();
+        $restaurant = auth()->user()->allAccessibleRestaurants()->first();
         $maxPhotos = static::getMaxPhotos();
         $currentCount = static::getCurrentPhotoCount();
         
@@ -189,7 +209,7 @@ class MyPhotosResource extends Resource
 
     public static function getMaxPhotos(): int
     {
-        $restaurant = auth()->user()?->restaurants()->first();
+        $restaurant = auth()->user()?->allAccessibleRestaurants()->first();
         $plan = $restaurant?->subscription_tier ?? 'free';
         
         return match($plan) {
@@ -202,7 +222,7 @@ class MyPhotosResource extends Resource
 
     public static function getCurrentPhotoCount(): int
     {
-        $restaurantIds = auth()->user()?->restaurants()->pluck('id') ?? collect();
+        $restaurantIds = auth()->user()?->allAccessibleRestaurants()->pluck('id') ?? collect();
         
         return UserPhoto::whereIn('restaurant_id', $restaurantIds)->count();
     }

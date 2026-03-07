@@ -7,7 +7,7 @@
 </head>
 <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
     <div style="background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-        <img src="https://restaurantesmexicanosfamosos.com/images/branding/icon.png" alt="Restaurantes Mexicanos Famosos" style="width: 70px; height: 70px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.3); margin-bottom: 12px;" />
+        <img src="https://restaurantesmexicanosfamosos.com/images/branding/logo.png?v=3" alt="Restaurantes Mexicanos Famosos" style="max-height: 50px; width: auto; margin-bottom: 12px;" />
         <h1 style="color: white; margin: 0; font-size: 24px;">🌮 Restaurantes Mexicanos</h1>
         <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0;">Verificación de Propietario</p>
     </div>

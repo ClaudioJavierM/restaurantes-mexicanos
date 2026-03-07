@@ -1,4 +1,6 @@
 <x-mail::message>
+
+<div style="text-align: center; margin-bottom: 20px;"><img src="https://restaurantesmexicanosfamosos.com/images/branding/logo.png?v=3" alt="Restaurantes Mexicanos Famosos" style="max-height: 50px; width: auto; margin-bottom: 12px;" /></div>
 # ¡Gracias por tu pedido!
 
 Hola **{{ $order->customer_name }}**,

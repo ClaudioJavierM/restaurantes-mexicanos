@@ -29,12 +29,32 @@ class MyReviewsResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        $restaurantIds = auth()->user()->restaurants()->pluck('id');
+        $restaurantIds = auth()->user()->allAccessibleRestaurants()->pluck('id');
         
         return parent::getEloquentQuery()
             ->whereIn('restaurant_id', $restaurantIds)
             ->where('status', 'approved')
             ->latest();
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        $user = auth()->user();
+        if (!$user) return false;
+        $teamMember = \App\Models\RestaurantTeamMember::where('user_id', $user->id)
+            ->where('status', 'active')->first();
+        if ($teamMember && $teamMember->role !== 'admin') {
+            $permissions = $teamMember->permissions ?? [];
+            if (!($permissions['reviews'] ?? false)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static function canAccess(): bool
+    {
+        return static::shouldRegisterNavigation();
     }
 
     public static function form(Form $form): Form
@@ -206,7 +226,7 @@ class MyReviewsResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        $restaurantIds = auth()->user()?->restaurants()?->pluck('id') ?? collect();
+        $restaurantIds = auth()->user()?->allAccessibleRestaurants()?->pluck('id') ?? collect();
         
         $count = Review::whereIn('restaurant_id', $restaurantIds)
             ->where('status', 'approved')

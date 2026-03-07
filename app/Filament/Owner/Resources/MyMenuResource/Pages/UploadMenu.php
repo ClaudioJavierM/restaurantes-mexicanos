@@ -21,7 +21,7 @@ class UploadMenu extends Page
 
     public function mount(): void
     {
-        $this->restaurant = auth()->user()->restaurants()->first();
+        $this->restaurant = auth()->user()->allAccessibleRestaurants()->first();
         $plan = $this->restaurant?->subscription_tier ?? 'free';
 
         if (!in_array($plan, ['premium', 'elite'])) {

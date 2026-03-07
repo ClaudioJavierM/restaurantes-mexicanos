@@ -13,6 +13,7 @@
                     {{-- Header --}}
                     <tr>
                         <td style="background: linear-gradient(135deg, #dc2626, #ea580c); padding: 30px; text-align: center;">
+                            <img src="https://restaurantesmexicanosfamosos.com/images/branding/logo.png?v=3" alt="Restaurantes Mexicanos Famosos" style="max-height: 50px; width: auto; margin-bottom: 12px;" />
                             @if($restaurant->logo_url)
                                 <img src="{{ $restaurant->logo_url }}" alt="{{ $restaurant->name }}" style="max-height: 60px; margin-bottom: 15px;">
                             @endif
