@@ -112,8 +112,17 @@
         {{-- Quick Actions --}}
         <div style="background-color: #1f2937; border-radius: 0.75rem; padding: 1.25rem; border: 1px solid #374151;">
             <h3 style="font-size: 1rem; font-weight: 600; color: #ffffff; margin: 0 0 1rem 0;">Acciones Rapidas</h3>
-            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem;">
-                <a href="{{ route('filament.owner.resources.my-restaurants.edit', $restaurant) }}" 
+            <div style="display: grid; grid-template-columns: repeat({{ $isPremium ? '5' : '4' }}, 1fr); gap: 0.75rem;">
+                @if($isPremium)
+                <a href="{{ route('restaurant.website', $restaurant->slug) }}" target="_blank"
+                   style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; background-color: #374151; padding: 1rem; border-radius: 0.5rem; text-decoration: none; transition: all 0.2s;">
+                    <div style="background: linear-gradient(135deg, #7c3aed, #6d28d9); width: 3rem; height: 3rem; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center;">
+                        <svg style="width: 1.5rem; height: 1.5rem; color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
+                    </div>
+                    <span style="color: #e5e7eb; font-size: 0.875rem; font-weight: 500;">Mi Sitio</span>
+                </a>
+                @endif
+                <a href="{{ route('filament.owner.resources.my-restaurants.edit', $restaurant) }}"
                    style="display: flex; flex-direction: column; align-items: center; gap: 0.5rem; background-color: #374151; padding: 1rem; border-radius: 0.5rem; text-decoration: none; transition: all 0.2s;">
                     <div style="background: linear-gradient(135deg, #ef4444, #dc2626); width: 3rem; height: 3rem; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center;">
                         <svg style="width: 1.5rem; height: 1.5rem; color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
