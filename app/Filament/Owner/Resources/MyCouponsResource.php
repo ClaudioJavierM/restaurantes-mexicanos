@@ -30,7 +30,7 @@ class MyCouponsResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        $restaurantIds = auth()->user()->restaurants()->pluck('id');
+        $restaurantIds = auth()->user()->allAccessibleRestaurants()->pluck('id');
         
         return parent::getEloquentQuery()
             ->whereIn('restaurant_id', $restaurantIds);
@@ -43,7 +43,7 @@ class MyCouponsResource extends Resource
                 Forms\Components\Section::make('Información del Cupón')
                     ->schema([
                         Forms\Components\Hidden::make('restaurant_id')
-                            ->default(fn () => auth()->user()->restaurants()->first()?->id),
+                            ->default(fn () => auth()->user()->allAccessibleRestaurants()->first()?->id),
 
                         Forms\Components\TextInput::make('title')
                             ->label('Título del Cupón')
@@ -258,7 +258,7 @@ class MyCouponsResource extends Resource
         $user = auth()->user();
         if (!$user) return false;
         
-        $restaurant = $user->restaurants()->first();
+        $restaurant = $user->allAccessibleRestaurants()->first();
         if (!$restaurant) return false;
         
         return in_array($restaurant->subscription_tier, ["premium", "elite"]);
@@ -266,10 +266,23 @@ class MyCouponsResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
+        // Check team member permissions
+        $user2 = auth()->user();
+        if ($user2) {
+            $teamMember = \App\Models\RestaurantTeamMember::where('user_id', $user2->id)
+                ->where('status', 'active')->first();
+            if ($teamMember && $teamMember->role !== 'admin') {
+                $permissions = $teamMember->permissions ?? [];
+                if (!($permissions['coupons'] ?? false)) {
+                    return false;
+                }
+            }
+        }
+
         $user = auth()->user();
         if (!$user) return false;
         
-        $restaurant = $user->restaurants()->first();
+        $restaurant = $user->allAccessibleRestaurants()->first();
         return $restaurant && $restaurant->is_claimed;
     }
 
@@ -278,12 +291,12 @@ class MyCouponsResource extends Resource
         $user = auth()->user();
         if (!$user) return null;
         
-        $restaurant = $user->restaurants()->first();
+        $restaurant = $user->allAccessibleRestaurants()->first();
         if ($restaurant && !in_array($restaurant->subscription_tier, ["premium", "elite"])) {
             return "PRO";
         }
         
-        $restaurantIds = $user->restaurants()->pluck("id");
+        $restaurantIds = $user->allAccessibleRestaurants()->pluck("id");
         $count = \App\Models\Coupon::whereIn("restaurant_id", $restaurantIds)
             ->where("is_active", true)
             ->valid()
@@ -294,8 +307,8 @@ class MyCouponsResource extends Resource
     
     public static function getNavigationBadgeColor(): ?string
     {
-        $restaurantIds = auth()->user()?->restaurants()?->pluck("id") ?? collect();
-        $restaurant = auth()->user()?->restaurants()->first();
+        $restaurantIds = auth()->user()?->allAccessibleRestaurants()?->pluck("id") ?? collect();
+        $restaurant = auth()->user()?->allAccessibleRestaurants()->first();
         
         if ($restaurant && !in_array($restaurant->subscription_tier, ["premium", "elite"])) {
             return "warning";

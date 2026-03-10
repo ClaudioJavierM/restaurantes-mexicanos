@@ -14,6 +14,7 @@
                     <!-- Header -->
                     <tr>
                         <td style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); padding: 30px 40px; border-radius: 12px 12px 0 0; text-align: center;">
+                            <img src="https://restaurantesmexicanosfamosos.com/images/branding/logo.png?v=3" alt="Restaurantes Mexicanos Famosos" style="max-height: 50px; width: auto; margin-bottom: 12px;" />
                             <h1 style="color: #ffffff; margin: 0; font-size: 24px;">
                                 @if($reminderNumber === 1)
                                     Casi terminas!

@@ -23,7 +23,7 @@ class EventsResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        $restaurantIds = auth()->user()->restaurants()->pluck('id');
+        $restaurantIds = auth()->user()->allAccessibleRestaurants()->pluck('id');
         return parent::getEloquentQuery()->whereIn('restaurant_id', $restaurantIds);
     }
 
@@ -33,7 +33,7 @@ class EventsResource extends Resource
             Forms\Components\Section::make('Informacion del Evento')
                 ->schema([
                     Forms\Components\Hidden::make('restaurant_id')
-                        ->default(fn () => auth()->user()->restaurants()->first()?->id),
+                        ->default(fn () => auth()->user()->allAccessibleRestaurants()->first()?->id),
                     Forms\Components\TextInput::make('title')->label('Titulo')->required()->maxLength(255),
                     Forms\Components\TextInput::make('title_en')->label('Titulo (Ingles)')->maxLength(255),
                     Forms\Components\Select::make('event_type')->label('Tipo de Evento')
@@ -82,21 +82,34 @@ class EventsResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
+        // Check team member permissions
+        $user2 = auth()->user();
+        if ($user2) {
+            $teamMember = \App\Models\RestaurantTeamMember::where('user_id', $user2->id)
+                ->where('status', 'active')->first();
+            if ($teamMember && $teamMember->role !== 'admin') {
+                $permissions = $teamMember->permissions ?? [];
+                if (!($permissions['events'] ?? false)) {
+                    return false;
+                }
+            }
+        }
+
         $user = auth()->user();
         if (!$user) return false;
-        $restaurant = $user->restaurants()->first();
+        $restaurant = $user->allAccessibleRestaurants()->first();
         return $restaurant && $restaurant->is_claimed;
     }
 
     public static function canCreate(): bool
     {
-        $restaurant = auth()->user()?->restaurants()->first();
+        $restaurant = auth()->user()?->allAccessibleRestaurants()->first();
         return $restaurant && in_array($restaurant->subscription_tier, ['premium', 'elite']);
     }
 
     public static function getNavigationBadge(): ?string
     {
-        $restaurant = auth()->user()?->restaurants()->first();
+        $restaurant = auth()->user()?->allAccessibleRestaurants()->first();
         if ($restaurant && !in_array($restaurant->subscription_tier, ['premium', 'elite'])) {
             return 'PRO';
         }

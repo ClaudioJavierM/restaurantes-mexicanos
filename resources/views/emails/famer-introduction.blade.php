@@ -14,6 +14,7 @@
                     <!-- Header con bandera mexicana -->
                     <tr>
                         <td style="background: linear-gradient(135deg, #006847 0%, #1a1a1a 50%, #CE1126 100%); padding: 40px 30px; text-align: center;">
+                            <img src="https://restaurantesmexicanosfamosos.com/images/branding/logo.png?v=3" alt="Restaurantes Mexicanos Famosos" style="max-height: 50px; width: auto; margin-bottom: 12px;" />
                             <h1 style="color: #FFD700; margin: 0; font-size: 32px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">FAMER</h1>
                             <p style="color: #ffffff; margin: 10px 0 0 0; font-size: 14px; letter-spacing: 2px;">RESTAURANTES MEXICANOS FAMOSOS</p>
                         </td>

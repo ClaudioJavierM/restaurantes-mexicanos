@@ -27,10 +27,6 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->default()
             ->id('admin')
-            ->renderHook(
-                'panels::body.end',
-                fn () => new HtmlString('<script src="/fix-widget.js"></script>')
-            )
             ->path('admin')
             ->login()
             ->colors([

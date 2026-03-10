@@ -14,7 +14,7 @@ class GooglePlacesService
 
     public function __construct()
     {
-        $this->apiKey = config('services.google.places_api_key', '');
+        $this->apiKey = config('services.google.places_api_key') ?? '';
     }
 
     /**

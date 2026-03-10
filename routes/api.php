@@ -186,6 +186,17 @@ Route::prefix('v1')->group(function () {
             Route::get('/score', [OwnerAppController::class, 'score']);
             Route::get('/analytics', [OwnerAppController::class, 'analytics']);
 
+            // Orders (Elite only — live order management)
+            Route::get('/orders', [OwnerAppController::class, 'orders']);
+            Route::put('/orders/{orderId}', [OwnerAppController::class, 'updateOrder']);
+
+            // Subscription info & feature gates
+            Route::get('/subscription', [OwnerAppController::class, 'subscription']);
+
+            // SMS Marketing (Elite only)
+            Route::get('/sms/stats', [OwnerAppController::class, 'smsStats']);
+            Route::get('/sms/automations', [OwnerAppController::class, 'smsAutomations']);
+
             // Account
             Route::delete('/account', [OwnerAppController::class, 'deleteAccount']);
         });

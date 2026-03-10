@@ -43,9 +43,29 @@ class SmsMarketing extends Page implements HasForms, HasTable
     public float $clickRate = 0;
     public int $subscribedCustomers = 0;
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        $user = auth()->user();
+        if (!$user) return false;
+        $teamMember = \App\Models\RestaurantTeamMember::where('user_id', $user->id)
+            ->where('status', 'active')->first();
+        if ($teamMember && $teamMember->role !== 'admin') {
+            $permissions = $teamMember->permissions ?? [];
+            if (!($permissions['marketing'] ?? false)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static function canAccess(): bool
+    {
+        return static::shouldRegisterNavigation();
+    }
+
     public function mount(): void
     {
-        $this->restaurant = Auth::user()->restaurants()->first();
+        $this->restaurant = Auth::user()->allAccessibleRestaurants()->first();
         $this->loadStats();
     }
 

@@ -10,8 +10,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="FAMER">
-    <link rel="apple-touch-icon" href="/images/branding/icon.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="/images/branding/icon.png">
+    <link rel="apple-touch-icon" href="/images/branding/icon.png?v=2">
+    <link rel="icon" type="image/png" sizes="192x192" href="/images/branding/icon.png?v=2">
 
     <!-- SEO: Dynamic Title and Description -->
     <title>@yield('title', ($title ?? __('app.site_name')) . ' - ' . __('app.tagline'))</title>

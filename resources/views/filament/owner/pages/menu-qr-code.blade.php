@@ -1,177 +1,70 @@
 <x-filament-panels::page>
-    <div class="space-y-6">
-        @if($restaurant)
-            @if(!$isPremium)
-            <x-premium-lock feature="Codigo QR del Menu" :benefits="['QR personalizado', 'Multiples tamanos', 'Plantillas imprimibles', 'Link directo al menu']">
-            @endif
-            
-            <!-- Header -->
-            <div class="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg shadow-lg p-6 text-white">
-                <h2 class="text-2xl font-bold mb-2">📱 Código QR de tu Menú</h2>
-                <p class="text-purple-100">Imprime este código QR y colócalo en tu restaurante. Tus clientes podrán escanear y ver tu menú digital al instante.</p>
+    <div class="flex items-center justify-center min-h-[60vh]">
+        <div class="text-center max-w-2xl mx-auto px-6">
+            {{-- Icon --}}
+            <div class="mx-auto w-24 h-24 rounded-full bg-yellow-500/10 flex items-center justify-center mb-8">
+                <svg class="w-12 h-12 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 013.75 9.375v-4.5zM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 01-1.125-1.125v-4.5zM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0113.5 9.375v-4.5z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6.75 6.75h.75v.75h-.75v-.75zM6.75 16.5h.75v.75h-.75v-.75zM16.5 6.75h.75v.75H16.5v-.75zM13.5 13.5h.75v.75h-.75v-.75zM13.5 19.5h.75v.75h-.75v-.75zM19.5 13.5h.75v.75h-.75v-.75zM19.5 19.5h.75v.75h-.75v-.75zM16.5 16.5h.75v.75H16.5v-.75z"></path>
+                </svg>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- QR Preview -->
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Vista Previa</h3>
-                    
-                    <div class="flex flex-col items-center justify-center p-6 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                        <!-- QR Code -->
-                        <div class="bg-white p-4 rounded-lg shadow-md">
-                            <img 
-                                id="qr-image"
-                                src="{{ $this->getQrCodeUrl(300) }}" 
-                                alt="QR Code del Menú"
-                                class="w-64 h-64"
-                            >
-                        </div>
-                        
-                        <!-- Restaurant Name -->
-                        <div class="mt-4 text-center">
-                            <p class="text-lg font-bold text-gray-900 dark:text-white">{{ $restaurant->name }}</p>
-                            <p class="text-sm text-gray-600 dark:text-gray-400">Escanea para ver el menú</p>
-                        </div>
-                    </div>
+            {{-- Badge --}}
+            <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-yellow-500/10 text-yellow-500 text-sm font-semibold mb-6">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Pronto
+            </span>
 
-                    <!-- URL Display -->
-                    <div class="mt-4 p-3 bg-gray-100 dark:bg-gray-700 rounded-lg">
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">URL del menú:</p>
-                        <code class="text-sm text-gray-800 dark:text-gray-200 break-all">{{ $menuUrl }}</code>
+            {{-- Title --}}
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                Codigo QR del Menu
+            </h2>
+
+            {{-- Description --}}
+            <p class="text-lg text-gray-500 dark:text-gray-400 mb-8 leading-relaxed">
+                Muy pronto podras generar codigos QR personalizados para tu menu digital.
+                Tus clientes podran escanear y ver tu menu completo desde su celular.
+            </p>
+
+            {{-- Features grid --}}
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
+                <div class="p-4 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10">
+                    <div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center mx-auto mb-3">
+                        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3"></path>
+                        </svg>
                     </div>
+                    <h3 class="font-semibold text-gray-900 dark:text-white text-sm">Escaneo Instantaneo</h3>
+                    <p class="text-xs text-gray-500 mt-1">Tus clientes acceden al menu con una foto</p>
                 </div>
 
-                <!-- Download Options -->
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Descargar QR</h3>
-                    
-                    <!-- Size Options -->
-                    <div class="mb-6">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tamaño</label>
-                        <div class="grid grid-cols-3 gap-3">
-                            <button 
-                                onclick="updateQrSize(200)"
-                                class="px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg text-center hover:bg-gray-50 dark:hover:bg-gray-700 transition"
-                            >
-                                <span class="block text-lg font-bold text-gray-900 dark:text-white">S</span>
-                                <span class="text-xs text-gray-500 dark:text-gray-400">200x200</span>
-                            </button>
-                            <button 
-                                onclick="updateQrSize(300)"
-                                class="px-4 py-3 border-2 border-purple-600 bg-purple-50 dark:bg-purple-900/30 rounded-lg text-center"
-                            >
-                                <span class="block text-lg font-bold text-purple-600 dark:text-purple-400">M</span>
-                                <span class="text-xs text-purple-600 dark:text-purple-400">300x300</span>
-                            </button>
-                            <button 
-                                onclick="updateQrSize(500)"
-                                class="px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg text-center hover:bg-gray-50 dark:hover:bg-gray-700 transition"
-                            >
-                                <span class="block text-lg font-bold text-gray-900 dark:text-white">L</span>
-                                <span class="text-xs text-gray-500 dark:text-gray-400">500x500</span>
-                            </button>
-                        </div>
+                <div class="p-4 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10">
+                    <div class="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center mx-auto mb-3">
+                        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M9.75 8.25h4.5"></path>
+                        </svg>
                     </div>
+                    <h3 class="font-semibold text-gray-900 dark:text-white text-sm">Listo para Imprimir</h3>
+                    <p class="text-xs text-gray-500 mt-1">Descarga e imprime para tus mesas</p>
+                </div>
 
-                    <!-- Download Buttons -->
-                    <div class="space-y-3">
-                        <a 
-                            id="download-png"
-                            href="{{ $this->getQrCodeUrl(500) }}"
-                            download="qr-menu-{{ $restaurant->slug }}.png"
-                            class="flex items-center justify-center w-full px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition"
-                        >
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-                            </svg>
-                            Descargar PNG
-                        </a>
-
-                        <button 
-                            onclick="printQr()"
-                            class="flex items-center justify-center w-full px-6 py-3 bg-gray-600 text-white rounded-lg font-semibold hover:bg-gray-700 transition"
-                        >
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
-                            </svg>
-                            Imprimir
-                        </button>
+                <div class="p-4 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10">
+                    <div class="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center mx-auto mb-3">
+                        <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42"></path>
+                        </svg>
                     </div>
-
-                    <!-- Tips -->
-                    <div class="mt-6 p-4 bg-yellow-50 dark:bg-yellow-900/30 rounded-lg border border-yellow-200 dark:border-yellow-800">
-                        <h4 class="font-semibold text-yellow-800 dark:text-yellow-200 mb-2">💡 Consejos</h4>
-                        <ul class="text-sm text-yellow-700 dark:text-yellow-300 space-y-1">
-                            <li>• Colócalo en cada mesa o en la entrada</li>
-                            <li>• Usa tamaño grande (L) para posters</li>
-                            <li>• Asegúrate que haya buena iluminación</li>
-                            <li>• Pruébalo antes de imprimir</li>
-                        </ul>
-                    </div>
+                    <h3 class="font-semibold text-gray-900 dark:text-white text-sm">Diseno Personalizado</h3>
+                    <p class="text-xs text-gray-500 mt-1">QR con tu logo y colores de marca</p>
                 </div>
             </div>
 
-            <!-- Printable Template -->
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">🖨️ Plantilla Imprimible</h3>
-                <p class="text-gray-600 dark:text-gray-400 mb-4">Haz clic en "Imprimir Plantilla" para imprimir una versión lista para usar con el nombre de tu restaurante.</p>
-                
-                <button 
-                    onclick="printTemplate()"
-                    class="px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition"
-                >
-                    Imprimir Plantilla
-                </button>
-            </div>
-        @if(!$isPremium)
-            </x-premium-lock>
-            @endif
-        @else
-            <div class="bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-800 rounded-lg p-6 text-center">
-                <p class="text-yellow-800 dark:text-yellow-200">No tienes un restaurante asociado. Por favor, reclama tu restaurante primero.</p>
-            </div>
-        @endif
-    </div>
-
-    <!-- Print Template (Hidden) -->
-    <div id="print-template" class="hidden">
-        <div style="text-align: center; padding: 40px; font-family: Arial, sans-serif;">
-            <h1 style="font-size: 28px; margin-bottom: 20px;">{{ $restaurant->name ?? "" }}</h1>
-            <img id="print-qr" src="{{ $this->getQrCodeUrl(400) }}" style="width: 300px; height: 300px;">
-            <p style="font-size: 18px; margin-top: 20px; color: #666;">📱 Escanea para ver nuestro menú</p>
-            <p style="font-size: 12px; margin-top: 10px; color: #999;">{{ $menuUrl }}</p>
+            {{-- CTA --}}
+            <p class="text-sm text-gray-400">
+                Estamos trabajando para ofrecerte los mejores codigos QR para tu restaurante.
+            </p>
         </div>
     </div>
-
-    <!-- Scripts -->
-    <script>
-        const baseUrl = @json($menuUrl);
-        const restaurantSlug = @json($restaurant->slug ?? "menu");
-        
-        function updateQrSize(size) {
-            const qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=" + size + "x" + size + "&data=" + encodeURIComponent(baseUrl) + "&format=png&margin=10";
-            document.getElementById('qr-image').src = qrUrl;
-            document.getElementById('download-png').href = qrUrl;
-            if (document.getElementById('print-qr')) {
-                document.getElementById('print-qr').src = qrUrl;
-            }
-        }
-        
-        function printQr() {
-            const img = document.getElementById('qr-image');
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write('<html><head><title>QR Code</title></head><body style="text-align: center; padding: 40px;"><img src="' + img.src + '" style="max-width: 400px;"></body></html>');
-            printWindow.document.close();
-            printWindow.print();
-        }
-        
-        function printTemplate() {
-            const template = document.getElementById('print-template').innerHTML;
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write('<html><head><title>Menu QR</title></head><body>' + template + '</body></html>');
-            printWindow.document.close();
-            printWindow.print();
-        }
-    </script>
-    
 </x-filament-panels::page>

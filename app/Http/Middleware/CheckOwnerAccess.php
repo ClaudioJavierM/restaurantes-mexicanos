@@ -25,6 +25,18 @@ class CheckOwnerAccess
             $user->save();
         }
 
+        // Check if user is an active team member of any restaurant
+        $isTeamMember = $user->activeTeamMemberships()->exists();
+
+        // If user is a team member but role is customer, allow access
+        if ($isTeamMember && !in_array($user->role, ['owner', 'admin'])) {
+            if (!$user->email_verified_at) {
+                $user->email_verified_at = now();
+                $user->save();
+            }
+            return $next($request);
+        }
+
         // If user still cannot access owner panel, redirect friendly
         if (!$user->hasVerifiedEmail() ||
             !in_array($user->role, ['owner', 'admin']) ||

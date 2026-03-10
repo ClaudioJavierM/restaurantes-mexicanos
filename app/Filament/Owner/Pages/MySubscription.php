@@ -78,10 +78,22 @@ class MySubscription extends Page
         ],
     ];
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        $user = auth()->user();
+        if (!$user) return false;
+        return $user->restaurants()->exists();
+    }
+
+    public static function canAccess(): bool
+    {
+        return static::shouldRegisterNavigation();
+    }
+
     public function mount(): void
     {
-        $this->restaurant = Auth::user()->restaurants()->first();
-        $this->currentPlan = $this->restaurant?->subscription_plan ?? 'free';
+        $this->restaurant = Auth::user()->allAccessibleRestaurants()->first();
+        $this->currentPlan = $this->restaurant?->subscription_tier ?? 'free';
         $this->planDetails = $this->plans[$this->currentPlan] ?? $this->plans['free'];
     }
 

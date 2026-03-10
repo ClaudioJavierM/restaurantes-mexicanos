@@ -32,6 +32,19 @@ class MyTeamResource extends Resource
 
     protected static ?int $navigationSort = 10;
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        $user = auth()->user();
+        if (!$user) return false;
+        // Only restaurant owners can manage team
+        return $user->restaurants()->exists();
+    }
+
+    public static function canAccess(): bool
+    {
+        return static::shouldRegisterNavigation();
+    }
+
     public static function getEloquentQuery(): Builder
     {
         $user = Auth::user();
@@ -77,10 +90,10 @@ class MyTeamResource extends Resource
                             ->label('Rol')
                             ->options([
                                 RestaurantTeamMember::ROLE_MANAGER => 'Gerente - Acceso completo excepto configuracion',
-                                RestaurantTeamMember::ROLE_STAFF => 'Staff - Solo ver y gestionar reservaciones',
+                                RestaurantTeamMember::ROLE_EDITOR => 'Editor - Editar menu, fotos y contenido',
                             ])
                             ->required()
-                            ->default(RestaurantTeamMember::ROLE_STAFF),
+                            ->default(RestaurantTeamMember::ROLE_EDITOR),
 
                         Forms\Components\Section::make('Permisos Personalizados')
                             ->schema([
@@ -121,15 +134,18 @@ class MyTeamResource extends Resource
                 Tables\Columns\TextColumn::make('restaurant.name')
                     ->label('Restaurante')
                     ->visible(fn () => Auth::user()->restaurants()->count() > 1),
-                Tables\Columns\BadgeColumn::make('role')
+                Tables\Columns\TextColumn::make('role')
                     ->label('Rol')
                     ->formatStateUsing(fn ($state) => RestaurantTeamMember::getRoles()[$state] ?? $state)
-                    ->colors([
-                        'danger' => 'owner',
-                        'warning' => 'manager',
-                        'info' => 'staff',
-                    ]),
-                Tables\Columns\BadgeColumn::make('status')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'admin' => 'danger',
+                        'manager' => 'warning',
+                        'editor' => 'info',
+                        'viewer' => 'gray',
+                        default => 'gray',
+                    }),
+                Tables\Columns\TextColumn::make('status')
                     ->label('Estado')
                     ->formatStateUsing(fn ($state) => match($state) {
                         'pending' => 'Invitacion Pendiente',
@@ -137,11 +153,13 @@ class MyTeamResource extends Resource
                         'revoked' => 'Revocado',
                         default => $state,
                     })
-                    ->colors([
-                        'warning' => 'pending',
-                        'success' => 'active',
-                        'danger' => 'revoked',
-                    ]),
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'pending' => 'warning',
+                        'active' => 'success',
+                        'revoked' => 'danger',
+                        default => 'gray',
+                    }),
                 Tables\Columns\TextColumn::make('accepted_at')
                     ->label('Fecha de union')
                     ->date('d/m/Y')
@@ -192,7 +210,7 @@ class MyTeamResource extends Resource
                     ->visible(fn ($record) => in_array($record->status, [
                         RestaurantTeamMember::STATUS_PENDING,
                         RestaurantTeamMember::STATUS_ACTIVE,
-                    ]) && $record->role !== RestaurantTeamMember::ROLE_OWNER)
+                    ]) && $record->role !== RestaurantTeamMember::ROLE_ADMIN)
                     ->requiresConfirmation()
                     ->modalHeading('Revocar acceso')
                     ->modalDescription('Esta persona ya no podra acceder al panel de administracion del restaurante.')

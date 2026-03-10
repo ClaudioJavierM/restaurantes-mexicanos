@@ -40,7 +40,7 @@ class CreateMyTeam extends CreateRecord
                 'name' => explode('@', $email)[0],
                 'email' => $email,
                 'password' => Hash::make(Str::random(16)),
-                'role' => 'user',
+                'role' => 'customer',
             ]);
         }
 
@@ -68,6 +68,8 @@ class CreateMyTeam extends CreateRecord
         $data['user_id'] = $user->id;
         $data['invited_by'] = Auth::id();
         $data['status'] = RestaurantTeamMember::STATUS_PENDING;
+        $data["invitation_token"] = RestaurantTeamMember::generateInvitationToken();
+        $data["invitation_expires_at"] = now()->addDays(7);
 
         // Remove email as it's not a field in the model
         unset($data['email']);
@@ -80,6 +82,7 @@ class CreateMyTeam extends CreateRecord
         // Send invitation email
         try {
             $member = $this->record;
+            $member->load(['user', 'restaurant', 'inviter']);
             if ($member->user) {
                 Mail::to($member->user->email)->send(new TeamInvitation($member));
             }
@@ -90,6 +93,7 @@ class CreateMyTeam extends CreateRecord
                 ->success()
                 ->send();
         } catch (\Exception $e) {
+            \Log::error('Team invitation email failed: ' . $e->getMessage());
             Notification::make()
                 ->title('Miembro creado')
                 ->body('El miembro fue creado pero hubo un problema enviando el email de invitacion')

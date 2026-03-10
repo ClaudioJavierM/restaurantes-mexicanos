@@ -15,7 +15,7 @@ class RecentReviewsWidget extends BaseWidget
 
     public function table(Table $table): Table
     {
-        $restaurantIds = auth()->user()->restaurants()->pluck('id');
+        $restaurantIds = auth()->user()->allAccessibleRestaurants()->pluck('id');
 
         return $table
             ->query(

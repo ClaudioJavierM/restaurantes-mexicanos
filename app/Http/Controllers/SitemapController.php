@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Restaurant;
 use App\Models\State;
-use App\Models\Category;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
@@ -70,25 +69,11 @@ class SitemapController extends Controller
         $xml = Cache::remember($cacheKey, 3600, function () use ($baseUrl) {
             $xml = $this->openUrlset();
 
-            // Homepage
             $xml .= $this->addUrl($baseUrl . '/', now(), 'daily', '1.0');
-
-            // Restaurant listing
             $xml .= $this->addUrl($baseUrl . '/restaurantes', now(), 'daily', '0.9');
-
-            // Suggest page
             $xml .= $this->addUrl($baseUrl . '/sugerir', now()->subMonth(), 'monthly', '0.5');
-
-            // Category pages (clean URLs, not query strings)
-            $categories = Category::has('restaurants')->select('slug', 'updated_at')->get();
-            foreach ($categories as $category) {
-                $xml .= $this->addUrl(
-                    $baseUrl . '/restaurantes/categoria/' . $category->slug,
-                    $category->updated_at ?? now()->subWeek(),
-                    'daily',
-                    '0.7'
-                );
-            }
+            $xml .= $this->addUrl($baseUrl . '/mejores-restaurantes-mexicanos', now(), 'weekly', '0.9');
+            $xml .= $this->addUrl($baseUrl . '/top-10-restaurantes-mexicanos', now(), 'weekly', '0.9');
 
             $xml .= '</urlset>';
             return $xml;
@@ -142,14 +127,12 @@ class SitemapController extends Controller
         $xml = Cache::remember($cacheKey, 3600, function () use ($baseUrl) {
             $xml = $this->openUrlset();
 
-            // Guides index
             $xml .= $this->addUrl($baseUrl . '/guia', now(), 'weekly', '0.8');
 
             $states = State::has('restaurants')
                 ->select('id', 'name', 'code', 'slug', 'updated_at')
                 ->get();
 
-            // State guide pages
             foreach ($states as $state) {
                 $xml .= $this->addUrl(
                     $baseUrl . '/guia/' . strtolower($state->code ?? $state->name),
@@ -159,7 +142,6 @@ class SitemapController extends Controller
                 );
             }
 
-            // City guide pages
             $cities = $this->getTopCities(500);
             foreach ($cities as $city) {
                 if ($city->state_code && $city->city) {
@@ -190,7 +172,6 @@ class SitemapController extends Controller
         $xml = Cache::remember($cacheKey, 3600, function () use ($baseUrl) {
             $xml = $this->openUrlset();
 
-            // Top-level ranking pages
             $xml .= $this->addUrl($baseUrl . '/mejores-restaurantes-mexicanos', now(), 'weekly', '0.9');
             $xml .= $this->addUrl($baseUrl . '/top-10-restaurantes-mexicanos', now(), 'weekly', '0.9');
 
@@ -198,7 +179,6 @@ class SitemapController extends Controller
                 ->select('id', 'name', 'code', 'slug', 'updated_at')
                 ->get();
 
-            // State ranking pages
             foreach ($states as $state) {
                 $stateSlug = $state->slug ?? strtolower($state->code ?? '');
                 if ($stateSlug) {
@@ -211,7 +191,6 @@ class SitemapController extends Controller
                 }
             }
 
-            // City ranking pages (top 100)
             $cities = $this->getTopCities(100);
             foreach ($cities as $city) {
                 if ($city->state_code && $city->city) {
@@ -281,7 +260,7 @@ class SitemapController extends Controller
     protected function xmlResponse(string $xml): Response
     {
         return response($xml, 200)
-            ->header('Content-Type', 'application/xml')
+            ->header('Content-Type', 'application/xml; charset=UTF-8')
             ->header('Cache-Control', 'public, max-age=3600, s-maxage=86400')
             ->header('Content-Encoding', 'identity');
     }

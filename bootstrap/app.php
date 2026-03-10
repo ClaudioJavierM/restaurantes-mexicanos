@@ -19,6 +19,11 @@ return Application::configure(basePath: dirname(__DIR__))
             "chat/*",
         ]);
         
+        // Cache headers must be prepended to override session middleware
+        $middleware->web(prepend: [
+            \App\Http\Middleware\SetPublicCacheHeaders::class,
+        ]);
+
         // Add locale detection middleware to web group
         $middleware->web(append: [
             \App\Http\Middleware\SetLocaleFromDomain::class,

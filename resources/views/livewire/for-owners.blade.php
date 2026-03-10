@@ -786,107 +786,251 @@
     </div>
 </section>
 
-{{-- CASOS DE ÉXITO - Testimonials Section --}}
-<section class="py-20 bg-gray-100">
+
+{{-- CASOS DE ÉXITO - Testimonials Section (owner.com style) --}}
+<section class="py-20 bg-gray-100" style="overflow: hidden;">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-12">
-            <span class="inline-block bg-red-100 text-red-700 text-sm font-bold px-4 py-2 rounded-full mb-4">CASOS DE ÉXITO</span>
-            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                Lo Que Dicen Nuestros Restaurantes
-            </h2>
-            <p class="text-xl text-gray-600">Historias reales de dueños que han crecido con nosotros</p>
+        <div class="text-center mb-16">
+            <span style="display: inline-block; background: #fef2f2; color: #dc2626; font-size: 0.8rem; font-weight: 700; padding: 0.5rem 1.25rem; border-radius: 9999px; margin-bottom: 1rem; letter-spacing: 0.05em;">CASOS DE ÉXITO</span>
+            <h2 style="font-size: 2.25rem; font-weight: 800; color: #111827; margin-bottom: 1rem;">Miles de Dueños Confían en Nosotros</h2>
+            <p style="font-size: 1.15rem; color: #6b7280; max-width: 600px; margin: 0 auto;">Historias reales de dueños que han crecido su negocio con nuestra plataforma</p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            {{-- Testimonial 1 --}}
-            <div class="bg-white rounded-2xl p-6 shadow-lg">
-                <div class="text-5xl text-gray-200 font-serif mb-4">"</div>
-                <div class="flex items-center gap-3 mb-4">
-                    <img src="/images/testimonials/maria.jpg" alt="María C." class="w-12 h-12 rounded-full object-cover">
-                    <div>
-                        <p class="font-semibold text-gray-900">María C.</p>
-                        <p class="text-sm text-gray-500">Taquería Los Compadres, TX</p>
+        <!-- Testimonials Carousel -->
+        <div style="position: relative;">
+            <div id="testimonials-track" style="display: flex; gap: 1.5rem; transition: transform 0.5s ease; cursor: grab;">
+
+                <!-- Card 1 -->
+                <div style="min-width: 350px; max-width: 350px; background: #fff; border-radius: 1.25rem; overflow: hidden; flex-shrink: 0; box-shadow: 0 4px 20px rgba(0,0,0,0.08); transition: transform 0.3s, box-shadow 0.3s;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 30px rgba(0,0,0,0.12)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 20px rgba(0,0,0,0.08)'">
+                    <div style="position: relative; height: 220px; overflow: hidden;">
+                        <img src="/images/testimonials/juan-lg.jpg" alt="Juan Rodriguez" style="width: 100%; height: 100%; object-fit: cover;">
+                        <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 80px; background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);"></div>
+                        <div style="position: absolute; bottom: 12px; left: 16px; color: #fff;">
+                            <p style="font-weight: 700; font-size: 1.05rem; margin: 0;">Juan Rodriguez</p>
+                            <p style="font-size: 0.8rem; opacity: 0.9; margin: 0;">La Taqueria de Javier, Houston TX</p>
+                        </div>
+                    </div>
+                    <div style="padding: 1.5rem;">
+                        <div style="color: #f59e0b; font-size: 0.95rem; margin-bottom: 0.75rem;">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                        <p style="color: #374151; font-size: 0.9rem; line-height: 1.65; margin-bottom: 1.25rem; font-style: italic;">"Desde que reclamé mi restaurante, mis pedidos en línea aumentaron un 40%. La plataforma es muy fácil de usar y el soporte es excelente."</p>
+                        <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #f3f4f6; padding-top: 1rem;">
+                            <div>
+                                <span style="color: #dc2626; font-weight: 800; font-size: 1.5rem;">+40%</span>
+                                <p style="color: #6b7280; font-size: 0.75rem; margin: 0;">Pedidos en línea</p>
+                            </div>
+                            <a href="{{ route('claim.restaurant') }}" style="color: #dc2626; font-size: 0.8rem; font-weight: 600; text-decoration: none;">Ver más →</a>
+                        </div>
                     </div>
                 </div>
-                <div class="flex gap-1 text-amber-400 mb-4">
-                    <span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span>
+
+                <!-- Card 2 -->
+                <div style="min-width: 350px; max-width: 350px; background: #fff; border-radius: 1.25rem; overflow: hidden; flex-shrink: 0; box-shadow: 0 4px 20px rgba(0,0,0,0.08); transition: transform 0.3s, box-shadow 0.3s;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 30px rgba(0,0,0,0.12)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 20px rgba(0,0,0,0.08)'">
+                    <div style="position: relative; height: 220px; overflow: hidden;">
+                        <img src="/images/testimonials/maria_g-lg.jpg" alt="Maria Garcia" style="width: 100%; height: 100%; object-fit: cover;">
+                        <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 80px; background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);"></div>
+                        <div style="position: absolute; bottom: 12px; left: 16px; color: #fff;">
+                            <p style="font-weight: 700; font-size: 1.05rem; margin: 0;">María García</p>
+                            <p style="font-size: 0.8rem; opacity: 0.9; margin: 0;">El Fogón Oaxaqueño, Los Angeles CA</p>
+                        </div>
+                    </div>
+                    <div style="padding: 1.5rem;">
+                        <div style="color: #f59e0b; font-size: 0.95rem; margin-bottom: 0.75rem;">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                        <p style="color: #374151; font-size: 0.9rem; line-height: 1.65; margin-bottom: 1.25rem; font-style: italic;">"El menú digital con IA es increíble. Mis clientes pueden ver los platillos con fotos y precios actualizados. Ha sido un cambio total para mi negocio."</p>
+                        <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #f3f4f6; padding-top: 1rem;">
+                            <div>
+                                <span style="color: #dc2626; font-weight: 800; font-size: 1.5rem;">+$8,500</span>
+                                <p style="color: #6b7280; font-size: 0.75rem; margin: 0;">/mes en ventas</p>
+                            </div>
+                            <a href="{{ route('claim.restaurant') }}" style="color: #dc2626; font-size: 0.8rem; font-weight: 600; text-decoration: none;">Ver más →</a>
+                        </div>
+                    </div>
                 </div>
-                <p class="text-gray-700 mb-4">
-                    "Desde que reclamé mi restaurante, las llamadas aumentaron un <span class="text-red-600 font-bold">40%</span>. El cupón de descuento que recibí me ayudó a ahorrar $500 en equipo nuevo para la cocina."
-                </p>
-                <p class="text-green-600 text-sm font-semibold">↗ +40% llamadas</p>
+
+                <!-- Card 3 -->
+                <div style="min-width: 350px; max-width: 350px; background: #fff; border-radius: 1.25rem; overflow: hidden; flex-shrink: 0; box-shadow: 0 4px 20px rgba(0,0,0,0.08); transition: transform 0.3s, box-shadow 0.3s;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 30px rgba(0,0,0,0.12)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 20px rgba(0,0,0,0.08)'">
+                    <div style="position: relative; height: 220px; overflow: hidden;">
+                        <img src="/images/testimonials/carlos-lg.jpg" alt="Carlos Lopez" style="width: 100%; height: 100%; object-fit: cover;">
+                        <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 80px; background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);"></div>
+                        <div style="position: absolute; bottom: 12px; left: 16px; color: #fff;">
+                            <p style="font-weight: 700; font-size: 1.05rem; margin: 0;">Carlos López</p>
+                            <p style="font-size: 0.8rem; opacity: 0.9; margin: 0;">Casa Mezcal, Chicago IL</p>
+                        </div>
+                    </div>
+                    <div style="padding: 1.5rem;">
+                        <div style="color: #f59e0b; font-size: 0.95rem; margin-bottom: 0.75rem;">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                        <p style="color: #374151; font-size: 0.9rem; line-height: 1.65; margin-bottom: 1.25rem; font-style: italic;">"El chatbot bilingüe atiende a mis clientes 24/7. Ya no pierdo reservaciones por no contestar el teléfono a tiempo. Excelente inversión."</p>
+                        <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #f3f4f6; padding-top: 1rem;">
+                            <div>
+                                <span style="color: #dc2626; font-weight: 800; font-size: 1.5rem;">+65%</span>
+                                <p style="color: #6b7280; font-size: 0.75rem; margin: 0;">Reservaciones</p>
+                            </div>
+                            <a href="{{ route('claim.restaurant') }}" style="color: #dc2626; font-size: 0.8rem; font-weight: 600; text-decoration: none;">Ver más →</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 4 -->
+                <div style="min-width: 350px; max-width: 350px; background: #fff; border-radius: 1.25rem; overflow: hidden; flex-shrink: 0; box-shadow: 0 4px 20px rgba(0,0,0,0.08); transition: transform 0.3s, box-shadow 0.3s;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 30px rgba(0,0,0,0.12)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 20px rgba(0,0,0,0.08)'">
+                    <div style="position: relative; height: 220px; overflow: hidden;">
+                        <img src="/images/testimonials/ana-lg.jpg" alt="Ana Sanchez" style="width: 100%; height: 100%; object-fit: cover;">
+                        <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 80px; background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);"></div>
+                        <div style="position: absolute; bottom: 12px; left: 16px; color: #fff;">
+                            <p style="font-weight: 700; font-size: 1.05rem; margin: 0;">Ana Sánchez</p>
+                            <p style="font-size: 0.8rem; opacity: 0.9; margin: 0;">Sabor Michoacano, Dallas TX</p>
+                        </div>
+                    </div>
+                    <div style="padding: 1.5rem;">
+                        <div style="color: #f59e0b; font-size: 0.95rem; margin-bottom: 0.75rem;">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                        <p style="color: #374151; font-size: 0.9rem; line-height: 1.65; margin-bottom: 1.25rem; font-style: italic;">"Los analytics me ayudaron a entender qué platillos son más populares. Ajusté mi menú y mis ganancias subieron. La mejor decisión que he tomado."</p>
+                        <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #f3f4f6; padding-top: 1rem;">
+                            <div>
+                                <span style="color: #dc2626; font-weight: 800; font-size: 1.5rem;">+$12,000</span>
+                                <p style="color: #6b7280; font-size: 0.75rem; margin: 0;">/mes ganancias</p>
+                            </div>
+                            <a href="{{ route('claim.restaurant') }}" style="color: #dc2626; font-size: 0.8rem; font-weight: 600; text-decoration: none;">Ver más →</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 5 -->
+                <div style="min-width: 350px; max-width: 350px; background: #fff; border-radius: 1.25rem; overflow: hidden; flex-shrink: 0; box-shadow: 0 4px 20px rgba(0,0,0,0.08); transition: transform 0.3s, box-shadow 0.3s;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 30px rgba(0,0,0,0.12)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 20px rgba(0,0,0,0.08)'">
+                    <div style="position: relative; height: 220px; overflow: hidden;">
+                        <img src="/images/testimonials/roberto-lg.jpg" alt="Roberto Hernandez" style="width: 100%; height: 100%; object-fit: cover;">
+                        <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 80px; background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);"></div>
+                        <div style="position: absolute; bottom: 12px; left: 16px; color: #fff;">
+                            <p style="font-weight: 700; font-size: 1.05rem; margin: 0;">Roberto Hernández</p>
+                            <p style="font-size: 0.8rem; opacity: 0.9; margin: 0;">El Rancho Grande, Phoenix AZ</p>
+                        </div>
+                    </div>
+                    <div style="padding: 1.5rem;">
+                        <div style="color: #f59e0b; font-size: 0.95rem; margin-bottom: 0.75rem;">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                        <p style="color: #374151; font-size: 0.9rem; line-height: 1.65; margin-bottom: 1.25rem; font-style: italic;">"Reclamé mi restaurante gratis y en una semana ya tenía nuevos clientes llegando. El plan premium se pagó solo en el primer mes."</p>
+                        <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #f3f4f6; padding-top: 1rem;">
+                            <div>
+                                <span style="color: #dc2626; font-weight: 800; font-size: 1.5rem;">+120</span>
+                                <p style="color: #6b7280; font-size: 0.75rem; margin: 0;">Nuevos clientes/mes</p>
+                            </div>
+                            <a href="{{ route('claim.restaurant') }}" style="color: #dc2626; font-size: 0.8rem; font-weight: 600; text-decoration: none;">Ver más →</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 6 -->
+                <div style="min-width: 350px; max-width: 350px; background: #fff; border-radius: 1.25rem; overflow: hidden; flex-shrink: 0; box-shadow: 0 4px 20px rgba(0,0,0,0.08); transition: transform 0.3s, box-shadow 0.3s;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 30px rgba(0,0,0,0.12)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 20px rgba(0,0,0,0.08)'">
+                    <div style="position: relative; height: 220px; overflow: hidden;">
+                        <img src="/images/testimonials/lupita-lg.jpg" alt="Lupita Martinez" style="width: 100%; height: 100%; object-fit: cover;">
+                        <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 80px; background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);"></div>
+                        <div style="position: absolute; bottom: 12px; left: 16px; color: #fff;">
+                            <p style="font-weight: 700; font-size: 1.05rem; margin: 0;">Lupita Martínez</p>
+                            <p style="font-size: 0.8rem; opacity: 0.9; margin: 0;">Tamales Doña Lupita, San Antonio TX</p>
+                        </div>
+                    </div>
+                    <div style="padding: 1.5rem;">
+                        <div style="color: #f59e0b; font-size: 0.95rem; margin-bottom: 0.75rem;">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                        <p style="color: #374151; font-size: 0.9rem; line-height: 1.65; margin-bottom: 1.25rem; font-style: italic;">"Como mujer empresaria, esta plataforma me dio las herramientas que necesitaba. El email marketing me ayudó a mantener a mis clientes regresando."</p>
+                        <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #f3f4f6; padding-top: 1rem;">
+                            <div>
+                                <span style="color: #dc2626; font-weight: 800; font-size: 1.5rem;">+85%</span>
+                                <p style="color: #6b7280; font-size: 0.75rem; margin: 0;">Clientes recurrentes</p>
+                            </div>
+                            <a href="{{ route('claim.restaurant') }}" style="color: #dc2626; font-size: 0.8rem; font-weight: 600; text-decoration: none;">Ver más →</a>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
-            {{-- Testimonial 2 --}}
-            <div class="bg-white rounded-2xl p-6 shadow-lg">
-                <div class="text-5xl text-gray-200 font-serif mb-4">"</div>
-                <div class="flex items-center gap-3 mb-4">
-                    <img src="/images/testimonials/jose.jpg" alt="José R." class="w-12 h-12 rounded-full object-cover">
-                    <div>
-                        <p class="font-semibold text-gray-900">José R.</p>
-                        <p class="text-sm text-gray-500">La Michoacana Premium, CA</p>
-                    </div>
-                </div>
-                <div class="flex gap-1 text-amber-400 mb-4">
-                    <span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span>
-                </div>
-                <p class="text-gray-700 mb-4">
-                    "Tenía mi paletería por 5 años sin presencia online. Ahora aparezco en el Top 10 de mi ciudad. El plan Premium vale cada centavo, y el <span class="text-red-600 font-bold">cupón para equipo de paletería</span> fue increíble."
-                </p>
-                <p class="text-green-600 text-sm font-semibold">↗ Top 10 en su ciudad</p>
-            </div>
-
-            {{-- Testimonial 3 --}}
-            <div class="bg-white rounded-2xl p-6 shadow-lg">
-                <div class="text-5xl text-gray-200 font-serif mb-4">"</div>
-                <div class="flex items-center gap-3 mb-4">
-                    <img src="/images/testimonials/luis.jpg" alt="Luis G." class="w-12 h-12 rounded-full object-cover">
-                    <div>
-                        <p class="font-semibold text-gray-900">Luis G.</p>
-                        <p class="text-sm text-gray-500">El Buen Sazón, AZ</p>
-                    </div>
-                </div>
-                <div class="flex gap-1 text-amber-400 mb-4">
-                    <span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span><span>⭐</span>
-                </div>
-                <p class="text-gray-700 mb-4">
-                    "La verificación tomó 5 minutos. Ahora tengo control total de mi información y puedo responder a las reseñas. <span class="text-red-600 font-bold">Mis ventas subieron un 25%</span> en el primer mes."
-                </p>
-                <p class="text-green-600 text-sm font-semibold">↗ +25% ventas</p>
-            </div>
+            <!-- Navigation Arrows -->
+            <button onclick="scrollTestimonials(-1)" style="position: absolute; left: -20px; top: 50%; transform: translateY(-50%); width: 48px; height: 48px; background: #fff; border: 1px solid #e5e7eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 10;" onmouseover="this.style.boxShadow='0 6px 20px rgba(0,0,0,0.15)'" onmouseout="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)'">
+                <svg width="20" height="20" fill="none" stroke="#374151" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            </button>
+            <button onclick="scrollTestimonials(1)" style="position: absolute; right: -20px; top: 50%; transform: translateY(-50%); width: 48px; height: 48px; background: #fff; border: 1px solid #e5e7eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 10;" onmouseover="this.style.boxShadow='0 6px 20px rgba(0,0,0,0.15)'" onmouseout="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)'">
+                <svg width="20" height="20" fill="none" stroke="#374151" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </button>
         </div>
 
-        {{-- Stats Bar --}}
-        <div class="bg-gradient-to-r from-red-600 to-green-600 rounded-2xl p-8 text-white">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-                <div>
-                    <div class="text-4xl font-bold">35%</div>
-                    <p class="text-white/80 text-sm mt-1">Aumento promedio en llamadas</p>
-                </div>
-                <div>
-                    <div class="text-4xl font-bold">4.5/5</div>
-                    <p class="text-white/80 text-sm mt-1">Satisfacción de usuarios</p>
-                </div>
-                <div>
-                    <div class="text-4xl font-bold">$1,200</div>
-                    <p class="text-white/80 text-sm mt-1">Ahorro promedio con cupones</p>
-                </div>
-                <div>
-                    <div class="text-4xl font-bold">5 min</div>
-                    <p class="text-white/80 text-sm mt-1">Tiempo de verificación</p>
-                </div>
-            </div>
+        <!-- Dots -->
+        <div style="display: flex; justify-content: center; gap: 0.5rem; margin-top: 2rem;" id="testimonials-dots">
+            <button onclick="goToTestimonial(0)" class="t-dot" style="width: 10px; height: 10px; border-radius: 50%; background: #dc2626; border: none; cursor: pointer; transition: all 0.3s;"></button>
+            <button onclick="goToTestimonial(1)" class="t-dot" style="width: 10px; height: 10px; border-radius: 50%; background: #d1d5db; border: none; cursor: pointer; transition: all 0.3s;"></button>
+            <button onclick="goToTestimonial(2)" class="t-dot" style="width: 10px; height: 10px; border-radius: 50%; background: #d1d5db; border: none; cursor: pointer; transition: all 0.3s;"></button>
+            <button onclick="goToTestimonial(3)" class="t-dot" style="width: 10px; height: 10px; border-radius: 50%; background: #d1d5db; border: none; cursor: pointer; transition: all 0.3s;"></button>
+            <button onclick="goToTestimonial(4)" class="t-dot" style="width: 10px; height: 10px; border-radius: 50%; background: #d1d5db; border: none; cursor: pointer; transition: all 0.3s;"></button>
+            <button onclick="goToTestimonial(5)" class="t-dot" style="width: 10px; height: 10px; border-radius: 50%; background: #d1d5db; border: none; cursor: pointer; transition: all 0.3s;"></button>
         </div>
 
-        <div class="text-center mt-8">
-            <a href="{{ route('claim.restaurant') }}" class="inline-flex items-center px-8 py-4 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition shadow-lg">
-                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                </svg>
+        <!-- CTA -->
+        <div style="text-align: center; margin-top: 2.5rem;">
+            <a href="{{ route('claim.restaurant') }}" style="display: inline-flex; align-items: center; gap: 0.5rem; background: #dc2626; color: #fff; padding: 1rem 2.5rem; border-radius: 0.75rem; font-weight: 700; font-size: 1rem; text-decoration: none; box-shadow: 0 4px 15px rgba(220,38,38,0.3); transition: all 0.3s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 25px rgba(220,38,38,0.4)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 15px rgba(220,38,38,0.3)'">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
                 Únete a Estos Casos de Éxito
             </a>
         </div>
     </div>
+
+    <script>
+        (function() {
+            const track = document.getElementById('testimonials-track');
+            const dots = document.querySelectorAll('.t-dot');
+            let current = 0;
+            const cardWidth = 350 + 24;
+            const totalCards = 6;
+
+            function getVisibleCards() {
+                return window.innerWidth < 768 ? 1 : 3;
+            }
+
+            window.scrollTestimonials = function(dir) {
+                const maxIndex = totalCards - getVisibleCards();
+                current = Math.max(0, Math.min(current + dir, maxIndex));
+                updatePosition();
+            };
+
+            window.goToTestimonial = function(index) {
+                const maxIndex = totalCards - getVisibleCards();
+                current = Math.min(index, maxIndex);
+                updatePosition();
+            };
+
+            function updatePosition() {
+                track.style.transform = 'translateX(-' + (current * cardWidth) + 'px)';
+                dots.forEach(function(dot, i) {
+                    dot.style.background = i === current ? '#dc2626' : '#d1d5db';
+                });
+            }
+
+            let autoPlay = setInterval(function() {
+                const maxIndex = totalCards - getVisibleCards();
+                current = current >= maxIndex ? 0 : current + 1;
+                updatePosition();
+            }, 4000);
+
+            track.addEventListener('mouseenter', function() { clearInterval(autoPlay); });
+            track.addEventListener('mouseleave', function() {
+                autoPlay = setInterval(function() {
+                    const maxIndex = totalCards - getVisibleCards();
+                    current = current >= maxIndex ? 0 : current + 1;
+                    updatePosition();
+                }, 4000);
+            });
+
+            let startX, isDragging = false;
+            track.addEventListener('mousedown', function(e) { startX = e.pageX; isDragging = true; track.style.cursor = 'grabbing'; });
+            track.addEventListener('mousemove', function(e) { if (!isDragging) return; e.preventDefault(); });
+            track.addEventListener('mouseup', function(e) {
+                if (!isDragging) return;
+                isDragging = false;
+                track.style.cursor = 'grab';
+                const diff = e.pageX - startX;
+                if (Math.abs(diff) > 50) scrollTestimonials(diff > 0 ? -1 : 1);
+            });
+            track.addEventListener('touchstart', function(e) { startX = e.touches[0].pageX; });
+            track.addEventListener('touchend', function(e) {
+                const diff = e.changedTouches[0].pageX - startX;
+                if (Math.abs(diff) > 50) scrollTestimonials(diff > 0 ? -1 : 1);
+            });
+        })();
+    </script>
 </section>
 
 {{-- ============================================ --}}

@@ -32,19 +32,31 @@ class MyMenuResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        $restaurant = auth()->user()?->restaurants()->first();
+        // Check team member permissions
+        $tmUser = auth()->user();
+        if ($tmUser) {
+            $tm = \App\Models\RestaurantTeamMember::where('user_id', $tmUser->id)
+                ->where('status', 'active')->first();
+            if ($tm && $tm->role !== 'admin') {
+                $perms = $tm->permissions ?? [];
+                if (!($perms['menu'] ?? false)) {
+                    return false;
+                }
+            }
+        }
+        $restaurant = auth()->user()?->allAccessibleRestaurants()->first();
         return $restaurant && $restaurant->is_claimed;
     }
 
     public static function canAccess(): bool
     {
-        $restaurant = auth()->user()?->restaurants()->first();
+        $restaurant = auth()->user()?->allAccessibleRestaurants()->first();
         return $restaurant && $restaurant->is_claimed;
     }
 
     public static function getNavigationBadge(): ?string
     {
-        $restaurant = auth()->user()?->restaurants()->first();
+        $restaurant = auth()->user()?->allAccessibleRestaurants()->first();
         if ($restaurant && !in_array($restaurant->subscription_tier, ['premium', 'elite'])) {
             return 'PRO';
         }
@@ -58,7 +70,7 @@ class MyMenuResource extends Resource
 
     public static function canCreate(): bool
     {
-        $restaurant = auth()->user()?->restaurants()->first();
+        $restaurant = auth()->user()?->allAccessibleRestaurants()->first();
         return $restaurant && $restaurant->is_claimed;
     }
 

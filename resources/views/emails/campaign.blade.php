@@ -155,7 +155,7 @@
             <!-- Header -->
             <tr>
                 <td class="email-header">
-                    <img src="{{ asset('images/famer-logo-white.png') }}" alt="FAMER" style="max-height: 40px;">
+                    <img src="https://restaurantesmexicanosfamosos.com/images/branding/logo.png?v=3" alt="Restaurantes Mexicanos Famosos" style="max-height: 50px; width: auto; margin-bottom: 12px;" />
                     <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0; font-size: 14px;">
                         Find Authentic Mexican Eats & Restaurants
                     </p>

@@ -1,6 +1,6 @@
 <x-filament-panels::page>
     @php
-        $restaurant = auth()->user()->restaurants->first();
+        $restaurant = auth()->user()->allAccessibleRestaurants()->first();
         $plan = $restaurant->subscription_plan ?? 'free';
         $isPremium = in_array($plan, ['premium', 'elite']);
         

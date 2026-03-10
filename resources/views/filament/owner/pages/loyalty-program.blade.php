@@ -1,193 +1,69 @@
 <x-filament-panels::page>
-    {{-- Stats --}}
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <x-filament::section>
-            <div class="text-center">
-                <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ number_format($totalMembers) }}</div>
-                <div class="text-sm text-gray-500">Miembros</div>
+    <div class="flex items-center justify-center min-h-[60vh]">
+        <div class="text-center max-w-2xl mx-auto px-6">
+            {{-- Icon --}}
+            <div class="mx-auto w-24 h-24 rounded-full bg-yellow-500/10 flex items-center justify-center mb-8">
+                <svg class="w-12 h-12 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 11.25v8.25a1.5 1.5 0 01-1.5 1.5H5.25a1.5 1.5 0 01-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 109.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1114.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"></path>
+                </svg>
             </div>
-        </x-filament::section>
-        <x-filament::section>
-            <div class="text-center">
-                <div class="text-2xl font-bold text-yellow-600">{{ number_format($totalPointsIssued) }}</div>
-                <div class="text-sm text-gray-500">Puntos Totales</div>
+
+            {{-- Badge --}}
+            <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-yellow-500/10 text-yellow-500 text-sm font-semibold mb-6">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Pronto
+            </span>
+
+            {{-- Title --}}
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                Programa de Lealtad
+            </h2>
+
+            {{-- Description --}}
+            <p class="text-lg text-gray-500 dark:text-gray-400 mb-8 leading-relaxed">
+                Muy pronto podras crear un programa de lealtad para recompensar a tus clientes mas fieles.
+                Aumenta la retencion y las visitas recurrentes a tu restaurante.
+            </p>
+
+            {{-- Features grid --}}
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
+                <div class="p-4 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10">
+                    <div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center mx-auto mb-3">
+                        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 dark:text-white text-sm">Puntos por Visita</h3>
+                    <p class="text-xs text-gray-500 mt-1">Recompensa cada visita y compra de tus clientes</p>
+                </div>
+
+                <div class="p-4 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10">
+                    <div class="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center mx-auto mb-3">
+                        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14.25l3-3m0 0l3 3m-3-3v8.25M15 3.75H9m6 0a2.25 2.25 0 012.25 2.25v.75m-9-3a2.25 2.25 0 00-2.25 2.25v.75m0 0h13.5m-13.5 0v10.5A2.25 2.25 0 006.75 20.25h10.5A2.25 2.25 0 0019.5 17.25V6.75m-13.5 0h13.5"></path>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 dark:text-white text-sm">Recompensas Personalizadas</h3>
+                    <p class="text-xs text-gray-500 mt-1">Crea premios unicos para tu restaurante</p>
+                </div>
+
+                <div class="p-4 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10">
+                    <div class="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center mx-auto mb-3">
+                        <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.8m2.58-5.84a14.927 14.927 0 00-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 01-2.448-2.448 14.9 14.9 0 01.06-.312m-2.24 2.39a4.493 4.493 0 00-1.757 4.306 4.493 4.493 0 004.306-1.758M16.5 9a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold text-gray-900 dark:text-white text-sm">Aumenta Retencion</h3>
+                    <p class="text-xs text-gray-500 mt-1">Clientes que regresan gastan hasta 67% mas</p>
+                </div>
             </div>
-        </x-filament::section>
-        <x-filament::section>
-            <div class="text-center">
-                <div class="text-2xl font-bold text-green-600">{{ number_format($totalRedemptions) }}</div>
-                <div class="text-sm text-gray-500">Canjes</div>
-            </div>
-        </x-filament::section>
-        <x-filament::section>
-            <div class="text-center">
-                <div class="text-2xl font-bold text-blue-600">{{ $activeRewards }}</div>
-                <div class="text-sm text-gray-500">Recompensas Activas</div>
-            </div>
-        </x-filament::section>
+
+            {{-- CTA --}}
+            <p class="text-sm text-gray-400">
+                Estamos trabajando para ofrecerte el mejor programa de lealtad para restaurantes.
+            </p>
+        </div>
     </div>
-
-    {{-- Settings --}}
-    <x-filament::section>
-        <x-slot name="heading">Configuracion del Programa</x-slot>
-        
-        <div class="space-y-4">
-            <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <div>
-                    <h3 class="font-medium">Programa de Lealtad</h3>
-                    <p class="text-sm text-gray-500">Activa el programa para comenzar a dar puntos</p>
-                </div>
-                <x-filament::button wire:click="toggleLoyalty" :color="$loyaltyEnabled ? 'success' : 'gray'">
-                    {{ $loyaltyEnabled ? 'Activado' : 'Desactivado' }}
-                </x-filament::button>
-            </div>
-
-            @if($loyaltyEnabled)
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Puntos por cada $1 gastado</label>
-                        <input type="number" wire:model="pointsPerDollar" min="1" max="100" class="w-full rounded-lg border-gray-300 dark:bg-gray-700 dark:border-gray-600">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Puntos por visita</label>
-                        <input type="number" wire:model="pointsPerVisit" min="0" max="1000" class="w-full rounded-lg border-gray-300 dark:bg-gray-700 dark:border-gray-600">
-                    </div>
-                </div>
-                <div class="flex justify-end">
-                    <x-filament::button wire:click="saveSettings" color="success">Guardar Configuracion</x-filament::button>
-                </div>
-            @endif
-        </div>
-    </x-filament::section>
-
-    {{-- Rewards --}}
-    <x-filament::section class="mt-6">
-        <x-slot name="heading">
-            <div class="flex items-center justify-between">
-                <span>Recompensas</span>
-                <x-filament::button wire:click="newReward" size="sm" icon="heroicon-o-plus">Nueva Recompensa</x-filament::button>
-            </div>
-        </x-slot>
-
-        <div class="space-y-3">
-            @forelse($this->rewards as $reward)
-                <div class="flex items-center justify-between p-4 border dark:border-gray-700 rounded-lg {{ $reward->is_active ? '' : 'opacity-50' }}">
-                    <div class="flex-1">
-                        <div class="flex items-center gap-2">
-                            <h4 class="font-medium">{{ $reward->name }}</h4>
-                            <span class="px-2 py-0.5 text-xs rounded-full {{ $reward->is_active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
-                                {{ $reward->is_active ? 'Activo' : 'Inactivo' }}
-                            </span>
-                        </div>
-                        <p class="text-sm text-gray-500">{{ $reward->formatted_reward }}</p>
-                        <p class="text-sm text-yellow-600 font-medium">{{ number_format($reward->points_required) }} puntos</p>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-sm text-gray-500">{{ $reward->redemption_count }} canjes</span>
-                        <x-filament::icon-button icon="heroicon-o-pencil" wire:click="editReward({{ $reward->id }})" />
-                        <x-filament::icon-button icon="{{ $reward->is_active ? 'heroicon-o-pause' : 'heroicon-o-play' }}" wire:click="toggleRewardStatus({{ $reward->id }})" />
-                        <x-filament::icon-button icon="heroicon-o-trash" color="danger" wire:click="deleteReward({{ $reward->id }})" wire:confirm="Eliminar esta recompensa?" />
-                    </div>
-                </div>
-            @empty
-                <div class="text-center py-8 text-gray-500">
-                    <svg class="w-12 h-12 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/></svg>
-                    <p>No hay recompensas configuradas</p>
-                    <x-filament::button wire:click="newReward" class="mt-4" size="sm">Crear primera recompensa</x-filament::button>
-                </div>
-            @endforelse
-        </div>
-    </x-filament::section>
-
-    {{-- Top Members & Recent Redemptions --}}
-    <div class="grid md:grid-cols-2 gap-6 mt-6">
-        <x-filament::section>
-            <x-slot name="heading">Top Miembros</x-slot>
-            <div class="space-y-2">
-                @forelse($this->topMembers as $index => $member)
-                    <div class="flex items-center justify-between p-2 {{ $index < 3 ? 'bg-yellow-50 dark:bg-yellow-900/20' : '' }} rounded">
-                        <div class="flex items-center gap-3">
-                            <span class="w-6 h-6 flex items-center justify-center text-sm font-medium {{ $index < 3 ? 'text-yellow-600' : 'text-gray-400' }}">{{ $index + 1 }}</span>
-                            <div>
-                                <p class="font-medium text-sm">{{ $member->display_name }}</p>
-                                <p class="text-xs text-gray-500">{{ $member->email }}</p>
-                            </div>
-                        </div>
-                        <span class="font-bold text-yellow-600">{{ number_format($member->points) }} pts</span>
-                    </div>
-                @empty
-                    <p class="text-center text-gray-500 py-4">No hay miembros aun</p>
-                @endforelse
-            </div>
-        </x-filament::section>
-
-        <x-filament::section>
-            <x-slot name="heading">Canjes Recientes</x-slot>
-            <div class="space-y-2">
-                @forelse($this->recentRedemptions as $redemption)
-                    <div class="flex items-center justify-between p-2 border-b dark:border-gray-700 last:border-0">
-                        <div>
-                            <p class="font-medium text-sm">{{ $redemption->customer->display_name }}</p>
-                            <p class="text-xs text-gray-500">{{ $redemption->reward->name }}</p>
-                        </div>
-                        <div class="text-right">
-                            <span class="px-2 py-0.5 text-xs rounded-full {{ $redemption->status === 'used' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
-                                {{ $redemption->status === 'used' ? 'Usado' : 'Pendiente' }}
-                            </span>
-                            <p class="text-xs text-gray-500 mt-1">{{ $redemption->created_at->diffForHumans() }}</p>
-                        </div>
-                    </div>
-                @empty
-                    <p class="text-center text-gray-500 py-4">No hay canjes aun</p>
-                @endforelse
-            </div>
-        </x-filament::section>
-    </div>
-
-    {{-- Reward Form Modal --}}
-    <x-filament::modal id="reward-form" :visible="$showRewardForm" width="lg">
-        <x-slot name="header">
-            <h2 class="text-xl font-bold">{{ $editingRewardId ? 'Editar Recompensa' : 'Nueva Recompensa' }}</h2>
-        </x-slot>
-        
-        <div class="space-y-4">
-            <div>
-                <label class="block text-sm font-medium mb-1">Nombre</label>
-                <input type="text" wire:model="rewardData.name" class="w-full rounded-lg border-gray-300 dark:bg-gray-700 dark:border-gray-600" placeholder="Ej: Postre Gratis">
-            </div>
-            <div>
-                <label class="block text-sm font-medium mb-1">Descripcion</label>
-                <textarea wire:model="rewardData.description" rows="2" class="w-full rounded-lg border-gray-300 dark:bg-gray-700 dark:border-gray-600"></textarea>
-            </div>
-            <div>
-                <label class="block text-sm font-medium mb-1">Puntos Requeridos</label>
-                <input type="number" wire:model="rewardData.points_required" min="1" class="w-full rounded-lg border-gray-300 dark:bg-gray-700 dark:border-gray-600">
-            </div>
-            <div>
-                <label class="block text-sm font-medium mb-1">Tipo de Recompensa</label>
-                <select wire:model.live="rewardData.reward_type" class="w-full rounded-lg border-gray-300 dark:bg-gray-700 dark:border-gray-600">
-                    <option value="discount_percentage">Descuento (%)</option>
-                    <option value="discount_fixed">Descuento ($)</option>
-                    <option value="free_item">Articulo Gratis</option>
-                    <option value="custom">Personalizado</option>
-                </select>
-            </div>
-            @if(in_array($rewardData['reward_type'] ?? '', ['discount_percentage', 'discount_fixed']))
-                <div>
-                    <label class="block text-sm font-medium mb-1">Valor del Descuento</label>
-                    <input type="number" wire:model="rewardData.reward_value" min="1" class="w-full rounded-lg border-gray-300 dark:bg-gray-700 dark:border-gray-600">
-                </div>
-            @elseif(($rewardData['reward_type'] ?? '') === 'free_item')
-                <div>
-                    <label class="block text-sm font-medium mb-1">Nombre del Articulo</label>
-                    <input type="text" wire:model="rewardData.free_item_name" class="w-full rounded-lg border-gray-300 dark:bg-gray-700 dark:border-gray-600" placeholder="Ej: Postre del dia">
-                </div>
-            @endif
-        </div>
-        
-        <x-slot name="footer">
-            <x-filament::button wire:click="$set('showRewardForm', false)" color="gray">Cancelar</x-filament::button>
-            <x-filament::button wire:click="saveReward" color="success">Guardar</x-filament::button>
-        </x-slot>
-    </x-filament::modal>
 </x-filament-panels::page>

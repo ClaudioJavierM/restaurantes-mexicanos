@@ -10,7 +10,7 @@ class ReviewsStatsWidget extends BaseWidget
 {
     protected function getStats(): array
     {
-        $restaurantIds = auth()->user()->restaurants()->pluck('id');
+        $restaurantIds = auth()->user()->allAccessibleRestaurants()->pluck('id');
         
         $totalReviews = Review::whereIn('restaurant_id', $restaurantIds)
             ->where('status', 'approved')
