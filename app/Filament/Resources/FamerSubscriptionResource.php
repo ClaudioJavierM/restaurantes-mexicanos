@@ -3,19 +3,17 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\FamerSubscriptionResource\Pages;
-use App\Filament\Resources\FamerSubscriptionResource\RelationManagers;
-use App\Models\FamerSubscription;
+use App\Models\Restaurant;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class FamerSubscriptionResource extends Resource
 {
-    protected static ?string $model = FamerSubscription::class;
+    protected static ?string $model = Restaurant::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-star';
 
@@ -29,68 +27,41 @@ class FamerSubscriptionResource extends Resource
 
     protected static ?int $navigationSort = 3;
 
+    protected static ?string $slug = 'subscriptions';
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->where('subscription_tier', '!=', 'free');
+    }
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\Section::make('Restaurante')
                     ->schema([
-                        Forms\Components\Select::make('restaurant_id')
-                            ->label('Restaurante')
-                            ->relationship('restaurant', 'name')
-                            ->searchable()
-                            ->preload()
-                            ->required(),
-                        Forms\Components\Select::make('user_id')
-                            ->label('Usuario/Dueño')
-                            ->relationship('user', 'name')
-                            ->searchable()
-                            ->preload(),
-                    ])->columns(2),
-
-                Forms\Components\Section::make('Plan')
-                    ->schema([
-                        Forms\Components\TextInput::make('year')
-                            ->label('Año')
-                            ->required()
-                            ->numeric()
-                            ->default(date('Y')),
-                        Forms\Components\Select::make('status')
-                            ->label('Estado')
+                        Forms\Components\TextInput::make('name')
+                            ->label('Nombre')
+                            ->disabled(),
+                        Forms\Components\Select::make('subscription_tier')
+                            ->label('Plan')
                             ->options([
-                                'active' => 'Activo',
-                                'pending' => 'Pendiente',
-                                'cancelled' => 'Cancelado',
-                                'expired' => 'Expirado',
+                                'claimed' => 'Claimed (Gratis)',
+                                'premium' => 'Premium ($29/mes)',
+                                'elite' => 'Elite ($79/mes)',
                             ])
-                            ->default('pending')
                             ->required(),
-                        Forms\Components\DateTimePicker::make('subscribed_at')
-                            ->label('Fecha de Suscripción'),
-                    ])->columns(3),
-
-                Forms\Components\Section::make('Contacto')
-                    ->schema([
-                        Forms\Components\TextInput::make('contact_email')
-                            ->label('Email de Contacto')
-                            ->email(),
-                        Forms\Components\TextInput::make('contact_phone')
-                            ->label('Teléfono de Contacto')
-                            ->tel(),
                     ])->columns(2),
 
-                Forms\Components\Section::make('Preferencias')
+                Forms\Components\Section::make('Contacto del Dueño')
                     ->schema([
-                        Forms\Components\Toggle::make('wants_notifications')
-                            ->label('Quiere Notificaciones')
-                            ->default(true),
-                        Forms\Components\Toggle::make('allows_promotion')
-                            ->label('Permite Promoción')
-                            ->default(true),
-                        Forms\Components\Textarea::make('goals')
-                            ->label('Objetivos/Notas')
-                            ->rows(3)
-                            ->columnSpanFull(),
+                        Forms\Components\TextInput::make('owner_email')
+                            ->label('Email del Dueño')
+                            ->email(),
+                        Forms\Components\TextInput::make('owner_phone')
+                            ->label('Teléfono del Dueño')
+                            ->tel(),
                     ])->columns(2),
             ]);
     }
@@ -99,99 +70,88 @@ class FamerSubscriptionResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('restaurant.name')
+                Tables\Columns\TextColumn::make('name')
                     ->label('Restaurante')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('restaurant.city')
+                Tables\Columns\TextColumn::make('city')
                     ->label('Ciudad')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('user.name')
-                    ->label('Dueño')
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('year')
-                    ->label('Año')
-                    ->sortable(),
-                Tables\Columns\BadgeColumn::make('status')
+                Tables\Columns\TextColumn::make('state.name')
                     ->label('Estado')
+                    ->sortable(),
+                Tables\Columns\BadgeColumn::make('subscription_tier')
+                    ->label('Plan')
                     ->colors([
-                        'success' => 'active',
-                        'warning' => 'pending',
-                        'danger' => 'cancelled',
-                        'gray' => 'expired',
+                        'info' => 'claimed',
+                        'warning' => 'premium',
+                        'success' => 'elite',
                     ])
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'active' => 'Activo',
-                        'pending' => 'Pendiente',
-                        'cancelled' => 'Cancelado',
-                        'expired' => 'Expirado',
+                        'claimed' => 'Claimed',
+                        'premium' => 'Premium',
+                        'elite' => 'Elite',
                         default => $state,
                     }),
-                Tables\Columns\IconColumn::make('wants_notifications')
-                    ->label('Notif.')
-                    ->boolean()
-                    ->toggleable(),
-                Tables\Columns\IconColumn::make('allows_promotion')
-                    ->label('Promo')
-                    ->boolean()
-                    ->toggleable(),
-                Tables\Columns\TextColumn::make('contact_email')
-                    ->label('Email')
+                Tables\Columns\IconColumn::make('is_claimed')
+                    ->label('Reclamado')
+                    ->boolean(),
+                Tables\Columns\TextColumn::make('owner_email')
+                    ->label('Email Dueño')
                     ->searchable()
                     ->toggleable(),
-                Tables\Columns\TextColumn::make('subscribed_at')
-                    ->label('Fecha Suscripción')
+                Tables\Columns\TextColumn::make('user.name')
+                    ->label('Usuario')
+                    ->sortable()
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('claimed_at')
+                    ->label('Fecha Claim')
                     ->dateTime('d/m/Y')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->label('Creado')
-                    ->dateTime()
+                Tables\Columns\TextColumn::make('average_rating')
+                    ->label('Rating')
+                    ->numeric(1)
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('status')
-                    ->label('Estado')
+                Tables\Filters\SelectFilter::make('subscription_tier')
+                    ->label('Plan')
                     ->options([
-                        'active' => 'Activo',
-                        'pending' => 'Pendiente',
-                        'cancelled' => 'Cancelado',
-                        'expired' => 'Expirado',
-                    ]),
-                Tables\Filters\SelectFilter::make('year')
-                    ->label('Año')
-                    ->options([
-                        '2024' => '2024',
-                        '2025' => '2025',
+                        'claimed' => 'Claimed',
+                        'premium' => 'Premium',
+                        'elite' => 'Elite',
                     ]),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ])
-            ->defaultSort('subscribed_at', 'desc')
+            ->bulkActions([])
+            ->defaultSort('subscription_tier', 'desc')
             ->emptyStateHeading('Sin suscripciones')
-            ->emptyStateDescription('Aún no hay restaurantes suscritos a Famer.');
+            ->emptyStateDescription('Aún no hay restaurantes con plan de pago.');
     }
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array
     {
         return [
             'index' => Pages\ListFamerSubscriptions::route('/'),
-            'create' => Pages\CreateFamerSubscription::route('/create'),
             'edit' => Pages\EditFamerSubscription::route('/{record}/edit'),
         ];
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) Restaurant::where('subscription_tier', '!=', 'free')->count() ?: null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'success';
     }
 }

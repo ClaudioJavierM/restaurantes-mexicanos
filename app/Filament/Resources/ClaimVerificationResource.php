@@ -230,11 +230,18 @@ class ClaimVerificationResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::where('status', 'pending')->count() ?: null;
+        $pending = static::getModel()::where('status', 'pending')->count();
+        return $pending > 0 ? (string) $pending : null;
     }
 
     public static function getNavigationBadgeColor(): ?string
     {
         return 'warning';
+    }
+
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        $totalClaimed = \App\Models\Restaurant::where('is_claimed', true)->count();
+        return "Total reclamados: {$totalClaimed}";
     }
 }
