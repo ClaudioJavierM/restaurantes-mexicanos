@@ -165,17 +165,15 @@
             : $bannerFallbackUrl; // first Yelp photo as fallback
     @endphp
     @if($coverUrl)
-        <div style="position:relative; height:260px; overflow:hidden; background:#111;"
-             x-data="{ imgFailed: false }">
-            {{-- onerror hides broken Yelp URLs and falls back to the placeholder --}}
+        <div style="position:relative; height:260px; overflow:hidden; background:#111;">
+            {{-- onerror hides broken external URLs and falls back to the placeholder --}}
             <img src="{{ $coverUrl }}"
                  alt="{{ $restaurant->name }}"
                  style="width:100%; height:100%; object-fit:cover; object-position:center; display:block;"
                  x-show="!imgFailed"
-                 @error="imgFailed = true">
+                 onerror="this._x_dataStack && (this._x_dataStack[0].imgFailed = true); this.style.display='none'; this.nextElementSibling.style.display='flex';">
             {{-- Placeholder shown if the cover image fails to load --}}
-            <div x-show="imgFailed"
-                 style="width:100%;height:100%;background:linear-gradient(135deg,#1F2937,#111827);display:flex;align-items:center;justify-content:center;flex-direction:column;color:white;">
+            <div style="display:none;width:100%;height:100%;background:linear-gradient(135deg,#1F2937,#111827);align-items:center;justify-content:center;flex-direction:column;color:white;">
                 <span style="font-size:64px;display:block;margin-bottom:8px;">🍽️</span>
                 <p style="font-size:16px;opacity:0.8;">{{ $restaurant->name }}</p>
             </div>
