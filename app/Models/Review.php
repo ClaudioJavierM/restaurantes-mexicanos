@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Review extends Model
 {
@@ -25,6 +26,14 @@ class Review extends Model
         'owner_response_at',
         'helpful_count',
         'not_helpful_count',
+        'trust_score',
+        'is_verified',
+        'trust_flags',
+        'visit_date',
+        'visit_type',
+        'edit_count',
+        'last_edited_at',
+        'flagged_suspicious',
         'status',
         'is_active',
         'approved_at',
@@ -33,16 +42,25 @@ class Review extends Model
     ];
 
     protected $casts = [
-        'is_active' => 'boolean',
-        'rating' => 'integer',
-        'service_rating' => 'integer',
-        'food_rating' => 'integer',
-        'ambiance_rating' => 'integer',
-        'helpful_count' => 'integer',
-        'not_helpful_count' => 'integer',
-        'approved_at' => 'datetime',
-        'owner_response_at' => 'datetime',
+        'is_active'          => 'boolean',
+        'is_verified'        => 'boolean',
+        'flagged_suspicious' => 'boolean',
+        'rating'             => 'integer',
+        'service_rating'     => 'integer',
+        'food_rating'        => 'integer',
+        'ambiance_rating'    => 'integer',
+        'helpful_count'      => 'integer',
+        'not_helpful_count'  => 'integer',
+        'trust_score'        => 'integer',
+        'edit_count'         => 'integer',
+        'trust_flags'        => 'array',
+        'approved_at'        => 'datetime',
+        'owner_response_at'  => 'datetime',
+        'last_edited_at'     => 'datetime',
+        'visit_date'         => 'date',
     ];
+
+    // ─── Relationships ────────────────────────────────────────────────────────
 
     public function restaurant(): BelongsTo
     {
@@ -54,134 +72,150 @@ class Review extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function photos()
+    public function photos(): HasMany
     {
         return $this->hasMany(ReviewPhoto::class);
     }
 
-    public function votes()
+    public function votes(): HasMany
     {
         return $this->hasMany(ReviewVote::class);
     }
 
-    public function reports()
+    public function reports(): HasMany
     {
         return $this->hasMany(ReviewReport::class);
     }
 
-    public function approvedBy()
+    public function editHistory(): HasMany
+    {
+        return $this->hasMany(ReviewEditHistory::class);
+    }
+
+    public function approvedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'approved_by');
     }
 
-    public function ownerResponseBy()
+    public function ownerResponseBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'owner_response_by');
     }
 
-    // Accessors
+    // ─── Accessors ───────────────────────────────────────────────────────────
+
     public function getReviewerNameAttribute(): string
     {
         return $this->user ? $this->user->name : ($this->guest_name ?? 'Anónimo');
     }
 
-    // Scope para reviews aprobados
+    public function getTrustLevelAttribute(): string
+    {
+        if ($this->trust_score >= 80) return 'high';
+        if ($this->trust_score >= 50) return 'medium';
+        return 'low';
+    }
+
+    public function getTrustBadgeAttribute(): ?string
+    {
+        if ($this->is_verified) return 'verified';
+        if ($this->trust_score >= 80) return 'trusted';
+        if ($this->flagged_suspicious) return 'suspicious';
+        return null;
+    }
+
+    // ─── Scopes ──────────────────────────────────────────────────────────────
+
     public function scopeApproved($query)
     {
         return $query->where('status', 'approved')->where('is_active', true);
     }
 
-    // Scope para ordenar por más recientes
     public function scopeRecent($query)
     {
         return $query->latest();
     }
 
-    // Scope para ordenar por más útiles
     public function scopeMostHelpful($query)
     {
         return $query->orderByDesc('helpful_count');
     }
 
-    // Check if user has voted
+    public function scopeTrusted($query)
+    {
+        return $query->where('trust_score', '>=', 50)->where('flagged_suspicious', false);
+    }
+
+    public function scopeSuspicious($query)
+    {
+        return $query->where('flagged_suspicious', true);
+    }
+
+    // ─── Edit Tracking ───────────────────────────────────────────────────────
+
+    public function recordEdit(string $oldComment, string $newComment, ?string $oldTitle, ?string $newTitle, int $oldRating, int $newRating, ?string $reason = null): void
+    {
+        $this->editHistory()->create([
+            'edited_by'   => auth()->id(),
+            'old_comment' => $oldComment,
+            'new_comment' => $newComment,
+            'old_title'   => $oldTitle,
+            'new_title'   => $newTitle,
+            'old_rating'  => $oldRating,
+            'new_rating'  => $newRating,
+            'edit_reason' => $reason,
+            'ip_address'  => request()->ip(),
+        ]);
+
+        $this->increment('edit_count');
+        $this->update(['last_edited_at' => now()]);
+    }
+
+    // ─── Vote Helpers ─────────────────────────────────────────────────────────
+
     public function hasUserVoted(?User $user = null): bool
     {
-        if (!$user) {
-            $user = auth()->user();
-        }
-
-        if (!$user) {
-            return false;
-        }
-
+        $user ??= auth()->user();
+        if (!$user) return false;
         return $this->votes()->where('user_id', $user->id)->exists();
     }
 
-    // Get user's vote
     public function getUserVote(?User $user = null): ?ReviewVote
     {
-        if (!$user) {
-            $user = auth()->user();
-        }
-
-        if (!$user) {
-            return null;
-        }
-
+        $user ??= auth()->user();
+        if (!$user) return null;
         return $this->votes()->where('user_id', $user->id)->first();
     }
 
-    // Toggle vote
     public function toggleVote(bool $isHelpful, ?User $user = null)
     {
-        if (!$user) {
-            $user = auth()->user();
-        }
-
-        if (!$user) {
-            return false;
-        }
+        $user ??= auth()->user();
+        if (!$user) return false;
 
         $existingVote = $this->votes()->where('user_id', $user->id)->first();
 
         if ($existingVote) {
-            // If same vote, remove it
             if ($existingVote->is_helpful == $isHelpful) {
-                if ($isHelpful) {
-                    $this->decrement('helpful_count');
-                } else {
-                    $this->decrement('not_helpful_count');
-                }
+                $isHelpful ? $this->decrement('helpful_count') : $this->decrement('not_helpful_count');
                 $existingVote->delete();
                 return null;
             } else {
-                // If different vote, update it
-                if ($isHelpful) {
-                    $this->increment('helpful_count');
-                    $this->decrement('not_helpful_count');
-                } else {
-                    $this->increment('not_helpful_count');
-                    $this->decrement('helpful_count');
-                }
+                $isHelpful ? $this->increment('helpful_count') : $this->increment('not_helpful_count');
+                $isHelpful ? $this->decrement('not_helpful_count') : $this->decrement('helpful_count');
                 $existingVote->update(['is_helpful' => $isHelpful]);
                 return $isHelpful;
             }
-        } else {
-            // Create new vote
-            ReviewVote::create([
-                'review_id' => $this->id,
-                'user_id' => $user->id,
-                'is_helpful' => $isHelpful,
-                'ip_address' => request()->ip(),
-            ]);
-
-            if ($isHelpful) {
-                $this->increment('helpful_count');
-            } else {
-                $this->increment('not_helpful_count');
-            }
-
-            return $isHelpful;
         }
+
+        ReviewVote::create([
+            'review_id'  => $this->id,
+            'user_id'    => $user->id,
+            'is_helpful' => $isHelpful,
+            'ip_address' => request()->ip(),
+        ]);
+
+        $isHelpful ? $this->increment('helpful_count') : $this->increment('not_helpful_count');
+
+        return $isHelpful;
     }
 }

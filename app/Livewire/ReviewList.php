@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Restaurant;
 use App\Models\Review;
+use App\Services\ReviewTrustService;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -16,7 +17,7 @@ class ReviewList extends Component
     public $filterRating = null; // 1-5 or null for all
 
     protected $queryString = [
-        'sortBy' => ['except' => 'recent'],
+        'sortBy'       => ['except' => 'recent'],
         'filterRating' => ['except' => null],
     ];
 
@@ -75,12 +76,10 @@ class ReviewList extends Component
     {
         $query = $this->restaurant->reviews()->approved();
 
-        // Apply rating filter
         if ($this->filterRating) {
             $query->where('rating', $this->filterRating);
         }
 
-        // Apply sorting
         switch ($this->sortBy) {
             case 'helpful':
                 $query->mostHelpful();
@@ -91,14 +90,12 @@ class ReviewList extends Component
             case 'rating_low':
                 $query->orderBy('rating')->orderByDesc('created_at');
                 break;
-            default: // recent
+            default:
                 $query->recent();
-                break;
         }
 
         $reviews = $query->with(['user', 'photos', 'votes'])->paginate(10);
 
-        // Get rating distribution
         $ratingDistribution = $this->restaurant->reviews()
             ->approved()
             ->selectRaw('rating, COUNT(*) as count')
@@ -107,9 +104,17 @@ class ReviewList extends Component
             ->get()
             ->pluck('count', 'rating');
 
+        // Detect suspicious patterns (cached per restaurant for 1 hour)
+        $suspiciousAlerts = cache()->remember(
+            "review_alerts_{$this->restaurant->id}",
+            3600,
+            fn () => app(ReviewTrustService::class)->detectSuspiciousPatterns($this->restaurant->id)
+        );
+
         return view('livewire.review-list', [
-            'reviews' => $reviews,
+            'reviews'            => $reviews,
             'ratingDistribution' => $ratingDistribution,
+            'suspiciousAlerts'   => $suspiciousAlerts,
         ]);
     }
 }

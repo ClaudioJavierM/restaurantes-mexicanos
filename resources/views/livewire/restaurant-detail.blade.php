@@ -43,35 +43,37 @@
         ? round($seoTotalWeightedScore / $seoTotalWeight, 1)
         : ($seoGoogleRating ?: ($seoYelpRating ?: 0));
 
-    // Collect all available photos
-    $allPhotos = [];
+    // Collect reliable (locally-stored) photos for the count and banner
+    $localPhotos = [];
     if ($restaurant->image) {
-        $allPhotos[] = str_starts_with($restaurant->image, 'http')
+        $localPhotos[] = str_starts_with($restaurant->image, 'http')
             ? $restaurant->image
             : asset('storage/' . $restaurant->image);
     }
     foreach ($restaurant->getMedia('images') as $media) {
-        $allPhotos[] = $media->getUrl();
+        $localPhotos[] = $media->getUrl();
     }
-    if (is_array($restaurant->yelp_photos)) {
-        foreach ($restaurant->yelp_photos as $yelpPhoto) {
-            $allPhotos[] = $yelpPhoto;
-        }
-    }
-    // Include user-uploaded photos (from owner panel)
     foreach ($restaurant->userPhotos()->where('status', 'approved')->orderBy('created_at', 'desc')->get() as $userPhoto) {
-        $allPhotos[] = asset('storage/' . $userPhoto->photo_path);
+        $localPhotos[] = asset('storage/' . $userPhoto->photo_path);
     }
-    $allPhotos = array_unique($allPhotos);
+    $localPhotos = array_unique($localPhotos);
 
-    // Free plan: limit gallery to 5 most recent photos
+    // Yelp photos are external URLs that may expire — kept separate for gallery display only
+    $yelpPhotosForGallery = is_array($restaurant->yelp_photos) ? $restaurant->yelp_photos : [];
+
+    // Free plan: limit gallery to 5 most recent local photos
     $isFreePlan = empty($restaurant->subscription_tier) || $restaurant->subscription_tier === 'free';
+    $allPhotos = $localPhotos;
     if ($isFreePlan && count($allPhotos) > 5) {
         $allPhotos = array_slice($allPhotos, -5);
     }
 
+    // totalPhotos counts only reliable local photos (not external Yelp URLs that may be broken)
     $totalPhotos = count($allPhotos);
     $displayPhotos = array_slice($allPhotos, 0, 5);
+
+    // Best cover image: local first, then first Yelp photo as fallback for banner display
+    $bannerFallbackUrl = count($yelpPhotosForGallery) > 0 ? $yelpPhotosForGallery[0] : null;
 
     // Parse hours for display
     $parsedHours = [];
@@ -158,12 +160,26 @@
 
     <!-- Cover Image Banner -->
     @php
-        $coverUrl = $restaurant->image ? asset('storage/' . $restaurant->image) : null;
+        $coverUrl = $restaurant->image
+            ? asset('storage/' . $restaurant->image)
+            : $bannerFallbackUrl; // first Yelp photo as fallback
     @endphp
     @if($coverUrl)
-        <div style="position:relative; height:260px; overflow:hidden; background:#111;">
-            <img src="{{ $coverUrl }}" alt="{{ $restaurant->name }}" style="width:100%; height:100%; object-fit:cover; object-position:center; display:block;">
-            <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 60%);"></div>
+        <div style="position:relative; height:260px; overflow:hidden; background:#111;"
+             x-data="{ imgFailed: false }">
+            {{-- onerror hides broken Yelp URLs and falls back to the placeholder --}}
+            <img src="{{ $coverUrl }}"
+                 alt="{{ $restaurant->name }}"
+                 style="width:100%; height:100%; object-fit:cover; object-position:center; display:block;"
+                 x-show="!imgFailed"
+                 @error="imgFailed = true">
+            {{-- Placeholder shown if the cover image fails to load --}}
+            <div x-show="imgFailed"
+                 style="width:100%;height:100%;background:linear-gradient(135deg,#1F2937,#111827);display:flex;align-items:center;justify-content:center;flex-direction:column;color:white;">
+                <span style="font-size:64px;display:block;margin-bottom:8px;">🍽️</span>
+                <p style="font-size:16px;opacity:0.8;">{{ $restaurant->name }}</p>
+            </div>
+            <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 60%);pointer-events:none;"></div>
             @if($totalPhotos > 0)
                 <div style="position:absolute; bottom:12px; right:16px; z-index:10;">
                     <button wire:click="switchTab('photos')" style="background:rgba(255,255,255,0.92); color:#111; padding:7px 16px; border-radius:8px; font-size:13px; font-weight:600; border:none; cursor:pointer; display:flex; align-items:center; gap:6px; box-shadow:0 2px 8px rgba(0,0,0,0.3);">
