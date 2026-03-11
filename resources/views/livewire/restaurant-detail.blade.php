@@ -50,8 +50,11 @@
             ? $restaurant->image
             : asset('storage/' . $restaurant->image);
     }
-    foreach ($restaurant->getMedia('images') as $media) {
-        $localPhotos[] = $media->getUrl();
+    // Only include Spatie media if there is no main image (avoids counting the same photo twice)
+    if (!$restaurant->image) {
+        foreach ($restaurant->getMedia('images') as $media) {
+            $localPhotos[] = $media->getUrl();
+        }
     }
     foreach ($restaurant->userPhotos()->where('status', 'approved')->orderBy('created_at', 'desc')->get() as $userPhoto) {
         $localPhotos[] = asset('storage/' . $userPhoto->photo_path);
