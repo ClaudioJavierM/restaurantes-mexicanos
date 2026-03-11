@@ -43,40 +43,27 @@
         ? round($seoTotalWeightedScore / $seoTotalWeight, 1)
         : ($seoGoogleRating ?: ($seoYelpRating ?: 0));
 
-    // Collect reliable (locally-stored) photos for the count and banner
-    $localPhotos = [];
+    // Cover image for the banner — not counted in gallery total
+    $coverImageUrl = null;
     if ($restaurant->image) {
-        $localPhotos[] = str_starts_with($restaurant->image, 'http')
+        $coverImageUrl = str_starts_with($restaurant->image, 'http')
             ? $restaurant->image
             : asset('storage/' . $restaurant->image);
+    } elseif ($restaurant->getFirstMediaUrl('images')) {
+        $coverImageUrl = $restaurant->getFirstMediaUrl('images');
+    } elseif (is_array($restaurant->yelp_photos) && count($restaurant->yelp_photos) > 0) {
+        $coverImageUrl = $restaurant->yelp_photos[0];
     }
-    // Only include Spatie media if there is no main image (avoids counting the same photo twice)
-    if (!$restaurant->image) {
-        foreach ($restaurant->getMedia('images') as $media) {
-            $localPhotos[] = $media->getUrl();
-        }
-    }
-    foreach ($restaurant->userPhotos()->where('status', 'approved')->orderBy('created_at', 'desc')->get() as $userPhoto) {
-        $localPhotos[] = asset('storage/' . $userPhoto->photo_path);
-    }
-    $localPhotos = array_unique($localPhotos);
 
-    // Yelp photos are external URLs that may expire — kept separate for gallery display only
-    $yelpPhotosForGallery = is_array($restaurant->yelp_photos) ? $restaurant->yelp_photos : [];
-
-    // Free plan: limit gallery to 5 most recent local photos
+    // Gallery count = only user-uploaded photos. Banner/Yelp images are NOT counted.
     $isFreePlan = empty($restaurant->subscription_tier) || $restaurant->subscription_tier === 'free';
-    $allPhotos = $localPhotos;
+    $userPhotoRecords = $restaurant->userPhotos()->where('status', 'approved')->orderBy('created_at', 'desc')->get();
+    $allPhotos = $userPhotoRecords->map(fn($p) => asset('storage/' . $p->photo_path))->toArray();
     if ($isFreePlan && count($allPhotos) > 5) {
-        $allPhotos = array_slice($allPhotos, -5);
+        $allPhotos = array_slice($allPhotos, 0, 5);
     }
-
-    // totalPhotos counts only reliable local photos (not external Yelp URLs that may be broken)
     $totalPhotos = count($allPhotos);
     $displayPhotos = array_slice($allPhotos, 0, 5);
-
-    // Best cover image: local first, then first Yelp photo as fallback for banner display
-    $bannerFallbackUrl = count($yelpPhotosForGallery) > 0 ? $yelpPhotosForGallery[0] : null;
 
     // Parse hours for display
     $parsedHours = [];
@@ -163,13 +150,10 @@
 
     <!-- Cover Image Banner -->
     @php
-        $coverUrl = $restaurant->image
-            ? asset('storage/' . $restaurant->image)
-            : $bannerFallbackUrl; // first Yelp photo as fallback
     @endphp
-    @if($coverUrl)
+    @if($coverImageUrl)
         <div style="position:relative; height:260px; overflow:hidden; background:#111;">
-            <img src="{{ $coverUrl }}"
+            <img src="{{ $coverImageUrl }}"
                  alt="{{ $restaurant->name }}"
                  style="width:100%; height:100%; object-fit:cover; object-position:center; display:block;"
                  onerror="this.style.display='none';">
