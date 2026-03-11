@@ -171,6 +171,7 @@ class ClaimVerification extends Model
         $this->restaurant->update([
             'is_claimed' => true,
             'claimed_at' => now(),
+            'subscription_tier' => 'claimed',
             'user_id' => $user->id,
             'owner_name' => $this->owner_name,
             'owner_email' => $this->owner_email,

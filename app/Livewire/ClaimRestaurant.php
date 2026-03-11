@@ -399,7 +399,7 @@ class ClaimRestaurant extends Component
         $this->selectedRestaurant->update([
             'is_claimed' => true,
             'claimed_at' => now(),
-            'subscription_tier' => 'free',
+            'subscription_tier' => 'claimed',
             'subscription_status' => 'active',
             'premium_analytics' => false,
             'premium_seo' => false,
