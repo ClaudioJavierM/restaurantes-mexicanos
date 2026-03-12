@@ -17,11 +17,11 @@ class FamerSubscriptionResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-star';
 
-    protected static ?string $navigationLabel = 'Suscripciones';
+    protected static ?string $navigationLabel = 'Suscripciones de Pago';
 
-    protected static ?string $modelLabel = 'Suscripción';
+    protected static ?string $modelLabel = 'Suscripción de Pago';
 
-    protected static ?string $pluralModelLabel = 'Suscripciones';
+    protected static ?string $pluralModelLabel = 'Suscripciones de Pago';
 
     protected static ?string $navigationGroup = 'Restaurantes';
 
@@ -32,11 +32,7 @@ class FamerSubscriptionResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->where(function ($q) {
-                $q->where('subscription_tier', '!=', 'free')
-                  ->orWhere('is_claimed', true)
-                  ->orWhereNotNull('user_id');
-            });
+            ->whereIn('subscription_tier', ['premium', 'elite']);
     }
 
     public static function form(Form $form): Form
@@ -51,14 +47,10 @@ class FamerSubscriptionResource extends Resource
                         Forms\Components\Select::make('subscription_tier')
                             ->label('Plan')
                             ->options([
-                                'free' => 'Free',
-                                'claimed' => 'Claimed (Gratis)',
                                 'premium' => 'Premium ($29/mes)',
                                 'elite' => 'Elite ($79/mes)',
                             ])
                             ->required(),
-                        Forms\Components\Toggle::make('is_claimed')
-                            ->label('Reclamado'),
                     ])->columns(3),
 
                 Forms\Components\Section::make('Contacto del Dueño')
@@ -96,19 +88,14 @@ class FamerSubscriptionResource extends Resource
                 Tables\Columns\BadgeColumn::make('subscription_tier')
                     ->label('Plan')
                     ->colors([
-                        'info' => 'claimed',
                         'warning' => 'premium',
                         'success' => 'elite',
                     ])
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'claimed' => 'Claimed',
-                        'premium' => 'Premium',
-                        'elite' => 'Elite',
+                        'premium' => 'Premium ($29/mes)',
+                        'elite' => 'Elite ($79/mes)',
                         default => $state,
                     }),
-                Tables\Columns\IconColumn::make('is_claimed')
-                    ->label('Reclamado')
-                    ->boolean(),
                 Tables\Columns\TextColumn::make('owner_email')
                     ->label('Email Dueño')
                     ->searchable()
@@ -131,21 +118,17 @@ class FamerSubscriptionResource extends Resource
                 Tables\Filters\SelectFilter::make('subscription_tier')
                     ->label('Plan')
                     ->options([
-                        'free' => 'Free (Claimed)',
-                        'claimed' => 'Claimed',
                         'premium' => 'Premium',
                         'elite' => 'Elite',
                     ]),
-                Tables\Filters\TernaryFilter::make('is_claimed')
-                    ->label('Reclamado'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([])
             ->defaultSort('subscription_tier', 'desc')
-            ->emptyStateHeading('Sin suscripciones')
-            ->emptyStateDescription('Aún no hay restaurantes con plan de pago.');
+            ->emptyStateHeading('Sin suscripciones de pago')
+            ->emptyStateDescription('Aún no hay restaurantes con plan Premium o Elite.');
     }
 
     public static function getRelations(): array
@@ -163,11 +146,7 @@ class FamerSubscriptionResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        $count = Restaurant::where(function ($q) {
-            $q->where('subscription_tier', '!=', 'free')
-              ->orWhere('is_claimed', true)
-              ->orWhereNotNull('user_id');
-        })->count();
+        $count = Restaurant::whereIn('subscription_tier', ['premium', 'elite'])->count();
         return $count > 0 ? (string) $count : null;
     }
 

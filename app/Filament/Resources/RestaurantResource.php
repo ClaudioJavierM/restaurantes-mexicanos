@@ -330,6 +330,23 @@ class RestaurantResource extends Resource
                 Tables\Columns\IconColumn::make('is_active')
                     ->label('Activo')
                     ->boolean(),
+                Tables\Columns\BadgeColumn::make('subscription_tier')
+                    ->label('Plan')
+                    ->colors([
+                        'gray' => 'free',
+                        'info' => 'claimed',
+                        'warning' => 'premium',
+                        'success' => 'elite',
+                    ])
+                    ->formatStateUsing(fn (?string $state): string => match ($state) {
+                        'free' => 'Free',
+                        'claimed' => 'Claimed',
+                        'premium' => 'Premium',
+                        'elite' => 'Elite',
+                        default => $state ?? 'Free',
+                    })
+                    ->sortable()
+                    ->toggleable(),
                 Tables\Columns\IconColumn::make('is_claimed')
                     ->label('Reclamado')
                     ->boolean()
@@ -383,6 +400,14 @@ class RestaurantResource extends Resource
                     ->label('Categoría'),
                 Tables\Filters\TernaryFilter::make('is_featured')
                     ->label('Destacado'),
+                Tables\Filters\SelectFilter::make('subscription_tier')
+                    ->label('Plan')
+                    ->options([
+                        'free' => 'Free',
+                        'claimed' => 'Claimed',
+                        'premium' => 'Premium',
+                        'elite' => 'Elite',
+                    ]),
                 Tables\Filters\TernaryFilter::make('is_claimed')
                     ->label('Reclamado'),
                 Tables\Filters\TrashedFilter::make(),

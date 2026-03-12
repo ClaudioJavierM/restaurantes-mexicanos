@@ -28,6 +28,11 @@ class ClaimVerificationResource extends Resource
 
     protected static ?int $navigationSort = 4;
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return false;
+    }
+
     protected static ?string $slug = 'claimed-restaurants';
 
     public static function getEloquentQuery(): Builder

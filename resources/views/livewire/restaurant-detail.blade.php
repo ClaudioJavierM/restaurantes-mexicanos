@@ -217,6 +217,54 @@
                         @endif
                     </div>
 
+                    {{-- FAMER Awards Ranking Badges --}}
+                    @php
+                        $rankings = $restaurant->rankings()
+                            ->where('year', now()->year - 1)
+                            ->where('position', '<=', 25)
+                            ->where('is_published', true)
+                            ->orderBy('position')
+                            ->get();
+                    @endphp
+                    @if($rankings->count() > 0)
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        @foreach($rankings as $ranking)
+                            @php
+                                // Elegant dark/gold theme based on position
+                                $badgeClasses = match(true) {
+                                    $ranking->position == 1 => 'bg-gradient-to-r from-amber-600 to-yellow-500 text-white ring-2 ring-amber-300/50',
+                                    $ranking->position <= 3 => 'bg-gradient-to-r from-gray-800 to-gray-700 text-amber-300 ring-1 ring-amber-400/30',
+                                    $ranking->position <= 10 => 'bg-gradient-to-r from-gray-800 to-gray-700 text-gray-200 ring-1 ring-gray-500/30',
+                                    default => 'bg-gray-100 text-gray-700 ring-1 ring-gray-200',
+                                };
+                                $iconSvg = match(true) {
+                                    $ranking->position == 1 => '<svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 2a2 2 0 00-2 2v1a2 2 0 002 2h1.06a7.04 7.04 0 003.272 4.35L8.12 15.7A2 2 0 009.98 18h.04a2 2 0 001.86-2.3l-1.212-4.35A7.04 7.04 0 0013.94 7H15a2 2 0 002-2V4a2 2 0 00-2-2H5z" clip-rule="evenodd"/></svg>',
+                                    $ranking->position <= 3 => '<svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 2a2 2 0 00-2 2v1a2 2 0 002 2h1.06a7.04 7.04 0 003.272 4.35L8.12 15.7A2 2 0 009.98 18h.04a2 2 0 001.86-2.3l-1.212-4.35A7.04 7.04 0 0013.94 7H15a2 2 0 002-2V4a2 2 0 00-2-2H5z" clip-rule="evenodd"/></svg>',
+                                    default => '<svg class="w-3.5 h-3.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>',
+                                };
+                                $positionLabel = match(true) {
+                                    $ranking->position == 1 => '#1',
+                                    $ranking->position <= 3 => '#' . $ranking->position,
+                                    default => 'Top ' . $ranking->position,
+                                };
+                                $scopeLabel = match($ranking->ranking_type) {
+                                    'national' => $ranking->ranking_scope === 'usa' ? 'USA' : strtoupper($ranking->ranking_scope),
+                                    'state' => $ranking->ranking_scope,
+                                    'city' => $ranking->ranking_scope,
+                                    default => $ranking->ranking_scope,
+                                };
+                            @endphp
+                            <a href="{{ url('/guia') }}?scope={{ $ranking->ranking_type }}{{ $ranking->ranking_type !== 'national' ? '&state=' . $ranking->ranking_scope : '' }}"
+                               class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide uppercase transition-all hover:scale-105 hover:shadow-lg {{ $badgeClasses }}">
+                                {!! $iconSvg !!}
+                                <span>{{ $positionLabel }}</span>
+                                <span class="opacity-70">·</span>
+                                <span>{{ $scopeLabel }} {{ $ranking->year }}</span>
+                            </a>
+                        @endforeach
+                    </div>
+                    @endif
+
                     <!-- Restaurant Name with Logo -->
                     <div class="flex items-center gap-4 mb-2">
                         @if($restaurant->logo)
