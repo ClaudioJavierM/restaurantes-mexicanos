@@ -232,10 +232,10 @@
                             @php
                                 // Elegant dark/gold theme based on position
                                 $badgeClasses = match(true) {
-                                    $ranking->position == 1 => 'bg-gradient-to-r from-amber-600 to-yellow-500 text-white ring-2 ring-amber-300/50',
-                                    $ranking->position <= 3 => 'bg-gradient-to-r from-gray-800 to-gray-700 text-amber-300 ring-1 ring-amber-400/30',
-                                    $ranking->position <= 10 => 'bg-gradient-to-r from-gray-800 to-gray-700 text-gray-200 ring-1 ring-gray-500/30',
-                                    default => 'bg-gray-100 text-gray-700 ring-1 ring-gray-200',
+                                    $ranking->position == 1 => 'bg-gradient-to-r from-amber-600 to-yellow-500 text-white ring-2 ring-amber-300/50 shadow-md',
+                                    $ranking->position <= 3 => 'bg-gradient-to-r from-amber-700 to-amber-600 text-white ring-1 ring-amber-400/40 shadow-sm',
+                                    $ranking->position <= 10 => 'bg-gradient-to-r from-slate-600 to-slate-500 text-white ring-1 ring-slate-400/30 shadow-sm',
+                                    default => 'bg-gray-200 text-gray-700 ring-1 ring-gray-300',
                                 };
                                 $iconSvg = match(true) {
                                     $ranking->position == 1 => '<svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 2a2 2 0 00-2 2v1a2 2 0 002 2h1.06a7.04 7.04 0 003.272 4.35L8.12 15.7A2 2 0 009.98 18h.04a2 2 0 001.86-2.3l-1.212-4.35A7.04 7.04 0 0013.94 7H15a2 2 0 002-2V4a2 2 0 00-2-2H5z" clip-rule="evenodd"/></svg>',
