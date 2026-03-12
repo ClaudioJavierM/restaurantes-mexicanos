@@ -32,8 +32,8 @@ Route::post('/team/decline/{token}', [TeamInvitationController::class, 'decline'
 
 // SEO Routes — Sitemap index + sub-sitemaps
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
-Route::get('/sitemap-main.xml', [SitemapController::class, 'main'])->name('sitemap.main');
-Route::get('/sitemap-restaurants-{page}.xml', [SitemapController::class, 'restaurants'])->where('page', '[0-9]+')->name('sitemap.restaurants');
+Route::get('/sitemap-pages.xml', [SitemapController::class, 'pages'])->name('sitemap.pages');
+Route::get('/sitemap-restaurants.xml', [SitemapController::class, 'restaurants'])->name('sitemap.restaurants');
 Route::get('/sitemap-guides.xml', [SitemapController::class, 'guides'])->name('sitemap.guides');
 Route::get('/sitemap-rankings.xml', [SitemapController::class, 'rankings'])->name('sitemap.rankings');
 
