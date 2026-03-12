@@ -150,6 +150,13 @@
 
     <!-- Cover Image Banner -->
     @php
+        $heroRankings = $restaurant->rankings()
+            ->where('year', now()->year - 1)
+            ->where('position', '<=', 25)
+            ->where('is_published', true)
+            ->orderBy('position')
+            ->get();
+        $bestRanking = $heroRankings->first();
     @endphp
     @if($coverImageUrl)
         <div style="position:relative; height:260px; overflow:hidden; background:#111;">
@@ -158,6 +165,51 @@
                  style="width:100%; height:100%; object-fit:cover; object-position:center; display:block;"
                  onerror="this.style.display='none';">
             <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 60%);pointer-events:none;"></div>
+
+            {{-- Ranking Badge Overlay on Banner --}}
+            @if($bestRanking)
+            <div style="position:absolute; top:16px; left:16px; z-index:10;">
+                <a href="{{ url('/guia') }}?scope={{ $bestRanking->ranking_type }}{{ $bestRanking->ranking_type !== 'national' ? '&state=' . $bestRanking->ranking_scope : '' }}"
+                   style="text-decoration:none; display:block;">
+                    <div style="background:linear-gradient(135deg, rgba(15,15,15,0.92), rgba(30,30,30,0.88)); backdrop-filter:blur(12px); border:1px solid rgba(212,175,55,0.4); border-radius:12px; padding:12px 18px; min-width:160px; box-shadow:0 8px 32px rgba(0,0,0,0.4);">
+                        {{-- Trophy icon + Position --}}
+                        <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
+                            <div style="width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+                                {{ $bestRanking->position == 1 ? 'background:linear-gradient(135deg, #D4AF37, #F5D060);' : ($bestRanking->position <= 3 ? 'background:linear-gradient(135deg, #B8860B, #D4AF37);' : 'background:linear-gradient(135deg, #6B7280, #9CA3AF);') }}">
+                                <svg width="22" height="22" fill="white" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 2a2 2 0 00-2 2v1a2 2 0 002 2h1.06a7.04 7.04 0 003.272 4.35L8.12 15.7A2 2 0 009.98 18h.04a2 2 0 001.86-2.3l-1.212-4.35A7.04 7.04 0 0013.94 7H15a2 2 0 002-2V4a2 2 0 00-2-2H5z" clip-rule="evenodd"/></svg>
+                            </div>
+                            <div>
+                                <div style="font-size:24px; font-weight:800; line-height:1; {{ $bestRanking->position <= 3 ? 'color:#D4AF37;' : 'color:#E5E7EB;' }}">
+                                    #{{ $bestRanking->position }}
+                                </div>
+                                <div style="font-size:11px; color:rgba(255,255,255,0.6); text-transform:uppercase; letter-spacing:1.5px; font-weight:600;">
+                                    {{ $bestRanking->ranking_type === 'city' ? $bestRanking->ranking_scope : ($bestRanking->ranking_type === 'state' ? $bestRanking->ranking_scope : 'USA') }}
+                                </div>
+                            </div>
+                        </div>
+                        {{-- FAMER Awards Year --}}
+                        <div style="border-top:1px solid rgba(212,175,55,0.2); padding-top:6px; display:flex; align-items:center; justify-content:space-between;">
+                            <span style="font-size:10px; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:2px; font-weight:700;">FAMER Awards</span>
+                            <span style="font-size:12px; color:#D4AF37; font-weight:700;">{{ $bestRanking->year }}</span>
+                        </div>
+                    </div>
+                </a>
+
+                {{-- Additional rankings as small pills below --}}
+                @if($heroRankings->count() > 1)
+                <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:8px;">
+                    @foreach($heroRankings->skip(1) as $ranking)
+                        <a href="{{ url('/guia') }}?scope={{ $ranking->ranking_type }}{{ $ranking->ranking_type !== 'national' ? '&state=' . $ranking->ranking_scope : '' }}"
+                           style="background:rgba(15,15,15,0.85); backdrop-filter:blur(8px); border:1px solid rgba(212,175,55,0.25); border-radius:8px; padding:5px 10px; text-decoration:none; display:inline-flex; align-items:center; gap:5px;">
+                            <span style="font-size:13px; font-weight:700; {{ $ranking->position <= 3 ? 'color:#D4AF37;' : 'color:#E5E7EB;' }}">#{{ $ranking->position }}</span>
+                            <span style="font-size:11px; color:rgba(255,255,255,0.6);">{{ $ranking->ranking_scope }} {{ $ranking->year }}</span>
+                        </a>
+                    @endforeach
+                </div>
+                @endif
+            </div>
+            @endif
+
             @if($totalPhotos > 0)
                 <div style="position:absolute; bottom:12px; right:16px; z-index:10;">
                     <button wire:click="switchTab('photos')" style="background:rgba(255,255,255,0.92); color:#111; padding:7px 16px; border-radius:8px; font-size:13px; font-weight:600; border:none; cursor:pointer; display:flex; align-items:center; gap:6px; box-shadow:0 2px 8px rgba(0,0,0,0.3);">
@@ -173,6 +225,33 @@
                 <span style="font-size:64px; display:block; margin-bottom:8px;">🍽️</span>
                 <p style="font-size:16px; opacity:0.8;">{{ $restaurant->name }}</p>
             </div>
+
+            {{-- Ranking Badge on fallback banner --}}
+            @if($bestRanking)
+            <div style="position:absolute; top:16px; left:16px; z-index:10;">
+                <div style="background:linear-gradient(135deg, rgba(15,15,15,0.92), rgba(30,30,30,0.88)); border:1px solid rgba(212,175,55,0.4); border-radius:12px; padding:12px 18px; min-width:160px;">
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
+                        <div style="width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+                            {{ $bestRanking->position == 1 ? 'background:linear-gradient(135deg, #D4AF37, #F5D060);' : ($bestRanking->position <= 3 ? 'background:linear-gradient(135deg, #B8860B, #D4AF37);' : 'background:linear-gradient(135deg, #6B7280, #9CA3AF);') }}">
+                            <svg width="22" height="22" fill="white" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 2a2 2 0 00-2 2v1a2 2 0 002 2h1.06a7.04 7.04 0 003.272 4.35L8.12 15.7A2 2 0 009.98 18h.04a2 2 0 001.86-2.3l-1.212-4.35A7.04 7.04 0 0013.94 7H15a2 2 0 002-2V4a2 2 0 00-2-2H5z" clip-rule="evenodd"/></svg>
+                        </div>
+                        <div>
+                            <div style="font-size:24px; font-weight:800; line-height:1; {{ $bestRanking->position <= 3 ? 'color:#D4AF37;' : 'color:#E5E7EB;' }}">
+                                #{{ $bestRanking->position }}
+                            </div>
+                            <div style="font-size:11px; color:rgba(255,255,255,0.6); text-transform:uppercase; letter-spacing:1.5px; font-weight:600;">
+                                {{ $bestRanking->ranking_type === 'city' ? $bestRanking->ranking_scope : ($bestRanking->ranking_type === 'state' ? $bestRanking->ranking_scope : 'USA') }}
+                            </div>
+                        </div>
+                    </div>
+                    <div style="border-top:1px solid rgba(212,175,55,0.2); padding-top:6px; display:flex; align-items:center; justify-content:space-between;">
+                        <span style="font-size:10px; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:2px; font-weight:700;">FAMER Awards</span>
+                        <span style="font-size:12px; color:#D4AF37; font-weight:700;">{{ $bestRanking->year }}</span>
+                    </div>
+                </div>
+            </div>
+            @endif
+
             @if($totalPhotos > 0)
                 <div style="position:absolute; bottom:12px; right:16px; z-index:10;">
                     <button wire:click="switchTab('photos')" style="background:rgba(255,255,255,0.92); color:#111; padding:7px 16px; border-radius:8px; font-size:13px; font-weight:600; border:none; cursor:pointer; display:flex; align-items:center; gap:6px; box-shadow:0 2px 8px rgba(0,0,0,0.3);">
@@ -216,54 +295,6 @@
                             </span>
                         @endif
                     </div>
-
-                    {{-- FAMER Awards Ranking Badges --}}
-                    @php
-                        $rankings = $restaurant->rankings()
-                            ->where('year', now()->year - 1)
-                            ->where('position', '<=', 25)
-                            ->where('is_published', true)
-                            ->orderBy('position')
-                            ->get();
-                    @endphp
-                    @if($rankings->count() > 0)
-                    <div class="flex flex-wrap gap-2 mb-4">
-                        @foreach($rankings as $ranking)
-                            @php
-                                // Elegant dark/gold theme based on position
-                                $badgeClasses = match(true) {
-                                    $ranking->position == 1 => 'bg-gradient-to-r from-amber-600 to-yellow-500 text-white ring-2 ring-amber-300/50 shadow-md',
-                                    $ranking->position <= 3 => 'bg-gradient-to-r from-amber-700 to-amber-600 text-white ring-1 ring-amber-400/40 shadow-sm',
-                                    $ranking->position <= 10 => 'bg-gradient-to-r from-slate-600 to-slate-500 text-white ring-1 ring-slate-400/30 shadow-sm',
-                                    default => 'bg-gray-200 text-gray-700 ring-1 ring-gray-300',
-                                };
-                                $iconSvg = match(true) {
-                                    $ranking->position == 1 => '<svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 2a2 2 0 00-2 2v1a2 2 0 002 2h1.06a7.04 7.04 0 003.272 4.35L8.12 15.7A2 2 0 009.98 18h.04a2 2 0 001.86-2.3l-1.212-4.35A7.04 7.04 0 0013.94 7H15a2 2 0 002-2V4a2 2 0 00-2-2H5z" clip-rule="evenodd"/></svg>',
-                                    $ranking->position <= 3 => '<svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 2a2 2 0 00-2 2v1a2 2 0 002 2h1.06a7.04 7.04 0 003.272 4.35L8.12 15.7A2 2 0 009.98 18h.04a2 2 0 001.86-2.3l-1.212-4.35A7.04 7.04 0 0013.94 7H15a2 2 0 002-2V4a2 2 0 00-2-2H5z" clip-rule="evenodd"/></svg>',
-                                    default => '<svg class="w-3.5 h-3.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>',
-                                };
-                                $positionLabel = match(true) {
-                                    $ranking->position == 1 => '#1',
-                                    $ranking->position <= 3 => '#' . $ranking->position,
-                                    default => 'Top ' . $ranking->position,
-                                };
-                                $scopeLabel = match($ranking->ranking_type) {
-                                    'national' => $ranking->ranking_scope === 'usa' ? 'USA' : strtoupper($ranking->ranking_scope),
-                                    'state' => $ranking->ranking_scope,
-                                    'city' => $ranking->ranking_scope,
-                                    default => $ranking->ranking_scope,
-                                };
-                            @endphp
-                            <a href="{{ url('/guia') }}?scope={{ $ranking->ranking_type }}{{ $ranking->ranking_type !== 'national' ? '&state=' . $ranking->ranking_scope : '' }}"
-                               class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold tracking-wide uppercase transition-all hover:scale-105 hover:shadow-lg {{ $badgeClasses }}">
-                                {!! $iconSvg !!}
-                                <span>{{ $positionLabel }}</span>
-                                <span class="opacity-70">·</span>
-                                <span>{{ $scopeLabel }} {{ $ranking->year }}</span>
-                            </a>
-                        @endforeach
-                    </div>
-                    @endif
 
                     <!-- Restaurant Name with Logo -->
                     <div class="flex items-center gap-4 mb-2">
