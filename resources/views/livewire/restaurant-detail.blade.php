@@ -254,7 +254,7 @@
                             @endfor
                         </div>
                         <span class="text-lg font-bold text-gray-900">{{ number_format($displayRating, 1) }}</span>
-                        <a href="#reviews" wire:click="switchTab('reviews')" class="text-gray-600 hover:text-red-600">({{ number_format($combinedReviews) }} resenas)</a>
+                        <a href="#reviews" wire:click="switchTab('reviews')" class="text-gray-600 hover:text-red-600">({{ number_format($combinedReviews) }} reseñas)</a>
                     </div>
 
                     <!-- Review Sources Breakdown -->
