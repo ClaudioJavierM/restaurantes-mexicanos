@@ -146,6 +146,37 @@
         }
     }
 @endphp
+
+@push('meta')
+    {{-- Open Graph for social sharing --}}
+    <meta property="og:type" content="restaurant">
+    <meta property="og:title" content="{{ $restaurant->name }} — {{ $restaurant->city }}, {{ $restaurant->state?->name ?? '' }}">
+    <meta property="og:description" content="{{ Str::limit(strip_tags($restaurant->description ?: 'Descubre ' . $restaurant->name . ', uno de los mejores restaurantes mexicanos en ' . $restaurant->city), 200) }}">
+    <meta property="og:url" content="{{ url()->current() }}">
+    @php
+        $hasRankings = $restaurant->rankings()->where('year', now()->year - 1)->where('position', '<=', 25)->where('is_published', true)->exists();
+    @endphp
+    @if($hasRankings)
+        <meta property="og:image" content="{{ route('og.restaurant', $restaurant->slug) }}">
+    @elseif($seoImage)
+        <meta property="og:image" content="{{ $seoImage }}">
+    @endif
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:locale" content="{{ app()->getLocale() === 'en' ? 'en_US' : 'es_MX' }}">
+    <meta property="og:site_name" content="Restaurantes Mexicanos Famosos">
+
+    {{-- Twitter Card --}}
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $restaurant->name }} — {{ $restaurant->city }}">
+    <meta name="twitter:description" content="{{ Str::limit(strip_tags($restaurant->description ?: 'Descubre ' . $restaurant->name), 150) }}">
+    @if($hasRankings)
+        <meta name="twitter:image" content="{{ route('og.restaurant', $restaurant->slug) }}">
+    @elseif($seoImage)
+        <meta name="twitter:image" content="{{ $seoImage }}">
+    @endif
+@endpush
+
 <div>
 
     <!-- Cover Image Banner -->

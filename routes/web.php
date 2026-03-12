@@ -76,6 +76,9 @@ Route::get('/terms', [\App\Http\Controllers\LegalController::class, 'terms'])->n
 Route::get('/contact', [\App\Http\Controllers\LegalController::class, 'contact'])->name('legal.contact');
 
 
+// OG Image Generator for social sharing
+Route::get('/og/restaurant/{slug}', [\App\Http\Controllers\OgImageController::class, 'restaurant'])->name('og.restaurant');
+
 // Email Tracking
 Route::get('/email/track/open/{token}', [\App\Http\Controllers\EmailTrackingController::class, 'trackOpen'])->name('email.track.open');
 Route::get('/email/track/click/{token}', [\App\Http\Controllers\EmailTrackingController::class, 'trackClick'])->name('email.track.click');
