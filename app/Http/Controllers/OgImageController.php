@@ -16,7 +16,7 @@ class OgImageController extends Controller
     {
         $restaurant = Restaurant::where('slug', $slug)->firstOrFail();
 
-        $cacheKey = "og_img_{$restaurant->id}_v3";
+        $cacheKey = "og_img_{$restaurant->id}_v4";
         $cachedPath = Cache::get($cacheKey);
 
         if ($cachedPath && file_exists(public_path($cachedPath))) {
@@ -83,60 +83,72 @@ class OgImageController extends Controller
         $darkBg = imagecolorallocatealpha($canvas, 10, 10, 10, 30);
         $goldBorder = imagecolorallocatealpha($canvas, 212, 175, 55, 60);
 
-        // --- Ranking Badge (top-left, large and prominent) ---
+        // --- Gold Award Banner (full width, top) ---
         if ($bestRanking) {
-            $bx = 40;
-            $by = 35;
-            $bw = 320;
-            $bh = 140;
+            $bannerH = 90;
 
-            // Badge background with rounded corners effect
-            imagefilledrectangle($canvas, $bx, $by, $bx + $bw, $by + $bh, $darkBg);
-            // Gold border
-            imagerectangle($canvas, $bx, $by, $bx + $bw, $by + $bh, $goldBorder);
-            imagerectangle($canvas, $bx + 1, $by + 1, $bx + $bw - 1, $by + $bh - 1, $goldBorder);
+            // Gold gradient background
+            $goldDark = imagecolorallocate($canvas, 184, 134, 11);   // #B8860B
+            $goldMid = imagecolorallocate($canvas, 212, 175, 55);    // #D4AF37
+            $goldBright = imagecolorallocate($canvas, 245, 208, 96); // #F5D060
+            for ($y = 0; $y < $bannerH; $y++) {
+                $ratio = $y / $bannerH;
+                $r = (int)(184 + (245 - 184) * $ratio);
+                $g = (int)(134 + (208 - 134) * $ratio);
+                $b = (int)(11 + (96 - 11) * $ratio);
+                $lineColor = imagecolorallocate($canvas, $r, $g, $b);
+                imageline($canvas, 0, $y, $w, $y, $lineColor);
+            }
+            // Subtle bottom border
+            $borderLine = imagecolorallocate($canvas, 160, 120, 10);
+            imageline($canvas, 0, $bannerH - 1, $w, $bannerH - 1, $borderLine);
+            imageline($canvas, 0, $bannerH, $w, $bannerH, $borderLine);
 
-            // Gold circle with position number
-            $circleX = $bx + 60;
-            $circleY = $by + 55;
-            $circleR = 35;
-            imagefilledellipse($canvas, $circleX, $circleY, $circleR * 2, $circleR * 2, $gold);
+            $darkText = imagecolorallocate($canvas, 26, 26, 46); // #1a1a2e navy
+            $darkTextSoft = imagecolorallocate($canvas, 60, 50, 20);
 
-            // Position number centered in circle
+            // Trophy circle (navy background)
+            $circleX = 70;
+            $circleY = (int)($bannerH / 2);
+            $navy = imagecolorallocate($canvas, 26, 26, 46);
+            imagefilledellipse($canvas, $circleX, $circleY, 60, 60, $navy);
+            // Trophy icon as text (gold on navy)
+            $trophyColor = imagecolorallocate($canvas, 245, 208, 96);
+            imagettftext($canvas, 20, 0, $circleX - 10, $circleY + 8, $trophyColor, self::FONT_BOLD, chr(0xF0) !== false ? '#' : '#');
+
+            // Position number (large)
             $posText = '#' . $bestRanking->position;
-            $posFontSize = $bestRanking->position < 10 ? 28 : 22;
-            $posBox = imagettfbbox($posFontSize, 0, self::FONT_BOLD, $posText);
-            $posTextW = $posBox[2] - $posBox[0];
-            $posTextH = $posBox[1] - $posBox[7];
-            $darkText = imagecolorallocate($canvas, 20, 20, 20);
-            imagettftext($canvas, $posFontSize, 0,
-                $circleX - ($posTextW / 2),
-                $circleY + ($posTextH / 2) - 2,
-                $darkText, self::FONT_BOLD, $posText);
+            $posFontSize = 38;
+            imagettftext($canvas, $posFontSize, 0, 120, 58, $darkText, self::FONT_BOLD, $posText);
 
-            // Scope name (city/state/USA)
+            // Scope name next to position
             $scopeText = match ($bestRanking->ranking_type) {
                 'city' => mb_strtoupper($bestRanking->ranking_scope, 'UTF-8'),
                 'state' => mb_strtoupper($bestRanking->ranking_scope, 'UTF-8'),
                 'national' => 'USA',
                 default => mb_strtoupper($bestRanking->ranking_scope, 'UTF-8'),
             };
-            imagettftext($canvas, 22, 0, $circleX + 50, $circleY - 5, $goldLight, self::FONT_BOLD, $scopeText);
+            $posBox = imagettfbbox($posFontSize, 0, self::FONT_BOLD, $posText);
+            $posW = $posBox[2] - $posBox[0];
+            imagettftext($canvas, 24, 0, 120 + $posW + 15, 55, $darkText, self::FONT_BOLD, $scopeText);
 
-            // "FAMER Awards 2025"
-            imagettftext($canvas, 12, 0, $circleX + 50, $circleY + 18, $lightGray, self::FONT_REGULAR, 'FAMER Awards ' . $bestRanking->year);
+            // FAMER Awards year (right-aligned)
+            $awardText = 'FAMER AWARDS ' . $bestRanking->year;
+            $awardBox = imagettfbbox(14, 0, self::FONT_BOLD, $awardText);
+            $awardW = $awardBox[2] - $awardBox[0];
+            imagettftext($canvas, 14, 0, $w - $awardW - 40, 38, $darkTextSoft, self::FONT_REGULAR, $awardText);
 
-            // Divider line
-            imageline($canvas, $bx + 15, $by + 100, $bx + $bw - 15, $by + 100, $goldBorder);
-
-            // Rating + reviews below divider
+            // Stars + rating (right side, below FAMER Awards)
             $rating = number_format($restaurant->google_rating ?? $restaurant->average_rating ?? 0, 1);
             $totalReviews = ($restaurant->google_reviews_count ?? 0) + ($restaurant->yelp_reviews_count ?? 0);
             $starsText = str_repeat('★', (int) round((float) $rating)) . str_repeat('☆', 5 - (int) round((float) $rating));
-            imagettftext($canvas, 13, 0, $bx + 20, $by + 125, $gold, self::FONT_REGULAR, $starsText . '  ' . $rating);
+            $ratingLine = $starsText . ' ' . $rating;
             if ($totalReviews > 0) {
-                imagettftext($canvas, 11, 0, $bx + 180, $by + 125, $lightGray, self::FONT_REGULAR, '(' . number_format($totalReviews) . ' reviews)');
+                $ratingLine .= '  (' . number_format($totalReviews) . ' reviews)';
             }
+            $ratingBox = imagettfbbox(12, 0, self::FONT_REGULAR, $ratingLine);
+            $ratingW = $ratingBox[2] - $ratingBox[0];
+            imagettftext($canvas, 12, 0, $w - $ratingW - 40, 65, $darkTextSoft, self::FONT_REGULAR, $ratingLine);
         }
 
         // --- Restaurant name (large, bottom-left) ---
