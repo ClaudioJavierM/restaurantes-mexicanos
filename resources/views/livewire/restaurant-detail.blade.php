@@ -332,6 +332,32 @@
                         @endif
                     </div>
 
+                    {{-- Ranking badges row (small pills) --}}
+                    @if($heroRankings->count() > 0)
+                    <div class="flex flex-wrap gap-2 mb-3">
+                        @foreach($heroRankings as $ranking)
+                            @php
+                                $pillBg = match(true) {
+                                    $ranking->position == 1 => 'background:linear-gradient(135deg, #D4AF37, #F5D060); color:#1a1a2e;',
+                                    $ranking->position <= 3 => 'background:linear-gradient(135deg, #B8860B, #D4AF37); color:#1a1a2e;',
+                                    $ranking->position <= 10 => 'background:linear-gradient(135deg, #475569, #64748B); color:white;',
+                                    default => 'background:#E5E7EB; color:#374151;',
+                                };
+                                $scopeName = match($ranking->ranking_type) {
+                                    'national' => 'USA',
+                                    default => $ranking->ranking_scope,
+                                };
+                            @endphp
+                            <a href="{{ url('/guia') }}?scope={{ $ranking->ranking_type }}{{ $ranking->ranking_type !== 'national' ? '&state=' . $ranking->ranking_scope : '' }}"
+                               style="{{ $pillBg }} padding:5px 14px; border-radius:20px; font-size:13px; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:5px; box-shadow:0 2px 6px rgba(0,0,0,0.15); transition:transform 0.15s;"
+                               onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                                <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 2a2 2 0 00-2 2v1a2 2 0 002 2h1.06a7.04 7.04 0 003.272 4.35L8.12 15.7A2 2 0 009.98 18h.04a2 2 0 001.86-2.3l-1.212-4.35A7.04 7.04 0 0013.94 7H15a2 2 0 002-2V4a2 2 0 00-2-2H5z" clip-rule="evenodd"/></svg>
+                                {{ $ranking->position <= 3 ? '#' . $ranking->position : 'Top ' . $ranking->position }} {{ $scopeName }} {{ $ranking->year }}
+                            </a>
+                        @endforeach
+                    </div>
+                    @endif
+
                     <!-- Restaurant Name with Logo -->
                     <div class="flex items-center gap-4 mb-2">
                         @if($restaurant->logo)
