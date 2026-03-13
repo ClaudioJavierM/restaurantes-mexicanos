@@ -22,6 +22,12 @@ class ListFamerSubscriptions extends ListRecords
             'premium' => Tab::make('Premium')
                 ->icon('heroicon-m-bolt')
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('subscription_tier', 'premium')),
+            'claimed' => Tab::make('Claimed')
+                ->icon('heroicon-m-check-badge')
+                ->modifyQueryUsing(fn (Builder $query) => $query->where(function ($q) {
+                    $q->where('subscription_tier', 'claimed')
+                      ->orWhere('is_claimed', true);
+                })),
         ];
     }
 }
