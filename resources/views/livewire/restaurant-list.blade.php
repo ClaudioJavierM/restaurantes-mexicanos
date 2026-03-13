@@ -245,7 +245,7 @@
                                     </span>
 
                                     <!-- Restaurant Image -->
-                                    <div class="aspect-video bg-gray-200 overflow-hidden">
+                                    <div class="aspect-video bg-gray-200 overflow-hidden relative">
                                         @if($restaurant->hasMedia('images'))
                                             <img
                                                 src="{{ $restaurant->getFirstMediaUrl('images') }}"
@@ -257,6 +257,20 @@
                                                 <svg class="w-16 h-16 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
                                                 </svg>
+                                            </div>
+                                        @endif
+
+                                        {{-- Ranking badge on card image --}}
+                                        @php
+                                            $cardRanking = $restaurant->rankings->first();
+                                        @endphp
+                                        @if($cardRanking)
+                                            <div class="absolute top-2 right-2 z-10" style="background:linear-gradient(135deg, #B8860B, #D4AF37, #F5D060); border-radius:8px; padding:3px 10px; box-shadow:0 2px 8px rgba(0,0,0,0.3); display:flex; align-items:center; gap:4px; border:1px solid rgba(255,255,255,0.25);">
+                                                <svg width="12" height="12" fill="#1a1a2e" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 2a2 2 0 00-2 2v1a2 2 0 002 2h1.06a7.04 7.04 0 003.272 4.35L8.12 15.7A2 2 0 009.98 18h.04a2 2 0 001.86-2.3l-1.212-4.35A7.04 7.04 0 0013.94 7H15a2 2 0 002-2V4a2 2 0 00-2-2H5z" clip-rule="evenodd"/></svg>
+                                                <span style="font-size:11px; font-weight:800; color:#1a1a2e; white-space:nowrap;">
+                                                    {{ $cardRanking->position <= 3 ? '#' . $cardRanking->position : 'Top ' . $cardRanking->position }}
+                                                    {{ $cardRanking->ranking_type === 'city' ? $cardRanking->ranking_scope : ($cardRanking->ranking_type === 'state' ? $cardRanking->ranking_scope : 'USA') }}
+                                                </span>
                                             </div>
                                         @endif
                                     </div>

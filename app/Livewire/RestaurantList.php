@@ -236,7 +236,12 @@ class RestaurantList extends Component
 
         $query = Restaurant::query()
             ->approved()->forCurrentCountry()
-            ->with(['state', 'category', 'media']);
+            ->with(['state', 'category', 'media', 'rankings' => function ($q) {
+                $q->where('year', now()->year - 1)
+                  ->where('position', '<=', 25)
+                  ->where('is_published', true)
+                  ->orderBy('position');
+            }]);
 
         // Search filter
         if ($this->search) {
