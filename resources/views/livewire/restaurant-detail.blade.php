@@ -203,25 +203,25 @@
                 <div style="max-width:900px; margin:0 auto; padding:0 16px 16px;">
                     <a href="{{ url('/guia') }}?scope={{ $bestRanking->ranking_type }}{{ $bestRanking->ranking_type !== 'national' ? '&state=' . $bestRanking->ranking_scope : '' }}"
                        style="text-decoration:none; display:block;">
-                        <div style="background:linear-gradient(135deg, rgba(12,12,12,0.93), rgba(25,25,25,0.90)); backdrop-filter:blur(16px); border:1px solid rgba(212,175,55,0.35); border-radius:16px; padding:16px 28px; display:flex; align-items:center; gap:20px; box-shadow:0 12px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(212,175,55,0.15);">
+                        <div style="background:linear-gradient(135deg, #B8860B, #D4AF37 40%, #F5D060 70%, #D4AF37); border-radius:16px; padding:16px 28px; display:flex; align-items:center; gap:20px; box-shadow:0 12px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -2px 0 rgba(0,0,0,0.15); border:1px solid rgba(255,255,255,0.2);">
 
                             {{-- Trophy circle --}}
-                            <div style="width:56px; height:56px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow:0 4px 16px rgba(0,0,0,0.4);
-                                {{ $bestRanking->position == 1 ? 'background:linear-gradient(135deg, #D4AF37, #F5D060);' : ($bestRanking->position <= 3 ? 'background:linear-gradient(135deg, #B8860B, #D4AF37);' : 'background:linear-gradient(135deg, #64748B, #94A3B8);') }}">
-                                <svg width="28" height="28" fill="white" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 2a2 2 0 00-2 2v1a2 2 0 002 2h1.06a7.04 7.04 0 003.272 4.35L8.12 15.7A2 2 0 009.98 18h.04a2 2 0 001.86-2.3l-1.212-4.35A7.04 7.04 0 0013.94 7H15a2 2 0 002-2V4a2 2 0 00-2-2H5z" clip-rule="evenodd"/></svg>
+                            <div style="width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow:0 4px 16px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.3);
+                                {{ $bestRanking->position == 1 ? 'background:linear-gradient(135deg, #1a1a2e, #16213e);' : ($bestRanking->position <= 3 ? 'background:linear-gradient(135deg, #1a1a2e, #16213e);' : 'background:linear-gradient(135deg, #374151, #1F2937);') }}">
+                                <svg width="30" height="30" fill="#F5D060" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 2a2 2 0 00-2 2v1a2 2 0 002 2h1.06a7.04 7.04 0 003.272 4.35L8.12 15.7A2 2 0 009.98 18h.04a2 2 0 001.86-2.3l-1.212-4.35A7.04 7.04 0 0013.94 7H15a2 2 0 002-2V4a2 2 0 00-2-2H5z" clip-rule="evenodd"/></svg>
                             </div>
 
                             {{-- Position + Scope --}}
                             <div style="flex:1; min-width:0;">
                                 <div style="display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;">
-                                    <span style="font-size:32px; font-weight:900; line-height:1; {{ $bestRanking->position <= 3 ? 'color:#D4AF37;' : 'color:#E5E7EB;' }}">
+                                    <span style="font-size:34px; font-weight:900; line-height:1; color:#1a1a2e; text-shadow:0 1px 0 rgba(255,255,255,0.3);">
                                         #{{ $bestRanking->position }}
                                     </span>
-                                    <span style="font-size:18px; font-weight:700; color:white; text-transform:uppercase; letter-spacing:1px;">
+                                    <span style="font-size:20px; font-weight:800; color:#1a1a2e; text-transform:uppercase; letter-spacing:1px;">
                                         {{ $bestRanking->ranking_type === 'city' ? $bestRanking->ranking_scope : ($bestRanking->ranking_type === 'state' ? $bestRanking->ranking_scope : 'USA') }}
                                     </span>
                                 </div>
-                                <div style="font-size:12px; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:3px; font-weight:600; margin-top:2px;">
+                                <div style="font-size:12px; color:rgba(30,30,30,0.6); text-transform:uppercase; letter-spacing:3px; font-weight:700; margin-top:3px;">
                                     FAMER Awards {{ $bestRanking->year }}
                                 </div>
                             </div>
@@ -230,11 +230,11 @@
                             @if($heroRankings->count() > 1)
                             <div style="display:flex; flex-wrap:wrap; gap:8px; flex-shrink:0;">
                                 @foreach($heroRankings->skip(1)->take(3) as $ranking)
-                                    <div style="background:rgba(255,255,255,0.08); border:1px solid rgba(212,175,55,0.2); border-radius:10px; padding:6px 14px; text-align:center;">
-                                        <div style="font-size:18px; font-weight:800; {{ $ranking->position <= 3 ? 'color:#D4AF37;' : 'color:#CBD5E1;' }}">
+                                    <div style="background:rgba(26,26,46,0.85); border-radius:10px; padding:6px 14px; text-align:center; box-shadow:0 2px 8px rgba(0,0,0,0.2);">
+                                        <div style="font-size:18px; font-weight:800; color:#F5D060;">
                                             #{{ $ranking->position }}
                                         </div>
-                                        <div style="font-size:10px; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:1px; font-weight:600; white-space:nowrap;">
+                                        <div style="font-size:10px; color:rgba(255,255,255,0.7); text-transform:uppercase; letter-spacing:1px; font-weight:600; white-space:nowrap;">
                                             {{ Str::limit($ranking->ranking_scope, 12) }}
                                         </div>
                                     </div>
@@ -243,7 +243,7 @@
                             @endif
 
                             {{-- Arrow icon --}}
-                            <svg width="20" height="20" fill="none" stroke="rgba(212,175,55,0.5)" viewBox="0 0 24 24" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                            <svg width="22" height="22" fill="none" stroke="rgba(26,26,46,0.4)" viewBox="0 0 24 24" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
                         </div>
                     </a>
                 </div>
@@ -270,19 +270,18 @@
             @if($bestRanking)
             <div style="position:absolute; bottom:0; left:0; right:0; z-index:10;">
                 <div style="max-width:900px; margin:0 auto; padding:0 16px 16px;">
-                    <div style="background:rgba(0,0,0,0.6); border:1px solid rgba(212,175,55,0.35); border-radius:16px; padding:14px 24px; display:flex; align-items:center; gap:16px;">
-                        <div style="width:48px; height:48px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;
-                            {{ $bestRanking->position == 1 ? 'background:linear-gradient(135deg, #D4AF37, #F5D060);' : ($bestRanking->position <= 3 ? 'background:linear-gradient(135deg, #B8860B, #D4AF37);' : 'background:linear-gradient(135deg, #64748B, #94A3B8);') }}">
-                            <svg width="24" height="24" fill="white" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 2a2 2 0 00-2 2v1a2 2 0 002 2h1.06a7.04 7.04 0 003.272 4.35L8.12 15.7A2 2 0 009.98 18h.04a2 2 0 001.86-2.3l-1.212-4.35A7.04 7.04 0 0013.94 7H15a2 2 0 002-2V4a2 2 0 00-2-2H5z" clip-rule="evenodd"/></svg>
+                    <div style="background:linear-gradient(135deg, #B8860B, #D4AF37 40%, #F5D060 70%, #D4AF37); border-radius:16px; padding:14px 24px; display:flex; align-items:center; gap:16px; box-shadow:0 8px 32px rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.2);">
+                        <div style="width:48px; height:48px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; background:linear-gradient(135deg, #1a1a2e, #16213e); box-shadow:0 3px 12px rgba(0,0,0,0.3);">
+                            <svg width="24" height="24" fill="#F5D060" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 2a2 2 0 00-2 2v1a2 2 0 002 2h1.06a7.04 7.04 0 003.272 4.35L8.12 15.7A2 2 0 009.98 18h.04a2 2 0 001.86-2.3l-1.212-4.35A7.04 7.04 0 0013.94 7H15a2 2 0 002-2V4a2 2 0 00-2-2H5z" clip-rule="evenodd"/></svg>
                         </div>
                         <div style="flex:1;">
                             <div style="display:flex; align-items:baseline; gap:8px;">
-                                <span style="font-size:28px; font-weight:900; {{ $bestRanking->position <= 3 ? 'color:#D4AF37;' : 'color:#E5E7EB;' }}">#{{ $bestRanking->position }}</span>
-                                <span style="font-size:16px; font-weight:700; color:white; text-transform:uppercase; letter-spacing:1px;">
+                                <span style="font-size:28px; font-weight:900; color:#1a1a2e; text-shadow:0 1px 0 rgba(255,255,255,0.3);">#{{ $bestRanking->position }}</span>
+                                <span style="font-size:16px; font-weight:800; color:#1a1a2e; text-transform:uppercase; letter-spacing:1px;">
                                     {{ $bestRanking->ranking_type === 'city' ? $bestRanking->ranking_scope : ($bestRanking->ranking_type === 'state' ? $bestRanking->ranking_scope : 'USA') }}
                                 </span>
                             </div>
-                            <div style="font-size:11px; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:3px; font-weight:600;">FAMER Awards {{ $bestRanking->year }}</div>
+                            <div style="font-size:11px; color:rgba(30,30,30,0.6); text-transform:uppercase; letter-spacing:3px; font-weight:700;">FAMER Awards {{ $bestRanking->year }}</div>
                         </div>
                     </div>
                 </div>
