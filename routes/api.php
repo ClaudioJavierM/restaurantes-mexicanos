@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\OwnerController;
 use App\Http\Controllers\Api\OwnerAppController;
 use App\Http\Controllers\Api\CouponController;
 use App\Http\Controllers\Api\CheckInController;
+use App\Http\Controllers\Api\FanController;
 use App\Http\Controllers\Api\SubscriberCouponApiController;
 use App\Http\Controllers\Api\CarmenApiController;
 
@@ -68,6 +69,10 @@ Route::prefix('v1')->group(function () {
     Route::get('/restaurants/{restaurantId}/coupons', [CouponController::class, 'restaurantCoupons']);
     Route::get('/restaurants/{restaurantId}/check-ins/count', [CheckInController::class, 'count']);
 
+    // Fan System (public)
+    Route::get('/restaurants/{restaurantId}/fans', [FanController::class, 'topFans']);
+    Route::post('/restaurants/{slug}/vote', [FanController::class, 'vote'])->middleware('throttle:10,1');
+
     // MF Group Subscriber Coupons API
     Route::prefix('subscriber-coupons')->group(function () {
         Route::post('/validate', [SubscriberCouponApiController::class, 'validate']);
@@ -112,6 +117,10 @@ Route::prefix('v1')->group(function () {
             // User's coupons & check-ins
             Route::get('/coupons', [CouponController::class, 'userCoupons']);
             Route::get('/check-ins', [CheckInController::class, 'userCheckIns']);
+
+            // Fan scores
+            Route::get('/fan-score/{restaurantId}', [FanController::class, 'myFanScore']);
+            Route::post('/fan-badge/{restaurantId}/accept', [FanController::class, 'acceptBadge']);
         });
 
         // Claim a coupon
@@ -119,6 +128,9 @@ Route::prefix('v1')->group(function () {
 
         // Check-in at a restaurant
         Route::post('/restaurants/{restaurantId}/check-in', [CheckInController::class, 'checkIn']);
+
+        // Fan share tracking
+        Route::post('/restaurants/{restaurantId}/share', [FanController::class, 'recordShare']);
 
         // Reviews (authenticated)
         Route::prefix('restaurants/{restaurantId}')->group(function () {
@@ -192,6 +204,9 @@ Route::prefix('v1')->group(function () {
 
             // Subscription info & feature gates
             Route::get('/subscription', [OwnerAppController::class, 'subscription']);
+
+            // Fans & voters
+            Route::get('/fans', [OwnerAppController::class, 'fans']);
 
             // SMS Marketing (Elite only)
             Route::get('/sms/stats', [OwnerAppController::class, 'smsStats']);

@@ -104,6 +104,7 @@ Route::get('/owner-email/unsubscribe/{token}', [\App\Http\Controllers\OwnerEmail
 
 // Voting Page
 Route::get('/votar', \App\Livewire\VoteRestaurant::class)->name('votar');
+Route::get('/votar/{slug}', \App\Livewire\VoteRestaurant::class)->name('votar.restaurant');
 Route::redirect('/contacto', '/contact');
 
 require __DIR__.'/auth.php';

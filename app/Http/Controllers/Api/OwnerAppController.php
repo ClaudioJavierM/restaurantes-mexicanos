@@ -1078,4 +1078,69 @@ class OwnerAppController extends Controller
             'trigger_types' => SmsAutomation::triggerTypes(),
         ]);
     }
+
+    /**
+     * GET /v1/owner/fans
+     * Returns top fans and voter stats for the restaurant.
+     */
+    public function fans(Request $request): JsonResponse
+    {
+        $restaurant = $this->getRestaurant($request);
+        if (!$restaurant) {
+            return response()->json(['success' => false, 'message' => 'Restaurante no encontrado'], 404);
+        }
+
+        $year = now()->year;
+
+        // Top fans with breakdown
+        $topFans = \App\Models\FanScore::where('restaurant_id', $restaurant->id)
+            ->where('year', $year)
+            ->where('total_points', '>', 0)
+            ->orderByDesc('total_points')
+            ->with('user:id,name,email,avatar')
+            ->limit(25)
+            ->get()
+            ->map(fn($fan) => [
+                'user_id' => $fan->user_id,
+                'name' => $fan->user->name ?? 'Anónimo',
+                'email' => $fan->user->email ?? null,
+                'avatar' => $fan->user->avatar ?? null,
+                'total_points' => $fan->total_points,
+                'fan_level' => $fan->fan_level,
+                'level_info' => $fan->level_info,
+                'badge_accepted' => $fan->badge_accepted,
+                'votes' => $fan->votes_count,
+                'checkins' => $fan->checkins_count,
+                'reviews' => $fan->reviews_count,
+            ]);
+
+        // Voter stats
+        $totalVoters = \App\Models\RestaurantVote::where('restaurant_id', $restaurant->id)
+            ->where('year', $year)->distinct('voter_fingerprint')->count();
+
+        $monthlyVotes = \App\Models\RestaurantVote::where('restaurant_id', $restaurant->id)
+            ->where('year', $year)->where('month', now()->month)->count();
+
+        $totalFans = \App\Models\FanScore::where('restaurant_id', $restaurant->id)
+            ->where('year', $year)->whereNotNull('fan_level')->count();
+
+        // Vote URL and QR for this restaurant
+        $voteUrl = url("/votar/{$restaurant->slug}");
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'top_fans' => $topFans,
+                'stats' => [
+                    'total_voters' => $totalVoters,
+                    'monthly_votes' => $monthlyVotes,
+                    'total_fans' => $totalFans,
+                    'fans_destacados' => \App\Models\FanScore::where('restaurant_id', $restaurant->id)
+                        ->where('year', $year)->where('fan_level', 'fan_destacado')->count(),
+                ],
+                'vote_url' => $voteUrl,
+                'qr_url' => "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=" . urlencode($voteUrl),
+            ],
+        ]);
+    }
 }

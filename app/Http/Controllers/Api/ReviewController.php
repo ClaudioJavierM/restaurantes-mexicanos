@@ -105,6 +105,10 @@ class ReviewController extends Controller
         // Update restaurant rating
         $this->updateRestaurantRating($restaurant);
 
+        // Update fan score
+        $fanScore = \App\Models\FanScore::getOrCreate($user->id, $restaurantId);
+        $fanScore->addAction('review');
+
         return response()->json([
             'success' => true,
             'message' => 'Reseña publicada exitosamente',

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\FanScore;
 
 class CheckIn extends Model
 {
@@ -45,6 +46,10 @@ class CheckIn extends Model
 
         // Award points
         LoyaltyPoints::addPoints($userId, 10, 'check_in', 'Check-in en restaurante', $checkIn);
+
+        // Update fan score
+        $fanScore = FanScore::getOrCreate($userId, $restaurantId);
+        $fanScore->addAction('checkin');
 
         return $checkIn;
     }

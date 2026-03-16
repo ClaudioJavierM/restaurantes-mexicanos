@@ -145,6 +145,10 @@ class UserController extends Controller
 
         $user->favorites()->attach($restaurantId);
 
+        // Update fan score
+        $fanScore = \App\Models\FanScore::getOrCreate($user->id, $restaurantId);
+        $fanScore->addAction('favorite');
+
         return response()->json([
             'success' => true,
             'message' => 'Restaurante agregado a favoritos',

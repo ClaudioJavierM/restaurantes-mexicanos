@@ -245,4 +245,17 @@ class User extends Authenticatable implements FilamentUser
     {
         $this->notify(new BilingualVerifyEmail);
     }
+
+    public function fanScores()
+    {
+        return $this->hasMany(FanScore::class);
+    }
+
+    public function fanScoreFor(int $restaurantId, ?int $year = null): ?FanScore
+    {
+        return $this->fanScores()
+            ->where('restaurant_id', $restaurantId)
+            ->where('year', $year ?? now()->year)
+            ->first();
+    }
 }

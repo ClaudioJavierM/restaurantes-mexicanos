@@ -5,6 +5,7 @@ namespace App\Livewire;
 use Livewire\Component;
 use App\Models\Restaurant;
 use App\Models\RestaurantVote;
+use App\Models\FanScore;
 use App\Models\State;
 use Carbon\Carbon;
 
@@ -16,16 +17,25 @@ class VoteRestaurant extends Component
     public ?int $votedRestaurantId = null;
     public bool $showThankYou = false;
     public ?string $voteError = null;
-    
+    public ?Restaurant $preselectedRestaurant = null;
+
     protected $queryString = ['stateCode', 'city', 'search'];
-    
-    public function mount($state = null, $city = null)
+
+    public function mount($state = null, $city = null, $slug = null)
     {
         if ($state) {
             $this->stateCode = strtoupper($state);
         }
         if ($city) {
             $this->city = urldecode($city);
+        }
+        // Pre-select restaurant when arriving via /votar/{slug}
+        if ($slug) {
+            $this->preselectedRestaurant = Restaurant::where('slug', $slug)->first();
+            if ($this->preselectedRestaurant) {
+                $this->stateCode = $this->preselectedRestaurant->state?->code;
+                $this->city = $this->preselectedRestaurant->city;
+            }
         }
     }
     
@@ -72,7 +82,13 @@ class VoteRestaurant extends Component
             'month' => $month,
             'year' => $year,
         ]);
-        
+
+        // Update fan score if authenticated
+        if (auth()->id()) {
+            $fanScore = FanScore::getOrCreate(auth()->id(), $restaurantId, $year);
+            $fanScore->addAction('vote');
+        }
+
         $this->votedRestaurantId = $restaurantId;
         $this->showThankYou = true;
         $this->voteError = null;

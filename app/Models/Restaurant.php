@@ -779,4 +779,19 @@ class Restaurant extends Model implements HasMedia
 
         return $googleReviews + $yelpReviews + $internalReviewCount;
     }
+
+    public function fanScores()
+    {
+        return $this->hasMany(FanScore::class);
+    }
+
+    public function topFans(?int $year = null, int $limit = 10)
+    {
+        return $this->fanScores()
+            ->where('year', $year ?? now()->year)
+            ->whereNotNull('fan_level')
+            ->orderByDesc('total_points')
+            ->with('user:id,name,email,avatar')
+            ->limit($limit);
+    }
 }
