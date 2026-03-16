@@ -716,7 +716,7 @@ class OwnerAppController extends Controller
             return response()->json(['success' => false, 'message' => 'Restaurante no encontrado'], 404);
         }
 
-        $tierError = $this->requireTier($restaurant, ['premium', 'elite']);
+        $tierError = $this->requireTier($restaurant, ['claimed', 'premium', 'elite']);
         if ($tierError) return $tierError;
 
         $request->validate(['period' => 'nullable|in:7d,30d,90d,1y']);
