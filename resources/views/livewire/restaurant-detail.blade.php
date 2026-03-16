@@ -333,6 +333,7 @@
                                 };
                                 $scopeName = match($ranking->ranking_type) {
                                     'national' => 'USA',
+                                    'state' => \App\Models\State::where('code', $ranking->ranking_scope)->value('name') ?? $ranking->ranking_scope,
                                     default => $ranking->ranking_scope,
                                 };
                             @endphp
@@ -342,6 +343,8 @@
                                 <span>🏆</span>
                                 @if($ranking->ranking_type === 'city')
                                     #{{ $ranking->position }} Mejor Restaurante Mexicano - {{ $scopeName }} {{ $ranking->year }}
+                                @elseif($ranking->ranking_type === 'state')
+                                    Top {{ $ranking->position }} {{ $scopeName }} {{ $ranking->year }}
                                 @else
                                     {{ $ranking->position <= 3 ? '#' . $ranking->position : 'Top ' . $ranking->position }} {{ $scopeName }} {{ $ranking->year }}
                                 @endif
