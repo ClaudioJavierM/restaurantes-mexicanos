@@ -311,27 +311,34 @@
                         <span class="inline-block bg-gray-100 text-gray-700 text-sm font-semibold px-3 py-1 rounded-full">{{ $restaurant->category->name }}</span>
                     </div>
 
-                    {{-- FAMER Ranking Badges --}}
+                    {{-- FAMER Ranking Badges (city first, then state, then national) --}}
                     @if($heroRankings->count() > 0)
+                    @php
+                        $sortedRankings = $heroRankings->sortBy(function($r) {
+                            return match($r->ranking_type) {
+                                'city' => 0,
+                                'state' => 1,
+                                'national' => 2,
+                                default => 3,
+                            };
+                        });
+                    @endphp
                     <div class="flex flex-wrap gap-2 mb-4">
-                        @foreach($heroRankings as $ranking)
+                        @foreach($sortedRankings as $ranking)
                             @php
                                 $pillBg = match(true) {
-                                    $ranking->position == 1 => 'background:linear-gradient(135deg, #7f1d1d, #991b1b); color:white;',
-                                    $ranking->position <= 3 => 'background:linear-gradient(135deg, #7f1d1d, #991b1b); color:white;',
-                                    $ranking->position <= 10 => 'background:linear-gradient(135deg, #1e3a5f, #2563eb); color:white;',
-                                    default => 'background:#E5E7EB; color:#374151;',
+                                    $ranking->position <= 3 => 'background:linear-gradient(135deg, #B8892E, #D4A54A 40%, #E8C67A 70%, #D4A54A); color:#1a1a2e;',
+                                    $ranking->position <= 10 => 'background:linear-gradient(135deg, #D4A54A, #E8C67A); color:#1a1a2e;',
+                                    default => 'background:linear-gradient(135deg, #E8C67A, #F0DBA8); color:#4a3a1a;',
                                 };
                                 $scopeName = match($ranking->ranking_type) {
                                     'national' => 'USA',
                                     default => $ranking->ranking_scope,
                                 };
-                                $posIcon = $ranking->position === 1 ? '📍' : '';
                             @endphp
                             <a href="{{ url('/guia') }}?scope={{ $ranking->ranking_type }}{{ $ranking->ranking_type !== 'national' ? '&state=' . $ranking->ranking_scope : '' }}"
-                               style="{{ $pillBg }} padding:6px 14px; border-radius:8px; font-size:13px; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 8px rgba(0,0,0,0.2); transition:transform 0.15s;"
+                               style="{{ $pillBg }} padding:6px 14px; border-radius:8px; font-size:13px; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 8px rgba(0,0,0,0.15); transition:transform 0.15s;"
                                onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-                                @if($posIcon)<span>{{ $posIcon }}</span>@endif
                                 <span>🏆</span>
                                 @if($ranking->ranking_type === 'city')
                                     #{{ $ranking->position }} Mejor Restaurante Mexicano - {{ $scopeName }} {{ $ranking->year }}
