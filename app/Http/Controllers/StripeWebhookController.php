@@ -226,7 +226,10 @@ class StripeWebhookController extends Controller
 
                 // Link user to restaurant if not already linked
                 if (!$restaurant->user_id) {
-                    $restaurant->update(['user_id' => $user->id]);
+                    $restaurant->user_id = $user->id;
+                    $restaurant->is_claimed = true;
+                    $restaurant->claimed_at = now();
+                    $restaurant->save();
                 }
 
                 // Log the user in

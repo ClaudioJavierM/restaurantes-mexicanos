@@ -413,21 +413,20 @@ class ClaimRestaurant extends Component
         }
         $user->save();
 
-        $this->selectedRestaurant->update([
-            'is_claimed' => true,
-            'claimed_at' => now(),
-            'user_id' => $user->id,
-            'owner_name' => $this->ownerName,
-            'owner_email' => $this->ownerEmail,
-            'owner_phone' => $this->ownerPhone,
-            'subscription_tier' => 'claimed',
-            'subscription_status' => 'active',
-            'premium_analytics' => false,
-            'premium_seo' => false,
-            'premium_featured' => false,
-            'premium_coupons' => false,
-            'premium_email_marketing' => false,
-        ]);
+        $this->selectedRestaurant->is_claimed = true;
+        $this->selectedRestaurant->claimed_at = now();
+        $this->selectedRestaurant->user_id = $user->id;
+        $this->selectedRestaurant->owner_name = $this->ownerName;
+        $this->selectedRestaurant->owner_email = $this->ownerEmail;
+        $this->selectedRestaurant->owner_phone = $this->ownerPhone;
+        $this->selectedRestaurant->subscription_tier = 'claimed';
+        $this->selectedRestaurant->subscription_status = 'active';
+        $this->selectedRestaurant->premium_analytics = false;
+        $this->selectedRestaurant->premium_seo = false;
+        $this->selectedRestaurant->premium_featured = false;
+        $this->selectedRestaurant->premium_coupons = false;
+        $this->selectedRestaurant->premium_email_marketing = false;
+        $this->selectedRestaurant->save();
 
         auth()->login($user);
         session()->regenerate();
