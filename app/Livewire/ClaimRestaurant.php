@@ -497,6 +497,18 @@ class ClaimRestaurant extends Component
     public function processPayment()
     {
         try {
+            // Check if local coupon with 100% discount — skip Stripe entirely
+            if ($this->couponApplied) {
+                $localPromo = \Illuminate\Support\Facades\DB::table('promotion_coupons')
+                    ->where('code', strtoupper(trim($this->couponCode)))
+                    ->where('is_active', true)
+                    ->first();
+
+                if ($localPromo && $localPromo->discount_type === 'percentage' && $localPromo->discount_value >= 100) {
+                    return $this->completePromoClai($localPromo);
+                }
+            }
+
             $stripeService = new StripeService();
 
             $session = $stripeService->createCheckoutSession(
@@ -511,6 +523,54 @@ class ClaimRestaurant extends Component
         } catch (\Exception $e) {
             session()->flash('error', 'Error al procesar el pago: ' . $e->getMessage());
         }
+    }
+
+    public function completePromoClai($promo)
+    {
+        $tier = $this->selectedPlan; // 'premium' or 'elite'
+        $isPremiumOrHigher = in_array($tier, ['premium', 'elite']);
+        $isElite = $tier === 'elite';
+
+        $this->selectedRestaurant->update([
+            'is_claimed' => true,
+            'claimed_at' => now(),
+            'subscription_tier' => $tier,
+            'subscription_status' => 'active',
+            'subscription_expires_at' => now()->addMonths($promo->duration_in_months),
+            'premium_analytics' => $isPremiumOrHigher,
+            'premium_seo' => $isPremiumOrHigher,
+            'premium_featured' => $isElite,
+            'premium_coupons' => $isPremiumOrHigher,
+            'premium_email_marketing' => $isElite,
+        ]);
+
+        $user = User::firstOrCreate(
+            ['email' => $this->ownerEmail],
+            [
+                'name' => $this->ownerName,
+                'password' => bcrypt(Str::random(12)),
+                'phone' => $this->ownerPhone,
+            ]
+        );
+
+        $user->role = 'owner';
+        if (!$user->email_verified_at) {
+            $user->email_verified_at = now();
+        }
+        $user->save();
+
+        $this->selectedRestaurant->update(['user_id' => $user->id]);
+
+        // Mark coupon as redeemed
+        \Illuminate\Support\Facades\DB::table('promotion_coupons')
+            ->where('id', $promo->id)
+            ->increment('times_redeemed');
+
+        auth()->login($user);
+        session()->regenerate();
+
+        session()->flash('success', "¡Felicidades! Tu plan {$tier} ha sido activado por {$promo->duration_in_months} meses gratis.");
+        return $this->redirect(route('filament.owner.pages.dashboard'), navigate: false);
     }
 
     public function render()
