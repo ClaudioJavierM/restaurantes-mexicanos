@@ -210,8 +210,10 @@ class UserController extends Controller
             $query->where('reservation_date', '>=', now()->toDateString())
                   ->whereIn('status', ['pending', 'confirmed']);
         } elseif ($status === 'past') {
-            $query->where('reservation_date', '<', now()->toDateString())
+            $query->where(function ($q) {
+                $q->where('reservation_date', '<', now()->toDateString())
                   ->orWhere('status', 'completed');
+            });
         } elseif ($status === 'cancelled') {
             $query->where('status', 'cancelled');
         }

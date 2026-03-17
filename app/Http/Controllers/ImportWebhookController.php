@@ -227,7 +227,11 @@ class ImportWebhookController extends Controller
         $secret = $request->header('X-Webhook-Secret')
             ?? $request->input('secret');
 
-        $expectedSecret = config('services.n8n.webhook_secret', 'famer-webhook-secret-2024');
+        $expectedSecret = config('services.n8n.webhook_secret');
+
+        if (empty($expectedSecret)) {
+            return false;
+        }
 
         return $secret === $expectedSecret;
     }

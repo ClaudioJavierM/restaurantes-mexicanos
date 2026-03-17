@@ -57,9 +57,14 @@ class RestaurantController extends Controller
             $query->featured();
         }
 
-        // Sort options
-        $sortBy = $request->get('sort', 'average_rating');
-        $sortDir = $request->get('direction', 'desc');
+        // Sort options (whitelist to prevent SQL injection)
+        $allowedSortColumns = ['average_rating', 'total_reviews', 'name', 'created_at', 'price_range', 'city', 'distance'];
+        $sortBy = in_array($request->get('sort', 'average_rating'), $allowedSortColumns)
+            ? $request->get('sort', 'average_rating')
+            : 'average_rating';
+        $sortDir = in_array(strtolower($request->get('direction', 'desc')), ['asc', 'desc'])
+            ? strtolower($request->get('direction', 'desc'))
+            : 'desc';
 
         if ($sortBy === 'distance' && $request->has('lat') && $request->has('lng')) {
             // Distance sorting handled separately

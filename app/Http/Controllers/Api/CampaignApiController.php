@@ -26,12 +26,12 @@ class CampaignApiController extends Controller
             "api_key" => "required|string",
         ]);
         
-        $validKey = env("N8N_API_KEY");
+        $validKey = config('services.n8n.api_key');
         if ($request->api_key !== $validKey) {
             return response()->json(["error" => "Invalid API key"], 401);
         }
         
-        $resendKey = env("RESEND_API_KEY");
+        $resendKey = config('services.resend.key');
         if (empty($resendKey)) {
             return response()->json(["error" => "RESEND_API_KEY not configured"], 500);
         }
@@ -102,7 +102,7 @@ class CampaignApiController extends Controller
     
     public function getContacts(Request $request)
     {
-        $validKey = env("N8N_API_KEY");
+        $validKey = config('services.n8n.api_key');
         if ($request->api_key !== $validKey) {
             return response()->json(["error" => "Invalid API key"], 401);
         }
@@ -145,7 +145,7 @@ class CampaignApiController extends Controller
     
     public function getStats(Request $request)
     {
-        $validKey = env("N8N_API_KEY");
+        $validKey = config('services.n8n.api_key');
         if ($request->api_key !== $validKey) {
             return response()->json(["error" => "Invalid API key"], 401);
         }
@@ -179,7 +179,7 @@ class CampaignApiController extends Controller
     {
         // Validate API key from header
         $apiKey = $request->header("X-API-Key");
-        $validKey = env("N8N_API_KEY", env("FAMER_API_KEY"));
+        $validKey = config('services.n8n.api_key');
 
         if ($apiKey !== $validKey) {
             return response()->json(["error" => "Invalid API key"], 401);
@@ -206,7 +206,7 @@ class CampaignApiController extends Controller
     public function pendingFollowups(Request $request)
     {
         $apiKey = $request->header("X-API-Key");
-        $validKey = env("N8N_API_KEY", env("FAMER_API_KEY"));
+        $validKey = config('services.n8n.api_key');
 
         if ($apiKey !== $validKey) {
             return response()->json(["error" => "Invalid API key"], 401);
@@ -241,7 +241,7 @@ class CampaignApiController extends Controller
     public function markReminderSent(Request $request)
     {
         $apiKey = $request->header("X-API-Key");
-        $validKey = env("N8N_API_KEY", env("FAMER_API_KEY"));
+        $validKey = config('services.n8n.api_key');
 
         if ($apiKey !== $validKey) {
             return response()->json(["error" => "Invalid API key"], 401);
@@ -269,7 +269,7 @@ class CampaignApiController extends Controller
     public function newRestaurantsRange(Request $request)
     {
         $apiKey = $request->header("X-API-Key");
-        $validKey = env("N8N_API_KEY", env("FAMER_API_KEY"));
+        $validKey = config('services.n8n.api_key');
 
         if ($apiKey !== $validKey) {
             return response()->json(["error" => "Invalid API key"], 401);
@@ -288,7 +288,7 @@ class CampaignApiController extends Controller
     public function platformStats(Request $request)
     {
         $apiKey = $request->header("X-API-Key");
-        $validKey = env("N8N_API_KEY", env("FAMER_API_KEY"));
+        $validKey = config('services.n8n.api_key');
 
         if ($apiKey !== $validKey) {
             return response()->json(["error" => "Invalid API key"], 401);
@@ -308,7 +308,7 @@ class CampaignApiController extends Controller
     public function restaurantStats(Request $request, $id)
     {
         $apiKey = $request->header("X-API-Key");
-        $validKey = env("N8N_API_KEY", env("FAMER_API_KEY"));
+        $validKey = config('services.n8n.api_key');
 
         if ($apiKey !== $validKey) {
             return response()->json(["error" => "Invalid API key"], 401);
@@ -325,7 +325,7 @@ class CampaignApiController extends Controller
     public function unclaimedAfterDays(Request $request)
     {
         $apiKey = $request->header("X-API-Key");
-        $validKey = env("N8N_API_KEY", env("FAMER_API_KEY"));
+        $validKey = config('services.n8n.api_key');
 
         if ($apiKey !== $validKey) {
             return response()->json(["error" => "Invalid API key"], 401);
@@ -343,7 +343,7 @@ class CampaignApiController extends Controller
     public function famerPendingEmail1(Request $request)
     {
         $apiKey = $request->header("X-API-Key");
-        $validKey = env("N8N_API_KEY", env("FAMER_API_KEY"));
+        $validKey = config('services.n8n.api_key');
 
         if ($apiKey !== $validKey) {
             return response()->json(["error" => "Invalid API key"], 401);
@@ -358,7 +358,7 @@ class CampaignApiController extends Controller
     public function famerPendingEmail2(Request $request)
     {
         $apiKey = $request->header("X-API-Key");
-        $validKey = env("N8N_API_KEY", env("FAMER_API_KEY"));
+        $validKey = config('services.n8n.api_key');
 
         if ($apiKey !== $validKey) {
             return response()->json(["error" => "Invalid API key"], 401);
@@ -375,7 +375,7 @@ class CampaignApiController extends Controller
     public function famerPendingEmail3(Request $request)
     {
         $apiKey = $request->header("X-API-Key");
-        $validKey = env("N8N_API_KEY", env("FAMER_API_KEY"));
+        $validKey = config('services.n8n.api_key');
 
         if ($apiKey !== $validKey) {
             return response()->json(["error" => "Invalid API key"], 401);
@@ -392,12 +392,13 @@ class CampaignApiController extends Controller
     public function famerMarkSent(Request $request)
     {
         $apiKey = $request->header("X-API-Key");
-        $validKey = env("N8N_API_KEY", env("FAMER_API_KEY"));
+        $validKey = config('services.n8n.api_key');
 
         if ($apiKey !== $validKey) {
             return response()->json(["error" => "Invalid API key"], 401);
         }
 
+        $request->validate(['email_number' => 'required|in:1,2,3']);
         $emailNum = $request->input("email_number");
         $ids = $request->input("restaurant_ids", []);
         $column = "famer_email" . $emailNum . "_sent_at";
@@ -410,7 +411,7 @@ class CampaignApiController extends Controller
     public function famerStats(Request $request)
     {
         $apiKey = $request->header("X-API-Key");
-        $validKey = env("N8N_API_KEY", env("FAMER_API_KEY"));
+        $validKey = config('services.n8n.api_key');
 
         if ($apiKey !== $validKey) {
             return response()->json(["error" => "Invalid API key"], 401);

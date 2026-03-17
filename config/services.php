@@ -19,7 +19,7 @@ return [
     ],
 
     'resend' => [
-        'key' => env('RESEND_KEY'),
+        'key' => env('RESEND_API_KEY'),
     ],
 
     'ses' => [
@@ -94,6 +94,7 @@ return [
     'n8n' => [
         'webhook_url' => env('N8N_WEBHOOK_URL'),
         'api_key' => env('N8N_API_KEY'),
+        'webhook_secret' => env('N8N_WEBHOOK_SECRET'),
     ],
 
     'anthropic' => [
