@@ -449,13 +449,26 @@
                         ])->filter(fn($r) => $r['lat'] && $r['lng'])->values();
                 @endphp
                 <script>
-                    document.addEventListener('livewire:navigated', () => {
-                        window.dispatchEvent(new CustomEvent('update-map-markers', { detail: {!! $mapRestaurants->toJson() !!} }));
-                    });
-                    // Also dispatch on Livewire morph (search/filter updates)
-                    queueMicrotask(() => {
-                        window.dispatchEvent(new CustomEvent('update-map-markers', { detail: {!! $mapRestaurants->toJson() !!} }));
-                    });
+                    (function() {
+                        var mapData = {!! $mapRestaurants->toJson() !!};
+                        function dispatchMapUpdate() {
+                            window.dispatchEvent(new CustomEvent('update-map-markers', { detail: mapData }));
+                        }
+                        // Retry until map is initialized (covers SPA navigation & initial load)
+                        function tryUpdate(attempts) {
+                            if (attempts <= 0) return;
+                            var mapEl = document.getElementById('restaurants-map');
+                            if (mapEl && mapEl.__gm) {
+                                dispatchMapUpdate();
+                            } else {
+                                setTimeout(function() { tryUpdate(attempts - 1); }, 300);
+                            }
+                        }
+                        // On Livewire SPA navigation
+                        document.addEventListener('livewire:navigated', function() { tryUpdate(20); });
+                        // On initial load or Livewire morph
+                        tryUpdate(20);
+                    })();
                 </script>
             </div>
         @else
