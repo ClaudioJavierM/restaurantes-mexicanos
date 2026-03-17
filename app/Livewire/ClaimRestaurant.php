@@ -435,17 +435,46 @@ class ClaimRestaurant extends Component
     public function applyCoupon()
     {
         if (empty($this->couponCode)) {
-            $this->couponMessage = 'Please enter a coupon code';
+            $this->couponMessage = 'Por favor ingresa un código de cupón';
             $this->couponApplied = false;
             return;
         }
 
+        // First check local promotion_coupons table
+        $localPromo = \Illuminate\Support\Facades\DB::table('promotion_coupons')
+            ->where('code', strtoupper(trim($this->couponCode)))
+            ->where('is_active', true)
+            ->first();
+
+        if ($localPromo) {
+            // Check expiration
+            if ($localPromo->expires_at && now()->greaterThan($localPromo->expires_at)) {
+                $this->couponApplied = false;
+                $this->couponMessage = 'Este cupón ha expirado';
+                return;
+            }
+            // Check max redemptions
+            if ($localPromo->max_redemptions && $localPromo->times_redeemed >= $localPromo->max_redemptions) {
+                $this->couponApplied = false;
+                $this->couponMessage = 'Este cupón ha alcanzado su límite de usos';
+                return;
+            }
+
+            $this->couponApplied = true;
+            if ($localPromo->discount_type === 'percentage') {
+                $this->couponMessage = "¡Cupón aplicado! {$localPromo->discount_value}% de descuento por {$localPromo->duration_in_months} meses";
+            } else {
+                $this->couponMessage = "¡Cupón aplicado! \${$localPromo->discount_value} de descuento";
+            }
+            return;
+        }
+
+        // Fallback to Stripe validation
         $stripeService = new StripeService();
         $promotionCode = $stripeService->validatePromotionCode($this->couponCode);
 
         if ($promotionCode) {
             $this->couponApplied = true;
-            // Stripe PHP v18: coupon is not directly expanded on PromotionCode
             $promoArr = $promotionCode->toArray();
             $couponId = $promoArr['promotion']['coupon'] ?? null;
             if (!$couponId && isset($promoArr['coupon'])) {
@@ -454,14 +483,14 @@ class ClaimRestaurant extends Component
             $coupon = $couponId ? \Stripe\Coupon::retrieve($couponId) : null;
 
             if ($coupon && $coupon->percent_off) {
-                $this->couponMessage = "Coupon applied! {$coupon->percent_off}% off";
+                $this->couponMessage = "¡Cupón aplicado! {$coupon->percent_off}% de descuento";
             } elseif ($coupon && $coupon->amount_off) {
                 $amount = $coupon->amount_off / 100;
-                $this->couponMessage = "Coupon applied! \${$amount} off";
+                $this->couponMessage = "¡Cupón aplicado! \${$amount} de descuento";
             }
         } else {
             $this->couponApplied = false;
-            $this->couponMessage = 'Invalid or expired coupon code';
+            $this->couponMessage = 'Código de cupón inválido o expirado';
         }
     }
 
@@ -480,7 +509,7 @@ class ClaimRestaurant extends Component
 
             return redirect($session->url);
         } catch (\Exception $e) {
-            session()->flash('error', 'Error processing payment: ' . $e->getMessage());
+            session()->flash('error', 'Error al procesar el pago: ' . $e->getMessage());
         }
     }
 
