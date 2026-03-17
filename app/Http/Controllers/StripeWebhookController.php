@@ -215,6 +215,15 @@ class StripeWebhookController extends Controller
                     $isNewUser = true;
                 }
 
+                // Ensure user has owner role and verified email
+                if ($user->role !== 'admin') {
+                    $user->role = 'owner';
+                }
+                if (!$user->email_verified_at) {
+                    $user->email_verified_at = now();
+                }
+                $user->save();
+
                 // Link user to restaurant if not already linked
                 if (!$restaurant->user_id) {
                     $restaurant->update(['user_id' => $user->id]);
