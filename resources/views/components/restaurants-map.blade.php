@@ -40,6 +40,7 @@
     x-data="restaurantsMap()"
     x-init="initMap()"
     @highlight-marker.window="highlightMarker($event.detail.index)"
+    @update-map-markers.window="updateMarkers($event.detail)"
     {{ $attributes->merge(['class' => 'rounded-lg overflow-hidden shadow-lg border border-gray-200 bg-gray-100']) }}
     style="height: {{ $heightStyle }};"
 >
@@ -203,6 +204,32 @@ function restaurantsMap() {
             });
 
             return marker;
+        },
+
+        updateMarkers(newRestaurants) {
+            if (!this.map) return;
+
+            // Clear existing markers
+            this.markers.forEach(m => m.setMap(null));
+            this.markers = [];
+            this.restaurants = newRestaurants;
+
+            if (this.restaurants.length === 0) return;
+
+            const bounds = new google.maps.LatLngBounds();
+
+            this.restaurants.forEach((restaurant, index) => {
+                const marker = this.createMarker(restaurant, index);
+                bounds.extend(marker.getPosition());
+                this.markers.push(marker);
+            });
+
+            if (this.restaurants.length === 1) {
+                this.map.setCenter({ lat: this.restaurants[0].lat, lng: this.restaurants[0].lng });
+                this.map.setZoom(14);
+            } else {
+                this.map.fitBounds(bounds);
+            }
         },
 
         highlightMarker(index) {

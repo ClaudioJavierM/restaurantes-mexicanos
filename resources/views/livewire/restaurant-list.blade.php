@@ -435,6 +435,28 @@
                         />
                     </div>
                 </div>
+
+                @php
+                    $mapRestaurants = collect($restaurants instanceof \Illuminate\Pagination\LengthAwarePaginator ? $restaurants->items() : $restaurants)
+                        ->map(fn($r, $i) => [
+                            'id' => $r->id, 'name' => $r->name,
+                            'lat' => (float) $r->latitude, 'lng' => (float) $r->longitude,
+                            'address' => $r->address ?? '', 'city' => $r->city ?? '',
+                            'state' => $r->state?->code ?? '',
+                            'rating' => round($r->getWeightedRating(), 1),
+                            'slug' => $r->slug, 'number' => $i + 1,
+                            'image' => $r->hasMedia('images') ? $r->getFirstMediaUrl('images') : null,
+                        ])->filter(fn($r) => $r['lat'] && $r['lng'])->values();
+                @endphp
+                <script>
+                    document.addEventListener('livewire:navigated', () => {
+                        window.dispatchEvent(new CustomEvent('update-map-markers', { detail: {!! $mapRestaurants->toJson() !!} }));
+                    });
+                    // Also dispatch on Livewire morph (search/filter updates)
+                    queueMicrotask(() => {
+                        window.dispatchEvent(new CustomEvent('update-map-markers', { detail: {!! $mapRestaurants->toJson() !!} }));
+                    });
+                </script>
             </div>
         @else
             <!-- Empty State -->
