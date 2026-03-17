@@ -24,7 +24,9 @@ class Restaurant extends Model implements HasMedia
     public $translatable = ['description'];
 
     protected $fillable = [
-        'user_id',
+        // NOTE: user_id, subscription_tier, stripe_customer_id, stripe_subscription_id,
+        // is_claimed, claimed_at, status, is_featured are NOT mass-assignable.
+        // They must be set programmatically (e.g. $restaurant->status = 'approved').
         'state_id',
         'category_id',
         'business_type',
@@ -41,8 +43,6 @@ class Restaurant extends Model implements HasMedia
         'latitude',
         'longitude',
         'hours',
-        'status',
-        'is_featured',
         'is_active',
         'average_rating',
         'total_reviews',
@@ -139,15 +139,10 @@ class Restaurant extends Model implements HasMedia
         // Import metadata
         'import_source',
         'imported_at',
-        // Ownership & Claim
-        'is_claimed',
-        'claimed_at',
+        // Ownership & Claim (is_claimed, claimed_at set programmatically)
         'claim_token',
         'verification_method',
-        // Subscription
-        'subscription_tier',
-        'stripe_customer_id',
-        'stripe_subscription_id',
+        // Subscription (subscription_tier, stripe_customer_id, stripe_subscription_id set programmatically)
         'subscription_started_at',
         'subscription_expires_at',
         'subscription_status',

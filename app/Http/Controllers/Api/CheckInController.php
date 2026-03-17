@@ -7,6 +7,7 @@ use App\Models\CheckIn;
 use App\Models\Restaurant;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 
 class CheckInController extends Controller
 {
@@ -23,25 +24,37 @@ class CheckInController extends Controller
             'longitude' => 'nullable|numeric|between:-180,180',
         ]);
 
-        // Prevent duplicate check-ins within 1 hour
-        $recentCheckIn = CheckIn::where('user_id', $request->user()->id)
-            ->where('restaurant_id', $restaurantId)
-            ->where('created_at', '>=', now()->subHour())
-            ->first();
+        // Wrap in transaction to prevent race condition on duplicate check-ins
+        $result = DB::transaction(function () use ($request, $restaurantId) {
+            // Prevent duplicate check-ins within 1 hour
+            $recentCheckIn = CheckIn::where('user_id', $request->user()->id)
+                ->where('restaurant_id', $restaurantId)
+                ->where('created_at', '>=', now()->subHour())
+                ->lockForUpdate()
+                ->first();
 
-        if ($recentCheckIn) {
+            if ($recentCheckIn) {
+                return ['error' => true];
+            }
+
+            $checkIn = CheckIn::createCheckIn(
+                $request->user()->id,
+                $restaurantId,
+                $request->latitude,
+                $request->longitude,
+            );
+
+            return ['error' => false, 'checkIn' => $checkIn];
+        });
+
+        if ($result['error']) {
             return response()->json([
                 'success' => false,
                 'message' => 'Ya hiciste check-in aquí recientemente',
             ], 422);
         }
 
-        $checkIn = CheckIn::createCheckIn(
-            $request->user()->id,
-            $restaurantId,
-            $request->latitude,
-            $request->longitude,
-        );
+        $checkIn = $result['checkIn'];
 
         return response()->json([
             'success'      => true,

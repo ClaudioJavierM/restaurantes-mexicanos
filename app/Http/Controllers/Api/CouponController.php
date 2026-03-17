@@ -7,6 +7,7 @@ use App\Models\Coupon;
 use App\Models\UserCoupon;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 
 class CouponController extends Controller
 {
@@ -94,33 +95,47 @@ class CouponController extends Controller
     {
         $coupon = Coupon::active()->valid()->findOrFail($couponId);
 
-        $existing = UserCoupon::where('user_id', $request->user()->id)
-            ->where('coupon_id', $couponId)
-            ->first();
+        // Wrap in transaction to prevent race conditions (duplicate claims)
+        $result = DB::transaction(function () use ($request, $coupon, $couponId) {
+            // Lock the coupon row to prevent concurrent claims exceeding usage_limit
+            $coupon = Coupon::lockForUpdate()->findOrFail($couponId);
 
-        if ($existing) {
+            $existing = UserCoupon::where('user_id', $request->user()->id)
+                ->where('coupon_id', $couponId)
+                ->first();
+
+            if ($existing) {
+                return ['error' => true, 'message' => 'Ya tienes este cupón en tu cartera'];
+            }
+
+            $userCoupon = UserCoupon::create([
+                'user_id'    => $request->user()->id,
+                'coupon_id'  => $couponId,
+                'claimed_at' => now(),
+                'is_used'    => false,
+            ]);
+
+            $coupon->incrementUsage();
+
+            return ['error' => false, 'userCoupon' => $userCoupon, 'coupon' => $coupon];
+        });
+
+        if ($result['error']) {
             return response()->json([
                 'success' => false,
-                'message' => 'Ya tienes este cupón en tu cartera',
+                'message' => $result['message'],
             ], 422);
         }
-
-        $userCoupon = UserCoupon::create([
-            'user_id'    => $request->user()->id,
-            'coupon_id'  => $couponId,
-            'claimed_at' => now(),
-            'is_used'    => false,
-        ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Cupón guardado en tu cartera',
             'data'    => [
-                'id'         => $userCoupon->id,
-                'claimed_at' => $userCoupon->claimed_at,
+                'id'         => $result['userCoupon']->id,
+                'claimed_at' => $result['userCoupon']->claimed_at,
                 'used_at'    => null,
                 'is_used'    => false,
-                'coupon'     => $this->formatCoupon($coupon),
+                'coupon'     => $this->formatCoupon($result['coupon']),
             ],
         ], 201);
     }

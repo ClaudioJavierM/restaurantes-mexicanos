@@ -74,7 +74,7 @@ Route::prefix('v1')->group(function () {
     Route::post('/restaurants/{slug}/vote', [FanController::class, 'vote'])->middleware('throttle:10,1');
 
     // MF Group Subscriber Coupons API
-    Route::prefix('subscriber-coupons')->group(function () {
+    Route::prefix('subscriber-coupons')->middleware(['throttle:10,1', 'verify.api.key'])->group(function () {
         Route::post('/validate', [SubscriberCouponApiController::class, 'validate']);
         Route::post('/redeem', [SubscriberCouponApiController::class, 'redeem']);
         Route::get('/{code}', [SubscriberCouponApiController::class, 'show']);
@@ -270,7 +270,7 @@ Route::prefix('v1')->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::prefix('carmen')->middleware('api')->group(function () {
+Route::prefix('carmen')->middleware(['api', 'verify.api.key'])->group(function () {
     Route::post('/order-status', [CarmenApiController::class, 'orderStatus']);
     Route::post('/reservation-status', [CarmenApiController::class, 'reservationStatus']);
     Route::post('/search-restaurant', [CarmenApiController::class, 'searchRestaurant']);

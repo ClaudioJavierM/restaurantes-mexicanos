@@ -29,6 +29,7 @@ class User extends Authenticatable implements FilamentUser
         'phone',
         'google_id',
         'facebook_id',
+        'apple_id',
         'avatar',
         'provider',
         'sms_marketing_consent',

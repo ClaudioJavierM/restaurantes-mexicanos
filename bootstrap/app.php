@@ -12,6 +12,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Register middleware aliases
+        $middleware->alias([
+            'verify.api.key' => \App\Http\Middleware\VerifyApiKey::class,
+        ]);
+
         // Exclude webhooks from CSRF verification
         $middleware->validateCsrfTokens(except: [
             "webhooks/*",

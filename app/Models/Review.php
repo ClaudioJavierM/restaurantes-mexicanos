@@ -26,19 +26,14 @@ class Review extends Model
         'owner_response_at',
         'helpful_count',
         'not_helpful_count',
-        'trust_score',
-        'is_verified',
+        // NOTE: trust_score, is_verified, flagged_suspicious, status, approved_at,
+        // ip_address, user_agent are NOT mass-assignable. Set programmatically only.
         'trust_flags',
         'visit_date',
         'visit_type',
         'edit_count',
         'last_edited_at',
-        'flagged_suspicious',
-        'status',
         'is_active',
-        'approved_at',
-        'ip_address',
-        'user_agent',
     ];
 
     protected $casts = [
