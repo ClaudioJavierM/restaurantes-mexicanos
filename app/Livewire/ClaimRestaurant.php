@@ -545,6 +545,12 @@ class ClaimRestaurant extends Component
 
             return redirect($session->url);
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('processPayment error: ' . $e->getMessage(), [
+                'restaurant' => $this->selectedRestaurant?->id,
+                'plan' => $this->selectedPlan,
+                'coupon' => $this->couponCode,
+                'trace' => $e->getTraceAsString(),
+            ]);
             session()->flash('error', 'Error al procesar el pago: ' . $e->getMessage());
         }
     }
