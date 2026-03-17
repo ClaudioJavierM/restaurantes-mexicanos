@@ -396,18 +396,6 @@ class ClaimRestaurant extends Component
 
     public function completeFreeClai()
     {
-        $this->selectedRestaurant->update([
-            'is_claimed' => true,
-            'claimed_at' => now(),
-            'subscription_tier' => 'claimed',
-            'subscription_status' => 'active',
-            'premium_analytics' => false,
-            'premium_seo' => false,
-            'premium_featured' => false,
-            'premium_coupons' => false,
-            'premium_email_marketing' => false,
-        ]);
-
         $user = User::firstOrCreate(
             ['email' => $this->ownerEmail],
             [
@@ -417,13 +405,29 @@ class ClaimRestaurant extends Component
             ]
         );
 
-        $user->role = 'owner';
+        if ($user->role !== 'admin') {
+            $user->role = 'owner';
+        }
         if (!$user->email_verified_at) {
             $user->email_verified_at = now();
         }
         $user->save();
 
-        $this->selectedRestaurant->update(['user_id' => $user->id]);
+        $this->selectedRestaurant->update([
+            'is_claimed' => true,
+            'claimed_at' => now(),
+            'user_id' => $user->id,
+            'owner_name' => $this->ownerName,
+            'owner_email' => $this->ownerEmail,
+            'owner_phone' => $this->ownerPhone,
+            'subscription_tier' => 'claimed',
+            'subscription_status' => 'active',
+            'premium_analytics' => false,
+            'premium_seo' => false,
+            'premium_featured' => false,
+            'premium_coupons' => false,
+            'premium_email_marketing' => false,
+        ]);
 
         auth()->login($user);
         session()->regenerate();
