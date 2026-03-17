@@ -107,7 +107,7 @@ class UserController extends Controller
     public function favorites(Request $request): JsonResponse
     {
         $favorites = $request->user()
-            ->favorites()
+            ->favoriteRestaurants()
             ->with(['state:id,name,abbreviation', 'category:id,name,slug'])
             ->select([
                 'restaurants.id', 'name', 'slug', 'address', 'city',
