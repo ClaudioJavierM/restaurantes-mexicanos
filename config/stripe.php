@@ -36,6 +36,9 @@ return [
         'elite' => env('STRIPE_PRICE_ELITE'),
     ],
 
+    // Introductory coupon for premium plan (first month at $9.99 instead of $39)
+    'intro_coupon_premium' => env('STRIPE_INTRO_COUPON_PREMIUM'),
+
     /*
     |--------------------------------------------------------------------------
     | Subscription Plans

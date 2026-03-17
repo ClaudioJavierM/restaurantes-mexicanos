@@ -77,6 +77,16 @@ class StripeService
                     unset($sessionData['allow_promotion_codes']);
                 }
             }
+            // Apply introductory pricing coupon for premium plan (first month $9.99)
+            elseif ($plan === 'premium') {
+                $introCoupon = config('stripe.intro_coupon_premium');
+                if ($introCoupon) {
+                    $sessionData['discounts'] = [[
+                        'coupon' => $introCoupon,
+                    ]];
+                    unset($sessionData['allow_promotion_codes']);
+                }
+            }
 
             // Create checkout session
             $session = Session::create($sessionData);
