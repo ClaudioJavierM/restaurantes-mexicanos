@@ -499,6 +499,7 @@ class ClaimRestaurant extends Component
         try {
             $stripeService = new StripeService();
             $couponCodeForStripe = null;
+            $stripePromoId = null;
 
             // If a local promo coupon is applied, ensure it exists in Stripe
             if ($this->couponApplied) {
@@ -507,32 +508,39 @@ class ClaimRestaurant extends Component
                     ->where('is_active', true)
                     ->first();
 
-                if ($localPromo && empty($localPromo->stripe_promotion_code_id)) {
-                    // Create coupon in Stripe
-                    $stripeCoupon = $stripeService->createCoupon([
-                        'percent_off' => $localPromo->discount_type === 'percentage' ? $localPromo->discount_value : null,
-                        'amount_off' => $localPromo->discount_type === 'fixed' ? $localPromo->discount_value * 100 : null,
-                        'duration' => $localPromo->duration ?? 'repeating',
-                        'duration_in_months' => $localPromo->duration_in_months,
-                        'name' => $localPromo->name,
-                    ]);
-
-                    // Create promotion code in Stripe
-                    $stripePromo = $stripeService->createPromotionCode($stripeCoupon->id, $localPromo->code, [
-                        'max_redemptions' => $localPromo->max_redemptions,
-                        'expires_at' => $localPromo->expires_at ? strtotime($localPromo->expires_at) : null,
-                    ]);
-
-                    // Save Stripe IDs back to local DB
-                    \Illuminate\Support\Facades\DB::table('promotion_coupons')
-                        ->where('id', $localPromo->id)
-                        ->update([
-                            'stripe_coupon_id' => $stripeCoupon->id,
-                            'stripe_promotion_code_id' => $stripePromo->id,
+                if ($localPromo) {
+                    if (empty($localPromo->stripe_promotion_code_id)) {
+                        // Create coupon in Stripe
+                        $stripeCoupon = $stripeService->createCoupon([
+                            'percent_off' => $localPromo->discount_type === 'percentage' ? $localPromo->discount_value : null,
+                            'amount_off' => $localPromo->discount_type === 'fixed' ? $localPromo->discount_value * 100 : null,
+                            'duration' => $localPromo->duration ?? 'repeating',
+                            'duration_in_months' => $localPromo->duration_in_months,
+                            'name' => $localPromo->name,
                         ]);
-                }
 
-                $couponCodeForStripe = $this->couponCode;
+                        // Create promotion code in Stripe
+                        $stripePromo = $stripeService->createPromotionCode($stripeCoupon->id, $localPromo->code, [
+                            'max_redemptions' => $localPromo->max_redemptions,
+                            'expires_at' => $localPromo->expires_at ? strtotime($localPromo->expires_at) : null,
+                        ]);
+
+                        $stripePromoId = $stripePromo->id;
+
+                        // Save Stripe IDs back to local DB
+                        \Illuminate\Support\Facades\DB::table('promotion_coupons')
+                            ->where('id', $localPromo->id)
+                            ->update([
+                                'stripe_coupon_id' => $stripeCoupon->id,
+                                'stripe_promotion_code_id' => $stripePromo->id,
+                            ]);
+                    } else {
+                        $stripePromoId = $localPromo->stripe_promotion_code_id;
+                    }
+                } else {
+                    // Not a local promo, pass code for Stripe lookup
+                    $couponCodeForStripe = $this->couponCode;
+                }
             }
 
             $session = $stripeService->createCheckoutSession(
@@ -540,7 +548,8 @@ class ClaimRestaurant extends Component
                 $this->selectedPlan,
                 route('claim.success') . '?session_id={CHECKOUT_SESSION_ID}',
                 route('claim.cancel'),
-                $couponCodeForStripe
+                $couponCodeForStripe,
+                $stripePromoId
             );
 
             return redirect($session->url);

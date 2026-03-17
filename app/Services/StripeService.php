@@ -22,7 +22,7 @@ class StripeService
     /**
      * Create a Stripe Checkout Session for subscription
      */
-    public function createCheckoutSession(Restaurant $restaurant, string $plan, string $successUrl, string $cancelUrl, ?string $couponCode = null): Session
+    public function createCheckoutSession(Restaurant $restaurant, string $plan, string $successUrl, string $cancelUrl, ?string $couponCode = null, ?string $stripePromotionCodeId = null): Session
     {
         try {
             $priceId = config("stripe.prices.{$plan}");
@@ -60,14 +60,20 @@ class StripeService
                 'allow_promotion_codes' => true,
             ];
 
-            // If a coupon code is provided, validate and apply it
-            if ($couponCode) {
+            // If a Stripe promotion code ID is provided directly, use it
+            if ($stripePromotionCodeId) {
+                $sessionData['discounts'] = [[
+                    'promotion_code' => $stripePromotionCodeId,
+                ]];
+                unset($sessionData['allow_promotion_codes']);
+            }
+            // Otherwise, if a coupon code text is provided, validate it in Stripe
+            elseif ($couponCode) {
                 $promotionCode = $this->validatePromotionCode($couponCode);
                 if ($promotionCode) {
                     $sessionData['discounts'] = [[
                         'promotion_code' => $promotionCode->id,
                     ]];
-                    // Remove allow_promotion_codes when pre-applying a code
                     unset($sessionData['allow_promotion_codes']);
                 }
             }
