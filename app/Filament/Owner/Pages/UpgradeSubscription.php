@@ -27,7 +27,7 @@ class UpgradeSubscription extends Page
         $this->restaurant = $user->allAccessibleRestaurants()->first();
 
         if ($this->restaurant) {
-            $this->currentPlan = $this->restaurant->subscription_plan ?? 'free';
+            $this->currentPlan = $this->restaurant->subscription_tier ?? 'free';
         }
 
         $this->plans = [
@@ -45,7 +45,7 @@ class UpgradeSubscription extends Page
             ],
             'premium' => [
                 'name' => 'Premium',
-                'price' => 29,
+                'price' => 39,
                 'first_month_price' => 9.99,
                 'price_id' => config('stripe.prices.premium', 'price_premium'),
                 'features' => [
@@ -88,7 +88,7 @@ class UpgradeSubscription extends Page
         // If downgrading to free
         if ($plan === 'free') {
             $this->restaurant->update([
-                'subscription_plan' => 'free',
+                'subscription_tier' => 'free',
                 'subscription_status' => 'active',
                 'premium_badge' => false,
                 'premium_analytics' => false,
