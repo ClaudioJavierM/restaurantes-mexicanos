@@ -216,19 +216,15 @@ class User extends Authenticatable implements FilamentUser
             return $this->role === 'admin';
         }
 
-        // Owner panel - owners with restaurants OR team members with active memberships
+        // Owner panel - fine-grained access handled by CheckOwnerAccess middleware
         if ($panel->getId() === 'owner') {
             if (!$this->hasVerifiedEmail()) {
                 return false;
             }
 
-            // Is a restaurant owner
-            if (($this->role === 'owner' || $this->role === 'admin') && $this->restaurants()->exists()) {
-                return true;
-            }
-
-            // Has active team memberships (manager, staff, or additional owner)
-            return $this->activeTeamMemberships()->exists();
+            // Allow owners, admins, and active team members through to middleware
+            return in_array($this->role, ['owner', 'admin'])
+                || $this->activeTeamMemberships()->exists();
         }
 
         return false;

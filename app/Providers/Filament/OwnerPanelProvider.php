@@ -48,7 +48,6 @@ class OwnerPanelProvider extends PanelProvider
                 Widgets\AccountWidget::class,
             ])
             ->middleware([
-                \App\Http\Middleware\CheckOwnerAccess::class,
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
                 StartSession::class,
@@ -61,6 +60,7 @@ class OwnerPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+                \App\Http\Middleware\CheckOwnerAccess::class,
             ])
             ->databaseNotifications()
             ->databaseNotificationsPolling('30s')
