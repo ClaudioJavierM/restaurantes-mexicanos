@@ -213,19 +213,4 @@ class CateringRequestsResource extends Resource
         ];
     }
 
-    public static function getNavigationBadge(): ?string
-    {
-        $restaurantIds = auth()->user()?->allAccessibleRestaurants()?->pluck('id') ?? collect();
-
-        $count = CateringRequest::whereIn('restaurant_id', $restaurantIds)
-            ->where('status', 'pending')
-            ->count();
-
-        return $count > 0 ? (string) $count : null;
-    }
-
-    public static function getNavigationBadgeColor(): ?string
-    {
-        return 'warning';
-    }
 }
