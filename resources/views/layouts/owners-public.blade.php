@@ -16,7 +16,10 @@
             <div class="flex items-center justify-between h-16">
                 {{-- Logo --}}
                 <a href="{{ route('home') }}" class="flex items-center gap-3">
-                    <img src="/images/branding/icon.png" alt="FAMER" class="h-10 w-10 rounded-full border-2 border-yellow-600/50">
+                    <picture>
+                        <source srcset="/images/branding/icon.webp" type="image/webp">
+                        <img src="/images/branding/icon.png" alt="FAMER" class="h-10 w-10 rounded-full border-2 border-yellow-600/50">
+                    </picture>
                     <div class="flex items-center gap-2">
                         <span class="text-xl font-black text-red-500">FAMER</span>
                         <span class="text-gray-600">|</span>

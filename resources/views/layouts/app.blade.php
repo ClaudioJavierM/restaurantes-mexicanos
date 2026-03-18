@@ -305,7 +305,10 @@
             <div class="flex justify-between h-20 overflow-visible">
                 <div class="flex items-center">
                     <a href="/" class="flex items-center gap-3 group">
-                        <img src="/images/branding/logo.png?v=3" alt="FAMER USA" class="h-14 w-auto group-hover:scale-105 transition-all duration-300" style="max-height: 56px;">
+                        <picture>
+                            <source srcset="/images/branding/logo.webp?v=3" type="image/webp">
+                            <img src="/images/branding/logo.png?v=3" alt="FAMER USA" class="h-14 w-auto group-hover:scale-105 transition-all duration-300" style="max-height: 56px;">
+                        </picture>
                         <div class="hidden sm:flex flex-col leading-none" style="gap: 2px;">
                             <span class="text-yellow-500 font-bold text-sm tracking-wide" style="line-height: 1;">Restaurantes</span>
                             <span class="text-white font-bold text-sm tracking-wide" style="line-height: 1;">Mexicanos</span>
@@ -732,7 +735,10 @@
                 <!-- Logo & About -->
                 <div class="md:col-span-1">
                     <div class="flex items-center gap-3 mb-4">
-                        <img src="/images/branding/logo.png?v=3" alt="FAMER USA" class="h-16 w-auto" style="max-height: 64px;">
+                        <picture>
+                            <source srcset="/images/branding/logo.webp?v=3" type="image/webp">
+                            <img src="/images/branding/logo.png?v=3" alt="FAMER USA" class="h-16 w-auto" style="max-height: 64px;">
+                        </picture>
                         <div class="flex flex-col leading-none" style="gap: 2px;">
                             <span class="text-yellow-500 font-bold text-sm tracking-wide" style="line-height: 1;">Restaurantes</span>
                             <span class="text-white font-bold text-sm tracking-wide" style="line-height: 1;">Mexicanos</span>
