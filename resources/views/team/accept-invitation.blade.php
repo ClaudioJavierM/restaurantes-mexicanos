@@ -14,16 +14,19 @@
     </head>
     <body class="font-sans text-gray-900 antialiased">
         <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
-            <div>
+            <!-- FAMER Branding -->
+            <div class="mb-4 text-center">
                 <a href="/">
-                    <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
+                    <img src="{{ asset('images/branding/icon.png') }}" alt="FAMER" class="w-16 h-16 mx-auto rounded-xl shadow-lg">
                 </a>
+                <p class="mt-2 text-sm font-semibold text-red-600">FAMER Business</p>
             </div>
 
-            <div class="w-full sm:max-w-lg mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
+            <div class="w-full sm:max-w-lg mt-2 px-6 py-6 bg-white shadow-md overflow-hidden sm:rounded-lg">
                 <div class="text-center mb-6">
                     <h2 class="text-2xl font-bold text-gray-900">Invitacion de Equipo</h2>
                     <p class="mt-2 text-gray-600">Has sido invitado a unirte al equipo</p>
+                    <p class="mt-1 text-sm font-medium text-gray-800">{{ $member->email }}</p>
                 </div>
 
                 <!-- Restaurant Info -->
@@ -149,6 +152,10 @@
                 <p class="mt-4 text-center text-xs text-gray-500">
                     Al aceptar, tendras acceso al panel de administracion del restaurante con los permisos de tu rol.
                 </p>
+
+                <div class="mt-6 pt-4 border-t text-center">
+                    <p class="text-xs text-gray-400">Powered by <a href="https://restaurantesmexicanosfamosos.com" class="text-red-500 hover:underline">FAMER</a> — Famous Mexican Restaurants</p>
+                </div>
             </div>
         </div>
     </body>
