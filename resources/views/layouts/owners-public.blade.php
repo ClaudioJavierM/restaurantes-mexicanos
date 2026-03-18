@@ -63,7 +63,7 @@
                             </button>
                         </form>
                     @else
-                        <a href="{{ route('owner.login') }}" class="text-gray-300 hover:text-white text-sm">Login</a>
+                        <a href="{{ route('filament.owner.auth.login') }}" class="text-gray-300 hover:text-white text-sm">Login</a>
                         <a href="{{ route('register') }}" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
                             Registrarse
                         </a>
