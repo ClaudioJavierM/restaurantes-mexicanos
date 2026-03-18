@@ -9,6 +9,23 @@
         $hasRestaurants = auth()->user()->restaurants()->exists();
         $myRestaurant = $hasRestaurants ? auth()->user()->restaurants()->first() : null;
         $favoritesCount = auth()->user()->favorites()->count();
+        $upcomingReservations = auth()->user()->reservations()
+            ->with('restaurant')
+            ->whereIn('status', ['pending', 'confirmed'])
+            ->whereDate('reservation_date', '>=', now()->toDateString())
+            ->orderBy('reservation_date')
+            ->limit(3)
+            ->get();
+        $recentOrders = auth()->user()->orders()
+            ->with('restaurant')
+            ->latest()
+            ->limit(3)
+            ->get();
+        $recentReviews = auth()->user()->reviews()
+            ->with('restaurant')
+            ->latest()
+            ->limit(3)
+            ->get();
     @endphp
 
     <div class="py-8">
@@ -198,6 +215,89 @@
                         <h3 class="font-bold text-lg text-gray-900 mb-2">FAMER Awards</h3>
                         <p class="text-sm text-gray-600">Conoce los restaurantes mejor calificados del año.</p>
                     </a>
+                </div>
+
+                {{-- Activity Summary --}}
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                    {{-- Próximas reservaciones --}}
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-bold text-gray-900 flex items-center gap-2">
+                                <span>🗓️</span> Reservaciones
+                            </h3>
+                            <a href="/my-reservations" class="text-xs text-blue-600 hover:underline font-medium">Ver todas</a>
+                        </div>
+                        @if($upcomingReservations->count() > 0)
+                            <div class="space-y-3">
+                                @foreach($upcomingReservations as $res)
+                                    <div class="flex items-start gap-2">
+                                        <div class="w-2 h-2 rounded-full bg-blue-400 mt-1.5 flex-shrink-0"></div>
+                                        <div class="min-w-0">
+                                            <p class="text-sm font-medium text-gray-800 truncate">{{ $res->restaurant->name ?? 'Restaurante' }}</p>
+                                            <p class="text-xs text-gray-500">{{ \Carbon\Carbon::parse($res->reservation_date)->format('d M') }} · {{ $res->reservation_time }} · {{ $res->party_size }} pers.</p>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <p class="text-sm text-gray-400 italic">Sin reservaciones próximas</p>
+                            <a href="/restaurantes" class="mt-3 inline-block text-xs text-blue-600 hover:underline">Buscar restaurante</a>
+                        @endif
+                    </div>
+
+                    {{-- Pedidos recientes --}}
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-bold text-gray-900 flex items-center gap-2">
+                                <span>🛍️</span> Pedidos
+                            </h3>
+                            <a href="/my-orders" class="text-xs text-green-600 hover:underline font-medium">Ver todos</a>
+                        </div>
+                        @if($recentOrders->count() > 0)
+                            <div class="space-y-3">
+                                @foreach($recentOrders as $order)
+                                    <div class="flex items-start gap-2">
+                                        <div class="w-2 h-2 rounded-full bg-green-400 mt-1.5 flex-shrink-0"></div>
+                                        <div class="min-w-0">
+                                            <p class="text-sm font-medium text-gray-800 truncate">{{ $order->restaurant->name ?? 'Restaurante' }}</p>
+                                            <p class="text-xs text-gray-500">${{ number_format($order->total, 2) }} · {{ $order->status_label }}</p>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <p class="text-sm text-gray-400 italic">Sin pedidos recientes</p>
+                            <a href="/restaurantes" class="mt-3 inline-block text-xs text-green-600 hover:underline">Explorar menús</a>
+                        @endif
+                    </div>
+
+                    {{-- Reseñas recientes --}}
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-bold text-gray-900 flex items-center gap-2">
+                                <span>⭐</span> Mis Reseñas
+                            </h3>
+                            <a href="/my-reviews" class="text-xs text-amber-600 hover:underline font-medium">Ver todas</a>
+                        </div>
+                        @if($recentReviews->count() > 0)
+                            <div class="space-y-3">
+                                @foreach($recentReviews as $rev)
+                                    <div class="flex items-start gap-2">
+                                        <div class="w-2 h-2 rounded-full bg-amber-400 mt-1.5 flex-shrink-0"></div>
+                                        <div class="min-w-0">
+                                            <p class="text-sm font-medium text-gray-800 truncate">{{ $rev->restaurant->name ?? 'Restaurante' }}</p>
+                                            <p class="text-xs text-gray-500">{{ str_repeat('★', $rev->rating) }}{{ str_repeat('☆', 5 - $rev->rating) }} · {{ $rev->created_at->diffForHumans() }}</p>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <p class="text-sm text-gray-400 italic">Aún no has escrito reseñas</p>
+                            <a href="/restaurantes" class="mt-3 inline-block text-xs text-amber-600 hover:underline">Escribir reseña</a>
+                        @endif
+                    </div>
+
                 </div>
 
                 {{-- CTA for Restaurant Owners --}}

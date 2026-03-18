@@ -419,15 +419,94 @@
 
                     <!-- Auth Links (Desktop) -->
                     @auth
-                        <a href="/my-favorites" class="text-gray-300 hover:text-red-400 px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-all flex items-center gap-1">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path>
-                            </svg>
-                            {{ app()->getLocale() === 'en' ? 'Favorites' : 'Favoritos' }}
-                        </a>
-                        <a href="/dashboard" class="text-gray-300 hover:text-yellow-500 px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-all">
-                            Dashboard
-                        </a>
+                        <div class="relative" x-data="{ open: false }" @click.outside="open = false">
+                            <button @click="open = !open" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-gray-300 hover:bg-gray-800 hover:text-white transition-all">
+                                @if(auth()->user()->avatar)
+                                    <img src="{{ auth()->user()->avatar }}" alt="{{ auth()->user()->name }}" class="w-8 h-8 rounded-full object-cover ring-2 ring-yellow-500">
+                                @else
+                                    <div class="w-8 h-8 rounded-full bg-yellow-600 flex items-center justify-center text-white text-sm font-bold ring-2 ring-yellow-500">
+                                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                                    </div>
+                                @endif
+                                <span class="hidden xl:block max-w-[120px] truncate">{{ auth()->user()->name }}</span>
+                                <svg class="w-4 h-4 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                            </button>
+
+                            <div x-show="open" x-cloak x-transition:enter="transition ease-out duration-100" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
+                                class="absolute right-0 top-full mt-1 w-64 bg-white rounded-xl shadow-2xl border border-gray-100 py-2 z-50">
+                                <!-- User info -->
+                                <div class="px-4 py-3 border-b border-gray-100">
+                                    <p class="text-sm font-semibold text-gray-900 truncate">{{ auth()->user()->name }}</p>
+                                    <p class="text-xs text-gray-500 truncate">{{ auth()->user()->email }}</p>
+                                </div>
+
+                                <!-- Links -->
+                                <a href="/dashboard" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                    <div class="w-7 h-7 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                        <svg class="w-3.5 h-3.5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                                        </svg>
+                                    </div>
+                                    Mi Dashboard
+                                </a>
+                                <a href="/my-favorites" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                    <div class="w-7 h-7 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                        <svg class="w-3.5 h-3.5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </div>
+                                    Mis Favoritos
+                                </a>
+                                <a href="/my-reservations" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                    <div class="w-7 h-7 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                        <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                        </svg>
+                                    </div>
+                                    Mis Reservaciones
+                                </a>
+                                <a href="/my-orders" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                    <div class="w-7 h-7 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                        <svg class="w-3.5 h-3.5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                                        </svg>
+                                    </div>
+                                    Mis Pedidos
+                                </a>
+                                <a href="/my-reviews" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                    <div class="w-7 h-7 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                        <svg class="w-3.5 h-3.5 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                        </svg>
+                                    </div>
+                                    Mis Reseñas
+                                </a>
+                                <a href="/profile" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                    <div class="w-7 h-7 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                        <svg class="w-3.5 h-3.5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                        </svg>
+                                    </div>
+                                    Mi Perfil
+                                </a>
+
+                                <!-- Separator + Logout -->
+                                <div class="border-t border-gray-100 my-1"></div>
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit" class="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors">
+                                        <div class="w-7 h-7 bg-red-50 rounded-full flex items-center justify-center flex-shrink-0">
+                                            <svg class="w-3.5 h-3.5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                                            </svg>
+                                        </div>
+                                        Cerrar Sesión
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
                     @else
                         <a href="/login" class="text-gray-300 hover:text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-all">
                             Login
@@ -514,12 +593,70 @@
                     FAMER Awards
                 </a>
                 @auth
-                    <a href="/my-favorites" class="block text-gray-300 hover:text-red-400 hover:bg-gray-800 px-3 py-2 rounded-lg text-base font-medium transition-all">
-                        {{ app()->getLocale() === 'en' ? 'My Favorites' : 'Mis Favoritos' }}
-                    </a>
-                    <a href="/dashboard" class="block text-gray-300 hover:text-yellow-500 hover:bg-gray-800 px-3 py-2 rounded-lg text-base font-medium transition-all">
-                        Dashboard
-                    </a>
+                    <!-- Mi Cuenta Section (Mobile) -->
+                    <div class="border-t border-gray-700 pt-2 mt-2">
+                        <div class="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            Mi Cuenta
+                        </div>
+                        <div class="px-3 py-2 flex items-center gap-3 border-b border-gray-700 mb-1">
+                            @if(auth()->user()->avatar)
+                                <img src="{{ auth()->user()->avatar }}" class="w-9 h-9 rounded-full object-cover ring-2 ring-yellow-500">
+                            @else
+                                <div class="w-9 h-9 rounded-full bg-yellow-600 flex items-center justify-center text-white font-bold ring-2 ring-yellow-500">
+                                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                                </div>
+                            @endif
+                            <div>
+                                <p class="text-sm font-semibold text-gray-200 truncate max-w-[180px]">{{ auth()->user()->name }}</p>
+                                <p class="text-xs text-gray-400 truncate max-w-[180px]">{{ auth()->user()->email }}</p>
+                            </div>
+                        </div>
+                        <a href="/dashboard" class="flex items-center gap-3 text-gray-300 hover:text-yellow-500 hover:bg-gray-800 px-3 py-2 rounded-lg text-base font-medium transition-all">
+                            <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                            </svg>
+                            Mi Dashboard
+                        </a>
+                        <a href="/my-favorites" class="flex items-center gap-3 text-gray-300 hover:text-yellow-500 hover:bg-gray-800 px-3 py-2 rounded-lg text-base font-medium transition-all">
+                            <svg class="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"/>
+                            </svg>
+                            Mis Favoritos
+                        </a>
+                        <a href="/my-reservations" class="flex items-center gap-3 text-gray-300 hover:text-yellow-500 hover:bg-gray-800 px-3 py-2 rounded-lg text-base font-medium transition-all">
+                            <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                            Mis Reservaciones
+                        </a>
+                        <a href="/my-orders" class="flex items-center gap-3 text-gray-300 hover:text-yellow-500 hover:bg-gray-800 px-3 py-2 rounded-lg text-base font-medium transition-all">
+                            <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                            </svg>
+                            Mis Pedidos
+                        </a>
+                        <a href="/my-reviews" class="flex items-center gap-3 text-gray-300 hover:text-yellow-500 hover:bg-gray-800 px-3 py-2 rounded-lg text-base font-medium transition-all">
+                            <svg class="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                            </svg>
+                            Mis Reseñas
+                        </a>
+                        <a href="/profile" class="flex items-center gap-3 text-gray-300 hover:text-yellow-500 hover:bg-gray-800 px-3 py-2 rounded-lg text-base font-medium transition-all">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            </svg>
+                            Mi Perfil
+                        </a>
+                        <form method="POST" action="{{ route('logout') }}" class="px-0">
+                            @csrf
+                            <button type="submit" class="flex items-center gap-3 w-full text-red-400 hover:text-red-300 hover:bg-gray-800 px-3 py-2 rounded-lg text-base font-medium transition-all">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                                </svg>
+                                Cerrar Sesión
+                            </button>
+                        </form>
+                    </div>
                 @else
                     <a href="/login" class="block text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-lg text-base font-medium transition-all">
                         Login

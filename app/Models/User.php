@@ -130,6 +130,16 @@ class User extends Authenticatable implements FilamentUser
         return $this->favoriteRestaurants()->where('restaurant_id', $restaurant->id)->exists();
     }
 
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class);
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(\App\Models\Order::class);
+    }
+
     // Team memberships
     public function teamMemberships()
     {
