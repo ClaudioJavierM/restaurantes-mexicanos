@@ -35,7 +35,7 @@ class InventoryResource extends Resource
         $user = auth()->user();
         if (!$user) return false;
         $restaurant = $user->allAccessibleRestaurants()->first();
-        return $restaurant && in_array($restaurant->subscription_tier, ['premium', 'elite']);
+        return $restaurant && $restaurant->is_claimed;
     }
 
     public static function canAccess(): bool
@@ -45,13 +45,21 @@ class InventoryResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        $restaurantIds = auth()->user()?->allAccessibleRestaurants()->pluck('id') ?? collect();
+        $restaurant = auth()->user()?->allAccessibleRestaurants()->first();
+        if (!$restaurant || $restaurant->subscription_tier !== 'elite') {
+            return 'ELITE';
+        }
+        $restaurantIds = auth()->user()->allAccessibleRestaurants()->pluck('id');
         $count = InventoryItem::whereIn('restaurant_id', $restaurantIds)->lowStock()->count();
         return $count > 0 ? (string) $count : null;
     }
 
     public static function getNavigationBadgeColor(): ?string
     {
+        $restaurant = auth()->user()?->allAccessibleRestaurants()->first();
+        if (!$restaurant || $restaurant->subscription_tier !== 'elite') {
+            return 'violet';
+        }
         return 'danger';
     }
 
@@ -223,7 +231,31 @@ class InventoryResource extends Resource
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
-            ->bulkActions([]);
+            ->bulkActions([])
+            ->emptyStateHeading(function (): string {
+                $restaurant = auth()->user()?->allAccessibleRestaurants()->first();
+                return ($restaurant && $restaurant->subscription_tier === 'elite')
+                    ? 'Sin artículos en inventario' : '🔒 Función Elite';
+            })
+            ->emptyStateDescription(function (): string {
+                $restaurant = auth()->user()?->allAccessibleRestaurants()->first();
+                return ($restaurant && $restaurant->subscription_tier === 'elite')
+                    ? 'Agrega tu primer artículo para comenzar a controlar el inventario.'
+                    : 'El control de inventario es una función exclusiva del plan Elite.';
+            })
+            ->emptyStateActions(function (): array {
+                $restaurant = auth()->user()?->allAccessibleRestaurants()->first();
+                if (!$restaurant || $restaurant->subscription_tier !== 'elite') {
+                    return [
+                        Tables\Actions\Action::make('upgrade')
+                            ->label('Ver plan Elite')
+                            ->url(\App\Filament\Owner\Pages\MySubscription::getUrl())
+                            ->color('violet')
+                            ->icon('heroicon-o-arrow-up-circle'),
+                    ];
+                }
+                return [];
+            });
     }
 
     public static function getPages(): array
