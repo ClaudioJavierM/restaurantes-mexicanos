@@ -168,6 +168,8 @@ class Restaurant extends Model implements HasMedia
         'famer_email_1_sent_at',
         'famer_email_2_sent_at',
         'famer_email_3_sent_at',
+        'virtual_tour_url',
+        'referral_code',
     ];
 
     protected $casts = [

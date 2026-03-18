@@ -11,6 +11,12 @@ Route::get('/restaurantes', \App\Livewire\RestaurantList::class)->name('restaura
 Route::get('/restaurante/{slug}', \App\Livewire\RestaurantDetail::class)->name('restaurants.show');
 Route::get('/sugerir', \App\Livewire\SmartSuggestionForm::class)->name('suggestions.create');
 
+// Tableside QR Ordering
+Route::get('/mesa/{restaurantSlug}/{tableCode}', \App\Livewire\TableMenu::class)->name('table.menu');
+
+// Gift Card public check
+Route::get('/tarjeta/{code}', \App\Livewire\GiftCardCheck::class)->name('gift-card.check');
+
 // For Business Owners
 Route::get("/for-owners", \App\Livewire\ForOwners::class)->name("for-owners");
 Route::get("/preguntas-frecuentes", \App\Livewire\Faq::class)->name("faq");

@@ -1,70 +1,119 @@
 <x-filament-panels::page>
-    <div class="flex items-center justify-center min-h-[60vh]">
-        <div class="text-center max-w-2xl mx-auto px-6">
-            {{-- Icon --}}
-            <div class="mx-auto w-24 h-24 rounded-full bg-yellow-500/10 flex items-center justify-center mb-8">
-                <svg class="w-12 h-12 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 013.75 9.375v-4.5zM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 01-1.125-1.125v-4.5zM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0113.5 9.375v-4.5z"></path>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6.75 6.75h.75v.75h-.75v-.75zM6.75 16.5h.75v.75h-.75v-.75zM16.5 6.75h.75v.75H16.5v-.75zM13.5 13.5h.75v.75h-.75v-.75zM13.5 19.5h.75v.75h-.75v-.75zM19.5 13.5h.75v.75h-.75v-.75zM19.5 19.5h.75v.75h-.75v-.75zM16.5 16.5h.75v.75H16.5v-.75z"></path>
-                </svg>
-            </div>
+@if(!$restaurant)
+<p style="color:#9ca3af">Sin restaurante asociado.</p>
+@else
+<div style="display:flex;flex-direction:column;gap:1.5rem;" wire:poll.30s="loadActiveOrders">
 
-            {{-- Badge --}}
-            <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-yellow-500/10 text-yellow-500 text-sm font-semibold mb-6">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                Pronto
-            </span>
-
-            {{-- Title --}}
-            <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                Codigo QR del Menu
-            </h2>
-
-            {{-- Description --}}
-            <p class="text-lg text-gray-500 dark:text-gray-400 mb-8 leading-relaxed">
-                Muy pronto podras generar codigos QR personalizados para tu menu digital.
-                Tus clientes podran escanear y ver tu menu completo desde su celular.
-            </p>
-
-            {{-- Features grid --}}
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
-                <div class="p-4 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10">
-                    <div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center mx-auto mb-3">
-                        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3"></path>
-                        </svg>
+    {{-- Órdenes activas --}}
+    @if(count($activeOrders) > 0)
+    <div style="background-color:#111827;border-radius:0.75rem;border:1px solid #374151;overflow:hidden;">
+        <div style="padding:1.25rem;border-bottom:1px solid #374151;background:linear-gradient(135deg,#7c2d12,#111827);display:flex;align-items:center;gap:0.75rem;">
+            <span style="font-size:1.25rem;">🔔</span>
+            <h3 style="font-size:1rem;font-weight:600;color:#fff;margin:0;">Órdenes Activas ({{ count($activeOrders) }})</h3>
+        </div>
+        <div style="padding:1.25rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;">
+            @foreach($activeOrders as $order)
+            @php
+                $sc = match($order['status']) {
+                    'pending'   => ['bg'=>'#7c2d12','text'=>'#fca5a5','label'=>'🆕 Nuevo'],
+                    'confirmed' => ['bg'=>'#1e3a5f','text'=>'#93c5fd','label'=>'✅ Confirmado'],
+                    'preparing' => ['bg'=>'#713f12','text'=>'#fde68a','label'=>'👨‍🍳 Preparando'],
+                    default     => ['bg'=>'#1f2937','text'=>'#9ca3af','label'=>ucfirst($order['status'])],
+                };
+            @endphp
+            <div style="background-color:#1f2937;border-radius:0.75rem;padding:1.25rem;border:1px solid #374151;">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;">
+                    <div>
+                        <p style="font-size:0.75rem;color:#9ca3af;margin:0;">{{ $order['table']['name'] ?? 'Mesa' }}</p>
+                        <p style="font-size:0.875rem;font-weight:600;color:#fff;margin:0.125rem 0 0;">{{ $order['order_number'] }}</p>
                     </div>
-                    <h3 class="font-semibold text-gray-900 dark:text-white text-sm">Escaneo Instantaneo</h3>
-                    <p class="text-xs text-gray-500 mt-1">Tus clientes acceden al menu con una foto</p>
+                    <span style="font-size:0.7rem;padding:0.2rem 0.6rem;border-radius:9999px;background:{{ $sc['bg'] }};color:{{ $sc['text'] }};">{{ $sc['label'] }}</span>
                 </div>
-
-                <div class="p-4 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10">
-                    <div class="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center mx-auto mb-3">
-                        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M9.75 8.25h4.5"></path>
-                        </svg>
-                    </div>
-                    <h3 class="font-semibold text-gray-900 dark:text-white text-sm">Listo para Imprimir</h3>
-                    <p class="text-xs text-gray-500 mt-1">Descarga e imprime para tus mesas</p>
+                <div style="margin-bottom:0.75rem;">
+                    @foreach(($order['items'] ?? []) as $item)
+                    <p style="font-size:0.8rem;color:#d1d5db;margin:0.125rem 0;">{{ $item['quantity'] }}× {{ $item['name'] }} <span style="color:#9ca3af;">${{ number_format($item['price'] * $item['quantity'], 2) }}</span></p>
+                    @endforeach
+                    @if($order['notes'])
+                    <p style="font-size:0.75rem;color:#fbbf24;margin-top:0.375rem;">📝 {{ $order['notes'] }}</p>
+                    @endif
+                    <p style="font-size:0.75rem;color:#9ca3af;font-weight:600;margin-top:0.375rem;">Total: ${{ number_format($order['subtotal'], 2) }}</p>
                 </div>
-
-                <div class="p-4 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10">
-                    <div class="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center mx-auto mb-3">
-                        <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42"></path>
-                        </svg>
-                    </div>
-                    <h3 class="font-semibold text-gray-900 dark:text-white text-sm">Diseno Personalizado</h3>
-                    <p class="text-xs text-gray-500 mt-1">QR con tu logo y colores de marca</p>
+                <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+                    @if($order['status'] === 'pending')
+                    <button wire:click="updateOrderStatus({{ $order['id'] }}, 'confirmed')" style="background:#1e3a5f;color:#93c5fd;border:1px solid #1e40af;padding:0.25rem 0.75rem;border-radius:0.375rem;font-size:0.75rem;cursor:pointer;">✅ Confirmar</button>
+                    @endif
+                    @if(in_array($order['status'], ['pending','confirmed']))
+                    <button wire:click="updateOrderStatus({{ $order['id'] }}, 'preparing')" style="background:#713f12;color:#fde68a;border:1px solid #92400e;padding:0.25rem 0.75rem;border-radius:0.375rem;font-size:0.75rem;cursor:pointer;">👨‍🍳 Preparando</button>
+                    @endif
+                    <button wire:click="updateOrderStatus({{ $order['id'] }}, 'ready')" style="background:#064e3b;color:#34d399;border:1px solid #047857;padding:0.25rem 0.75rem;border-radius:0.375rem;font-size:0.75rem;cursor:pointer;">🔔 Listo</button>
+                    <button wire:click="updateOrderStatus({{ $order['id'] }}, 'delivered')" style="background:#374151;color:#9ca3af;border:1px solid #4b5563;padding:0.25rem 0.75rem;border-radius:0.375rem;font-size:0.75rem;cursor:pointer;">✓ Entregado</button>
                 </div>
             </div>
-
-            {{-- CTA --}}
-            <p class="text-sm text-gray-400">
-                Estamos trabajando para ofrecerte los mejores codigos QR para tu restaurante.
-            </p>
+            @endforeach
         </div>
     </div>
+    @endif
+
+    {{-- Agregar mesa --}}
+    <div style="background-color:#1f2937;border-radius:0.75rem;padding:1.25rem;border:1px solid #374151;">
+        <h3 style="font-size:0.9rem;font-weight:600;color:#fff;margin:0 0 1rem;">➕ Agregar Mesa</h3>
+        @error('newTableName') <p style="color:#f87171;font-size:0.75rem;margin-bottom:0.5rem;">{{ $message }}</p> @enderror
+        <div style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:flex-end;">
+            <div>
+                <label style="font-size:0.75rem;color:#9ca3af;display:block;margin-bottom:0.25rem;">Nombre / Número</label>
+                <input wire:model="newTableName" type="text" placeholder="Mesa 1, Terraza 2, Barra..."
+                    style="background:#111827;border:1px solid #374151;border-radius:0.375rem;padding:0.5rem 0.75rem;color:#fff;font-size:0.875rem;width:180px;">
+            </div>
+            <div>
+                <label style="font-size:0.75rem;color:#9ca3af;display:block;margin-bottom:0.25rem;">Capacidad (personas)</label>
+                <input wire:model="newTableCapacity" type="number" min="1" max="30"
+                    style="background:#111827;border:1px solid #374151;border-radius:0.375rem;padding:0.5rem 0.75rem;color:#fff;font-size:0.875rem;width:80px;">
+            </div>
+            <button wire:click="addTable"
+                style="background:linear-gradient(135deg,#dc2626,#991b1b);color:white;padding:0.5rem 1.25rem;border-radius:0.5rem;border:none;font-size:0.875rem;font-weight:600;cursor:pointer;">
+                Agregar Mesa
+            </button>
+        </div>
+    </div>
+
+    {{-- Lista de mesas --}}
+    @if(count($tables) > 0)
+    <div style="background-color:#111827;border-radius:0.75rem;border:1px solid #374151;overflow:hidden;">
+        <div style="padding:1.25rem;border-bottom:1px solid #374151;">
+            <h3 style="font-size:1rem;font-weight:600;color:#fff;margin:0;">Mis Mesas ({{ count($tables) }})</h3>
+            <p style="font-size:0.8rem;color:#9ca3af;margin:0.25rem 0 0;">Clientes escanean el QR para ver el menú y hacer pedidos desde su lugar</p>
+        </div>
+        <div style="padding:1.25rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;">
+            @foreach($tables as $table)
+            @php $url = url('/mesa/' . $restaurant->slug . '/' . $table['table_code']); @endphp
+            <div style="background-color:#1f2937;border-radius:0.75rem;padding:1.25rem;border:1px solid #374151;text-align:center;">
+                <p style="font-size:1rem;font-weight:700;color:#fff;margin:0 0 0.75rem;">{{ $table['name'] }}</p>
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data={{ urlencode($url) }}"
+                    alt="QR" style="width:120px;height:120px;border-radius:0.5rem;background:#fff;padding:4px;margin:0 auto 0.5rem;display:block;">
+                <p style="font-size:0.7rem;color:#9ca3af;margin:0 0 0.75rem;">{{ $table['capacity'] }} personas</p>
+                <div style="display:flex;gap:0.5rem;justify-content:center;">
+                    <a href="{{ $url }}" target="_blank"
+                        style="font-size:0.75rem;color:#818cf8;border:1px solid #4f46e5;padding:0.3rem 0.75rem;border-radius:0.375rem;text-decoration:none;">
+                        Vista previa
+                    </a>
+                    <button wire:click="deleteTable({{ $table['id'] }})"
+                        wire:confirm="¿Eliminar {{ $table['name'] }}?"
+                        style="font-size:0.75rem;color:#f87171;border:1px solid #7f1d1d;padding:0.3rem 0.75rem;border-radius:0.375rem;background:transparent;cursor:pointer;">
+                        Eliminar
+                    </button>
+                </div>
+            </div>
+            @endforeach
+        </div>
+    </div>
+    @else
+    <div style="background-color:#1f2937;border-radius:0.75rem;padding:3rem;text-align:center;border:1px solid #374151;">
+        <p style="font-size:2.5rem;margin:0 0 0.5rem;">📱</p>
+        <p style="color:#fff;font-weight:600;margin:0 0 0.5rem;">Sin mesas configuradas</p>
+        <p style="color:#9ca3af;font-size:0.875rem;margin:0;">Agrega mesas arriba y genera QR codes que los clientes pueden escanear</p>
+    </div>
+    @endif
+
+</div>
+@endif
 </x-filament-panels::page>

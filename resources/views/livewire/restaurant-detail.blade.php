@@ -690,6 +690,24 @@
                     @livewire('review-list', ['restaurant' => $restaurant])
                 </div>
 
+                <!-- Virtual Tour Section -->
+                @if($restaurant->virtual_tour_url)
+                <div id="tour-virtual" class="bg-white rounded-lg shadow-lg p-6 mb-6">
+                    <div class="flex items-center gap-2 mb-4">
+                        <h2 class="text-xl font-bold text-gray-900">Tour Virtual 360°</h2>
+                        <span class="bg-purple-100 text-purple-700 text-xs font-medium px-2 py-0.5 rounded-full">🌐 Virtual</span>
+                    </div>
+                    <div class="rounded-xl overflow-hidden" style="aspect-ratio:16/9;">
+                        <iframe src="{{ $restaurant->virtual_tour_url }}"
+                            width="100%" height="100%"
+                            frameborder="0" allowfullscreen
+                            allow="xr-spatial-tracking; gyroscope; accelerometer"
+                            style="border:0;width:100%;height:100%;">
+                        </iframe>
+                    </div>
+                </div>
+                @endif
+
                 <!-- Q&A Section -->
                 <div id="qa" class="bg-white rounded-lg shadow-lg p-6 mb-6">
                     <div class="flex items-center gap-2 mb-4">
