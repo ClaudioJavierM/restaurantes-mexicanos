@@ -9,6 +9,25 @@
         $hasRestaurants = auth()->user()->restaurants()->exists();
         $myRestaurant = $hasRestaurants ? auth()->user()->restaurants()->first() : null;
         $favoritesCount = auth()->user()->favorites()->count();
+        $upcomingReservations = auth()->user()->reservations()
+            ->with('restaurant')
+            ->whereIn('status', ['pending', 'confirmed'])
+            ->whereDate('reservation_date', '>=', now()->toDateString())
+            ->orderBy('reservation_date')
+            ->limit(3)
+            ->get();
+        $recentOrders = auth()->user()->orders()
+            ->with('restaurant')
+            ->latest()
+            ->limit(3)
+            ->get();
+        $recentReviews = auth()->user()->reviews()
+            ->with('restaurant')
+            ->latest()
+            ->limit(3)
+            ->get();
+        $loyalty = \App\Models\LoyaltyPoints::getOrCreate(auth()->user()->id);
+        $checkInsCount = \App\Models\CheckIn::where('user_id', auth()->user()->id)->count();
     @endphp
 
     <div class="py-8">
@@ -198,6 +217,158 @@
                         <h3 class="font-bold text-lg text-gray-900 mb-2">FAMER Awards</h3>
                         <p class="text-sm text-gray-600">Conoce los restaurantes mejor calificados del año.</p>
                     </a>
+                </div>
+
+                {{-- Activity Summary --}}
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                    {{-- Próximas reservaciones --}}
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-bold text-gray-900 flex items-center gap-2">
+                                <span>🗓️</span> Reservaciones
+                            </h3>
+                            <a href="/my-reservations" class="text-xs text-blue-600 hover:underline font-medium">Ver todas</a>
+                        </div>
+                        @if($upcomingReservations->count() > 0)
+                            <div class="space-y-3">
+                                @foreach($upcomingReservations as $res)
+                                    <div class="flex items-start gap-2">
+                                        <div class="w-2 h-2 rounded-full bg-blue-400 mt-1.5 flex-shrink-0"></div>
+                                        <div class="min-w-0">
+                                            <p class="text-sm font-medium text-gray-800 truncate">{{ $res->restaurant->name ?? 'Restaurante' }}</p>
+                                            <p class="text-xs text-gray-500">{{ \Carbon\Carbon::parse($res->reservation_date)->format('d M') }} · {{ $res->reservation_time }} · {{ $res->party_size }} pers.</p>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <p class="text-sm text-gray-400 italic">Sin reservaciones próximas</p>
+                            <a href="/restaurantes" class="mt-3 inline-block text-xs text-blue-600 hover:underline">Buscar restaurante</a>
+                        @endif
+                    </div>
+
+                    {{-- Pedidos recientes --}}
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-bold text-gray-900 flex items-center gap-2">
+                                <span>🛍️</span> Pedidos
+                            </h3>
+                            <a href="/my-orders" class="text-xs text-green-600 hover:underline font-medium">Ver todos</a>
+                        </div>
+                        @if($recentOrders->count() > 0)
+                            <div class="space-y-3">
+                                @foreach($recentOrders as $order)
+                                    <div class="flex items-start gap-2">
+                                        <div class="w-2 h-2 rounded-full bg-green-400 mt-1.5 flex-shrink-0"></div>
+                                        <div class="min-w-0">
+                                            <p class="text-sm font-medium text-gray-800 truncate">{{ $order->restaurant->name ?? 'Restaurante' }}</p>
+                                            <p class="text-xs text-gray-500">${{ number_format($order->total, 2) }} · {{ $order->status_label }}</p>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <p class="text-sm text-gray-400 italic">Sin pedidos recientes</p>
+                            <a href="/restaurantes" class="mt-3 inline-block text-xs text-green-600 hover:underline">Explorar menús</a>
+                        @endif
+                    </div>
+
+                    {{-- Reseñas recientes --}}
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-bold text-gray-900 flex items-center gap-2">
+                                <span>⭐</span> Mis Reseñas
+                            </h3>
+                            <a href="/my-reviews" class="text-xs text-amber-600 hover:underline font-medium">Ver todas</a>
+                        </div>
+                        @if($recentReviews->count() > 0)
+                            <div class="space-y-3">
+                                @foreach($recentReviews as $rev)
+                                    <div class="flex items-start gap-2">
+                                        <div class="w-2 h-2 rounded-full bg-amber-400 mt-1.5 flex-shrink-0"></div>
+                                        <div class="min-w-0">
+                                            <p class="text-sm font-medium text-gray-800 truncate">{{ $rev->restaurant->name ?? 'Restaurante' }}</p>
+                                            <p class="text-xs text-gray-500">{{ str_repeat('★', $rev->rating) }}{{ str_repeat('☆', 5 - $rev->rating) }} · {{ $rev->created_at->diffForHumans() }}</p>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <p class="text-sm text-gray-400 italic">Aún no has escrito reseñas</p>
+                            <a href="/restaurantes" class="mt-3 inline-block text-xs text-amber-600 hover:underline">Escribir reseña</a>
+                        @endif
+                    </div>
+
+                </div>
+
+                {{-- Loyalty & Check-ins --}}
+                @php
+                    $loyaltyLevels = \App\Models\LoyaltyPoints::LEVELS;
+                    $currentLevel  = $loyalty->level ?? 'bronce';
+                    $currentData   = $loyaltyLevels[$currentLevel];
+                    $nextLevelKey  = null;
+                    $nextLevelData = null;
+                    $levelKeys = array_keys($loyaltyLevels);
+                    $levelIdx  = array_search($currentLevel, $levelKeys);
+                    if ($levelIdx !== false && isset($levelKeys[$levelIdx + 1])) {
+                        $nextLevelKey  = $levelKeys[$levelIdx + 1];
+                        $nextLevelData = $loyaltyLevels[$nextLevelKey];
+                    }
+                    $progressPct = $nextLevelData
+                        ? min(100, round(($loyalty->points - $currentData['min']) / ($nextLevelData['min'] - $currentData['min']) * 100))
+                        : 100;
+                @endphp
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="bg-gradient-to-r from-yellow-500 to-amber-500 px-6 py-4 flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                                🏅 Mi Nivel FAMER
+                            </h3>
+                            <p class="text-yellow-100 text-sm">Gana puntos visitando restaurantes y escribiendo reseñas</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-3xl font-black text-white">{{ number_format($loyalty->points) }}</p>
+                            <p class="text-yellow-100 text-xs">puntos</p>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-3">
+                                <span class="text-2xl font-black uppercase tracking-wide" style="color: {{ $currentData['color'] }}">
+                                    {{ ucfirst($currentLevel) }}
+                                </span>
+                                <span class="text-sm text-gray-600">{{ $currentData['discount'] }}% descuento</span>
+                            </div>
+                            @if($nextLevelKey)
+                                <span class="text-xs text-gray-500">
+                                    {{ number_format($nextLevelData['min'] - $loyalty->points) }} pts para {{ ucfirst($nextLevelKey) }}
+                                </span>
+                            @else
+                                <span class="text-xs text-amber-600 font-semibold">¡Nivel máximo! 🏆</span>
+                            @endif
+                        </div>
+                        <!-- Progress bar -->
+                        <div class="h-2.5 bg-gray-100 rounded-full overflow-hidden mb-4">
+                            <div class="h-full rounded-full bg-gradient-to-r from-yellow-400 to-amber-500 transition-all duration-700"
+                                 style="width: {{ $progressPct }}%"></div>
+                        </div>
+                        <!-- Stats row -->
+                        <div class="grid grid-cols-3 gap-4 text-center">
+                            <div class="bg-gray-50 rounded-lg p-3">
+                                <p class="text-xl font-bold text-gray-900">{{ $checkInsCount }}</p>
+                                <p class="text-xs text-gray-500 mt-0.5">📍 Check-ins</p>
+                            </div>
+                            <div class="bg-gray-50 rounded-lg p-3">
+                                <p class="text-xl font-bold text-gray-900">{{ $loyalty->total_reviews ?? 0 }}</p>
+                                <p class="text-xs text-gray-500 mt-0.5">⭐ Reseñas</p>
+                            </div>
+                            <div class="bg-gray-50 rounded-lg p-3">
+                                <p class="text-xl font-bold text-gray-900">{{ $favoritesCount }}</p>
+                                <p class="text-xs text-gray-500 mt-0.5">❤️ Favoritos</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 {{-- CTA for Restaurant Owners --}}

@@ -64,6 +64,11 @@ class Coupon extends Model
         return $this->belongsTo(Restaurant::class);
     }
 
+    public function userCoupons()
+    {
+        return $this->hasMany(UserCoupon::class);
+    }
+
     // Scopes
     public function scopeActive($query)
     {

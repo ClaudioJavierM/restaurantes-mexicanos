@@ -59,10 +59,22 @@ Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');
 
-// Favorites (requires authentication)
+// Customer pages (requires authentication)
 Route::get('/my-favorites', \App\Livewire\MyFavorites::class)
     ->middleware(['auth'])
     ->name('favorites.index');
+
+Route::get('/my-reservations', \App\Livewire\MyReservations::class)
+    ->middleware(['auth'])
+    ->name('reservations.index');
+
+Route::get('/my-orders', \App\Livewire\MyOrders::class)
+    ->middleware(['auth'])
+    ->name('orders.index');
+
+Route::get('/my-reviews', \App\Livewire\MyReviews::class)
+    ->middleware(['auth'])
+    ->name('reviews.index');
 
 // Social Authentication
 Route::get('auth/{provider}/redirect', [SocialAuthController::class, 'redirect'])

@@ -712,6 +712,50 @@ class Restaurant extends Model implements HasMedia
         ];
     }
 
+    /**
+     * Returns true if open, false if closed, null if unknown.
+     * Checks Google opening_hours first, then owner-managed hours JSON.
+     */
+    public function isOpen(): ?bool
+    {
+        // Google Places API format: {"open_now": true, "weekday_text": [...]}
+        if (!empty($this->opening_hours) && array_key_exists('open_now', $this->opening_hours)) {
+            return (bool) $this->opening_hours['open_now'];
+        }
+
+        // Owner-managed hours: {"monday": {"open": "11:00", "close": "22:00", "closed": false}, ...}
+        if (!empty($this->hours)) {
+            $day = strtolower(now()->format('l')); // e.g. 'monday'
+            $dayHours = $this->hours[$day] ?? null;
+
+            if (!$dayHours || ($dayHours['closed'] ?? false)) {
+                return false;
+            }
+
+            $open  = $dayHours['open']  ?? null;
+            $close = $dayHours['close'] ?? null;
+
+            if ($open && $close) {
+                $now = now()->format('H:i');
+                return $now >= $open && $now <= $close;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns today's hours array or null if unavailable.
+     */
+    public function getTodayHours(): ?array
+    {
+        if (!empty($this->hours)) {
+            $day = strtolower(now()->format('l'));
+            return $this->hours[$day] ?? null;
+        }
+        return null;
+    }
+
     // Update restaurant rating based on approved reviews
     public function updateRating(): void
     {
