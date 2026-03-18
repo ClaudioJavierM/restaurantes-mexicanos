@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Session;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
 
-new #[Layout('layouts.guest')] class extends Component
+new #[Layout('layouts.guest-owner')] class extends Component
 {
     public LoginForm $form;
 
@@ -19,20 +19,24 @@ new #[Layout('layouts.guest')] class extends Component
 
         $user = auth()->user();
 
-        if ($user->role === 'admin') {
-            $this->redirect('/admin', navigate: false);
-        } elseif ($user->role === 'owner') {
-            $this->redirect('/owner', navigate: false);
-        } else {
-            $this->redirectIntended(default: route('dashboard', absolute: false), navigate: false);
+        $canAccess = in_array($user->role, ['owner', 'admin'])
+            || $user->teamMemberships()->where('status', 'active')->exists();
+
+        if (! $canAccess) {
+            auth()->logout();
+            Session::invalidate();
+            $this->addError('form.email', 'Esta cuenta no tiene acceso al panel de negocios. Si eres dueño, primero registra o reclama tu restaurante.');
+            return;
         }
+
+        $this->redirect('/owner', navigate: false);
     }
 }; ?>
 
 <div>
     <div class="mb-5 text-center">
-        <h2 class="text-xl font-bold text-gray-900">Bienvenido de vuelta</h2>
-        <p class="text-sm text-gray-500 mt-1">Accede para ver tus favoritos, reservaciones y más</p>
+        <h2 class="text-xl font-bold text-gray-900">Panel de Negocios</h2>
+        <p class="text-sm text-gray-500 mt-1">Administra tu restaurante, menú, reseñas y más</p>
     </div>
 
     <x-auth-session-status class="mb-4" :status="session('status')" />
@@ -61,32 +65,32 @@ new #[Layout('layouts.guest')] class extends Component
 
         <div class="block mt-4">
             <label for="remember" class="inline-flex items-center">
-                <input wire:model="form.remember" id="remember" type="checkbox" class="rounded border-gray-300 text-red-600 shadow-sm focus:ring-red-500" name="remember">
+                <input wire:model="form.remember" id="remember" type="checkbox" class="rounded border-gray-300 text-amber-600 shadow-sm focus:ring-amber-500" name="remember">
                 <span class="ms-2 text-sm text-gray-600">Recordarme</span>
             </label>
         </div>
 
         <div class="flex items-center justify-end mt-4">
             @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" href="{{ route('password.request') }}" wire:navigate>
+                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500" href="{{ route('password.request') }}" wire:navigate>
                     ¿Olvidaste tu contraseña?
                 </a>
             @endif
 
-            <x-primary-button class="ms-3">
-                Entrar
-            </x-primary-button>
+            <button type="button" wire:click="login" class="ms-3 inline-flex items-center px-4 py-2 bg-amber-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-amber-700 focus:bg-amber-700 active:bg-amber-900 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                Entrar al panel
+            </button>
         </div>
     </form>
 
-    <!-- Owner CTA -->
+    <!-- Customer CTA -->
     <div class="mt-6 pt-5 border-t border-gray-100 text-center">
-        <p class="text-sm text-gray-500">¿Eres dueño de un restaurante?</p>
-        <a href="/owner/login" class="mt-1 inline-flex items-center gap-1.5 text-sm font-semibold text-amber-700 hover:text-amber-900 transition-colors">
+        <p class="text-sm text-gray-500">¿Buscas restaurantes?</p>
+        <a href="/login" class="mt-1 inline-flex items-center gap-1.5 text-sm font-semibold text-red-600 hover:text-red-800 transition-colors">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
             </svg>
-            Accede al panel de negocios →
+            Accede como cliente →
         </a>
     </div>
 </div>
