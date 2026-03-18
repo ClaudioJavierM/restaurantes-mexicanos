@@ -21,7 +21,10 @@ new #[Layout('layouts.guest')] class extends Component
 
         if ($user->role === 'admin') {
             $this->redirect('/admin', navigate: false);
-        } elseif ($user->role === 'owner') {
+        } elseif (
+            in_array($user->role, ['owner', 'admin']) &&
+            ($user->restaurants()->exists() || $user->teamMemberships()->where('status', 'active')->exists())
+        ) {
             $this->redirect('/owner', navigate: false);
         } else {
             $this->redirectIntended(default: route('dashboard', absolute: false), navigate: false);
