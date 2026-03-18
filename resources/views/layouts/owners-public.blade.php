@@ -43,11 +43,16 @@
                         ← Volver al Sitio
                     </a>
                     @auth
-                        @if(auth()->user()->ownedRestaurants()->exists())
-                            <a href="/owner/{{ auth()->user()->ownedRestaurants()->first()->id }}" class="text-amber-400 hover:text-amber-300 text-sm font-medium">
-                                Mi Dashboard
+                        @if(auth()->user()->restaurants()->exists() || auth()->user()->activeTeamMemberships()->exists())
+                            <a href="/owner" class="text-amber-400 hover:text-amber-300 text-sm font-medium">
+                                Mi Panel
+                            </a>
+                        @else
+                            <a href="/dashboard" class="text-amber-400 hover:text-amber-300 text-sm font-medium">
+                                Mi Cuenta
                             </a>
                         @endif
+                        <span class="text-gray-600 text-xs hidden md:block truncate max-w-[120px]">{{ auth()->user()->name }}</span>
                         <form method="POST" action="{{ route('logout') }}" class="inline">
                             @csrf
                             <button type="submit" class="text-gray-400 hover:text-white text-sm">
@@ -55,7 +60,7 @@
                             </button>
                         </form>
                     @else
-                        <a href="{{ route('login') }}" class="text-gray-300 hover:text-white text-sm">Login</a>
+                        <a href="{{ route('owner.login') }}" class="text-gray-300 hover:text-white text-sm">Login</a>
                         <a href="{{ route('register') }}" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
                             Registrarse
                         </a>
