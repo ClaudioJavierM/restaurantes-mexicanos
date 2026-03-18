@@ -1695,3 +1695,25 @@ function cityStats() {
 }
 </script>
 </div>
+
+{{-- ============================================ --}}
+{{-- PROVEEDORES RECOMENDADOS Section --}}
+{{-- ============================================ --}}
+<section class="py-12 bg-amber-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-2xl font-bold text-gray-800 mb-2">Proveedores Recomendados</h2>
+        <p class="text-gray-600 mb-8">Equipa tu restaurante mexicano con los mejores proveedores</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <a href="https://mf-imports.com" target="_blank" rel="noopener" class="block p-6 bg-white rounded-xl shadow-sm border border-amber-100 hover:shadow-md transition">
+                <h3 class="font-semibold text-lg text-gray-800 mb-1">MF Imports</h3>
+                <p class="text-gray-600 text-sm">Mobiliario artesanal certificado para restaurantes mexicanos en USA</p>
+                <span class="text-amber-600 text-sm font-medium mt-2 inline-block">mf-imports.com →</span>
+            </a>
+            <a href="https://tormexpro.com" target="_blank" rel="noopener" class="block p-6 bg-white rounded-xl shadow-sm border border-amber-100 hover:shadow-md transition">
+                <h3 class="font-semibold text-lg text-gray-800 mb-1">TorMex Pro</h3>
+                <p class="text-gray-600 text-sm">Tortilladoras y equipo industrial para restaurantes mexicanos</p>
+                <span class="text-amber-600 text-sm font-medium mt-2 inline-block">tormexpro.com →</span>
+            </a>
+        </div>
+    </div>
+</section>
