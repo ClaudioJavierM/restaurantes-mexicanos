@@ -689,6 +689,16 @@
                     </div>
                     @livewire('review-list', ['restaurant' => $restaurant])
                 </div>
+
+                <!-- Q&A Section -->
+                <div id="qa" class="bg-white rounded-lg shadow-lg p-6 mb-6">
+                    <div class="flex items-center gap-2 mb-4">
+                        <h2 class="text-xl font-bold text-gray-900">Preguntas y Respuestas</h2>
+                        <span class="bg-blue-100 text-blue-700 text-xs font-medium px-2 py-0.5 rounded-full">Q&A</span>
+                    </div>
+                    <p class="text-gray-500 text-sm mb-4">¿Tienes dudas sobre este restaurante? Pregunta directamente al equipo.</p>
+                    @livewire('restaurant-q-a', ['restaurant' => $restaurant])
+                </div>
             </div>
 
             <!-- Right Column - Sticky Sidebar -->
@@ -862,6 +872,19 @@
                                 </div>
                             </div>
                         </div>
+                    @endif
+
+                    <!-- Catering / Quote Request -->
+                    @if(in_array($restaurant->subscription_tier, ['premium', 'elite']))
+                    <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+                        <div class="px-4 py-3 border-b border-gray-100 bg-amber-50">
+                            <h3 class="font-bold text-gray-900 text-sm">Catering y Eventos 🍽️</h3>
+                            <p class="text-xs text-gray-500 mt-0.5">Solicita una cotización para tu próximo evento</p>
+                        </div>
+                        <div class="p-4">
+                            @livewire('catering-request-form', ['restaurant' => $restaurant])
+                        </div>
+                    </div>
                     @endif
 
                     <!-- Ad Space -->
