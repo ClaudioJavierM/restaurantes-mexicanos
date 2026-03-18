@@ -874,6 +874,19 @@
                         </div>
                     @endif
 
+                    <!-- Waitlist -->
+                    @if($restaurant->is_claimed)
+                    <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+                        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50">
+                            <h3 class="font-bold text-gray-900 text-sm">Lista de Espera 📋</h3>
+                            <p class="text-xs text-gray-500 mt-0.5">¿Hay espera? Agrega tu nombre y te avisamos</p>
+                        </div>
+                        <div class="p-4">
+                            @livewire('join-waitlist', ['restaurant' => $restaurant])
+                        </div>
+                    </div>
+                    @endif
+
                     <!-- Catering / Quote Request -->
                     @if(in_array($restaurant->subscription_tier, ['premium', 'elite']))
                     <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
