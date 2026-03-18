@@ -68,7 +68,7 @@ class OwnerAppController extends Controller
             'reservations'     => $isPremium,
             'orders'           => $isElite,
             'sms_marketing'    => $isElite,
-            'team_management'  => $isElite,
+            'team_management'  => $isPremium,
             'white_label'      => $isElite,
             'priority_support' => $isElite,
             'unlimited_photos' => $isElite,

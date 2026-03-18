@@ -224,13 +224,32 @@ class StripeWebhookController extends Controller
                 }
                 $user->save();
 
-                // Link user to restaurant if not already linked
+                // Link user to restaurant and set subscription tier
                 if (!$restaurant->user_id) {
                     $restaurant->user_id = $user->id;
-                    $restaurant->is_claimed = true;
-                    $restaurant->claimed_at = now();
-                    $restaurant->save();
                 }
+                $restaurant->is_claimed = true;
+                $restaurant->claimed_at = $restaurant->claimed_at ?? now();
+                $restaurant->subscription_tier = $plan ?: 'premium';
+                $restaurant->subscription_status = 'active';
+                $restaurant->subscription_started_at = $restaurant->subscription_started_at ?? now();
+                if (!$restaurant->subscription_expires_at) {
+                    $restaurant->subscription_expires_at = now()->addMonth();
+                }
+                // Set premium feature flags
+                $restaurant->premium_analytics = true;
+                $restaurant->premium_seo = true;
+                $restaurant->premium_featured = true;
+                $restaurant->premium_coupons = true;
+                $restaurant->premium_email_marketing = true;
+                // Try to get subscription ID from Stripe session
+                if ($session->subscription && !$restaurant->stripe_subscription_id) {
+                    $restaurant->stripe_subscription_id = $session->subscription;
+                }
+                if ($session->customer && !$restaurant->stripe_customer_id) {
+                    $restaurant->stripe_customer_id = $session->customer;
+                }
+                $restaurant->save();
 
                 // Log the user in
                 auth()->login($user);
