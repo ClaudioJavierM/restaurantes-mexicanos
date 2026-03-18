@@ -50,6 +50,32 @@ Route::prefix('guia')->group(function () {
     Route::get('/{state}/{city}', [\App\Http\Controllers\CityGuideController::class, 'city'])->name('city-guides.city');
 });
 
+// City Guides — US Cities (SEO food tourism)
+Route::get('/guias/restaurantes-mexicanos-en-chicago', function () {
+    return view('city-guides.chicago');
+})->name('guides.chicago');
+
+Route::get('/guias/restaurantes-mexicanos-en-los-angeles', function () {
+    return view('city-guides.los-angeles');
+})->name('guides.los-angeles');
+
+Route::get('/guias/restaurantes-mexicanos-en-nueva-york', function () {
+    return view('city-guides.nueva-york');
+})->name('guides.nueva-york');
+
+Route::get('/guias/restaurantes-mexicanos-en-houston', function () {
+    return view('city-guides.houston');
+})->name('guides.houston');
+
+// Gastronomia Mexicana (SEO content)
+Route::get('/gastronomia/antojitos-mexicanos', function () {
+    return view('city-guides.gastronomia-mexicana');
+})->name('gastronomia.antojitos');
+
+Route::get('/gastronomia/cocina-mexicana-regional', function () {
+    return view('city-guides.cocina-regional');
+})->name('gastronomia.regional');
+
 // SEO Ranking Pages (to compete with Yelp for "mejores restaurantes mexicanos" keywords)
 Route::get('/mejores-restaurantes-mexicanos', [\App\Http\Controllers\RankingController::class, 'mejoresNacional'])->name('rankings.mejores-nacional');
 Route::get('/top-10-restaurantes-mexicanos', [\App\Http\Controllers\RankingController::class, 'top10Nacional'])->name('rankings.top10-nacional');
