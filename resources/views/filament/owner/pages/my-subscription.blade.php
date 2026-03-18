@@ -27,6 +27,18 @@
                                 Facturacion mensual activa
                             @endif
                         </p>
+                        @if($plan !== 'free' && $restaurant && $restaurant->stripe_customer_id)
+                        <div style="margin-top: 1rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                            <button wire:click="manageBilling"
+                                style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); color: white; padding: 0.5rem 1.25rem; border-radius: 0.5rem; border: 1px solid rgba(255,255,255,0.3); font-size: 0.875rem; font-weight: 500; cursor: pointer;">
+                                💳 Administrar Facturacion
+                            </button>
+                            <a href="{{ url('/owner/payment-history') }}"
+                                style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255,255,255,0.15); color: white; padding: 0.5rem 1.25rem; border-radius: 0.5rem; border: 1px solid rgba(255,255,255,0.2); font-size: 0.875rem; font-weight: 500; text-decoration: none;">
+                                🧾 Historial de Pagos
+                            </a>
+                        </div>
+                        @endif
                     </div>
                     
                     <div style="text-align: center; background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); border-radius: 1rem; padding: 1.25rem 2rem;">
@@ -104,7 +116,7 @@
                             <div style="text-align: center; margin-bottom: 1.5rem;">
                                 <h4 style="font-size: 1.5rem; font-weight: bold; color: #ffffff; margin: 0;">⭐ Premium</h4>
                                 <div style="margin-top: 0.5rem;">
-                                    <span style="font-size: 2.5rem; font-weight: bold; color: #ffffff;">$29</span>
+                                    <span style="font-size: 2.5rem; font-weight: bold; color: #ffffff;">$39</span>
                                     <span style="font-size: 1rem; color: #9ca3af;">/mes</span>
                                 </div>
                                 <span style="display: inline-block; margin-top: 0.5rem; background: linear-gradient(135deg, #f97316, #dc2626); color: white; font-size: 0.75rem; padding: 0.25rem 0.75rem; border-radius: 9999px; font-weight: 600;">10% descuento FAMER</span>
