@@ -40,7 +40,7 @@ class CheckOwnerAccess
         // If user still cannot access owner panel, redirect friendly
         if (!$user->hasVerifiedEmail() ||
             !in_array($user->role, ['owner', 'admin']) ||
-            !$user->restaurants()->exists()) {
+            (!$user->restaurants()->exists() && !$isTeamMember)) {
             return redirect('/for-owners')->with('info', 'Necesitas reclamar un restaurante para acceder al dashboard.');
         }
 
