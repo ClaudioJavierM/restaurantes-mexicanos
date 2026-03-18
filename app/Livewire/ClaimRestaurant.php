@@ -44,6 +44,12 @@ class ClaimRestaurant extends Component
     {
         $this->searchResults = collect();
 
+        // Track referral code from URL
+        $refCode = request()->query('ref');
+        if ($refCode) {
+            session(['famer_referral_code' => strtoupper($refCode)]);
+        }
+
         $searchQuery = request()->query("search");
         if ($searchQuery) {
             $this->search = $searchQuery;
@@ -430,6 +436,23 @@ class ClaimRestaurant extends Component
 
         auth()->login($user);
         session()->regenerate();
+
+        // Track referral if came from a referral link
+        $referralCode = session('famer_referral_code');
+        if ($referralCode) {
+            $referrerRestaurant = \App\Models\Restaurant::where('referral_code', $referralCode)->first();
+            if ($referrerRestaurant && $referrerRestaurant->id !== $this->selectedRestaurant->id) {
+                \App\Models\RestaurantReferral::create([
+                    'referrer_restaurant_id' => $referrerRestaurant->id,
+                    'referred_restaurant_id' => $this->selectedRestaurant->id,
+                    'referral_code' => $referralCode,
+                    'referred_email' => $user->email,
+                    'status' => 'claimed',
+                    'claimed_at' => now(),
+                ]);
+            }
+            session()->forget('famer_referral_code');
+        }
 
         session()->flash('success', '¡Felicidades! Tu restaurante ha sido reclamado exitosamente.');
         return $this->redirect(route('filament.owner.pages.dashboard'), navigate: false);

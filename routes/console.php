@@ -178,3 +178,16 @@ Schedule::command('restaurants:send-claim-invitations --limit=50 --delay=3')
 Schedule::command('verification:cleanup-audio')
     ->hourly()
     ->description('Clean up old verification audio files');
+
+// ============================================================================
+// Auto-Campaigns (birthday, reactivation)
+// ============================================================================
+Schedule::command('famer:send-auto-campaigns --type=birthday')
+    ->dailyAt('09:00')
+    ->timezone('America/Chicago')
+    ->description('DAILY: Send birthday auto-campaigns to restaurant customers');
+
+Schedule::command('famer:send-auto-campaigns --type=reactivation')
+    ->weeklyOn(1, '10:00')
+    ->timezone('America/Chicago')
+    ->description('WEEKLY: Send reactivation auto-campaigns to inactive customers');

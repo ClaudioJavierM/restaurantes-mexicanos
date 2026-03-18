@@ -400,6 +400,19 @@ class MyRestaurantResource extends Resource
                             ])
                             ->columns(2)
                             ->collapsible(),
+
+                        Forms\Components\Section::make('🌐 Tour Virtual')
+                            ->description('Agrega un tour virtual 360° de tu restaurante (Google Street View, Matterport, etc.)')
+                            ->schema([
+                                Forms\Components\TextInput::make('virtual_tour_url')
+                                    ->label('URL del Tour Virtual')
+                                    ->url()
+                                    ->placeholder('https://www.google.com/maps/embed?...')
+                                    ->helperText('Pega el URL de embed de Google Street View, Matterport u otro servicio de tours 360°.')
+                                    ->columnSpanFull(),
+                            ])
+                            ->collapsible()
+                            ->collapsed(fn ($record) => !$record?->virtual_tour_url),
                     ])
                     ->columns(2),
             ]);

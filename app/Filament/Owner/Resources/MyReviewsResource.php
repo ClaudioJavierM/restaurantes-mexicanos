@@ -4,8 +4,10 @@ namespace App\Filament\Owner\Resources;
 
 use App\Filament\Owner\Resources\MyReviewsResource\Pages;
 use App\Models\Review;
+use App\Services\ReviewResponseService;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -156,6 +158,25 @@ class MyReviewsResource extends Resource
                     ),
             ])
             ->actions([
+                Tables\Actions\Action::make('ai_suggest')
+                    ->label('Sugerencia IA')
+                    ->icon('heroicon-o-sparkles')
+                    ->color('warning')
+                    ->visible(fn (Review $record): bool => empty($record->owner_response))
+                    ->action(function (Review $record) {
+                        $service = new ReviewResponseService();
+                        $suggested = $service->generateResponse($record, $record->restaurant);
+
+                        // Store in session to pre-fill the respond modal
+                        session(['ai_suggested_response_' . $record->id => $suggested]);
+
+                        Notification::make()
+                            ->title('Respuesta IA generada')
+                            ->body('Usa el boton "Responder" para ver y editar la sugerencia.')
+                            ->success()
+                            ->send();
+                    }),
+
                 Tables\Actions\Action::make('respond')
                     ->label('Responder')
                     ->icon('heroicon-o-chat-bubble-left-right')
@@ -165,9 +186,11 @@ class MyReviewsResource extends Resource
                         Forms\Components\Textarea::make('owner_response')
                             ->label('Tu Respuesta')
                             ->placeholder('Gracias por tu reseña...')
-                            ->rows(4)
+                            ->default(fn (Review $record): string => session('ai_suggested_response_' . $record->id, ''))
+                            ->rows(5)
                             ->required()
-                            ->maxLength(1000),
+                            ->maxLength(1000)
+                            ->helperText('Tip: usa "Sugerencia IA" primero para generar una respuesta automaticamente.'),
                     ])
                     ->action(function (Review $record, array $data): void {
                         $record->update([
@@ -175,6 +198,7 @@ class MyReviewsResource extends Resource
                             'owner_response_by' => auth()->id(),
                             'owner_response_at' => now(),
                         ]);
+                        session()->forget('ai_suggested_response_' . $record->id);
                     })
                     ->successNotificationTitle('Respuesta guardada correctamente'),
 
