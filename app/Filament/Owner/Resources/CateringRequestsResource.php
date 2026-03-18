@@ -37,12 +37,33 @@ class CateringRequestsResource extends Resource
         $user = auth()->user();
         if (!$user) return false;
         $restaurant = $user->allAccessibleRestaurants()->first();
-        return $restaurant && in_array($restaurant->subscription_tier, ['premium', 'elite']);
+        return $restaurant && $restaurant->is_claimed;
     }
 
     public static function canAccess(): bool
     {
         return static::shouldRegisterNavigation();
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        $restaurant = auth()->user()?->allAccessibleRestaurants()->first();
+        if (!$restaurant || !in_array($restaurant->subscription_tier, ['premium', 'elite'])) {
+            return 'PRO';
+        }
+        $restaurantIds = auth()->user()->allAccessibleRestaurants()->pluck('id');
+        $count = \App\Models\CateringRequest::whereIn('restaurant_id', $restaurantIds)
+            ->where('status', 'pending')->count();
+        return $count > 0 ? (string) $count : null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        $restaurant = auth()->user()?->allAccessibleRestaurants()->first();
+        if (!$restaurant || !in_array($restaurant->subscription_tier, ['premium', 'elite'])) {
+            return 'warning';
+        }
+        return 'danger';
     }
 
     public static function form(Form $form): Form
@@ -158,7 +179,31 @@ class CateringRequestsResource extends Resource
                     }),
             ])
             ->bulkActions([])
-            ->defaultSort('created_at', 'desc');
+            ->defaultSort('created_at', 'desc')
+            ->emptyStateHeading(function (): string {
+                $restaurant = auth()->user()?->allAccessibleRestaurants()->first();
+                return (!$restaurant || !in_array($restaurant->subscription_tier, ['premium', 'elite']))
+                    ? '🔒 Función Premium' : 'Sin solicitudes de catering';
+            })
+            ->emptyStateDescription(function (): string {
+                $restaurant = auth()->user()?->allAccessibleRestaurants()->first();
+                return (!$restaurant || !in_array($restaurant->subscription_tier, ['premium', 'elite']))
+                    ? 'Actualiza tu plan a Premium para recibir solicitudes de catering y eventos privados.'
+                    : 'Cuando los clientes soliciten catering, aparecerá aquí.';
+            })
+            ->emptyStateActions(function (): array {
+                $restaurant = auth()->user()?->allAccessibleRestaurants()->first();
+                if (!$restaurant || !in_array($restaurant->subscription_tier, ['premium', 'elite'])) {
+                    return [
+                        Tables\Actions\Action::make('upgrade')
+                            ->label('Ver planes Premium')
+                            ->url(\App\Filament\Owner\Pages\MySubscription::getUrl())
+                            ->color('warning')
+                            ->icon('heroicon-o-arrow-up-circle'),
+                    ];
+                }
+                return [];
+            });
     }
 
     public static function getPages(): array

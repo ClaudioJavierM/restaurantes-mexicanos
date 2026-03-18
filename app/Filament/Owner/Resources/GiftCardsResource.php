@@ -37,12 +37,30 @@ class GiftCardsResource extends Resource
         $user = auth()->user();
         if (!$user) return false;
         $restaurant = $user->allAccessibleRestaurants()->first();
-        return $restaurant && in_array($restaurant->subscription_tier, ['premium', 'elite']);
+        return $restaurant && $restaurant->is_claimed;
     }
 
     public static function canAccess(): bool
     {
         return static::shouldRegisterNavigation();
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        $restaurant = auth()->user()?->allAccessibleRestaurants()->first();
+        if (!$restaurant || $restaurant->subscription_tier !== 'elite') {
+            return 'ELITE';
+        }
+        return null;
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        $restaurant = auth()->user()?->allAccessibleRestaurants()->first();
+        if (!$restaurant || $restaurant->subscription_tier !== 'elite') {
+            return 'violet';
+        }
+        return 'success';
     }
 
     public static function form(Form $form): Form
@@ -106,6 +124,7 @@ class GiftCardsResource extends Resource
                     ->label('Emitir Tarjeta')
                     ->icon('heroicon-o-plus')
                     ->color('success')
+                    ->visible(fn (): bool => (bool) (auth()->user()?->allAccessibleRestaurants()->first()?->subscription_tier === 'elite'))
                     ->form([
                         Forms\Components\Grid::make(2)->schema([
                             Forms\Components\TextInput::make('purchaser_name')
@@ -183,7 +202,31 @@ class GiftCardsResource extends Resource
                     }),
             ])
             ->bulkActions([])
-            ->defaultSort('created_at', 'desc');
+            ->defaultSort('created_at', 'desc')
+            ->emptyStateHeading(function (): string {
+                $restaurant = auth()->user()?->allAccessibleRestaurants()->first();
+                return ($restaurant && $restaurant->subscription_tier === 'elite')
+                    ? 'Sin tarjetas emitidas' : '🔒 Función Elite';
+            })
+            ->emptyStateDescription(function (): string {
+                $restaurant = auth()->user()?->allAccessibleRestaurants()->first();
+                return ($restaurant && $restaurant->subscription_tier === 'elite')
+                    ? 'Emite tu primera tarjeta de regalo digital usando el botón de arriba.'
+                    : 'Las tarjetas de regalo digitales son una función exclusiva del plan Elite.';
+            })
+            ->emptyStateActions(function (): array {
+                $restaurant = auth()->user()?->allAccessibleRestaurants()->first();
+                if (!$restaurant || $restaurant->subscription_tier !== 'elite') {
+                    return [
+                        Tables\Actions\Action::make('upgrade')
+                            ->label('Ver plan Elite')
+                            ->url(\App\Filament\Owner\Pages\MySubscription::getUrl())
+                            ->color('violet')
+                            ->icon('heroicon-o-arrow-up-circle'),
+                    ];
+                }
+                return [];
+            });
     }
 
     public static function getPages(): array

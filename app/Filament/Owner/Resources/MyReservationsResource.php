@@ -68,8 +68,12 @@ class MyReservationsResource extends Resource
         $user = Auth::user();
         if (!$user) return null;
 
-        $restaurantIds = $user->allAccessibleRestaurants()->pluck('id');
+        $restaurant = $user->allAccessibleRestaurants()->first();
+        if (!$restaurant || !in_array($restaurant->subscription_tier, ['premium', 'elite'])) {
+            return 'PRO';
+        }
 
+        $restaurantIds = $user->allAccessibleRestaurants()->pluck('id');
         return Reservation::whereIn('restaurant_id', $restaurantIds)
             ->where('status', Reservation::STATUS_PENDING)
             ->count() ?: null;
@@ -77,6 +81,10 @@ class MyReservationsResource extends Resource
 
     public static function getNavigationBadgeColor(): ?string
     {
+        $restaurant = auth()->user()?->allAccessibleRestaurants()->first();
+        if (!$restaurant || !in_array($restaurant->subscription_tier, ['premium', 'elite'])) {
+            return 'warning';
+        }
         return 'warning';
     }
 
