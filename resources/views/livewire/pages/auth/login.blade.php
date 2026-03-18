@@ -27,7 +27,7 @@ new #[Layout('layouts.guest')] class extends Component
         ) {
             $this->redirect('/owner', navigate: false);
         } else {
-            $this->redirectIntended(default: route('dashboard', absolute: false), navigate: false);
+            $this->redirect(route('dashboard', absolute: false), navigate: false);
         }
     }
 }; ?>
