@@ -327,6 +327,19 @@
                                             </p>
                                         @endif
 
+                                        <!-- Horario de hoy -->
+                                        @php
+                                            $todayHours = $restaurant->getTodayHours();
+                                        @endphp
+                                        @if($todayHours && !($todayHours['closed'] ?? false) && isset($todayHours['open'], $todayHours['close']))
+                                            <p class="text-xs text-gray-500 mt-1 flex items-center gap-1">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                </svg>
+                                                Hoy: {{ $todayHours['open'] }} – {{ $todayHours['close'] }}
+                                            </p>
+                                        @endif
+
                                         <!-- Advanced Mexican Badges -->
                                         @include('livewire.partials.restaurant-advanced-badges', ['restaurant' => $restaurant])
 
@@ -388,14 +401,23 @@
                                             {{-- Badge: Datos Fusionados (cuando tiene ambas fuentes) --}}
                                             @include('livewire.partials.data-completeness-badge', ['restaurant' => $restaurant])
 
-                                            @if($restaurant->business_status === 'operational')
-                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-800">
-                                                    Abierto
-                                                </span>
-                                            @elseif($restaurant->business_status === 'coming_soon')
+                                            @if($restaurant->business_status === 'coming_soon')
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
                                                     Próximamente
                                                 </span>
+                                            @else
+                                                @php $openStatus = $restaurant->isOpen(); @endphp
+                                                @if($openStatus === true)
+                                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold bg-emerald-100 text-emerald-800">
+                                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                                        Abierto
+                                                    </span>
+                                                @elseif($openStatus === false)
+                                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-500">
+                                                        <span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span>
+                                                        Cerrado
+                                                    </span>
+                                                @endif
                                             @endif
                                         </div>
                                     </div>

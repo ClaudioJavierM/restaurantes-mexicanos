@@ -26,6 +26,8 @@
             ->latest()
             ->limit(3)
             ->get();
+        $loyalty = \App\Models\LoyaltyPoints::getOrCreate(auth()->user()->id);
+        $checkInsCount = \App\Models\CheckIn::where('user_id', auth()->user()->id)->count();
     @endphp
 
     <div class="py-8">
@@ -298,6 +300,75 @@
                         @endif
                     </div>
 
+                </div>
+
+                {{-- Loyalty & Check-ins --}}
+                @php
+                    $loyaltyLevels = \App\Models\LoyaltyPoints::LEVELS;
+                    $currentLevel  = $loyalty->level ?? 'bronce';
+                    $currentData   = $loyaltyLevels[$currentLevel];
+                    $nextLevelKey  = null;
+                    $nextLevelData = null;
+                    $levelKeys = array_keys($loyaltyLevels);
+                    $levelIdx  = array_search($currentLevel, $levelKeys);
+                    if ($levelIdx !== false && isset($levelKeys[$levelIdx + 1])) {
+                        $nextLevelKey  = $levelKeys[$levelIdx + 1];
+                        $nextLevelData = $loyaltyLevels[$nextLevelKey];
+                    }
+                    $progressPct = $nextLevelData
+                        ? min(100, round(($loyalty->points - $currentData['min']) / ($nextLevelData['min'] - $currentData['min']) * 100))
+                        : 100;
+                @endphp
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="bg-gradient-to-r from-yellow-500 to-amber-500 px-6 py-4 flex items-center justify-between">
+                        <div>
+                            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                                🏅 Mi Nivel FAMER
+                            </h3>
+                            <p class="text-yellow-100 text-sm">Gana puntos visitando restaurantes y escribiendo reseñas</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-3xl font-black text-white">{{ number_format($loyalty->points) }}</p>
+                            <p class="text-yellow-100 text-xs">puntos</p>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-3">
+                                <span class="text-2xl font-black uppercase tracking-wide" style="color: {{ $currentData['color'] }}">
+                                    {{ ucfirst($currentLevel) }}
+                                </span>
+                                <span class="text-sm text-gray-600">{{ $currentData['discount'] }}% descuento</span>
+                            </div>
+                            @if($nextLevelKey)
+                                <span class="text-xs text-gray-500">
+                                    {{ number_format($nextLevelData['min'] - $loyalty->points) }} pts para {{ ucfirst($nextLevelKey) }}
+                                </span>
+                            @else
+                                <span class="text-xs text-amber-600 font-semibold">¡Nivel máximo! 🏆</span>
+                            @endif
+                        </div>
+                        <!-- Progress bar -->
+                        <div class="h-2.5 bg-gray-100 rounded-full overflow-hidden mb-4">
+                            <div class="h-full rounded-full bg-gradient-to-r from-yellow-400 to-amber-500 transition-all duration-700"
+                                 style="width: {{ $progressPct }}%"></div>
+                        </div>
+                        <!-- Stats row -->
+                        <div class="grid grid-cols-3 gap-4 text-center">
+                            <div class="bg-gray-50 rounded-lg p-3">
+                                <p class="text-xl font-bold text-gray-900">{{ $checkInsCount }}</p>
+                                <p class="text-xs text-gray-500 mt-0.5">📍 Check-ins</p>
+                            </div>
+                            <div class="bg-gray-50 rounded-lg p-3">
+                                <p class="text-xl font-bold text-gray-900">{{ $loyalty->total_reviews ?? 0 }}</p>
+                                <p class="text-xs text-gray-500 mt-0.5">⭐ Reseñas</p>
+                            </div>
+                            <div class="bg-gray-50 rounded-lg p-3">
+                                <p class="text-xl font-bold text-gray-900">{{ $favoritesCount }}</p>
+                                <p class="text-xs text-gray-500 mt-0.5">❤️ Favoritos</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 {{-- CTA for Restaurant Owners --}}
