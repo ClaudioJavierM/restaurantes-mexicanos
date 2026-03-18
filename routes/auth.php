@@ -12,7 +12,7 @@ Route::middleware('guest')->group(function () {
         ->name('login');
 
     Volt::route('owner/login', 'pages.auth.owner-login')
-        ->name('owner.login');
+        ->name('filament.owner.auth.login');
 
     Volt::route('forgot-password', 'pages.auth.forgot-password')
         ->name('password.request');
