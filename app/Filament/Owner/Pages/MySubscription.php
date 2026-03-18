@@ -43,7 +43,7 @@ class MySubscription extends Page
         ],
         'premium' => [
             'name' => 'Premium',
-            'price' => 29,
+            'price' => 39,
             'color' => 'red',
             'features' => [
                 'Todo en Gratis +',
@@ -124,9 +124,28 @@ class MySubscription extends Page
         }
     }
 
+    public function manageBilling(): void
+    {
+        if (!$this->restaurant || !$this->restaurant->stripe_customer_id) {
+            session()->flash('error', 'No tienes un perfil de facturación activo. Contacta soporte@restaurantesmexicanosfamosos.com');
+            return;
+        }
+
+        try {
+            $stripeService = new StripeService();
+            $returnUrl = route('filament.owner.pages.my-subscription');
+            $portalUrl = $stripeService->createBillingPortalSession(
+                $this->restaurant->stripe_customer_id,
+                $returnUrl
+            );
+            redirect($portalUrl);
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error al acceder al portal de facturación: ' . $e->getMessage());
+        }
+    }
+
     public function cancelSubscription(): void
     {
-        // TODO: Implement Stripe subscription cancellation
-        session()->flash('info', 'Para cancelar tu suscripción, por favor contáctanos a soporte@restaurantesmexicanos.com');
+        session()->flash('info', 'Para cancelar tu suscripción, usa el botón "Administrar Facturación" o contáctanos a soporte@restaurantesmexicanosfamosos.com');
     }
 }

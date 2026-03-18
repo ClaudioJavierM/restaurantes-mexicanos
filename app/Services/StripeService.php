@@ -10,6 +10,8 @@ use Stripe\Subscription;
 use Stripe\Price;
 use Stripe\Coupon;
 use Stripe\PromotionCode;
+use Stripe\Invoice;
+use Stripe\BillingPortal\Session as PortalSession;
 use Exception;
 
 class StripeService
@@ -288,6 +290,61 @@ class StripeService
         } catch (Exception $e) {
             throw new Exception("Error updating subscription: " . $e->getMessage());
         }
+    }
+
+    /**
+     * Create Stripe Customer Portal session for self-service billing management
+     */
+    public function createBillingPortalSession(string $customerId, string $returnUrl): string
+    {
+        try {
+            $session = PortalSession::create([
+                'customer' => $customerId,
+                'return_url' => $returnUrl,
+            ]);
+
+            return $session->url;
+        } catch (Exception $e) {
+            throw new Exception("Error creating billing portal session: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Get invoices for a Stripe customer
+     */
+    public function getInvoices(string $customerId, int $limit = 24): array
+    {
+        try {
+            $invoices = Invoice::all([
+                'customer' => $customerId,
+                'limit' => $limit,
+                'expand' => ['data.charge'],
+            ]);
+
+            return $invoices->data ?? [];
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+
+    /**
+     * Get an upcoming invoice for a customer
+     */
+    public function getUpcomingInvoice(string $customerId): ?Invoice
+    {
+        try {
+            return Invoice::upcoming(['customer' => $customerId]);
+        } catch (Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Create upgrade checkout session (alias with explicit name)
+     */
+    public function createUpgradeCheckoutSession(Restaurant $restaurant, string $plan, string $successUrl, string $cancelUrl): Session
+    {
+        return $this->createCheckoutSession($restaurant, $plan, $successUrl, $cancelUrl);
     }
 
     /**
