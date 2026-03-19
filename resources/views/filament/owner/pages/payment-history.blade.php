@@ -28,10 +28,14 @@
                 <div>
                     <p style="font-size: 0.75rem; color: #93c5fd; text-transform: uppercase; margin: 0 0 0.25rem;">Proximo Cargo</p>
                     <p style="font-size: 1.75rem; font-weight: bold; color: #ffffff; margin: 0;">
-                        ${{ number_format($upcomingInvoice->amount_due / 100, 2) }} USD
+                        ${{ number_format(($upcomingInvoice['amount_due'] ?? 0) / 100, 2) }} USD
                     </p>
                     <p style="color: #93c5fd; font-size: 0.875rem; margin: 0.25rem 0 0 0;">
-                        {{ \Carbon\Carbon::createFromTimestamp($upcomingInvoice->next_payment_attempt)->format('d M, Y') }}
+                        @if(!empty($upcomingInvoice['next_payment_attempt']))
+                            {{ \Carbon\Carbon::createFromTimestamp($upcomingInvoice['next_payment_attempt'])->format('d M, Y') }}
+                        @else
+                            Proximamente
+                        @endif
                     </p>
                 </div>
                 <div style="text-align: right;">
@@ -67,32 +71,33 @@
                     <tbody>
                         @foreach($invoices as $invoice)
                         @php
-                            $statusColor = match($invoice->status) {
+                            $invStatus = $invoice['status'] ?? 'unknown';
+                            $statusColor = match($invStatus) {
                                 'paid' => '#22c55e',
                                 'open' => '#f59e0b',
                                 'void', 'uncollectible' => '#ef4444',
                                 default => '#9ca3af',
                             };
-                            $statusLabel = match($invoice->status) {
+                            $statusLabel = match($invStatus) {
                                 'paid' => 'Pagado',
                                 'open' => 'Pendiente',
                                 'void' => 'Cancelado',
                                 'uncollectible' => 'No cobrable',
                                 'draft' => 'Borrador',
-                                default => ucfirst($invoice->status),
+                                default => ucfirst($invStatus),
                             };
-                            $description = $invoice->lines->data[0]->description ??
-                                           ($invoice->description ?? 'Suscripcion FAMER');
+                            $description = $invoice['lines']['data'][0]['description']
+                                           ?? ($invoice['description'] ?? 'Suscripcion FAMER');
                         @endphp
                         <tr style="border-bottom: 1px solid #374151;">
                             <td style="padding: 1rem 1.25rem; color: #d1d5db; font-size: 0.875rem;">
-                                {{ \Carbon\Carbon::createFromTimestamp($invoice->created)->format('d M, Y') }}
+                                {{ \Carbon\Carbon::createFromTimestamp($invoice['created'])->format('d M, Y') }}
                             </td>
                             <td style="padding: 1rem 1.25rem; color: #d1d5db; font-size: 0.875rem; max-width: 250px;">
                                 {{ Str::limit($description, 50) }}
                             </td>
                             <td style="padding: 1rem 1.25rem; color: #ffffff; font-size: 0.875rem; font-weight: 600; text-align: right;">
-                                ${{ number_format($invoice->amount_paid / 100, 2) }} USD
+                                ${{ number_format(($invoice['amount_paid'] ?? 0) / 100, 2) }} USD
                             </td>
                             <td style="padding: 1rem 1.25rem; text-align: center;">
                                 <span style="display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; background: {{ $statusColor }}20; color: {{ $statusColor }}; border: 1px solid {{ $statusColor }}40;">
@@ -100,13 +105,13 @@
                                 </span>
                             </td>
                             <td style="padding: 1rem 1.25rem; text-align: center;">
-                                @if($invoice->invoice_pdf)
-                                <a href="{{ $invoice->invoice_pdf }}" target="_blank"
+                                @if(!empty($invoice['invoice_pdf']))
+                                <a href="{{ $invoice['invoice_pdf'] }}" target="_blank"
                                     style="display: inline-flex; align-items: center; gap: 0.25rem; color: #818cf8; font-size: 0.75rem; text-decoration: none;">
                                     ⬇ PDF
                                 </a>
-                                @elseif($invoice->hosted_invoice_url)
-                                <a href="{{ $invoice->hosted_invoice_url }}" target="_blank"
+                                @elseif(!empty($invoice['hosted_invoice_url']))
+                                <a href="{{ $invoice['hosted_invoice_url'] }}" target="_blank"
                                     style="display: inline-flex; align-items: center; gap: 0.25rem; color: #818cf8; font-size: 0.75rem; text-decoration: none;">
                                     Ver →
                                 </a>
