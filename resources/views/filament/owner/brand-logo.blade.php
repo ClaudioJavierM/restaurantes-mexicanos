@@ -3,7 +3,13 @@
     $siteLogo = asset('images/branding/sombrero-icon.png');
 
     if (auth()->check()) {
-        $restaurant = auth()->user()->restaurants()->first();
+        $selectedId = session('selected_restaurant_id');
+        if ($selectedId) {
+            $restaurant = auth()->user()->allAccessibleRestaurants()->where('restaurants.id', $selectedId)->first();
+        }
+        if (!isset($restaurant) || !$restaurant) {
+            $restaurant = auth()->user()->allAccessibleRestaurants()->first();
+        }
         if ($restaurant && $restaurant->logo) {
             $logoUrl = asset('storage/' . $restaurant->logo);
         }
