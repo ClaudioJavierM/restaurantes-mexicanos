@@ -1,6 +1,21 @@
 <x-filament-panels::page>
     @php
-        $restaurant = auth()->user()->allAccessibleRestaurants()->first();
+        $allRestaurants = auth()->user()->allAccessibleRestaurants()->get();
+        // Handle restaurant switch
+        if (request()->has('switch_restaurant')) {
+            $switchId = (int) request()->query('switch_restaurant');
+            if ($allRestaurants->contains('id', $switchId)) {
+                session(['selected_restaurant_id' => $switchId]);
+            }
+        }
+        $selectedId = session('selected_restaurant_id');
+        $restaurant = $selectedId ? $allRestaurants->firstWhere('id', $selectedId) : null;
+        if (!$restaurant) {
+            $restaurant = $allRestaurants->first();
+        }
+        if ($restaurant) {
+            session(['selected_restaurant_id' => $restaurant->id]);
+        }
         if (!$restaurant) {
             echo '<div style="padding:2rem;color:#9ca3af;text-align:center;"><p style="font-size:1.5rem;">🍽️</p><p>Sin restaurante asociado a esta cuenta.</p></div>';
             return;
@@ -55,7 +70,29 @@
     @endphp
 
     <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-        
+
+        {{-- Restaurant Switcher --}}
+        @if($allRestaurants->count() > 1)
+        <div style="background: #ffffff; border: 1px solid #e5e7eb; border-radius: 0.75rem; padding: 0.75rem 1rem; display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+            <span style="font-size: 0.875rem; color: #6b7280; white-space: nowrap;">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width: 1rem; height: 1rem; display: inline; vertical-align: -2px; margin-right: 4px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                Cambiar restaurante:
+            </span>
+            @foreach($allRestaurants as $r)
+                @php
+                    $isActive = $r->id === $restaurant->id;
+                    $role = auth()->user()->getRoleForRestaurant($r);
+                    $roleLabel = match($role) { 'owner' => 'Dueño', 'manager' => 'Gerente', 'staff' => 'Staff', default => $role ? ucfirst($role) : 'Dueño' };
+                @endphp
+                <a href="?switch_restaurant={{ $r->id }}"
+                   style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 0.875rem; font-weight: {{ $isActive ? '600' : '400' }}; text-decoration: none; border: 1px solid {{ $isActive ? '#dc2626' : '#e5e7eb' }}; background: {{ $isActive ? '#fef2f2' : '#f9fafb' }}; color: {{ $isActive ? '#dc2626' : '#374151' }}; transition: all 0.15s;">
+                    {{ $r->name }}
+                    <span style="font-size: 0.7rem; background: {{ $isActive ? '#dc2626' : '#9ca3af' }}; color: white; padding: 1px 6px; border-radius: 9999px;">{{ $roleLabel }}</span>
+                </a>
+            @endforeach
+        </div>
+        @endif
+
         {{-- Welcome Banner --}}
         <div style="background: linear-gradient(135deg, #dc2626 0%, #f97316 100%); border-radius: 1rem; padding: 1.5rem; color: white; box-shadow: 0 10px 25px rgba(0,0,0,0.15);">
             <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem;">
