@@ -74,14 +74,24 @@ class MyMenuResource extends Resource
         return $restaurant && $restaurant->is_claimed;
     }
 
+    public static function getSelectedRestaurantId(): ?int
+    {
+        $selectedId = session('selected_restaurant_id');
+        $user = auth()->user();
+        if ($selectedId) {
+            $exists = $user->allAccessibleRestaurants()->where('restaurants.id', $selectedId)->exists();
+            if ($exists) return $selectedId;
+        }
+        return $user->allAccessibleRestaurants()->value('restaurants.id');
+    }
+
     public static function getEloquentQuery(): Builder
     {
-        $user = auth()->user();
-        $restaurantIds = $user->allAccessibleRestaurants()->pluck('id');
+        $restaurantId = static::getSelectedRestaurantId();
 
         return parent::getEloquentQuery()
-            ->whereHas('category', function ($query) use ($restaurantIds) {
-                $query->whereIn('restaurant_id', $restaurantIds);
+            ->whereHas('category', function ($query) use ($restaurantId) {
+                $query->where('restaurant_id', $restaurantId);
             });
     }
 
@@ -98,10 +108,9 @@ class MyMenuResource extends Resource
 
     protected static function getCategories()
     {
-        $user = auth()->user();
-        $restaurantIds = $user->allAccessibleRestaurants()->pluck('id');
+        $restaurantId = static::getSelectedRestaurantId();
 
-        return MenuCategory::whereIn('restaurant_id', $restaurantIds)
+        return MenuCategory::where('restaurant_id', $restaurantId)
             ->orderBy('name')
             ->get()
             ->mapWithKeys(fn ($cat) => [$cat->id => $cat->icon . ' ' . $cat->name]);
