@@ -4,6 +4,52 @@
 @else
 <div style="display:flex;flex-direction:column;gap:1.5rem;" wire:poll.30s="loadActiveOrders">
 
+    {{-- QR del Menú Principal --}}
+    @php
+        $menuUrl = url('/restaurante/' . $restaurant->slug . '/menu');
+        $hasMenu = $restaurant->menuCategories()->whereHas('items', fn($q) => $q->where('is_available', true))->exists();
+    @endphp
+    <div style="background:linear-gradient(135deg,#111827,#1f2937);border-radius:0.75rem;border:1px solid #374151;overflow:hidden;">
+        <div style="padding:1.25rem;border-bottom:1px solid #374151;display:flex;align-items:center;gap:0.75rem;">
+            <span style="font-size:1.25rem;">📱</span>
+            <div>
+                <h3 style="font-size:1rem;font-weight:600;color:#fff;margin:0;">QR de tu Menú Digital</h3>
+                <p style="font-size:0.8rem;color:#9ca3af;margin:0.125rem 0 0;">Tus clientes escanean y ven el menú completo en su teléfono</p>
+            </div>
+        </div>
+        <div style="padding:2rem;text-align:center;">
+            @if($hasMenu)
+                <div style="display:inline-block;background:#fff;border-radius:1rem;padding:1rem;box-shadow:0 4px 24px rgba(0,0,0,0.3);">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={{ urlencode($menuUrl) }}"
+                        alt="QR Menú" style="width:200px;height:200px;display:block;">
+                </div>
+                <p style="color:#d1d5db;font-size:0.875rem;margin:1rem 0 0.5rem;font-weight:600;">{{ $restaurant->name }}</p>
+                <p style="color:#6b7280;font-size:0.75rem;margin:0 0 1rem;">{{ $menuUrl }}</p>
+                <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap;">
+                    <a href="{{ $menuUrl }}" target="_blank"
+                        style="background:linear-gradient(135deg,#dc2626,#991b1b);color:white;padding:0.5rem 1.25rem;border-radius:0.5rem;text-decoration:none;font-size:0.875rem;font-weight:600;">
+                        👁️ Ver Menú
+                    </a>
+                    <a href="https://api.qrserver.com/v1/create-qr-code/?size=600x600&format=png&data={{ urlencode($menuUrl) }}"
+                        download="menu-qr-{{ $restaurant->slug }}.png"
+                        style="background:#374151;color:#d1d5db;padding:0.5rem 1.25rem;border-radius:0.5rem;text-decoration:none;font-size:0.875rem;font-weight:600;border:1px solid #4b5563;">
+                        ⬇️ Descargar QR
+                    </a>
+                </div>
+            @else
+                <div style="padding:2rem 0;">
+                    <p style="font-size:2.5rem;margin:0 0 0.75rem;">📋</p>
+                    <p style="color:#fff;font-weight:600;margin:0 0 0.5rem;">Tu menú aún no tiene platillos</p>
+                    <p style="color:#9ca3af;font-size:0.875rem;margin:0 0 1rem;">Agrega platillos desde "Menú Digital" y el QR se generará automáticamente</p>
+                    <a href="{{ route('filament.owner.resources.my-menu.index') }}"
+                        style="background:linear-gradient(135deg,#dc2626,#991b1b);color:white;padding:0.5rem 1.25rem;border-radius:0.5rem;text-decoration:none;font-size:0.875rem;font-weight:600;">
+                        ➕ Agregar Platillos
+                    </a>
+                </div>
+            @endif
+        </div>
+    </div>
+
     {{-- Órdenes activas --}}
     @if(count($activeOrders) > 0)
     <div style="background-color:#111827;border-radius:0.75rem;border:1px solid #374151;overflow:hidden;">

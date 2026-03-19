@@ -34,7 +34,14 @@ class MenuQrCode extends Page
 
     public function mount(): void
     {
-        $this->restaurant = Auth::user()->allAccessibleRestaurants()->first();
+        $selectedId = session('selected_restaurant_id');
+        if ($selectedId) {
+            $this->restaurant = Auth::user()->allAccessibleRestaurants()
+                ->where('restaurants.id', $selectedId)->first();
+        }
+        if (!$this->restaurant) {
+            $this->restaurant = Auth::user()->allAccessibleRestaurants()->first();
+        }
         $this->loadTables();
         $this->loadActiveOrders();
     }

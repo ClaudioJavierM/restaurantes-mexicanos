@@ -9,6 +9,7 @@ use App\Http\Controllers\TeamInvitationController;
 Route::get('/', \App\Livewire\Home::class)->name('home');
 Route::get('/restaurantes', \App\Livewire\RestaurantList::class)->name('restaurants.index');
 Route::get('/restaurante/{slug}', \App\Livewire\RestaurantDetail::class)->name('restaurants.show');
+Route::get('/restaurante/{slug}/menu', \App\Livewire\RestaurantMenu::class)->name('restaurant.menu');
 Route::get('/sugerir', \App\Livewire\SmartSuggestionForm::class)->name('suggestions.create');
 
 // Tableside QR Ordering
