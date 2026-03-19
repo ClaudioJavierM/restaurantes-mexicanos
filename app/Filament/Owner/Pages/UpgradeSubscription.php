@@ -79,7 +79,7 @@ class UpgradeSubscription extends Page
         ];
     }
 
-    public function upgradeToPlan(string $plan): void
+    public function upgradeToPlan(string $plan)
     {
         if (!$this->restaurant || $plan === $this->currentPlan) {
             return;
@@ -87,17 +87,16 @@ class UpgradeSubscription extends Page
 
         // If downgrading to free
         if ($plan === 'free') {
-            $this->restaurant->update([
-                'subscription_tier' => 'free',
-                'subscription_status' => 'active',
-                'premium_badge' => false,
-                'premium_analytics' => false,
-                'premium_menu' => false,
-                'premium_reservations' => false,
-                'premium_chatbot' => false,
-                'premium_email_marketing' => false,
-                'premium_coupons' => false,
-            ]);
+            $this->restaurant->subscription_tier = 'free';
+            $this->restaurant->subscription_status = 'active';
+            $this->restaurant->premium_badge = false;
+            $this->restaurant->premium_analytics = false;
+            $this->restaurant->premium_menu = false;
+            $this->restaurant->premium_reservations = false;
+            $this->restaurant->premium_chatbot = false;
+            $this->restaurant->premium_email_marketing = false;
+            $this->restaurant->premium_coupons = false;
+            $this->restaurant->save();
 
             // Update coupon tier
             if ($coupon = $this->restaurant->subscriberCoupon) {
@@ -112,7 +111,7 @@ class UpgradeSubscription extends Page
         // For paid plans, redirect to Stripe Checkout
         try {
             $stripeService = new StripeService();
-            
+
             $session = $stripeService->createUpgradeCheckoutSession(
                 $this->restaurant,
                 $plan,
@@ -120,8 +119,9 @@ class UpgradeSubscription extends Page
                 route('owner.upgrade.cancel')
             );
 
-            redirect($session->url);
+            return $this->redirect($session->url, navigate: false);
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Upgrade error: ' . $e->getMessage());
             session()->flash('error', 'Error al procesar: ' . $e->getMessage());
         }
     }
