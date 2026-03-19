@@ -92,11 +92,10 @@ class FamerGrader extends Component
     {
         $this->validate([
             'searchName' => 'required|min:2',
-            'searchCity' => 'required|min:2',
+            'searchCity' => 'nullable|min:2',
         ], [
             'searchName.required' => 'Ingresa el nombre del restaurante',
             'searchName.min' => 'El nombre debe tener al menos 2 caracteres',
-            'searchCity.required' => 'Ingresa la ciudad',
             'searchCity.min' => 'La ciudad debe tener al menos 2 caracteres',
         ]);
 
@@ -126,7 +125,8 @@ class FamerGrader extends Component
             $this->searchResults = $this->combineResults($dbResults, $yelpResults, $googleResults);
 
             if (empty($this->searchResults)) {
-                $this->errorMessage = "No encontramos \"{$this->searchName}\" en {$this->searchCity}. Intenta con otro nombre o ciudad.";
+                $location = $this->searchCity ? " en {$this->searchCity}" : '';
+                $this->errorMessage = "No encontramos \"{$this->searchName}\"{$location}. Intenta con otro nombre o ciudad.";
             }
         } catch (\Exception $e) {
             Log::error('FAMER Grader search error: ' . $e->getMessage());
@@ -147,7 +147,9 @@ class FamerGrader extends Component
             ->where('is_active', true)
             ->forCurrentCountry()
             ->where('name', 'LIKE', '%' . $this->searchName . '%')
-            ->where('city', 'LIKE', '%' . $this->searchCity . '%')
+            ->when($this->searchCity, function ($query) {
+                $query->where('city', 'LIKE', '%' . $this->searchCity . '%');
+            })
             ->when($this->searchState, function ($query) {
                 $query->whereHas('state', function ($q) {
                     $q->where('code', $this->searchState);
