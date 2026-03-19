@@ -1,68 +1,46 @@
 <x-filament-panels::page>
-    <div class="flex items-center justify-center min-h-[60vh]">
-        <div class="text-center max-w-2xl mx-auto px-6">
-            {{-- Icon --}}
-            <div class="mx-auto w-24 h-24 rounded-full bg-yellow-500/10 flex items-center justify-center mb-8">
-                <svg class="w-12 h-12 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5"></path>
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 400px; text-align: center;">
+        <div style="background: linear-gradient(135deg, #374151 0%, #1f2937 100%); border-radius: 1rem; padding: 3rem; max-width: 500px; border: 2px solid #4b5563;">
+
+            <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+                <svg style="width: 40px; height: 40px; color: white;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5"></path>
                 </svg>
             </div>
 
-            {{-- Badge --}}
-            <span class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-yellow-500/10 text-yellow-500 text-sm font-semibold mb-6">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                Pronto
-            </span>
-
-            {{-- Title --}}
-            <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 style="font-size: 1.75rem; font-weight: bold; color: white; margin-bottom: 0.75rem;">
                 Widget para tu Sitio Web
             </h2>
 
-            {{-- Description --}}
-            <p class="text-lg text-gray-500 dark:text-gray-400 mb-8 leading-relaxed">
-                Muy pronto podras insertar un widget en tu sitio web para mostrar tus resenas, 
+            <div style="display: inline-block; background-color: #3b82f6; color: white; padding: 0.25rem 1rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 600; margin-bottom: 1rem;">
+                EN DESARROLLO
+            </div>
+
+            <p style="color: #9ca3af; font-size: 1rem; line-height: 1.6; margin-bottom: 1.5rem;">
+                Muy pronto podras insertar un widget en tu sitio web para mostrar tus resenas,
                 menu y boton de reservaciones directamente a tus visitantes.
             </p>
 
-            {{-- Features grid --}}
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
-                <div class="p-4 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10">
-                    <div class="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center mx-auto mb-3">
-                        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"></path>
-                        </svg>
-                    </div>
-                    <h3 class="font-semibold text-gray-900 dark:text-white text-sm">Resenas en tu Web</h3>
-                    <p class="text-xs text-gray-500 mt-1">Muestra tus mejores resenas automaticamente</p>
-                </div>
-
-                <div class="p-4 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10">
-                    <div class="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center mx-auto mb-3">
-                        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6.75 7.5l3 2.25-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0021 18V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v12a2.25 2.25 0 002.25 2.25z"></path>
-                        </svg>
-                    </div>
-                    <h3 class="font-semibold text-gray-900 dark:text-white text-sm">Facil de Instalar</h3>
-                    <p class="text-xs text-gray-500 mt-1">Copia y pega una linea de codigo</p>
-                </div>
-
-                <div class="p-4 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10">
-                    <div class="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center mx-auto mb-3">
-                        <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42"></path>
-                        </svg>
-                    </div>
-                    <h3 class="font-semibold text-gray-900 dark:text-white text-sm">Personalizable</h3>
-                    <p class="text-xs text-gray-500 mt-1">Adapta colores y estilo a tu marca</p>
-                </div>
+            <div style="background-color: #111827; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1.5rem;">
+                <p style="color: #6b7280; font-size: 0.875rem; margin-bottom: 0.5rem;">Beneficios cuando este disponible:</p>
+                <ul style="list-style: none; padding: 0; margin: 0; text-align: left;">
+                    <li style="display: flex; align-items: center; gap: 0.5rem; color: #d1d5db; font-size: 0.875rem; margin-bottom: 0.5rem;">
+                        <svg style="width: 1rem; height: 1rem; color: #22c55e;" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                        Muestra tus mejores resenas automaticamente
+                    </li>
+                    <li style="display: flex; align-items: center; gap: 0.5rem; color: #d1d5db; font-size: 0.875rem; margin-bottom: 0.5rem;">
+                        <svg style="width: 1rem; height: 1rem; color: #22c55e;" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                        Facil de instalar: copia y pega una linea de codigo
+                    </li>
+                    <li style="display: flex; align-items: center; gap: 0.5rem; color: #d1d5db; font-size: 0.875rem;">
+                        <svg style="width: 1rem; height: 1rem; color: #22c55e;" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                        Personalizable: adapta colores y estilo a tu marca
+                    </li>
+                </ul>
             </div>
 
-            {{-- CTA --}}
-            <p class="text-sm text-gray-400">
-                Estamos trabajando para ofrecerte el mejor widget embebible para tu restaurante.
+            <p style="color: #6b7280; font-size: 0.75rem;">
+                Te notificaremos cuando este disponible
             </p>
         </div>
     </div>
