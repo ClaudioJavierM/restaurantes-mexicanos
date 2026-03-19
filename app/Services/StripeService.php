@@ -334,7 +334,7 @@ class StripeService
     {
         try {
             $client = new \Stripe\StripeClient(config('stripe.secret'));
-            return $client->invoices->upcoming(['customer' => $customerId]);
+            return $client->invoices->createPreview(['customer' => $customerId]);
         } catch (Exception $e) {
             return null;
         }
