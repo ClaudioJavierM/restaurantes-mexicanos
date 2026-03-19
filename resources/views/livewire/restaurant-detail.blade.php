@@ -676,6 +676,21 @@
                             </div>
                         @endforeach
                     </div>
+
+                    {{-- QR del Menú Digital (solo Premium/Elite) --}}
+                    @if(in_array($restaurant->subscription_tier, ['premium', 'elite']))
+                    <div class="mt-6 pt-5 border-t border-gray-100">
+                        <div class="flex items-center gap-4">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ urlencode(url('/restaurante/' . $restaurant->slug . '/menu')) }}"
+                                 alt="QR Menú" class="w-20 h-20 rounded-lg border border-gray-200 p-1 bg-white">
+                            <div>
+                                <p class="font-semibold text-gray-900 text-sm">Escanea el menú</p>
+                                <p class="text-gray-500 text-xs mt-0.5">Abre la cámara de tu teléfono y apunta al código QR para ver el menú completo</p>
+                                <a href="{{ url('/restaurante/' . $restaurant->slug . '/menu') }}" target="_blank" class="text-blue-600 hover:underline text-xs mt-1 inline-block">Ver menú digital →</a>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
                 </div>
                 @endif
 
