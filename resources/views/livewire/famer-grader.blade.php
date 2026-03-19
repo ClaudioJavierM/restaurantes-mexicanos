@@ -841,7 +841,7 @@
                         <input
                             type="email"
                             id="leadEmail"
-                            wire:model="leadEmail"
+                            wire:model.blur="leadEmail"
                             class="w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500"
                             placeholder="tu@email.com"
                         >
@@ -857,7 +857,7 @@
                         <input
                             type="text"
                             id="leadName"
-                            wire:model="leadName"
+                            wire:model.blur="leadName"
                             class="w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500"
                             placeholder="Tu nombre"
                         >
@@ -888,8 +888,9 @@
                     </div>
 
                     <button
-                        wire:click="submitEmailForReport"
+                        wire:click.prevent="submitEmailForReport"
                         wire:loading.attr="disabled"
+                        type="button"
                         class="w-full py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition-colors disabled:opacity-50"
                     >
                         <span wire:loading.remove wire:target="submitEmailForReport">
