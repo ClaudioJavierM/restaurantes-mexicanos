@@ -5,7 +5,7 @@
             echo '<div style="padding:2rem;color:#9ca3af;text-align:center;"><p style="font-size:1.5rem;">🍽️</p><p>Sin restaurante asociado a esta cuenta.</p></div>';
             return;
         }
-        $plan = $restaurant->subscription_plan ?? 'free';
+        $plan = $restaurant->subscription_tier ?? 'free';
         $isPremium = in_array($plan, ['premium', 'elite']);
         
         // Calculate profile completion
