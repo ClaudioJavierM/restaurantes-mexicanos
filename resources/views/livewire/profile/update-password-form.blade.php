@@ -11,7 +11,6 @@ new class extends Component
     public string $current_password = '';
     public string $password = '';
     public string $password_confirmation = '';
-    public bool $showSuccess = false;
 
     /**
      * Update the password for the currently authenticated user.
@@ -34,13 +33,12 @@ new class extends Component
         ]);
 
         $this->reset('current_password', 'password', 'password_confirmation');
-        $this->showSuccess = true;
 
         $this->dispatch('password-updated');
     }
 }; ?>
 
-<section>
+<section x-data="{ showSuccess: false }" @password-updated.window="showSuccess = true; setTimeout(() => showSuccess = false, 8000)">
     <header>
         <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
             Actualizar Contraseña
@@ -51,17 +49,15 @@ new class extends Component
         </p>
     </header>
 
-    @if($showSuccess)
-        <div class="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-3">
-            <svg class="w-6 h-6 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-            <div>
-                <p class="text-sm font-semibold text-green-800">Contraseña actualizada correctamente</p>
-                <p class="text-xs text-green-600">Tu nueva contraseña ya esta activa. Usala la proxima vez que inicies sesion.</p>
-            </div>
+    <div x-show="showSuccess" x-transition.duration.300ms class="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-3">
+        <svg class="w-6 h-6 text-green-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <div>
+            <p class="text-sm font-semibold text-green-800">Contraseña actualizada correctamente</p>
+            <p class="text-xs text-green-600">Tu nueva contraseña ya esta activa. Usala la proxima vez que inicies sesion.</p>
         </div>
-    @endif
+    </div>
 
     <form wire:submit="updatePassword" class="mt-6 space-y-6">
         <div>
