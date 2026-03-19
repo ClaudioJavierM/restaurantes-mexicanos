@@ -302,7 +302,7 @@
                 <div style="background: linear-gradient(135deg, #f97316 0%, #dc2626 100%); border-radius: 0.75rem; padding: 1.25rem;">
                     <h3 style="font-size: 1rem; font-weight: 600; color: #ffffff; margin: 0 0 0.75rem 0;">🎁 Tus Beneficios FAMER</h3>
                     <p style="font-size: 0.875rem; color: #fed7aa; margin: 0 0 1rem 0;">
-                        Como suscriptor {{ ucfirst($plan) }} obtienes 
+                        Como suscriptor {{ match($plan) { 'claimed', 'free' => 'Gratuito', 'premium' => 'Premium', 'elite' => 'Elite', default => ucfirst($plan) } }} obtienes 
                         <strong style="color: white;">{{ $plan === 'elite' ? '15%' : ($plan === 'premium' ? '10%' : '5%') }}</strong> 
                         de descuento en todos los negocios afiliados.
                     </p>
@@ -498,7 +498,7 @@
                 <div style="display: flex; align-items: center; gap: 0.75rem;">
                     <span style="font-size: 1.5rem;">{{ $restaurant->subscription_tier === 'elite' ? '🏆' : '⭐' }}</span>
                     <div>
-                        <h3 style="font-size: 1rem; font-weight: bold; color: white; margin: 0;">Plan {{ ucfirst($restaurant->subscription_tier) }}</h3>
+                        <h3 style="font-size: 1rem; font-weight: bold; color: white; margin: 0;">Plan {{ match($restaurant->subscription_tier) { 'claimed', 'free' => 'Gratuito', 'premium' => 'Premium', 'elite' => 'Elite', default => ucfirst($restaurant->subscription_tier) } }}</h3>
                         <p style="font-size: 0.75rem; color: rgba(255,255,255,0.8); margin: 0;">Funciones activas de tu suscripcion</p>
                     </div>
                 </div>

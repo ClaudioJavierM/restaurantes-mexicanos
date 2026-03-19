@@ -18,7 +18,7 @@
                         <p style="font-size: 0.875rem; opacity: 0.9; margin: 0 0 0.25rem 0; text-transform: uppercase; letter-spacing: 0.05em;">Tu Plan Actual</p>
                         <h1 style="font-size: 2.5rem; font-weight: bold; margin: 0;">
                             @if($plan === 'elite') 🏆 @elseif($plan === 'premium') ⭐ @else 📋 @endif
-                            {{ ucfirst($plan) }}
+                            {{ match($plan) { 'claimed', 'free' => 'Gratuito', 'premium' => 'Premium', 'elite' => 'Elite', default => ucfirst($plan) } }}
                         </h1>
                         <p style="font-size: 1rem; opacity: 0.9; margin: 0.5rem 0 0 0;">
                             @if($plan === 'free')
@@ -75,7 +75,7 @@
         {{-- Features Included --}}
         <div style="background-color: #1f2937; border-radius: 0.75rem; border: 1px solid #374151; overflow: hidden;">
             <div style="padding: 1.25rem; border-bottom: 1px solid #374151; background-color: #111827;">
-                <h3 style="font-size: 1.125rem; font-weight: 600; color: #ffffff; margin: 0;">✅ Incluido en tu Plan {{ ucfirst($plan) }}</h3>
+                <h3 style="font-size: 1.125rem; font-weight: 600; color: #ffffff; margin: 0;">✅ Incluido en tu Plan {{ match($plan) { 'claimed', 'free' => 'Gratuito', 'premium' => 'Premium', 'elite' => 'Elite', default => ucfirst($plan) } }}</h3>
             </div>
             <div style="padding: 1.25rem;">
                 <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem;">

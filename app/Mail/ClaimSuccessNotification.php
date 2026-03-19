@@ -36,6 +36,7 @@ class ClaimSuccessNotification extends Mailable
         $planName = match($this->plan) {
             'elite' => 'Elite',
             'premium' => 'Premium',
+            'claimed', 'free' => 'Gratuito',
             default => ucfirst($this->plan),
         };
 

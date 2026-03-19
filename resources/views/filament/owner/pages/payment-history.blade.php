@@ -36,7 +36,7 @@
                 </div>
                 <div style="text-align: right;">
                     <p style="font-size: 0.75rem; color: #93c5fd; margin: 0 0 0.25rem;">Plan</p>
-                    <p style="font-size: 1rem; font-weight: 600; color: #ffffff; margin: 0;">{{ ucfirst($restaurant->subscription_tier) }}</p>
+                    <p style="font-size: 1rem; font-weight: 600; color: #ffffff; margin: 0;">{{ match($restaurant->subscription_tier) { 'claimed', 'free' => 'Gratuito', 'premium' => 'Premium', 'elite' => 'Elite', default => ucfirst($restaurant->subscription_tier) } }}</p>
                 </div>
             </div>
         </div>

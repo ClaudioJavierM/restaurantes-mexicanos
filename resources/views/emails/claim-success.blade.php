@@ -26,7 +26,7 @@
                                 Bienvenido{{ $plan === 'elite' ? ' al Club Elite' : ($plan === 'premium' ? ' a Premium' : '') }}, {{ $user->name }}!
                             </h1>
                             <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0; font-size: 16px;">
-                                Tu suscripcion <strong>{{ ucfirst($plan) }}</strong> esta activa
+                                Tu suscripcion <strong>{{ match($plan) { 'claimed', 'free' => 'Gratuito', 'premium' => 'Premium', 'elite' => 'Elite', default => ucfirst($plan) } }}</strong> esta activa
                             </p>
                         </td>
                     </tr>
@@ -40,7 +40,7 @@
                             </h2>
 
                             <p style="color: #4b5563; font-size: 15px; line-height: 1.7; text-align: center; margin: 0 0 25px 0;">
-                                Tu restaurante ha sido verificado y tu plan <strong>{{ ucfirst($plan) }}</strong> esta completamente activo.
+                                Tu restaurante ha sido verificado y tu plan <strong>{{ match($plan) { 'claimed', 'free' => 'Gratuito', 'premium' => 'Premium', 'elite' => 'Elite', default => ucfirst($plan) } }}</strong> esta completamente activo.
                                 Ya puedes acceder a tu panel de propietario para gestionar tu restaurante.
                             </p>
 
