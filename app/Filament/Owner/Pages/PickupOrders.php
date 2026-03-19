@@ -13,7 +13,10 @@ class PickupOrders extends Page
     protected static ?string $navigationGroup = 'Mi Negocio';
     protected static ?int $navigationSort = 9;
     
-    protected static string $view = 'filament.owner.pages.pickup-orders';
+    protected static string $view = 'filament.owner.pages.coming-soon';
+
+    public string $featureName = 'Pedidos Pickup';
+    public string $featureDescription = 'Muy pronto tus clientes podran hacer pedidos para recoger directamente desde tu perfil. Ordenes en linea, notificaciones y seguimiento en tiempo real.';
 
     public static function shouldRegisterNavigation(): bool
     {

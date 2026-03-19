@@ -13,7 +13,10 @@ class WidgetEmbed extends Page
     protected static ?string $navigationGroup = 'Contenido';
     protected static ?int $navigationSort = 6;
     
-    protected static string $view = 'filament.owner.pages.widget-embed';
+    protected static string $view = 'filament.owner.pages.coming-soon';
+
+    public string $featureName = 'Widget para tu Sitio Web';
+    public string $featureDescription = 'Muy pronto podras insertar un widget en tu sitio web para mostrar tus resenas, menu y boton de reservaciones directamente a tus visitantes.';
 
     public static function shouldRegisterNavigation(): bool
     {

@@ -13,7 +13,10 @@ class LoyaltyProgram extends Page
     protected static ?string $navigationGroup = 'Mi Negocio';
     protected static ?int $navigationSort = 20;
     
-    protected static string $view = 'filament.owner.pages.loyalty-program';
+    protected static string $view = 'filament.owner.pages.coming-soon';
+
+    public string $featureName = 'Programa de Lealtad';
+    public string $featureDescription = 'Muy pronto podras crear un programa de lealtad para recompensar a tus clientes mas fieles. Puntos por visita, recompensas personalizadas y mas.';
 
     public static function shouldRegisterNavigation(): bool
     {
