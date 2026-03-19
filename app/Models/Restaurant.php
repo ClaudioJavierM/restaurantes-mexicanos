@@ -721,8 +721,12 @@ class Restaurant extends Model implements HasMedia
     public function isOpen(): ?bool
     {
         // Google Places API format: {"open_now": true, "weekday_text": [...]}
-        if (!empty($this->opening_hours) && array_key_exists('open_now', $this->opening_hours)) {
-            return (bool) $this->opening_hours['open_now'];
+        $openingHours = $this->opening_hours;
+        if (is_string($openingHours)) {
+            $openingHours = json_decode($openingHours, true);
+        }
+        if (is_array($openingHours) && array_key_exists('open_now', $openingHours)) {
+            return (bool) $openingHours['open_now'];
         }
 
         // Owner-managed hours: {"monday": {"open": "11:00", "close": "22:00", "closed": false}, ...}
