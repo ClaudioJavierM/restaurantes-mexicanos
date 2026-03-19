@@ -43,8 +43,10 @@ class PaymentHistory extends Page
 
         try {
             $stripeService = new StripeService();
-            $this->invoices = $stripeService->getInvoices($this->restaurant->stripe_customer_id);
-            $this->upcomingInvoice = $stripeService->getUpcomingInvoice($this->restaurant->stripe_customer_id);
+            $rawInvoices = $stripeService->getInvoices($this->restaurant->stripe_customer_id);
+            $this->invoices = array_map(fn($inv) => is_object($inv) ? $inv->toArray() : $inv, $rawInvoices);
+            $upcoming = $stripeService->getUpcomingInvoice($this->restaurant->stripe_customer_id);
+            $this->upcomingInvoice = $upcoming ? $upcoming->toArray() : null;
         } catch (\Exception $e) {
             $this->invoices = [];
             $this->upcomingInvoice = null;
