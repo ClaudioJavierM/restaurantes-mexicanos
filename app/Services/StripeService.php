@@ -333,7 +333,8 @@ class StripeService
     public function getUpcomingInvoice(string $customerId): ?Invoice
     {
         try {
-            return Invoice::upcoming(['customer' => $customerId]);
+            $client = new \Stripe\StripeClient(config('stripe.secret'));
+            return $client->invoices->upcoming(['customer' => $customerId]);
         } catch (Exception $e) {
             return null;
         }
