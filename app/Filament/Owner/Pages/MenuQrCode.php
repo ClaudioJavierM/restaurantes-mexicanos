@@ -56,7 +56,7 @@ class MenuQrCode extends Page
             ->toArray();
     }
 
-    protected function loadActiveOrders(): void
+    public function loadActiveOrders(): void
     {
         if (!$this->restaurant) return;
 

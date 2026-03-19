@@ -41,7 +41,7 @@
                     <p style="font-size:2.5rem;margin:0 0 0.75rem;">📋</p>
                     <p style="color:#fff;font-weight:600;margin:0 0 0.5rem;">Tu menú aún no tiene platillos</p>
                     <p style="color:#9ca3af;font-size:0.875rem;margin:0 0 1rem;">Agrega platillos desde "Menú Digital" y el QR se generará automáticamente</p>
-                    <a href="{{ route('filament.owner.resources.my-menu.index') }}"
+                    <a href="{{ route('filament.owner.resources.my-menus.index') }}"
                         style="background:linear-gradient(135deg,#dc2626,#991b1b);color:white;padding:0.5rem 1.25rem;border-radius:0.5rem;text-decoration:none;font-size:0.875rem;font-weight:600;">
                         ➕ Agregar Platillos
                     </a>
