@@ -254,6 +254,14 @@ class User extends Authenticatable implements FilamentUser
         $this->notify(new BilingualVerifyEmail);
     }
 
+    /**
+     * Send the password reset notification.
+     */
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new \App\Notifications\CustomResetPassword($token));
+    }
+
     public function fanScores()
     {
         return $this->hasMany(FanScore::class);
