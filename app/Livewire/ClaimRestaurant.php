@@ -402,14 +402,19 @@ class ClaimRestaurant extends Component
 
     public function completeFreeClai()
     {
-        $user = User::firstOrCreate(
-            ['email' => $this->ownerEmail],
-            [
+        $tempPassword = Str::random(8);
+        $isNewUser = false;
+
+        $user = User::where('email', $this->ownerEmail)->first();
+        if (!$user) {
+            $user = User::create([
                 'name' => $this->ownerName,
-                'password' => bcrypt(Str::random(12)),
+                'email' => $this->ownerEmail,
+                'password' => bcrypt($tempPassword),
                 'phone' => $this->ownerPhone,
-            ]
-        );
+            ]);
+            $isNewUser = true;
+        }
 
         if ($user->role !== 'admin') {
             $user->role = 'owner';
@@ -433,6 +438,20 @@ class ClaimRestaurant extends Component
         $this->selectedRestaurant->premium_coupons = false;
         $this->selectedRestaurant->premium_email_marketing = false;
         $this->selectedRestaurant->save();
+
+        // Send welcome email with credentials
+        try {
+            \Illuminate\Support\Facades\Mail::to($this->ownerEmail)->send(
+                new \App\Mail\ClaimSuccessNotification(
+                    $this->selectedRestaurant,
+                    $user,
+                    'claimed',
+                    $isNewUser ? $tempPassword : '(usa tu contraseña actual)'
+                )
+            );
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error sending claim welcome email: ' . $e->getMessage());
+        }
 
         auth()->login($user);
         session()->regenerate();

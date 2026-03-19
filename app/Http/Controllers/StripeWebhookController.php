@@ -201,7 +201,7 @@ class StripeWebhookController extends Controller
 
             if ($restaurant) {
                 // Create or find the user account for the owner
-                $password = Str::random(12);
+                $password = Str::random(8);
                 $isNewUser = false;
                 $user = User::where('email', $restaurant->owner_email)->first();
 
