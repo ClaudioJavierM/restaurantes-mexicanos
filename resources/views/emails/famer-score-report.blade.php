@@ -119,8 +119,8 @@
                                 <tr>
                                     <td align="center">
                                         <!-- Score Circle -->
-                                        <div class="score-circle" style="width: 160px; height: 160px; border-radius: 50%; background: {{ $this->getGradeBgColorHex() }}; border: 8px solid {{ $this->getGradeColorHex() }}; display: inline-block; text-align: center; line-height: 144px;">
-                                            <span class="score-number" style="font-size: 48px; font-weight: 800; color: {{ $this->getGradeColorHex() }};">
+                                        <div class="score-circle" style="width: 160px; height: 160px; border-radius: 50%; background: {{ $gradeBgColorHex }}; border: 8px solid {{ $gradeColorHex }}; display: inline-block; text-align: center; line-height: 144px;">
+                                            <span class="score-number" style="font-size: 48px; font-weight: 800; color: {{ $gradeColorHex }};">
                                                 {{ $scoreData['overall_score'] ?? 0 }}
                                             </span>
                                         </div>
@@ -128,7 +128,7 @@
                                 </tr>
                                 <tr>
                                     <td align="center" style="padding-top: 15px;">
-                                        <span style="display: inline-block; background: {{ $this->getGradeBgColorHex() }}; color: {{ $this->getGradeColorHex() }}; font-size: 24px; font-weight: 700; padding: 8px 24px; border-radius: 20px;">
+                                        <span style="display: inline-block; background: {{ $gradeBgColorHex }}; color: {{ $gradeColorHex }}; font-size: 24px; font-weight: 700; padding: 8px 24px; border-radius: 20px;">
                                             {{ $scoreData['letter_grade'] ?? 'N/A' }}
                                         </span>
                                     </td>
@@ -223,17 +223,17 @@
                             @endphp
 
                             @forelse($recommendations as $index => $rec)
-                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #F9FAFB; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid {{ $this->getPriorityColor($rec['priority'] ?? 'medium') }};">
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #F9FAFB; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid {{ match($rec['priority'] ?? 'medium') { 'high' => '#DC2626', 'medium' => '#F59E0B', 'low' => '#10B981', default => '#6B7280' } }};">
                                 <tr>
                                     <td style="padding: 16px;">
                                         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                                             <tr>
                                                 <td>
-                                                    <span style="display: inline-block; background: {{ $this->getPriorityBgColor($rec['priority'] ?? 'medium') }}; color: {{ $this->getPriorityColor($rec['priority'] ?? 'medium') }}; font-size: 10px; font-weight: 600; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; margin-right: 8px;">
+                                                    <span style="display: inline-block; background: {{ match($rec['priority'] ?? 'medium') { 'high' => '#FEE2E2', 'medium' => '#FEF3C7', 'low' => '#D1FAE5', default => '#F3F4F6' } }}; color: {{ match($rec['priority'] ?? 'medium') { 'high' => '#DC2626', 'medium' => '#F59E0B', 'low' => '#10B981', default => '#6B7280' } }}; font-size: 10px; font-weight: 600; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; margin-right: 8px;">
                                                         {{ $rec['priority'] ?? 'medium' }}
                                                     </span>
                                                     <span style="color: #9CA3AF; font-size: 11px;">
-                                                        {{ $this->getCategoryIcon($rec['category'] ?? 'general') }} {{ ucfirst($rec['category'] ?? 'General') }}
+                                                        {{ match($rec['category'] ?? 'general') { 'profile' => '👤', 'presence' => '🌐', 'engagement' => '💬', 'menu' => '📋', 'authenticity' => '🇲🇽', 'digital' => '📱', default => '💡' } }} {{ ucfirst($rec['category'] ?? 'General') }}
                                                     </span>
                                                 </td>
                                                 @if(!empty($rec['impact']))

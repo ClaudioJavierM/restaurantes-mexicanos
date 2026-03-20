@@ -70,6 +70,10 @@ class FamerScoreReport extends Mailable implements ShouldQueue
     {
         return new Content(
             view: 'emails.famer-score-report',
+            with: [
+                'gradeColorHex' => $this->getGradeColorHex(),
+                'gradeBgColorHex' => $this->getGradeBgColorHex(),
+            ],
         );
     }
 
