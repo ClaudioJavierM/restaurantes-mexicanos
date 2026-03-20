@@ -649,7 +649,15 @@
                     </div>
 
                     {{-- CTA for Full Report --}}
-                    @if (!$emailSubmitted)
+                    @if ($emailSubmitted)
+                        <div class="bg-green-50 border border-green-200 rounded-xl p-6 text-center">
+                            <div class="text-4xl mb-3">✅</div>
+                            <h3 class="text-xl font-bold text-green-800 mb-2">Reporte Enviado!</h3>
+                            <p class="text-green-700">
+                                Tu reporte completo ha sido enviado a <strong>{{ $leadEmail }}</strong>. Revisa tu bandeja de entrada.
+                            </p>
+                        </div>
+                    @else
                         <div class="bg-gradient-to-r from-red-600 to-red-700 rounded-xl p-6 text-center text-white">
                             <h3 class="text-xl font-bold mb-2">Quieres el Reporte Completo?</h3>
                             <p class="text-red-100 mb-4">
