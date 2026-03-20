@@ -349,7 +349,7 @@ class FamerGrader extends Component
                 $this->calculateExternalScore($result);
             }
         } catch (\Exception $e) {
-            Log::error('Error calculating score: ' . $e->getMessage());
+            Log::error('Error calculating score: ' . $e->getMessage() . ' at ' . $e->getFile() . ':' . $e->getLine());
             $this->errorMessage = 'Error al calcular el score.';
             $this->showAnalysis = false;
         }

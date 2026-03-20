@@ -341,10 +341,8 @@ class FamerScoreService
         elseif ($menuItems > 0) $score += 5;
 
         // Menu Categories Coverage (25 points)
-        $categories = $restaurant->menuItems()
-            ->whereNotNull('category')
-            ->distinct()
-            ->pluck('category')
+        $categories = $restaurant->menuCategories()
+            ->whereHas('items', fn($q) => $q->where('is_available', true))
             ->count();
 
         $breakdown['category_count'] = $categories;
