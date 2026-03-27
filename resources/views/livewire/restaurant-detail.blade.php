@@ -43,33 +43,25 @@
         ? round($seoTotalWeightedScore / $seoTotalWeight, 1)
         : ($seoGoogleRating ?: ($seoYelpRating ?: 0));
 
-    // Collect all available photos
-    $allPhotos = [];
+    // Cover image for the banner — not counted in gallery total
+    $coverImageUrl = null;
     if ($restaurant->image) {
-        $allPhotos[] = str_starts_with($restaurant->image, 'http')
+        $coverImageUrl = str_starts_with($restaurant->image, 'http')
             ? $restaurant->image
             : asset('storage/' . $restaurant->image);
+    } elseif ($restaurant->getFirstMediaUrl('images')) {
+        $coverImageUrl = $restaurant->getFirstMediaUrl('images');
+    } elseif (is_array($restaurant->yelp_photos) && count($restaurant->yelp_photos) > 0) {
+        $coverImageUrl = $restaurant->yelp_photos[0];
     }
-    foreach ($restaurant->getMedia('images') as $media) {
-        $allPhotos[] = $media->getUrl();
-    }
-    if (is_array($restaurant->yelp_photos)) {
-        foreach ($restaurant->yelp_photos as $yelpPhoto) {
-            $allPhotos[] = $yelpPhoto;
-        }
-    }
-    // Include user-uploaded photos (from owner panel)
-    foreach ($restaurant->userPhotos()->where('status', 'approved')->orderBy('created_at', 'desc')->get() as $userPhoto) {
-        $allPhotos[] = asset('storage/' . $userPhoto->photo_path);
-    }
-    $allPhotos = array_unique($allPhotos);
 
-    // Free plan: limit gallery to 5 most recent photos
+    // Gallery count = only user-uploaded photos. Banner/Yelp images are NOT counted.
     $isFreePlan = empty($restaurant->subscription_tier) || $restaurant->subscription_tier === 'free';
+    $userPhotoRecords = $restaurant->userPhotos()->where('status', 'approved')->orderBy('created_at', 'desc')->get();
+    $allPhotos = $userPhotoRecords->map(fn($p) => asset('storage/' . $p->photo_path))->toArray();
     if ($isFreePlan && count($allPhotos) > 5) {
-        $allPhotos = array_slice($allPhotos, -5);
+        $allPhotos = array_slice($allPhotos, 0, 5);
     }
-
     $totalPhotos = count($allPhotos);
     $displayPhotos = array_slice($allPhotos, 0, 5);
 
@@ -154,18 +146,112 @@
         }
     }
 @endphp
+
+@push('meta')
+    {{-- Open Graph for social sharing --}}
+    <meta property="og:type" content="restaurant">
+    <meta property="og:title" content="{{ $restaurant->name }} — {{ $restaurant->city }}, {{ $restaurant->state?->name ?? '' }}">
+    <meta property="og:description" content="{{ Str::limit(strip_tags($restaurant->description ?: 'Descubre ' . $restaurant->name . ', uno de los mejores restaurantes mexicanos en ' . $restaurant->city), 200) }}">
+    <meta property="og:url" content="{{ url()->current() }}">
+    @php
+        $hasRankings = $restaurant->rankings()->where('year', now()->year - 1)->where('position', '<=', 25)->where('is_published', true)->exists();
+    @endphp
+    @if($hasRankings)
+        <meta property="og:image" content="{{ route('og.restaurant', $restaurant->slug) }}">
+    @elseif($seoImage)
+        <meta property="og:image" content="{{ $seoImage }}">
+    @endif
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:locale" content="{{ app()->getLocale() === 'en' ? 'en_US' : 'es_MX' }}">
+    <meta property="og:site_name" content="Restaurantes Mexicanos Famosos">
+
+    {{-- Twitter Card --}}
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $restaurant->name }} — {{ $restaurant->city }}">
+    <meta name="twitter:description" content="{{ Str::limit(strip_tags($restaurant->description ?: 'Descubre ' . $restaurant->name), 150) }}">
+    @if($hasRankings)
+        <meta name="twitter:image" content="{{ route('og.restaurant', $restaurant->slug) }}">
+    @elseif($seoImage)
+        <meta name="twitter:image" content="{{ $seoImage }}">
+    @endif
+@endpush
+
 <div>
 
     <!-- Cover Image Banner -->
     @php
-        $coverUrl = $restaurant->image ? asset('storage/' . $restaurant->image) : null;
+        $heroRankings = $restaurant->rankings()
+            ->where('year', now()->year - 1)
+            ->where('position', '<=', 25)
+            ->where('is_published', true)
+            ->orderBy('position')
+            ->get();
+        $bestRanking = $heroRankings->first();
     @endphp
-    @if($coverUrl)
-        <div style="position:relative; height:260px; overflow:hidden; background:#111;">
-            <img src="{{ $coverUrl }}" alt="{{ $restaurant->name }}" style="width:100%; height:100%; object-fit:cover; object-position:center; display:block;">
-            <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 60%);"></div>
+    @if($coverImageUrl)
+        <div style="position:relative; {{ $bestRanking ? 'height:320px;' : 'height:260px;' }} overflow:hidden; background:#111;">
+            <img src="{{ $coverImageUrl }}"
+                 alt="{{ $restaurant->name }}"
+                 style="width:100%; height:100%; object-fit:cover; object-position:center; display:block;"
+                 onerror="this.style.display='none';">
+            <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.2) 40%, transparent 70%);pointer-events:none;"></div>
+
+            {{-- Award Banner - centered at bottom of hero --}}
+            @if($bestRanking)
+            <div style="position:absolute; bottom:0; left:0; right:0; z-index:10;">
+                <div style="max-width:900px; margin:0 auto; padding:0 16px 16px;">
+                    <a href="{{ url('/guia') }}?scope={{ $bestRanking->ranking_type }}{{ $bestRanking->ranking_type !== 'national' ? '&state=' . $bestRanking->ranking_scope : '' }}"
+                       style="text-decoration:none; display:block;">
+                        <div style="background:linear-gradient(135deg, #B8860B, #D4AF37 40%, #F5D060 70%, #D4AF37); border-radius:16px; padding:16px 28px; display:flex; align-items:center; gap:20px; box-shadow:0 12px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -2px 0 rgba(0,0,0,0.15); border:1px solid rgba(255,255,255,0.2);">
+
+                            {{-- Trophy circle --}}
+                            <div style="width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow:0 4px 16px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.3);
+                                {{ $bestRanking->position == 1 ? 'background:linear-gradient(135deg, #1a1a2e, #16213e);' : ($bestRanking->position <= 3 ? 'background:linear-gradient(135deg, #1a1a2e, #16213e);' : 'background:linear-gradient(135deg, #374151, #1F2937);') }}">
+                                <svg width="30" height="30" fill="#F5D060" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 2a2 2 0 00-2 2v1a2 2 0 002 2h1.06a7.04 7.04 0 003.272 4.35L8.12 15.7A2 2 0 009.98 18h.04a2 2 0 001.86-2.3l-1.212-4.35A7.04 7.04 0 0013.94 7H15a2 2 0 002-2V4a2 2 0 00-2-2H5z" clip-rule="evenodd"/></svg>
+                            </div>
+
+                            {{-- Position + Scope --}}
+                            <div style="flex:1; min-width:0;">
+                                <div style="display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;">
+                                    <span style="font-size:34px; font-weight:900; line-height:1; color:#1a1a2e; text-shadow:0 1px 0 rgba(255,255,255,0.3);">
+                                        #{{ $bestRanking->position }}
+                                    </span>
+                                    <span style="font-size:20px; font-weight:800; color:#1a1a2e; text-transform:uppercase; letter-spacing:1px;">
+                                        {{ $bestRanking->ranking_type === 'city' ? $bestRanking->ranking_scope : ($bestRanking->ranking_type === 'state' ? $bestRanking->ranking_scope : 'USA') }}
+                                    </span>
+                                </div>
+                                <div style="font-size:12px; color:rgba(30,30,30,0.6); text-transform:uppercase; letter-spacing:3px; font-weight:700; margin-top:3px;">
+                                    FAMER Awards {{ $bestRanking->year }}
+                                </div>
+                            </div>
+
+                            {{-- Additional rankings --}}
+                            @if($heroRankings->count() > 1)
+                            <div style="display:flex; flex-wrap:wrap; gap:8px; flex-shrink:0;">
+                                @foreach($heroRankings->skip(1)->take(3) as $ranking)
+                                    <div style="background:rgba(26,26,46,0.85); border-radius:10px; padding:6px 14px; text-align:center; box-shadow:0 2px 8px rgba(0,0,0,0.2);">
+                                        <div style="font-size:18px; font-weight:800; color:#F5D060;">
+                                            #{{ $ranking->position }}
+                                        </div>
+                                        <div style="font-size:10px; color:rgba(255,255,255,0.7); text-transform:uppercase; letter-spacing:1px; font-weight:600; white-space:nowrap;">
+                                            {{ Str::limit($ranking->ranking_scope, 12) }}
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                            @endif
+
+                            {{-- Arrow icon --}}
+                            <svg width="22" height="22" fill="none" stroke="rgba(26,26,46,0.4)" viewBox="0 0 24 24" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            @endif
+
             @if($totalPhotos > 0)
-                <div style="position:absolute; bottom:12px; right:16px; z-index:10;">
+                <div style="position:absolute; {{ $bestRanking ? 'top:12px;' : 'bottom:12px;' }} right:16px; z-index:10;">
                     <button wire:click="switchTab('photos')" style="background:rgba(255,255,255,0.92); color:#111; padding:7px 16px; border-radius:8px; font-size:13px; font-weight:600; border:none; cursor:pointer; display:flex; align-items:center; gap:6px; box-shadow:0 2px 8px rgba(0,0,0,0.3);">
                         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                         Ver {{ $totalPhotos }} fotos
@@ -174,13 +260,36 @@
             @endif
         </div>
     @else
-        <div style="position:relative; height:200px; background:linear-gradient(135deg, #1F2937, #111827); display:flex; align-items:center; justify-content:center;">
+        <div style="position:relative; {{ $bestRanking ? 'height:260px;' : 'height:200px;' }} background:linear-gradient(135deg, #1F2937, #111827); display:flex; align-items:center; justify-content:center;">
             <div style="text-align:center; color:white;">
                 <span style="font-size:64px; display:block; margin-bottom:8px;">🍽️</span>
                 <p style="font-size:16px; opacity:0.8;">{{ $restaurant->name }}</p>
             </div>
+
+            {{-- Award Banner on fallback --}}
+            @if($bestRanking)
+            <div style="position:absolute; bottom:0; left:0; right:0; z-index:10;">
+                <div style="max-width:900px; margin:0 auto; padding:0 16px 16px;">
+                    <div style="background:linear-gradient(135deg, #B8860B, #D4AF37 40%, #F5D060 70%, #D4AF37); border-radius:16px; padding:14px 24px; display:flex; align-items:center; gap:16px; box-shadow:0 8px 32px rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.2);">
+                        <div style="width:48px; height:48px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; background:linear-gradient(135deg, #1a1a2e, #16213e); box-shadow:0 3px 12px rgba(0,0,0,0.3);">
+                            <svg width="24" height="24" fill="#F5D060" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 2a2 2 0 00-2 2v1a2 2 0 002 2h1.06a7.04 7.04 0 003.272 4.35L8.12 15.7A2 2 0 009.98 18h.04a2 2 0 001.86-2.3l-1.212-4.35A7.04 7.04 0 0013.94 7H15a2 2 0 002-2V4a2 2 0 00-2-2H5z" clip-rule="evenodd"/></svg>
+                        </div>
+                        <div style="flex:1;">
+                            <div style="display:flex; align-items:baseline; gap:8px;">
+                                <span style="font-size:28px; font-weight:900; color:#1a1a2e; text-shadow:0 1px 0 rgba(255,255,255,0.3);">#{{ $bestRanking->position }}</span>
+                                <span style="font-size:16px; font-weight:800; color:#1a1a2e; text-transform:uppercase; letter-spacing:1px;">
+                                    {{ $bestRanking->ranking_type === 'city' ? $bestRanking->ranking_scope : ($bestRanking->ranking_type === 'state' ? $bestRanking->ranking_scope : 'USA') }}
+                                </span>
+                            </div>
+                            <div style="font-size:11px; color:rgba(30,30,30,0.6); text-transform:uppercase; letter-spacing:3px; font-weight:700;">FAMER Awards {{ $bestRanking->year }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
+
             @if($totalPhotos > 0)
-                <div style="position:absolute; bottom:12px; right:16px; z-index:10;">
+                <div style="position:absolute; {{ $bestRanking ? 'top:12px;' : 'bottom:12px;' }} right:16px; z-index:10;">
                     <button wire:click="switchTab('photos')" style="background:rgba(255,255,255,0.92); color:#111; padding:7px 16px; border-radius:8px; font-size:13px; font-weight:600; border:none; cursor:pointer; display:flex; align-items:center; gap:6px; box-shadow:0 2px 8px rgba(0,0,0,0.3);">
                         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                         Ver {{ $totalPhotos }} fotos
@@ -190,45 +299,62 @@
         </div>
     @endif
 
-    <!-- Main Content Area -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <!-- Main Content Area - Overlapping Card -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" style="margin-top:-80px; position:relative; z-index:20;">
         <div class="lg:flex lg:gap-8">
             <!-- Left Column - Main Content -->
             <div class="min-w-0" style="flex: 2 1 0%">
-                <!-- Restaurant Header Info -->
-                <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
-                    <!-- Category & Badges Row -->
-                    <div class="flex flex-wrap items-center gap-2 mb-3">
-                        <span class="bg-red-100 text-red-800 text-sm font-semibold px-3 py-1 rounded-full">{{ $restaurant->category->name }}</span>
-                        @if($restaurant->is_claimed)
-                            <span class="inline-flex items-center bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full">
-                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-                                Verificado
-                            </span>
-                        @endif
-                        @if($restaurant->price_range)
-                            <span class="text-gray-600 font-medium">{{ $restaurant->price_range }}</span>
-                        @endif
-                        @if($restaurant->google_verified || $restaurant->google_place_id)
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-white text-gray-700 border border-gray-200 shadow-sm">
-                                <svg class="w-3.5 h-3.5 mr-1" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-                                Google
-                            </span>
-                        @endif
-                        @if($restaurant->yelp_id && $restaurant->yelp_rating)
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-[#AF0606] text-white shadow-sm">
-                                <svg class="w-3.5 h-3.5 mr-1" viewBox="0 0 24 24" fill="currentColor"><path d="M20.16 12.594l-4.995 1.433c-.96.276-1.74-.8-1.176-1.63l2.905-4.308a1.072 1.072 0 011.596-.206 9.194 9.194 0 011.67 4.711z"/></svg>
-                                Yelp
-                            </span>
-                        @endif
+                <!-- Restaurant Header Info - Overlapping Card -->
+                <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 mb-6">
+                    <!-- Category Badge -->
+                    <div class="mb-3">
+                        <span class="inline-block bg-gray-100 text-gray-700 text-sm font-semibold px-3 py-1 rounded-full">{{ $restaurant->category->name }}</span>
                     </div>
 
+                    {{-- FAMER Ranking Badges --}}
+                    @if($heroRankings->count() > 0)
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        @foreach($heroRankings as $ranking)
+                            @php
+                                $pillBg = match(true) {
+                                    $ranking->position == 1 => 'background:linear-gradient(135deg, #7f1d1d, #991b1b); color:white;',
+                                    $ranking->position <= 3 => 'background:linear-gradient(135deg, #7f1d1d, #991b1b); color:white;',
+                                    $ranking->position <= 10 => 'background:linear-gradient(135deg, #1e3a5f, #2563eb); color:white;',
+                                    default => 'background:#E5E7EB; color:#374151;',
+                                };
+                                $scopeName = match($ranking->ranking_type) {
+                                    'national' => 'USA',
+                                    default => $ranking->ranking_scope,
+                                };
+                                $posIcon = $ranking->position === 1 ? '📍' : '';
+                            @endphp
+                            <a href="{{ url('/guia') }}?scope={{ $ranking->ranking_type }}{{ $ranking->ranking_type !== 'national' ? '&state=' . $ranking->ranking_scope : '' }}"
+                               style="{{ $pillBg }} padding:6px 14px; border-radius:8px; font-size:13px; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 8px rgba(0,0,0,0.2); transition:transform 0.15s;"
+                               onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                                @if($posIcon)<span>{{ $posIcon }}</span>@endif
+                                <span>🏆</span>
+                                @if($ranking->ranking_type === 'city')
+                                    #{{ $ranking->position }} Mejor Restaurante Mexicano - {{ $scopeName }} {{ $ranking->year }}
+                                @else
+                                    {{ $ranking->position <= 3 ? '#' . $ranking->position : 'Top ' . $ranking->position }} {{ $scopeName }} {{ $ranking->year }}
+                                @endif
+                            </a>
+                        @endforeach
+                    </div>
+                    @endif
+
                     <!-- Restaurant Name with Logo -->
-                    <div class="flex items-center gap-4 mb-2">
+                    <div class="flex items-center gap-4 mb-3">
                         @if($restaurant->logo)
                             <img src="{{ asset('storage/' . $restaurant->logo) }}" alt="{{ $restaurant->name }}" class="w-16 h-16 md:w-20 md:h-20 rounded-full object-cover border-2 border-gray-200 shadow-sm flex-shrink-0">
                         @endif
                         <h1 class="text-3xl md:text-4xl font-bold text-gray-900">{{ $restaurant->name }}</h1>
+                    </div>
+
+                    <!-- Location -->
+                    <div class="flex items-center gap-2 mb-3 text-gray-500">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        <span class="text-base">{{ $restaurant->city }}@if($restaurant->state), {{ $restaurant->state->name ?? '' }}@endif</span>
                     </div>
 
                     <!-- Rating Row -->
@@ -247,60 +373,84 @@
                         if ($internalRating > 0 && $internalReviewCount > 0) { $totalWeightedScore += $internalRating * $internalReviewCount; $totalWeight += $internalReviewCount; }
                         $displayRating = $totalWeight > 0 ? $totalWeightedScore / $totalWeight : ($googleRating ?: ($yelpRating ?: 0));
                     @endphp
-                    <div class="flex items-center gap-3 mb-2">
-                        <div class="flex text-red-500">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="flex text-yellow-400">
                             @for($i = 0; $i < 5; $i++)
                                 @if($i < floor($displayRating))
                                     <svg class="w-6 h-6 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
                                 @elseif($i < $displayRating)
-                                    <svg class="w-6 h-6" viewBox="0 0 20 20"><defs><linearGradient id="half"><stop offset="50%" stop-color="#ef4444"/><stop offset="50%" stop-color="#d1d5db"/></linearGradient></defs><path fill="url(#half)" d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                    <svg class="w-6 h-6" viewBox="0 0 20 20"><defs><linearGradient id="half-{{ $i }}"><stop offset="50%" stop-color="#facc15"/><stop offset="50%" stop-color="#d1d5db"/></linearGradient></defs><path fill="url(#half-{{ $i }})" d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
                                 @else
                                     <svg class="w-6 h-6 fill-gray-300" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
                                 @endif
                             @endfor
                         </div>
-                        <span class="text-lg font-bold text-gray-900">{{ number_format($displayRating, 1) }}</span>
-                        <a href="#reviews" wire:click="switchTab('reviews')" class="text-gray-600 hover:text-red-600">({{ number_format($combinedReviews) }} resenas)</a>
+                        <span class="text-xl font-bold text-gray-900">{{ number_format($displayRating, 1) }}</span>
+                        <a href="#reviews" wire:click="switchTab('reviews')" class="text-gray-500 hover:text-red-600">({{ number_format($combinedReviews) }} reviews)</a>
                     </div>
 
-                    <!-- Review Sources Breakdown -->
-                    <div class="flex flex-wrap items-center gap-3 mb-3 text-sm">
+                    <!-- Call to Action Button -->
+                    @if($restaurant->phone)
+                        <div class="mb-4">
+                            <a href="tel:{{ $restaurant->phone }}" class="inline-flex items-center px-6 py-3 bg-[#AF0606] text-white font-bold rounded-xl hover:bg-[#8B0505] transition-colors text-base shadow-md">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                                Llamar Ahora
+                            </a>
+                        </div>
+                    @endif
+
+                    <!-- Brief Description -->
+                    @if($restaurant->description)
+                        <p class="text-gray-600 text-base leading-relaxed mb-4">{{ Str::limit($restaurant->description, 200) }}</p>
+                    @endif
+
+                    <!-- Source Badges & Info Row -->
+                    <div class="flex flex-wrap items-center gap-2 pt-4 border-t border-gray-100">
+                        @if($restaurant->is_claimed)
+                            <span class="inline-flex items-center bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-1 rounded-full">
+                                <svg class="w-3.5 h-3.5 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                                Verificado
+                            </span>
+                        @endif
+                        @if($restaurant->price_range)
+                            <span class="text-gray-600 font-medium text-sm">{{ $restaurant->price_range }}</span>
+                        @endif
+                        @if($restaurant->google_verified || $restaurant->google_place_id)
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-white text-gray-700 border border-gray-200 shadow-sm">
+                                <svg class="w-3.5 h-3.5 mr-1" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                                Google
+                            </span>
+                        @endif
+                        @if($restaurant->yelp_id && $restaurant->yelp_rating)
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-[#AF0606] text-white shadow-sm">
+                                <svg class="w-3.5 h-3.5 mr-1" viewBox="0 0 24 24" fill="currentColor"><path d="M20.16 12.594l-4.995 1.433c-.96.276-1.74-.8-1.176-1.63l2.905-4.308a1.072 1.072 0 011.596-.206 9.194 9.194 0 011.67 4.711z"/></svg>
+                                Yelp
+                            </span>
+                        @endif
                         @if($googleReviews > 0)
-                            <div class="flex items-center gap-1.5 bg-gray-50 px-3 py-1.5 rounded-full">
-                                <svg class="w-4 h-4" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-                                <span class="text-gray-700"><strong>{{ number_format($googleRating, 1) }}</strong> ({{ number_format($googleReviews) }})</span>
-                            </div>
+                            <span class="text-xs text-gray-500">Google {{ number_format($googleRating, 1) }} ({{ number_format($googleReviews) }})</span>
                         @endif
                         @if($yelpReviews > 0)
-                            <div class="flex items-center gap-1.5 bg-[#AF0606]/10 px-3 py-1.5 rounded-full">
-                                <svg class="w-4 h-4 text-[#AF0606]" viewBox="0 0 24 24" fill="currentColor"><path d="M20.16 12.594l-4.995 1.433c-.96.276-1.74-.8-1.176-1.63l2.905-4.308a1.072 1.072 0 011.596-.206 9.194 9.194 0 011.67 4.711zm-6.728 6.272a1.07 1.07 0 01-.18 1.602 9.2 9.2 0 01-4.638 1.838 1.073 1.073 0 01-1.143-.857l-.887-5.166c-.171-1.001.956-1.65 1.705-1.006l3.143 2.589zm-8.476-2.612a9.2 9.2 0 01-.934-4.98 1.072 1.072 0 011.32-.897l5.022 1.524c.97.294.97 1.69 0 1.984l-5.022 1.524a1.07 1.07 0 01-.386-.155zm3.042-8.476l.887-5.166a1.073 1.073 0 011.143-.857 9.2 9.2 0 014.638 1.838 1.07 1.07 0 01.18 1.602L11.7 8.784c-.749.643-1.876-.005-1.705-1.006zm.84-6.184a1.072 1.072 0 011.596.206l2.905 4.308c.564.83-.216 1.906-1.176 1.63l-4.995-1.433a1.073 1.073 0 01-.426-1.808 9.19 9.19 0 012.096-2.903z"/></svg>
-                                <span class="text-gray-700"><strong>{{ number_format($yelpRating, 1) }}</strong> ({{ number_format($yelpReviews) }})</span>
-                            </div>
-                        @endif
-                        @if($internalReviewCount > 0)
-                            <div class="flex items-center gap-1.5 bg-yellow-50 px-3 py-1.5 rounded-full">
-                                <svg class="w-4 h-4 text-yellow-600" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                                <span class="text-gray-700"><strong>{{ number_format($internalRating, 1) }}</strong> ({{ number_format($internalReviewCount) }} FAMER)</span>
-                            </div>
+                            <span class="text-xs text-gray-500">Yelp {{ number_format($yelpRating, 1) }} ({{ number_format($yelpReviews) }})</span>
                         @endif
                     </div>
 
                     <!-- Hours Status -->
                     @if($todayHours)
-                        <div class="flex items-center gap-2 mb-4 text-sm">
+                        <div class="flex items-center gap-2 mt-3 text-sm">
                             @if($isOpenNow)
                                 <span class="text-green-600 font-semibold">Abierto</span>
                             @else
-                                <span class="text-danger-600 font-semibold">Cerrado</span>
+                                <span class="text-red-600 font-semibold">Cerrado</span>
                             @endif
                             <span class="text-gray-600">{{ preg_replace('/^[^:]+:\s*/', '', $todayHours) }}</span>
                             <button onclick="document.getElementById('hours-section').scrollIntoView({behavior: 'smooth'})" class="text-blue-600 hover:underline">Ver horarios</button>
                         </div>
                     @endif
 
-                    <!-- Action Buttons - Yelp Style -->
-                    <div class="flex flex-wrap gap-3 pt-4 border-t border-gray-100">
-                        <a href="#write-review" wire:click="switchTab('reviews')" class="inline-flex items-center px-4 py-2.5 bg-[#AF0606] text-white font-semibold rounded-lg hover:bg-[#8B0505] transition-colors">
+                    <!-- Action Buttons -->
+                    <div class="flex flex-wrap gap-3 pt-4 mt-4 border-t border-gray-100">
+                        <a href="#write-review" wire:click="switchTab('reviews')" class="inline-flex items-center px-4 py-2.5 bg-gray-900 text-white font-semibold rounded-lg hover:bg-gray-800 transition-colors">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
                             Escribir reseña
                         </a>

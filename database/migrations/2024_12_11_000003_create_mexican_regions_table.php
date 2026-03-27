@@ -18,9 +18,8 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // Agregar foreign key a restaurants
         Schema::table('restaurants', function (Blueprint $table) {
-            $table->foreignId('mexican_region_id')->nullable()->after('mexican_region')->constrained('mexican_regions')->nullOnDelete();
+            $table->foreignId('mexican_region_id')->nullable()->constrained('mexican_regions')->nullOnDelete();
         });
     }
 

@@ -9,10 +9,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('restaurants', function (Blueprint $table) {
-            $table->string('yelp_id')->nullable()->after('google_reviews_count')->index();
-            $table->string('yelp_url')->nullable()->after('yelp_id');
-            $table->decimal('yelp_rating', 2, 1)->nullable()->after('yelp_url');
-            $table->integer('yelp_reviews_count')->default(0)->after('yelp_rating');
+            if (!Schema::hasColumn('restaurants', 'yelp_id')) {
+                $table->string('yelp_id')->nullable()->index();
+            }
+            if (!Schema::hasColumn('restaurants', 'yelp_url')) {
+                $table->string('yelp_url')->nullable();
+            }
+            if (!Schema::hasColumn('restaurants', 'yelp_rating')) {
+                $table->decimal('yelp_rating', 2, 1)->nullable();
+            }
+            if (!Schema::hasColumn('restaurants', 'yelp_reviews_count')) {
+                $table->integer('yelp_reviews_count')->default(0);
+            }
         });
     }
 

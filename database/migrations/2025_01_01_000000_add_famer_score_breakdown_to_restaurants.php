@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::table('restaurants', function (Blueprint $table) {
             if (!Schema::hasColumn('restaurants', 'famer_score_breakdown')) {
-                $table->json('famer_score_breakdown')->nullable()->after('average_rating');
+                $table->json('famer_score_breakdown')->nullable();
             }
         });
     }

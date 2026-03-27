@@ -26,7 +26,7 @@ return new class extends Migration
             $table->decimal('revenue_generated', 10, 2)->default(0);
             $table->timestamps();
             
-            $table->index(['restaurant_id', 'trigger_type', 'is_active']);
+            $table->index(['restaurant_id', 'trigger_type', 'is_active'], 'sms_auto_rest_idx');
         });
     }
 

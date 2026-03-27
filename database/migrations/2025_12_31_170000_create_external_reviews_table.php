@@ -49,7 +49,7 @@ return new class extends Migration
             $table->timestamps();
             
             // Indexes
-            $table->unique(['restaurant_id', 'platform', 'platform_review_id']);
+            $table->unique(['restaurant_id', 'platform', 'platform_review_id'], 'ext_reviews_unique');
             $table->index(['restaurant_id', 'platform']);
             $table->index(['restaurant_id', 'status']);
             $table->index('reviewed_at');
