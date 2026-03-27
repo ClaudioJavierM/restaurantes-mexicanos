@@ -18,6 +18,11 @@
     <meta name="description" content="{{ $seoDesc }}">
     <link rel="canonical" href="{{ $seoUrl }}">
 
+    {{-- Hreflang alternates --}}
+    <link rel="alternate" hreflang="es" href="https://restaurantesmexicanosfamosos.com/sitio/{{ $restaurant->slug }}" />
+    <link rel="alternate" hreflang="en" href="https://famousmexicanrestaurants.com/sitio/{{ $restaurant->slug }}" />
+    <link rel="alternate" hreflang="x-default" href="https://famousmexicanrestaurants.com/sitio/{{ $restaurant->slug }}" />
+
     {{-- Open Graph --}}
     <meta property="og:type" content="restaurant">
     <meta property="og:title" content="{{ $restaurant->name }} - Mexican Food in {{ $restaurant->city }}">

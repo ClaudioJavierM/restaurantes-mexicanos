@@ -21,9 +21,10 @@
     <link rel="canonical" href="{{ url()->current() }}">
 
     <!-- SEO: Hreflang Tags for Bilingual Support -->
-    <link rel="alternate" hreflang="en" href="https://famousmexicanrestaurants.com{{ request()->path() === '/' ? '' : '/' . request()->path() }}" />
-    <link rel="alternate" hreflang="es" href="https://restaurantesmexicanosfamosos.com{{ request()->path() === '/' ? '' : '/' . request()->path() }}" />
-    <link rel="alternate" hreflang="x-default" href="https://famousmexicanrestaurants.com{{ request()->path() === '/' ? '' : '/' . request()->path() }}" />
+    @php $hrefPath = request()->path() === '/' ? '' : '/' . request()->path(); @endphp
+    <link rel="alternate" hreflang="en" href="https://famousmexicanrestaurants.com{{ $hrefPath }}" />
+    <link rel="alternate" hreflang="es" href="https://restaurantesmexicanosfamosos.com{{ $hrefPath }}" />
+    <link rel="alternate" hreflang="x-default" href="https://famousmexicanrestaurants.com{{ $hrefPath }}" />
 
     <!-- Open Graph Locale -->
     <meta property="og:locale" content="{{ app()->getLocale() === 'en' ? 'en_US' : 'es_US' }}" />
