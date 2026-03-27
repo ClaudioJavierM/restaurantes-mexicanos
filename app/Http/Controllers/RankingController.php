@@ -25,7 +25,7 @@ class RankingController extends Controller
             $restaurants = Restaurant::where('status', 'approved')
                 ->where('country', $country)
                 ->with(['state', 'category', 'media'])
-                ->orderByRaw('(average_rating * 0.7 + MIN(total_reviews / 100, 1) * 0.3 * 5) DESC')
+                ->orderByRaw('(average_rating * 0.7 + LEAST(total_reviews / 100, 1) * 0.3 * 5) DESC')
                 ->orderByDesc('total_reviews')
                 ->limit(50)
                 ->get();
@@ -80,7 +80,7 @@ class RankingController extends Controller
             $restaurants = Restaurant::where('status', 'approved')
                 ->where('country', $country)
                 ->with(['state', 'category', 'media'])
-                ->orderByRaw('(average_rating * 0.7 + MIN(total_reviews / 100, 1) * 0.3 * 5) DESC')
+                ->orderByRaw('(average_rating * 0.7 + LEAST(total_reviews / 100, 1) * 0.3 * 5) DESC')
                 ->orderByDesc('total_reviews')
                 ->limit(10)
                 ->get();
@@ -115,7 +115,7 @@ class RankingController extends Controller
                 ->where('city', 'like', $cityName)
                 ->where('status', 'approved')
                 ->with(['state', 'category', 'media'])
-                ->orderByRaw('(average_rating * 0.7 + MIN(total_reviews / 100, 1) * 0.3 * 5) DESC')
+                ->orderByRaw('(average_rating * 0.7 + LEAST(total_reviews / 100, 1) * 0.3 * 5) DESC')
                 ->orderByDesc('total_reviews')
                 ->limit(25)
                 ->get();
@@ -168,7 +168,7 @@ class RankingController extends Controller
             $restaurants = Restaurant::where('state_id', $state->id)
                 ->where('status', 'approved')
                 ->with(['state', 'category', 'media'])
-                ->orderByRaw('(average_rating * 0.7 + MIN(total_reviews / 100, 1) * 0.3 * 5) DESC')
+                ->orderByRaw('(average_rating * 0.7 + LEAST(total_reviews / 100, 1) * 0.3 * 5) DESC')
                 ->orderByDesc('total_reviews')
                 ->limit(25)
                 ->get();
