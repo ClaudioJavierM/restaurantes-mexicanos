@@ -308,7 +308,7 @@
                 <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 mb-6">
                     <!-- Category Badge -->
                     <div class="mb-3">
-                        <span class="inline-block bg-gray-100 text-gray-700 text-sm font-semibold px-3 py-1 rounded-full">{{ $restaurant->category->name }}</span>
+                        <span class="inline-block bg-gray-100 text-gray-700 text-sm font-semibold px-3 py-1 rounded-full">{{ $restaurant->category?->name }}</span>
                     </div>
 
                     {{-- FAMER Ranking Badges --}}
@@ -354,7 +354,7 @@
                     <!-- Location -->
                     <div class="flex items-center gap-2 mb-3 text-gray-500">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                        <span class="text-base">{{ $restaurant->city }}@if($restaurant->state), {{ $restaurant->state->name ?? '' }}@endif</span>
+                        <span class="text-base">{{ $restaurant->city }}@if($restaurant->state), {{ $restaurant->state?->name ?? '' }}@endif</span>
                     </div>
 
                     <!-- Rating Row -->
@@ -495,7 +495,7 @@
                     <div class="flex flex-wrap gap-2 mt-4 pt-4 border-t border-gray-100">
                         <span class="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
                             <svg class="w-4 h-4 mr-1.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                            {{ $restaurant->city }}, {{ $restaurant->state->code }}
+                            {{ $restaurant->city }}, {{ $restaurant->state?->code }}
                         </span>
                         @if($restaurant->price_range)
                             <span class="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
@@ -505,7 +505,7 @@
                         @endif
                         <span class="inline-flex items-center px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm">
                             <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-                            {{ $restaurant->category->name }}
+                            {{ $restaurant->category?->name }}
                         </span>
                         @if($restaurant->phone)
                             <span class="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
@@ -577,14 +577,14 @@
                     <div class="grid md:grid-cols-2 gap-6">
                         <!-- Map -->
                         <div>
-                            <x-google-map :name="$restaurant->name" :address="$restaurant->address . ', ' . $restaurant->city . ', ' . $restaurant->state->code . ' ' . $restaurant->zip_code" height="250" zoom="15" />
+                            <x-google-map :name="$restaurant->name" :address="$restaurant->address . ', ' . $restaurant->city . ', ' . $restaurant->state?->code . ' ' . $restaurant->zip_code" height="250" zoom="15" />
                             <div class="mt-3">
-                                <a href="https://www.google.com/maps/dir/?api=1&destination={{ urlencode($restaurant->address . ', ' . $restaurant->city . ', ' . $restaurant->state->code) }}" target="_blank" class="text-blue-600 hover:underline font-medium">
+                                <a href="https://www.google.com/maps/dir/?api=1&destination={{ urlencode($restaurant->address . ', ' . $restaurant->city . ', ' . $restaurant->state?->code) }}" target="_blank" class="text-blue-600 hover:underline font-medium">
                                     Cómo llegar
                                 </a>
                             </div>
                             <p class="text-gray-700 mt-2">{{ $restaurant->address }}</p>
-                            <p class="text-gray-600">{{ $restaurant->city }}, {{ $restaurant->state->code }} {{ $restaurant->zip_code }}</p>
+                            <p class="text-gray-600">{{ $restaurant->city }}, {{ $restaurant->state?->code }} {{ $restaurant->zip_code }}</p>
                         </div>
                         <!-- Hours -->
                         <div>
@@ -788,10 +788,10 @@
                         @endif
 
                         <!-- Directions -->
-                        <a href="https://www.google.com/maps/dir/?api=1&destination={{ urlencode($restaurant->address . ', ' . $restaurant->city . ', ' . $restaurant->state->code) }}" target="_blank" class="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors border-b border-gray-100">
+                        <a href="https://www.google.com/maps/dir/?api=1&destination={{ urlencode($restaurant->address . ', ' . $restaurant->city . ', ' . $restaurant->state?->code) }}" target="_blank" class="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors border-b border-gray-100">
                             <div>
                                 <p class="text-blue-600 font-semibold">Cómo Llegar</p>
-                                <p class="text-gray-600 text-sm">{{ $restaurant->address }} {{ $restaurant->city }}, {{ $restaurant->state->code }} {{ $restaurant->zip_code }}</p>
+                                <p class="text-gray-600 text-sm">{{ $restaurant->address }} {{ $restaurant->city }}, {{ $restaurant->state?->code }} {{ $restaurant->zip_code }}</p>
                             </div>
                             <svg class="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                         </a>
