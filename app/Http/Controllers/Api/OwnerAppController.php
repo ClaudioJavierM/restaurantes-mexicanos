@@ -130,7 +130,7 @@ class OwnerAppController extends Controller
             ], 404);
         }
 
-        $restaurant->load(['state:id,name,abbreviation', 'category:id,name']);
+        $restaurant->load(['state:id,name,code', 'category:id,name']);
 
         return response()->json([
             'success' => true,
