@@ -9,6 +9,7 @@ use App\Models\State;
 use App\Models\Suggestion;
 use App\Notifications\SuggestionApprovedNotification;
 use App\Services\BusinessValidationService;
+use App\Services\GooglePlacesService;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
@@ -213,15 +214,28 @@ class SuggestionResource extends Resource
                             'subscription_status' => null,
                         ]);
 
+                        // Fetch Google Places data if not already present
+                        if ($restaurant && !$restaurant->google_place_id) {
+                            try {
+                                $googleService = new GooglePlacesService();
+                                $restaurant->load('state'); // ensure relationship loaded
+                                $googleService->syncRestaurantWithGoogle($restaurant);
+                                $restaurant->refresh();
+                            } catch (\Exception $e) {
+                                \Illuminate\Support\Facades\Log::warning('Google sync failed on approve: ' . $e->getMessage());
+                            }
+                        }
+
                         // Send notification to user or submitter
                         if ($record->user) {
                             $record->user->notify(new SuggestionApprovedNotification($record));
                         }
 
+                        $googleInfo = $restaurant->google_rating ? " | Google: {$restaurant->google_rating}★" : '';
                         Notification::make()
                             ->success()
                             ->title('Suggestion Approved')
-                            ->body("Restaurante \"{$restaurant->name}\" creado en FAMER.")
+                            ->body("Restaurante \"{$restaurant->name}\" creado en FAMER.{$googleInfo}")
                             ->send();
                     }),
                 Tables\Actions\EditAction::make(),
