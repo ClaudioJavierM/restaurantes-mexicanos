@@ -169,6 +169,26 @@ Schedule::command('restaurants:send-claim-invitations --limit=50 --delay=3')
     });
 
 // ============================================================================
+// Rankings Calculation
+// ============================================================================
+
+/**
+ * Recalculate Top 10 city, Top 10 state, and Top 100 national rankings
+ * Runs every Sunday at 3:00 AM (after imports + duplicate cleanup are done)
+ */
+Schedule::command('rankings:calculate')
+    ->cron('0 3 * * 0')
+    ->timezone('America/New_York')
+    ->description('WEEKLY: Recalculate Top 10 city/state + Top 100 national rankings')
+    ->onSuccess(function () {
+        \Log::info('Weekly rankings calculation completed successfully');
+    })
+    ->onFailure(function () {
+        \Log::error('Weekly rankings calculation failed');
+        notifyN8nFailure('rankings:calculate', 'Weekly Top 10 city/state rankings');
+    });
+
+// ============================================================================
 // System Maintenance
 // ============================================================================
 
