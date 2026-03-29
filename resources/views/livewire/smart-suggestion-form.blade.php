@@ -534,6 +534,18 @@
                             </div>
                         </div>
 
+                        <!-- Validation Error Summary -->
+                        @if($errors->any())
+                            <div class="rounded-md bg-red-50 border border-red-200 p-4">
+                                <p class="text-sm font-medium text-red-800">Por favor corrige los siguientes campos:</p>
+                                <ul class="mt-2 text-sm text-red-700 list-disc list-inside">
+                                    @foreach($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+
                         <!-- Submit Button -->
                         <div class="flex items-center justify-between">
                             <p class="text-sm text-gray-600">
