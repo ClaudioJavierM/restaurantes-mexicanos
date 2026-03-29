@@ -4,6 +4,8 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\SuggestionResource\Pages;
 use App\Filament\Resources\SuggestionResource\RelationManagers;
+use App\Models\Restaurant;
+use App\Models\State;
 use App\Models\Suggestion;
 use App\Notifications\SuggestionApprovedNotification;
 use App\Services\BusinessValidationService;
@@ -182,8 +184,33 @@ class SuggestionResource extends Resource
                     ->visible(fn (Suggestion $record) => $record->status !== 'approved')
                     ->requiresConfirmation()
                     ->action(function (Suggestion $record) {
-                        $record->update([
-                            'status' => 'approved',
+                        $record->update(['status' => 'approved']);
+
+                        // Resolve state_id from suggestion's state string (code or name)
+                        $state = State::where('code', strtoupper($record->restaurant_state))
+                            ->orWhere('name', $record->restaurant_state)
+                            ->first();
+
+                        // Create the restaurant record
+                        $restaurant = Restaurant::create([
+                            'name'               => $record->restaurant_name,
+                            'address'            => $record->restaurant_address,
+                            'city'               => $record->restaurant_city,
+                            'state_id'           => $state?->id,
+                            'zip_code'           => $record->restaurant_zip_code,
+                            'phone'              => $record->restaurant_phone,
+                            'website'            => $record->restaurant_website,
+                            'category_id'        => $record->category_id,
+                            'description'        => $record->description,
+                            'status'             => 'approved',
+                            'is_active'          => true,
+                            'google_place_id'    => $record->google_place_id,
+                            'google_rating'      => $record->google_rating,
+                            'google_reviews_count' => $record->google_reviews_count,
+                            'yelp_id'            => $record->yelp_id,
+                            'yelp_rating'        => $record->yelp_rating,
+                            'yelp_review_count'  => $record->yelp_reviews_count,
+                            'subscription_status' => 'free',
                         ]);
 
                         // Send notification to user or submitter
@@ -194,7 +221,7 @@ class SuggestionResource extends Resource
                         Notification::make()
                             ->success()
                             ->title('Suggestion Approved')
-                            ->body('The suggestion has been approved and the submitter has been notified.')
+                            ->body("Restaurante \"{$restaurant->name}\" creado en FAMER.")
                             ->send();
                     }),
                 Tables\Actions\EditAction::make(),
