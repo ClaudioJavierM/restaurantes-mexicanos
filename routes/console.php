@@ -36,10 +36,13 @@ function notifyN8nFailure(string $jobName, string $description): void
  * - ~100-150 new restaurants per day
  * - No manual state rotation needed
  */
-Schedule::command('yelp:import-smart --cities=30 --limit=50 --min-rating=3.5 --delay=2')
+// Budget: Enhanced plan = 5,000 calls/month (~166/day)
+// Each city: 1 search + ~20-50 detail calls = ~21-51 calls/city
+// 4 cities/run × 2 runs = ~8 cities/day = ~88-408 calls/day → stays within budget
+Schedule::command('yelp:import-smart --cities=4 --limit=50 --min-rating=3.5 --delay=2')
     ->dailyAt('02:00')
     ->timezone('America/New_York')
-    ->description('DAILY smart import: 30 cities, skips exhausted cities automatically')
+    ->description('DAILY smart import: 4 cities, budget-safe for 5K/month Enhanced plan')
     ->onSuccess(function () {
         \Log::info('Daily smart import completed successfully');
     })
@@ -51,10 +54,10 @@ Schedule::command('yelp:import-smart --cities=30 --limit=50 --min-rating=3.5 --d
 /**
  * SECOND RUN at 2:00 PM - Additional import for faster growth
  */
-Schedule::command('yelp:import-smart --cities=20 --limit=50 --min-rating=3.5 --delay=2')
+Schedule::command('yelp:import-smart --cities=3 --limit=50 --min-rating=3.5 --delay=2')
     ->dailyAt('14:00')
     ->timezone('America/New_York')
-    ->description('Afternoon smart import: 20 additional cities')
+    ->description('Afternoon smart import: 3 additional cities')
     ->onSuccess(function () {
         \Log::info('Afternoon smart import completed successfully');
     })
