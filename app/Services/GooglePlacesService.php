@@ -224,6 +224,40 @@ class GooglePlacesService
     }
 
     /**
+     * Buscar múltiples restaurantes por nombre y ciudad (Text Search)
+     * Usado por SmartSuggestionForm cuando Yelp falla o se necesitan más resultados
+     */
+    public function searchPlaces(string $name, string $city, string $state, int $limit = 5): array
+    {
+        $query = "{$name} restaurant {$city}, {$state}";
+
+        try {
+            $this->checkAndTrackUsage('google_places_text_search', 1);
+
+            $response = Http::get("{$this->baseUrl}/place/textsearch/json", [
+                'query' => $query,
+                'type' => 'restaurant',
+                'key' => $this->apiKey,
+            ]);
+
+            $this->trackUsage('google_places_text_search', 'textsearch', 1, [
+                'query' => $query,
+                'status' => $response->json('status'),
+            ]);
+
+            if ($response->successful() && in_array($response->json('status'), ['OK', 'ZERO_RESULTS'])) {
+                $results = $response->json('results') ?? [];
+                return array_slice($results, 0, $limit);
+            }
+
+            return [];
+        } catch (\Exception $e) {
+            Log::error('Google Places Text Search Error: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
      * Actualizar un restaurante con información de Google Places
      * OPTIMIZADO: Solo hace 2 llamadas máximo (findPlace + getPlaceDetails)
      */
