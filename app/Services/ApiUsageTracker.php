@@ -22,9 +22,6 @@ class ApiUsageTracker
     {
         $cost = self::calculateCost($service, $requestCount);
 
-        ApiUsage::create([
-        ]);
-
         // Also log to api_call_logs for dashboard
         try {
             ApiCallLog::create([
