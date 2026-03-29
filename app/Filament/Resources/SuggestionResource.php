@@ -210,7 +210,7 @@ class SuggestionResource extends Resource
                             'yelp_id'            => $record->yelp_id,
                             'yelp_rating'        => $record->yelp_rating,
                             'yelp_review_count'  => $record->yelp_reviews_count,
-                            'subscription_status' => 'free',
+                            'subscription_status' => null,
                         ]);
 
                         // Send notification to user or submitter
