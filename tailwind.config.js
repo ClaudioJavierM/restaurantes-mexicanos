@@ -34,21 +34,20 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                sans: ['Poppins', ...defaultTheme.fontFamily.sans],
+                display: ['Playfair Display', 'serif'],
             },
             colors: {
-                red: {
-                    50:  '#fdf9ef',
-                    100: '#f9f0d5',
-                    200: '#f2dda5',
-                    300: '#e6c66b',
-                    400: '#d9b355',
-                    500: '#C9A84C',
-                    600: '#C9A84C',
-                    700: '#a88a30',
-                    800: '#8a6f28',
-                    900: '#725c24',
-                    950: '#3e3011',
+                famer: {
+                    black: '#0B0B0B',
+                    charcoal: '#1A1A1A',
+                    gray: '#2A2A2A',
+                    gold: '#D4AF37',
+                    'gold-light': '#E8C67A',
+                    'gold-dark': '#B08A1E',
+                    green: '#1F3D2B',
+                    red: '#8B1E1E',
+                    white: '#F5F5F5',
                 },
             },
         },

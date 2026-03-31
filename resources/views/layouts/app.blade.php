@@ -6,7 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- PWA Meta Tags -->
-    <meta name="theme-color" content="#1F2937">
+    <meta name="theme-color" content="#0B0B0B">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="FAMER">
@@ -33,7 +33,7 @@
     <!-- Dynamic Meta Tags (Open Graph, Twitter Cards) -->
     @stack('meta')
 
-    <!-- Fonts - Elegantes -->
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=poppins:400,500,600,700,800|playfair-display:400,700,900&display=swap" rel="stylesheet" />
 
@@ -51,18 +51,20 @@
 
     <style>
         :root {
-            --color-gold: #D4A54A;
+            --color-gold: #D4AF37;
             --color-gold-light: #E8C67A;
-            --color-gold-dark: #B8892E;
-            --color-cream: #F5E6C8;
-            --color-red: #DC2626;
-            --color-green: #166534;
-            --color-dark: #1F2937;
-            --color-darker: #111827;
+            --color-gold-dark: #B08A1E;
+            --color-green: #1F3D2B;
+            --color-red: #8B1E1E;
+            --color-dark: #1A1A1A;
+            --color-darker: #0B0B0B;
+            --color-gray: #2A2A2A;
         }
 
         body {
             font-family: 'Poppins', sans-serif;
+            background-color: #0B0B0B;
+            color: #F5F5F5;
         }
         .font-display {
             font-family: 'Playfair Display', serif;
@@ -102,15 +104,10 @@
             left: 100%;
         }
 
-        /* Mexican flag ribbon */
-        .mexican-ribbon {
-            background: linear-gradient(90deg, var(--color-green) 33.33%, white 33.33%, white 66.66%, var(--color-red) 66.66%);
-        }
-
         /* Dark elegant pattern */
         .pattern-dark {
             background-color: var(--color-darker);
-            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23D4A54A' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23D4AF37' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
         }
 
         /* iOS Install Banner Styles */
@@ -152,55 +149,54 @@
                 border-radius: 1rem;
             }
         }
-    
-        /* Ensure Para Dueños dropdown appears above everything */
-        nav [x-show] {
-            z-index: 99999 !important;
-        }
+
         /* Hide Alpine elements until initialized */
         [x-cloak] {
             display: none !important;
         }
-</style>
-        <!-- Google Analytics 4 -->
-        @php
-            $host = request()->getHost();
-            if (str_contains($host, ".com.mx")) {
-                $ga4Id = "G-35N2H2RPVW"; // Mexico
-            } elseif (str_contains($host, "famousmexican")) {
-                $ga4Id = "G-3Y4S0P66Z6"; // USA English
-            } else {
-                $ga4Id = "G-J6S51PLBZM"; // USA Spanish
-            }
-        @endphp
-        <script data-cfasync="false" async src="https://www.googletagmanager.com/gtag/js?id={{ $ga4Id }}"></script>
-        <script data-cfasync="false">
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag("js", new Date());
-            gtag("config", "{{ $ga4Id }}");
-        </script>
-        <!-- Umami Analytics -->
-        @php
-            $umamiHost = request()->getHost();
-            if (str_contains($umamiHost, '.com.mx')) {
-                $umamiId = '4a52fdfa-33a3-4264-9259-43a4e843fe23'; // Mexico
-            } elseif (str_contains($umamiHost, 'famousmexican')) {
-                $umamiId = '5fe98c6a-4370-4c81-8e2f-9ccbaf6f8324'; // Famous MX Restaurants EN
-            } else {
-                $umamiId = 'f88d7ac0-a825-409f-aa5c-c484d9106e7b'; // USA Spanish
-            }
-        @endphp
-        <script data-cfasync="false">
-            // Load Umami directly, bypassing Rocket Loader
-            (function() {
-                var s = document.createElement("script");
-                s.defer = true;
-                s.dataset.websiteId = "{{ $umamiId }}";
-                s.src = "https://analytics.mefimports.com/script.js";
-                document.head.appendChild(s);
-            })();
-        </script>
+    </style>
+
+    <!-- Google Analytics 4 -->
+    @php
+        $host = request()->getHost();
+        if (str_contains($host, ".com.mx")) {
+            $ga4Id = "G-35N2H2RPVW"; // Mexico
+        } elseif (str_contains($host, "famousmexican")) {
+            $ga4Id = "G-3Y4S0P66Z6"; // USA English
+        } else {
+            $ga4Id = "G-J6S51PLBZM"; // USA Spanish
+        }
+    @endphp
+    <script data-cfasync="false" async src="https://www.googletagmanager.com/gtag/js?id={{ $ga4Id }}"></script>
+    <script data-cfasync="false">
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag("js", new Date());
+        gtag("config", "{{ $ga4Id }}");
+    </script>
+
+    <!-- Umami Analytics -->
+    @php
+        $umamiHost = request()->getHost();
+        if (str_contains($umamiHost, '.com.mx')) {
+            $umamiId = '4a52fdfa-33a3-4264-9259-43a4e843fe23'; // Mexico
+        } elseif (str_contains($umamiHost, 'famousmexican')) {
+            $umamiId = '5fe98c6a-4370-4c81-8e2f-9ccbaf6f8324'; // Famous MX Restaurants EN
+        } else {
+            $umamiId = 'f88d7ac0-a825-409f-aa5c-c484d9106e7b'; // USA Spanish
+        }
+    @endphp
+    <script data-cfasync="false">
+        // Load Umami directly, bypassing Rocket Loader
+        (function() {
+            var s = document.createElement("script");
+            s.defer = true;
+            s.dataset.websiteId = "{{ $umamiId }}";
+            s.src = "https://analytics.mefimports.com/script.js";
+            document.head.appendChild(s);
+        })();
+    </script>
+
     <!-- MF Group Universal Conversion Tracking -->
     <script data-cfasync="false">
     (function() {
@@ -277,141 +273,42 @@
         })();
     </script>
 </head>
-<body class="bg-gray-100 antialiased">
+<body class="bg-[#0B0B0B] antialiased text-[#F5F5F5]">
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ app()->getLocale() === 'en' ? 'GTM-NLKPXHKM' : 'GTM-M53NLTND' }}"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
 
-    <!-- Mexican Flag Ribbon Top -->
-    <div class="h-1.5 mexican-ribbon"></div>
-
-    <!-- Navigation - Dark & Elegant -->
-    <nav class="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 shadow-2xl sticky top-0 border-b border-yellow-600/30" style="z-index:9999; overflow:visible;">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 overflow-visible">
-            <div class="flex justify-between h-20 overflow-visible">
+    <!-- Navigation -->
+    <nav class="bg-[#0B0B0B] sticky top-0 border-b border-[#D4AF37]/20" style="z-index:9999;">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-18 items-center">
+                <!-- Logo -->
                 <div class="flex items-center">
                     <a href="/" class="flex items-center gap-3 group">
-                        <img src="/images/branding/logo.png?v=3" alt="FAMER USA" class="h-14 w-auto group-hover:scale-105 transition-all duration-300" style="max-height: 56px;">
-                        <div class="hidden sm:flex flex-col leading-none" style="gap: 2px;">
-                            <span class="text-yellow-500 font-bold text-sm tracking-wide" style="line-height: 1;">Restaurantes</span>
-                            <span class="text-white font-bold text-sm tracking-wide" style="line-height: 1;">Mexicanos</span>
-                            <span class="text-yellow-500 font-bold text-sm tracking-wide" style="line-height: 1;">Famosos</span>
+                        <img src="/images/branding/famer55.png" alt="FAMER" class="h-10 w-auto group-hover:scale-105 transition-transform duration-300">
+                        <div class="hidden sm:flex flex-col leading-tight">
+                            <span class="font-display font-black text-lg text-[#D4AF37] tracking-wide">FAMER</span>
+                            <span class="text-[10px] text-[#CCCCCC] tracking-widest uppercase">Famous Mexican Restaurants</span>
                         </div>
                     </a>
                 </div>
 
                 <!-- Desktop Navigation -->
-                <div class="hidden lg:flex items-center space-x-1 overflow-visible">
-                    <a href="/" class="text-gray-300 hover:text-yellow-500 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-all">
-                        {{ __('app.home') }}
-                    </a>
-                    <a href="/restaurantes" class="text-gray-300 hover:text-yellow-500 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-all">
+                <div class="hidden lg:flex items-center space-x-1">
+                    <a href="/restaurantes" class="text-gray-400 hover:text-[#D4AF37] px-4 py-2 text-sm font-medium transition-colors duration-200">
                         {{ __('app.restaurants') }}
                     </a>
-                    <a href="/sugerir" class="text-gray-300 hover:text-yellow-500 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-all">
-                        {{ __('app.suggest') }}
+                    <a href="/mejores-restaurantes-mexicanos" class="text-gray-400 hover:text-[#D4AF37] px-4 py-2 text-sm font-medium transition-colors duration-200">
+                        Top 10
                     </a>
-                    <!-- Para Dueños Dropdown -->
-                    <div class="relative" style="z-index:99999;" x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false" @click.outside="open = false">
-                        <button @click="open = !open" class="text-gray-300 hover:text-yellow-500 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-all flex items-center gap-1">
-                            {{ app()->getLocale() === 'en' ? 'For Owners' : 'Para Dueños' }}
-                            <svg class="w-4 h-4 transition-transform" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                            </svg>
-                        </button>
-
-                        <!-- Dropdown Menu -->
-                        <div x-show="open" x-cloak
-                             x-transition:enter="transition ease-out duration-200"
-                             x-transition:enter-start="opacity-0 translate-y-1"
-                             x-transition:enter-end="opacity-100 translate-y-0"
-                             x-transition:leave="transition ease-in duration-150"
-                             x-transition:leave-start="opacity-100 translate-y-0"
-                             x-transition:leave-end="opacity-0 translate-y-1"
-                             class="absolute left-0 top-full w-64 bg-white rounded-xl shadow-2xl border border-gray-100 py-2" style="z-index:99999;">
-                            
-                            <!-- Add Restaurant -->
-                            <a href="/sugerir" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
-                                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                                    </svg>
-                                </div>
-                                <div>
-                                    <div class="text-sm font-semibold text-gray-900">{{ app()->getLocale() === 'en' ? 'Add Restaurant' : 'Agregar Restaurante' }}</div>
-                                    <div class="text-xs text-gray-500">{{ app()->getLocale() === 'en' ? 'List your business' : 'Registra tu negocio' }}</div>
-                                </div>
-                            </a>
-                            
-                            <!-- Claim Restaurant -->
-                            <a href="/claim" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
-                                <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                    </svg>
-                                </div>
-                                <div>
-                                    <div class="text-sm font-semibold text-gray-900">{{ app()->getLocale() === 'en' ? 'Claim for Free' : 'Reclamar Gratis' }}</div>
-                                    <div class="text-xs text-gray-500">{{ app()->getLocale() === 'en' ? 'Verify your listing' : 'Verifica tu perfil' }}</div>
-                                </div>
-                            </a>
-                            
-                            <!-- Owner Dashboard -->
-                            <a href="{{ auth()->check() && auth()->user()->restaurants->first() ? url('/owner') : '/for-owners' }}" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
-                                <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                                    <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                                    </svg>
-                                </div>
-                                <div>
-                                    <div class="text-sm font-semibold text-gray-900">{{ app()->getLocale() === 'en' ? 'Owner Dashboard' : 'Mi Dashboard' }}</div>
-                                    <div class="text-xs text-gray-500">{{ app()->getLocale() === 'en' ? 'Manage your restaurant' : 'Administra tu restaurante' }}</div>
-                                </div>
-                            </a>
-                            
-                            <!-- Divider -->
-                            <div class="border-t border-gray-100 my-2"></div>
-                            
-                            
-                            <!-- FAMER Grader -->
-                            <a href="/grader" class="flex items-center gap-3 px-4 py-3 hover:bg-red-50 transition-colors">
-                                <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
-                                    <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                                    </svg>
-                                </div>
-                                <div>
-                                    <div class="text-sm font-semibold text-gray-900">FAMER Score</div>
-                                    <div class="text-xs text-gray-500">Conoce tu puntuacion</div>
-                                </div>
-                            </a>
-                            
-<!-- Explore Plans -->
-                            <a href="/for-owners" class="flex items-center gap-3 px-4 py-3 hover:bg-amber-50 transition-colors">
-                                <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
-                                    <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
-                                    </svg>
-                                </div>
-                                <div>
-                                    <div class="text-sm font-semibold text-gray-900">{{ app()->getLocale() === 'en' ? 'Explore Plans' : 'Explorar Planes' }}</div>
-                                    <div class="text-xs text-gray-500">{{ app()->getLocale() === 'en' ? 'Free, Premium & Elite' : 'Gratis, Premium y Elite' }}</div>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                    <a href="/guia" class="text-gray-300 hover:text-green-400 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-all flex items-center gap-1">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                        </svg>
-                        {{ app()->getLocale() === 'en' ? 'City Guide' : 'Guía' }}
+                    <a href="/for-owners" class="text-gray-400 hover:text-[#D4AF37] px-4 py-2 text-sm font-medium transition-colors duration-200">
+                        {{ app()->getLocale() === 'en' ? 'For Owners' : 'Para Duenos' }}
                     </a>
-                    
-                    <!-- FAMER Awards Link -->
-                    <a href="/famer-awards" class="text-gray-300 hover:text-amber-400 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-all flex items-center gap-1">
-                        <span class="text-amber-500">🏆</span>
+                    <a href="/for-owners#pricing" class="text-gray-400 hover:text-[#D4AF37] px-4 py-2 text-sm font-medium transition-colors duration-200">
+                        {{ app()->getLocale() === 'en' ? 'Pricing' : 'Planes' }}
+                    </a>
+                    <a href="/famer-awards" class="text-gray-400 hover:text-[#D4AF37] px-4 py-2 text-sm font-medium transition-colors duration-200">
                         FAMER Awards
                     </a>
 
@@ -420,23 +317,25 @@
 
                     <!-- Auth Links (Desktop) -->
                     @auth
-                        <a href="/my-favorites" class="text-gray-300 hover:text-red-400 px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-all flex items-center gap-1">
+                        <a href="/my-favorites" class="text-gray-400 hover:text-[#D4AF37] px-3 py-2 text-sm font-medium transition-colors duration-200 flex items-center gap-1">
                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path>
                             </svg>
                             {{ app()->getLocale() === 'en' ? 'Favorites' : 'Favoritos' }}
                         </a>
-                        <a href="/dashboard" class="text-gray-300 hover:text-yellow-500 px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-all">
+                        <a href="/dashboard" class="text-gray-400 hover:text-[#D4AF37] px-3 py-2 text-sm font-medium transition-colors duration-200">
                             Dashboard
                         </a>
                     @else
-                        <a href="/login" class="text-gray-300 hover:text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-all">
+                        <a href="/login" class="text-gray-400 hover:text-[#F5F5F5] px-3 py-2 text-sm font-medium transition-colors duration-200">
                             Login
                         </a>
-                        <a href="/register" class="bg-gradient-to-r from-red-600 to-red-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:shadow-xl hover:scale-105 transition-all duration-300">
-                            Register
-                        </a>
                     @endauth
+
+                    <!-- Claim CTA Button -->
+                    <a href="/claim" class="bg-[#D4AF37] text-[#0B0B0B] px-5 py-2 rounded-lg text-sm font-bold hover:bg-[#E8C67A] transition-colors duration-200 ml-2">
+                        {{ app()->getLocale() === 'en' ? 'Claim Restaurant' : 'Reclamar Restaurante' }}
+                    </a>
                 </div>
 
                 <!-- Mobile menu button -->
@@ -445,8 +344,8 @@
                     <x-language-switcher />
 
                     <!-- Hamburger Button -->
-                    <button id="mobile-menu-btn" type="button" class="inline-flex items-center justify-center p-2 rounded-lg text-gray-300 hover:text-yellow-500 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-yellow-500">
-                        <span class="sr-only">{{ app()->getLocale() === 'en' ? 'Open main menu' : 'Abrir menú principal' }}</span>
+                    <button id="mobile-menu-btn" type="button" class="inline-flex items-center justify-center p-2 rounded-lg text-gray-400 hover:text-[#D4AF37] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#D4AF37]">
+                        <span class="sr-only">{{ app()->getLocale() === 'en' ? 'Open main menu' : 'Abrir menu principal' }}</span>
                         <svg class="block h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
@@ -456,79 +355,42 @@
         </div>
 
         <!-- Mobile menu -->
-        <div id="mobile-menu" class="hidden lg:hidden bg-gray-900 border-t border-gray-700">
-            <div class="px-2 pt-2 pb-3 space-y-1">
-                <a href="/" class="block text-gray-300 hover:text-yellow-500 hover:bg-gray-800 px-3 py-2 rounded-lg text-base font-medium transition-all">
-                    {{ __('app.home') }}
-                </a>
-                <a href="/restaurantes" class="block text-gray-300 hover:text-yellow-500 hover:bg-gray-800 px-3 py-2 rounded-lg text-base font-medium transition-all">
+        <div id="mobile-menu" class="hidden lg:hidden bg-[#0B0B0B] border-t border-[#2A2A2A]">
+            <div class="px-4 pt-2 pb-4 space-y-1">
+                <a href="/restaurantes" class="block text-gray-400 hover:text-[#D4AF37] px-3 py-2.5 rounded-lg text-base font-medium transition-colors duration-200">
                     {{ __('app.restaurants') }}
                 </a>
-                <a href="/sugerir" class="block text-gray-300 hover:text-yellow-500 hover:bg-gray-800 px-3 py-2 rounded-lg text-base font-medium transition-all">
-                    {{ __('app.suggest') }}
+                <a href="/mejores-restaurantes-mexicanos" class="block text-gray-400 hover:text-[#D4AF37] px-3 py-2.5 rounded-lg text-base font-medium transition-colors duration-200">
+                    Top 10
                 </a>
-                <!-- Para Dueños Section (Mobile) -->
-                <div class="border-t border-gray-700 pt-2 mt-2">
-                    <div class="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                        {{ app()->getLocale() === 'en' ? 'For Owners' : 'Para Dueños' }}
-                    </div>
-                    <a href="/sugerir" class="flex items-center gap-3 text-gray-300 hover:text-yellow-500 hover:bg-gray-800 px-3 py-2 rounded-lg text-base font-medium transition-all">
-                        <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                        </svg>
-                        {{ app()->getLocale() === 'en' ? 'Add Restaurant' : 'Agregar Restaurante' }}
-                    </a>
-                    <a href="/claim" class="flex items-center gap-3 text-gray-300 hover:text-yellow-500 hover:bg-gray-800 px-3 py-2 rounded-lg text-base font-medium transition-all">
-                        <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        {{ app()->getLocale() === 'en' ? 'Claim for Free' : 'Reclamar Gratis' }}
-                    </a>
-                    <a href="{{ auth()->check() && auth()->user()->restaurants->first() ? url('/owner') : '/for-owners' }}" class="flex items-center gap-3 text-gray-300 hover:text-yellow-500 hover:bg-gray-800 px-3 py-2 rounded-lg text-base font-medium transition-all">
-                        <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                        </svg>
-                        {{ app()->getLocale() === 'en' ? 'My Dashboard' : 'Mi Dashboard' }}
-                    </a>
-                                        <a href="/grader" class="flex items-center gap-3 text-gray-300 hover:text-red-500 hover:bg-gray-800 px-3 py-2 rounded-lg text-base font-medium transition-all">
-                        <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                        </svg>
-                        FAMER Score
-                    </a>
-                    <a href="/for-owners" class="flex items-center gap-3 text-gray-300 hover:text-amber-500 hover:bg-gray-800 px-3 py-2 rounded-lg text-base font-medium transition-all">
-                        <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
-                        </svg>
-                        {{ app()->getLocale() === 'en' ? 'Explore Plans' : 'Ver Planes' }}
-                    </a>
-                </div>
-                <a href="/guia" class="block text-gray-300 hover:text-green-400 hover:bg-gray-800 px-3 py-2 rounded-lg text-base font-medium transition-all flex items-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                    </svg>
-                    {{ app()->getLocale() === 'en' ? 'City Guide' : 'Guía por Ciudad' }}
+                <a href="/for-owners" class="block text-gray-400 hover:text-[#D4AF37] px-3 py-2.5 rounded-lg text-base font-medium transition-colors duration-200">
+                    {{ app()->getLocale() === 'en' ? 'For Owners' : 'Para Duenos' }}
                 </a>
-                <a href="/famer-awards" class="block text-gray-300 hover:text-amber-400 hover:bg-gray-800 px-3 py-2 rounded-lg text-base font-medium transition-all flex items-center gap-2">
-                    <span class="text-xl">🏆</span>
+                <a href="/for-owners#pricing" class="block text-gray-400 hover:text-[#D4AF37] px-3 py-2.5 rounded-lg text-base font-medium transition-colors duration-200">
+                    {{ app()->getLocale() === 'en' ? 'Pricing' : 'Planes' }}
+                </a>
+                <a href="/famer-awards" class="block text-gray-400 hover:text-[#D4AF37] px-3 py-2.5 rounded-lg text-base font-medium transition-colors duration-200">
                     FAMER Awards
                 </a>
+
+                <div class="border-t border-[#2A2A2A] my-2"></div>
+
                 @auth
-                    <a href="/my-favorites" class="block text-gray-300 hover:text-red-400 hover:bg-gray-800 px-3 py-2 rounded-lg text-base font-medium transition-all">
+                    <a href="/my-favorites" class="block text-gray-400 hover:text-[#D4AF37] px-3 py-2.5 rounded-lg text-base font-medium transition-colors duration-200">
                         {{ app()->getLocale() === 'en' ? 'My Favorites' : 'Mis Favoritos' }}
                     </a>
-                    <a href="/dashboard" class="block text-gray-300 hover:text-yellow-500 hover:bg-gray-800 px-3 py-2 rounded-lg text-base font-medium transition-all">
+                    <a href="/dashboard" class="block text-gray-400 hover:text-[#D4AF37] px-3 py-2.5 rounded-lg text-base font-medium transition-colors duration-200">
                         Dashboard
                     </a>
                 @else
-                    <a href="/login" class="block text-gray-300 hover:text-white hover:bg-gray-800 px-3 py-2 rounded-lg text-base font-medium transition-all">
+                    <a href="/login" class="block text-gray-400 hover:text-[#F5F5F5] px-3 py-2.5 rounded-lg text-base font-medium transition-colors duration-200">
                         Login
                     </a>
-                    <a href="/register" class="block bg-gradient-to-r from-red-600 to-red-700 text-white text-center px-3 py-2 rounded-lg text-base font-semibold transition-all">
-                        Register
-                    </a>
                 @endauth
+
+                <a href="/claim" class="block bg-[#D4AF37] text-[#0B0B0B] text-center px-3 py-2.5 rounded-lg text-base font-bold transition-colors duration-200 hover:bg-[#E8C67A] mt-2">
+                    {{ app()->getLocale() === 'en' ? 'Claim Restaurant' : 'Reclamar Restaurante' }}
+                </a>
             </div>
         </div>
     </nav>
@@ -571,93 +433,107 @@
         @endisset
     </main>
 
-    <!-- Footer - Dark & Elegant -->
-    <footer class="relative pattern-dark text-white mt-20">
+    <!-- Footer -->
+    <footer class="bg-[#0B0B0B] text-[#F5F5F5] mt-20">
         <!-- Gold top border -->
-        <div class="h-1 bg-gradient-to-r from-transparent via-yellow-600 to-transparent"></div>
+        <div class="h-px bg-[#D4AF37]/30"></div>
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 mb-12">
                 <!-- Logo & About -->
-                <div class="md:col-span-1">
+                <div class="lg:col-span-1">
                     <div class="flex items-center gap-3 mb-4">
-                        <img src="/images/branding/logo.png?v=3" alt="FAMER USA" class="h-16 w-auto" style="max-height: 64px;">
-                        <div class="flex flex-col leading-none" style="gap: 2px;">
-                            <span class="text-yellow-500 font-bold text-sm tracking-wide" style="line-height: 1;">Restaurantes</span>
-                            <span class="text-white font-bold text-sm tracking-wide" style="line-height: 1;">Mexicanos</span>
-                            <span class="text-yellow-500 font-bold text-sm tracking-wide" style="line-height: 1;">Famosos</span>
-                        </div>
+                        <img src="/images/branding/famer55.png" alt="FAMER" class="h-16 w-auto">
                     </div>
-                    <p class="text-gray-400 text-sm leading-relaxed">
-                        El directorio más completo de restaurantes mexicanos auténticos en Estados Unidos.
+                    <span class="font-display font-black text-xl text-[#D4AF37] tracking-wide block">FAMER</span>
+                    <span class="text-xs text-[#CCCCCC] tracking-widest uppercase block mt-1 mb-4">Famous Mexican Restaurants</span>
+                    <p class="text-gray-500 text-sm leading-relaxed">
+                        {{ app()->getLocale() === 'en' ? 'The most complete directory of authentic Mexican restaurants in the United States.' : 'El directorio mas completo de restaurantes mexicanos autenticos en Estados Unidos.' }}
                     </p>
                 </div>
 
-                <!-- Quick Links -->
+                <!-- Discovery -->
                 <div>
-                    <h3 class="text-yellow-500 font-bold mb-4 text-sm uppercase tracking-wider">{{ app()->getLocale() === 'en' ? 'Quick Links' : 'Enlaces' }}</h3>
-                    <ul class="space-y-2 text-sm">
-                        <li><a href="/" class="text-gray-400 hover:text-yellow-500 transition-colors">{{ app()->getLocale() === 'en' ? 'Home' : 'Inicio' }}</a></li>
-                        <li><a href="/restaurantes" class="text-gray-400 hover:text-yellow-500 transition-colors">{{ app()->getLocale() === 'en' ? 'All Restaurants' : 'Restaurantes' }}</a></li>
-                        <li><a href="/guia" class="text-gray-400 hover:text-yellow-500 transition-colors">{{ app()->getLocale() === 'en' ? 'City Guides' : 'Guía por Ciudad' }}</a></li>
-                        <li><a href="/sugerir" class="text-gray-400 hover:text-yellow-500 transition-colors">{{ app()->getLocale() === 'en' ? 'Suggest' : 'Sugerir' }}</a></li>
+                    <h3 class="text-[#D4AF37] font-bold mb-4 text-sm uppercase tracking-wider">{{ app()->getLocale() === 'en' ? 'Discovery' : 'Descubre' }}</h3>
+                    <ul class="space-y-2.5 text-sm">
+                        <li><a href="/restaurantes" class="text-gray-500 hover:text-[#D4AF37] transition-colors duration-200">{{ app()->getLocale() === 'en' ? 'Explore Restaurants' : 'Explorar Restaurantes' }}</a></li>
+                        <li><a href="/mejores-restaurantes-mexicanos" class="text-gray-500 hover:text-[#D4AF37] transition-colors duration-200">Top 10</a></li>
+                        <li><a href="/categorias" class="text-gray-500 hover:text-[#D4AF37] transition-colors duration-200">{{ app()->getLocale() === 'en' ? 'Categories' : 'Categorias' }}</a></li>
+                        <li><a href="/guia" class="text-gray-500 hover:text-[#D4AF37] transition-colors duration-200">{{ app()->getLocale() === 'en' ? 'City Guide' : 'Guia por Ciudad' }}</a></li>
+                        <li><a href="/famer-awards" class="text-gray-500 hover:text-[#D4AF37] transition-colors duration-200">FAMER Awards</a></li>
                     </ul>
                 </div>
 
-                <!-- For Business -->
+                <!-- For Owners -->
                 <div>
-                    <h3 class="text-yellow-500 font-bold mb-4 text-sm uppercase tracking-wider">{{ app()->getLocale() === 'en' ? 'For Business' : 'Negocios' }}</h3>
-                    <ul class="space-y-2 text-sm">
-                        <li><a href="/for-owners" class="text-gray-400 hover:text-yellow-500 transition-colors">{{ app()->getLocale() === 'en' ? 'For Owners' : 'Para Dueños' }}</a></li>
-                        <li><a href="/claim" class="text-gray-400 hover:text-yellow-500 transition-colors">{{ app()->getLocale() === 'en' ? 'Claim Restaurant' : 'Reclamar' }}</a></li>
+                    <h3 class="text-[#D4AF37] font-bold mb-4 text-sm uppercase tracking-wider">{{ app()->getLocale() === 'en' ? 'For Owners' : 'Para Duenos' }}</h3>
+                    <ul class="space-y-2.5 text-sm">
+                        <li><a href="/claim" class="text-gray-500 hover:text-[#D4AF37] transition-colors duration-200">{{ app()->getLocale() === 'en' ? 'Claim Restaurant' : 'Reclamar Restaurante' }}</a></li>
+                        <li><a href="/for-owners#pricing" class="text-gray-500 hover:text-[#D4AF37] transition-colors duration-200">{{ app()->getLocale() === 'en' ? 'Plans & Pricing' : 'Planes y Precios' }}</a></li>
+                        <li><a href="/dashboard" class="text-gray-500 hover:text-[#D4AF37] transition-colors duration-200">{{ app()->getLocale() === 'en' ? 'Owner Dashboard' : 'Dashboard' }}</a></li>
+                        <li><a href="/grader" class="text-gray-500 hover:text-[#D4AF37] transition-colors duration-200">FAMER Score</a></li>
                     </ul>
                 </div>
 
-                <!-- MF Imports Family -->
+                <!-- Company -->
                 <div>
-                    <h3 class="text-yellow-500 font-bold mb-4 text-sm uppercase tracking-wider">Nuestros Negocios</h3>
-                    <ul class="space-y-2 text-sm">
-                        <li><a href="https://mf-imports.com" class="text-gray-400 hover:text-yellow-500 transition-colors" target="_blank">MF Imports</a></li>
-                        <li><a href="https://mueblesmexicanos.com" class="text-gray-400 hover:text-yellow-500 transition-colors" target="_blank">Muebles Mexicanos</a></li>
-                        <li><a href="https://tormexpro.com" class="text-gray-400 hover:text-yellow-500 transition-colors" target="_blank">TorMex Pro</a></li>
-                        <li><a href="https://mftrailers.com" class="text-gray-400 hover:text-yellow-500 transition-colors" target="_blank">MF Trailers</a></li>
+                    <h3 class="text-[#D4AF37] font-bold mb-4 text-sm uppercase tracking-wider">{{ app()->getLocale() === 'en' ? 'Company' : 'Empresa' }}</h3>
+                    <ul class="space-y-2.5 text-sm">
+                        <li><a href="/about" class="text-gray-500 hover:text-[#D4AF37] transition-colors duration-200">{{ app()->getLocale() === 'en' ? 'About Us' : 'Nosotros' }}</a></li>
+                        <li><a href="/contact" class="text-gray-500 hover:text-[#D4AF37] transition-colors duration-200">{{ app()->getLocale() === 'en' ? 'Contact' : 'Contacto' }}</a></li>
+                        <li><a href="/privacy" class="text-gray-500 hover:text-[#D4AF37] transition-colors duration-200">{{ app()->getLocale() === 'en' ? 'Privacy Policy' : 'Privacidad' }}</a></li>
+                        <li><a href="/terms" class="text-gray-500 hover:text-[#D4AF37] transition-colors duration-200">{{ app()->getLocale() === 'en' ? 'Terms of Service' : 'Terminos' }}</a></li>
+                    </ul>
+                </div>
+
+                <!-- MF Group -->
+                <div>
+                    <h3 class="text-[#D4AF37] font-bold mb-4 text-sm uppercase tracking-wider">MF Group</h3>
+                    <ul class="space-y-2.5 text-sm">
+                        <li><a href="https://mf-imports.com" class="text-gray-500 hover:text-[#D4AF37] transition-colors duration-200" target="_blank" rel="noopener">MF Imports</a></li>
+                        <li><a href="https://mueblesmexicanos.com" class="text-gray-500 hover:text-[#D4AF37] transition-colors duration-200" target="_blank" rel="noopener">Muebles Mexicanos</a></li>
+                        <li><a href="https://tormexpro.com" class="text-gray-500 hover:text-[#D4AF37] transition-colors duration-200" target="_blank" rel="noopener">TorMex Pro</a></li>
+                        <li><a href="https://mftrailers.com" class="text-gray-500 hover:text-[#D4AF37] transition-colors duration-200" target="_blank" rel="noopener">MF Trailers</a></li>
                     </ul>
                 </div>
             </div>
-
-            <!-- Mexican Flag Divider -->
-            <div class="h-0.5 mexican-ribbon rounded-full mb-8"></div>
 
             <!-- Bottom Bar -->
-            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-                <p class="text-gray-500 text-sm">
-                    &copy; {{ date('Y') }} <span class="text-yellow-600 font-semibold">Restaurantes Mexicanos Famosos</span>. All rights reserved.
-                </p>
-                <div class="flex items-center gap-4 text-sm">
-                    <a href="/privacy" class="text-gray-500 hover:text-yellow-500 transition-colors">Privacy</a>
-                    <a href="/terms" class="text-gray-500 hover:text-yellow-500 transition-colors">Terms</a>
-                    <a href="/contact" class="text-gray-500 hover:text-yellow-500 transition-colors">Contact</a>
+            <div class="border-t border-[#2A2A2A] pt-8">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                    <p class="text-gray-600 text-sm">
+                        &copy; {{ date('Y') }} <span class="text-[#D4AF37]">FAMER</span> &mdash; Famous Mexican Restaurants. {{ app()->getLocale() === 'en' ? 'All rights reserved.' : 'Todos los derechos reservados.' }}
+                    </p>
+                    <div class="flex items-center gap-5">
+                        <!-- Social placeholders -->
+                        <a href="#" class="text-gray-600 hover:text-[#D4AF37] transition-colors duration-200" aria-label="Facebook">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                        </a>
+                        <a href="#" class="text-gray-600 hover:text-[#D4AF37] transition-colors duration-200" aria-label="Instagram">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+                        </a>
+                        <a href="#" class="text-gray-600 hover:text-[#D4AF37] transition-colors duration-200" aria-label="TikTok">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
+                        </a>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Legal Disclaimer -->
-            <div class="mt-6 pt-4 border-t border-gray-800">
-                <p class="text-gray-600 text-xs text-center leading-relaxed max-w-4xl mx-auto">
-                    <strong class="text-gray-500">Disclaimer:</strong> Restaurant information is compiled from public sources including
-                    <a href="https://www.yelp.com" target="_blank" rel="noopener" class="text-red-400 hover:text-red-300">Yelp</a> and
-                    <a href="https://www.google.com/maps" target="_blank" rel="noopener" class="text-blue-400 hover:text-blue-300">Google</a>.
-                    Restaurant owners can <a href="/claim" class="text-yellow-500 hover:text-yellow-400 underline">claim and verify their listing</a>.
+                <!-- Subtle disclaimer -->
+                <p class="text-gray-700 text-xs text-center mt-6 leading-relaxed max-w-3xl mx-auto">
+                    {{ app()->getLocale() === 'en' ? 'Restaurant information compiled from public sources. Owners can' : 'Informacion recopilada de fuentes publicas. Duenos pueden' }}
+                    <a href="/claim" class="text-[#D4AF37]/60 hover:text-[#D4AF37] underline">{{ app()->getLocale() === 'en' ? 'claim and verify their listing' : 'reclamar y verificar su perfil' }}</a>.
                 </p>
             </div>
         </div>
     </footer>
 
-        @livewire('cart')
+    @livewire('cart')
 
     @livewireScripts
 
     <!-- Dynamic Scripts -->
     @stack('scripts')
+
     {{-- Carmen AI Chat: only on Premium/Elite restaurant detail pages --}}
     @php
         $chatRestaurant = null;
