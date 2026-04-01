@@ -70,4 +70,8 @@ class DishController extends Controller
 
         return view('dishes.dish', compact('dish', 'data', 'restaurants'));
     }
+
+    public function birria(): View  { return $this->show('birria'); }
+    public function tamales(): View { return $this->show('tamales'); }
+    public function pozole(): View  { return $this->show('pozole'); }
 }

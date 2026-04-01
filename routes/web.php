@@ -15,9 +15,9 @@ Route::get('/sugerir', \App\Livewire\SmartSuggestionForm::class)->name('suggesti
 Route::get('/restaurantes-mexicanos-cerca-de-mi', [\App\Http\Controllers\NearMeController::class, 'index'])->name('near-me');
 
 // Dish-specific landing pages (SEO)
-Route::get('/birria', fn() => app(\App\Http\Controllers\DishController::class)->show('birria'))->name('dishes.birria');
-Route::get('/tamales', fn() => app(\App\Http\Controllers\DishController::class)->show('tamales'))->name('dishes.tamales');
-Route::get('/pozole', fn() => app(\App\Http\Controllers\DishController::class)->show('pozole'))->name('dishes.pozole');
+Route::get('/birria', [\App\Http\Controllers\DishController::class, 'birria'])->name('dishes.birria');
+Route::get('/tamales', [\App\Http\Controllers\DishController::class, 'tamales'])->name('dishes.tamales');
+Route::get('/pozole', [\App\Http\Controllers\DishController::class, 'pozole'])->name('dishes.pozole');
 
 // For Business Owners
 Route::get("/for-owners", \App\Livewire\ForOwners::class)->name("for-owners");
