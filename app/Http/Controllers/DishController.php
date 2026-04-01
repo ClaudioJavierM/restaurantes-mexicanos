@@ -51,7 +51,7 @@ class DishController extends Controller
         $restaurants = Restaurant::approved()
             ->where($column, true)
             ->with(['state'])
-            ->select(['id', 'name', 'slug', 'city', 'state_id', 'address', 'average_rating', 'total_reviews', 'description', 'cover_image', 'logo_image'])
+            ->select(['id', 'name', 'slug', 'city', 'state_id', 'address', 'average_rating', 'total_reviews', 'description', 'image'])
             ->orderByDesc('average_rating')
             ->orderByDesc('total_reviews')
             ->limit(50)
@@ -61,7 +61,7 @@ class DishController extends Controller
         if ($restaurants->isEmpty()) {
             $restaurants = Restaurant::approved()
                 ->with(['state'])
-                ->select(['id', 'name', 'slug', 'city', 'state_id', 'address', 'average_rating', 'total_reviews', 'description', 'cover_image', 'logo_image'])
+                ->select(['id', 'name', 'slug', 'city', 'state_id', 'address', 'average_rating', 'total_reviews', 'description', 'image'])
                 ->orderByDesc('average_rating')
                 ->orderByDesc('total_reviews')
                 ->limit(50)

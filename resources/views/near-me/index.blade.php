@@ -89,9 +89,9 @@ Restaurantes Mexicanos Cerca de Mí | FAMER
                 <a href="/restaurante/{{ $restaurant->slug }}"
                    style="display:block; background:#1A1A1A; border:1px solid #2A2A2A; border-radius:12px; overflow:hidden; text-decoration:none; transition:border-color 0.2s;"
                    onmouseover="this.style.borderColor='#D4AF37'" onmouseout="this.style.borderColor='#2A2A2A'">
-                    @if($restaurant->cover_image)
+                    @if($restaurant->image)
                     <div style="height:160px; overflow:hidden;">
-                        <img src="{{ $restaurant->cover_image }}" alt="{{ $restaurant->name }}" style="width:100%; height:100%; object-fit:cover;">
+                        <img src="{{ $restaurant->image }}" alt="{{ $restaurant->name }}" style="width:100%; height:100%; object-fit:cover;">
                     </div>
                     @else
                     <div style="height:100px; background:#2A2A2A; display:flex; align-items:center; justify-content:center;">
