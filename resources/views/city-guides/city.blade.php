@@ -42,7 +42,9 @@
 
         {{-- Breadcrumb --}}
         <nav class="text-sm mb-6 flex items-center gap-2 text-gray-500">
-            <a href="{{ route('city-guides.states') }}" class="hover:text-[#D4AF37] transition-colors">Guías</a>
+            <a href="{{ url('/') }}" class="hover:text-[#D4AF37] transition-colors">FAMER</a>
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            <a href="{{ route('city-guides.states') }}" class="hover:text-[#D4AF37] transition-colors">Guía</a>
             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
             <a href="{{ route('city-guides.state', strtolower($state->code)) }}" class="hover:text-[#D4AF37] transition-colors">{{ $state->name }}</a>
             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
@@ -160,7 +162,7 @@
                             $combinedReviews = $restaurant->getCombinedReviewCount();
                         @endphp
                         <a href="{{ route('restaurants.show', $restaurant->slug) }}"
-                           class="flex gap-4 bg-[#1A1A1A] border {{ $isElite ? 'border-[#D4AF37]/50' : ($isPremium ? 'border-emerald-600/50' : 'border-[#2A2A2A]') }} rounded-xl p-4 hover:border-[#D4AF37]/40 hover:bg-[#1F1F1F] transition-all group">
+                           class="flex gap-4 bg-[#1A1A1A] border {{ $isElite ? 'border-[#D4AF37]/50' : ($isPremium ? 'border-[#D4AF37]/20' : 'border-[#2A2A2A]') }} rounded-xl p-4 hover:border-[#D4AF37]/40 hover:bg-[#1F1F1F] transition-all group">
 
                             {{-- Rank Number --}}
                             <div class="flex-shrink-0 flex items-center">
@@ -193,10 +195,10 @@
                                         @if($isElite)
                                             <span class="bg-[#D4AF37]/10 text-[#D4AF37] text-xs px-2 py-0.5 rounded-full border border-[#D4AF37]/30 font-semibold whitespace-nowrap">Destacado</span>
                                         @elseif($isPremium)
-                                            <span class="bg-emerald-900/30 text-emerald-400 text-xs px-2 py-0.5 rounded-full border border-emerald-600/30 font-semibold whitespace-nowrap">Premium</span>
+                                            <span style="background:rgba(212,175,55,0.08); color:#D4AF37; border:1px solid rgba(212,175,55,0.25);" class="text-xs px-2 py-0.5 rounded-full font-semibold whitespace-nowrap">Premium</span>
                                         @endif
                                         @if($restaurant->is_claimed)
-                                            <span class="bg-emerald-900/20 text-emerald-400 text-xs px-2 py-0.5 rounded-full border border-emerald-600/20 whitespace-nowrap">Verificado</span>
+                                            <span style="background:rgba(212,175,55,0.06); color:#D4AF37; border:1px solid rgba(212,175,55,0.15);" class="text-xs px-2 py-0.5 rounded-full whitespace-nowrap">Verificado</span>
                                         @endif
                                     </div>
                                 </div>
@@ -240,8 +242,8 @@
                 @if($restaurants->total() > 10)
                 <section>
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="w-1 h-8 bg-[#2A2A2A] rounded-full"></div>
-                        <h2 class="text-xl font-bold text-[#F5F5F5]">
+                        <div class="w-1 h-8 bg-[#D4AF37] rounded-full"></div>
+                        <h2 class="text-xl font-bold text-[#F5F5F5]" style="font-family: 'Playfair Display', serif;">
                             Todos los Restaurantes en {{ $cityName }}
                         </h2>
                     </div>
@@ -261,7 +263,7 @@
                             $cardReviews = $restaurant->getCombinedReviewCount();
                         @endphp
                         <a href="{{ route('restaurants.show', $restaurant->slug) }}"
-                           class="bg-[#1A1A1A] border {{ $isEliteCard ? 'border-[#D4AF37]/40' : ($isPremiumCard ? 'border-emerald-600/30' : 'border-[#2A2A2A]') }} rounded-xl overflow-hidden hover:border-[#D4AF37]/30 hover:bg-[#1F1F1F] transition-all group">
+                           class="bg-[#1A1A1A] border {{ $isEliteCard ? 'border-[#D4AF37]/40' : ($isPremiumCard ? 'border-[#D4AF37]/15' : 'border-[#2A2A2A]') }} rounded-xl overflow-hidden hover:border-[#D4AF37]/30 hover:bg-[#1F1F1F] transition-all group">
 
                             {{-- Image --}}
                             <div class="relative h-44 bg-[#2A2A2A]">
@@ -287,12 +289,12 @@
                                             Destacado
                                         </span>
                                     @elseif($isPremiumCard)
-                                        <span class="bg-emerald-600 text-white text-xs px-2.5 py-1 rounded-full font-semibold shadow">Premium</span>
+                                        <span style="background:rgba(212,175,55,0.15); color:#D4AF37; border:1px solid rgba(212,175,55,0.3);" class="text-xs px-2.5 py-1 rounded-full font-semibold shadow">Premium</span>
                                     @endif
                                 </div>
                                 @if($restaurant->is_claimed)
                                 <div class="absolute top-3 right-3">
-                                    <span class="bg-emerald-900/80 text-emerald-400 text-xs px-2 py-1 rounded border border-emerald-600/30">Verificado</span>
+                                    <span style="background:rgba(212,175,55,0.1); color:#D4AF37; border:1px solid rgba(212,175,55,0.25);" class="text-xs px-2 py-1 rounded">Verificado</span>
                                 </div>
                                 @endif
                             </div>

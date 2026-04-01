@@ -46,7 +46,9 @@ Descubre los {{ number_format($stats->total) }} mejores restaurantes mexicanos e
 
         {{-- Breadcrumb --}}
         <nav class="text-sm mb-6 flex items-center gap-2 text-gray-500">
-            <a href="{{ route('city-guides.states') }}" class="hover:text-[#D4AF37] transition-colors">Guías</a>
+            <a href="{{ url('/') }}" class="hover:text-[#D4AF37] transition-colors">FAMER</a>
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            <a href="{{ route('city-guides.states') }}" class="hover:text-[#D4AF37] transition-colors">Guía</a>
             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
             <span class="text-[#F5F5F5]">{{ $state->name }}</span>
         </nav>
@@ -118,7 +120,7 @@ Descubre los {{ number_format($stats->total) }} mejores restaurantes mexicanos e
                     $combinedReviews = $restaurant->getCombinedReviewCount();
                 @endphp
                 <a href="{{ route('restaurants.show', $restaurant->slug) }}"
-                   class="flex gap-4 bg-[#1A1A1A] border {{ $isElite ? 'border-[#D4AF37]/50' : ($isPremium ? 'border-emerald-600/50' : 'border-[#2A2A2A]') }} rounded-xl p-4 hover:border-[#D4AF37]/40 hover:bg-[#1F1F1F] transition-all group">
+                   class="flex gap-4 bg-[#1A1A1A] border {{ $isElite ? 'border-[#D4AF37]/50' : ($isPremium ? 'border-[#D4AF37]/20' : 'border-[#2A2A2A]') }} rounded-xl p-4 hover:border-[#D4AF37]/40 hover:bg-[#1F1F1F] transition-all group">
 
                     {{-- Rank Number --}}
                     <div class="flex-shrink-0 flex items-center">
@@ -151,10 +153,10 @@ Descubre los {{ number_format($stats->total) }} mejores restaurantes mexicanos e
                                 @if($isElite)
                                     <span class="bg-[#D4AF37]/10 text-[#D4AF37] text-xs px-2 py-0.5 rounded-full border border-[#D4AF37]/30 font-semibold whitespace-nowrap">Destacado</span>
                                 @elseif($isPremium)
-                                    <span class="bg-emerald-900/30 text-emerald-400 text-xs px-2 py-0.5 rounded-full border border-emerald-600/30 font-semibold whitespace-nowrap">Premium</span>
+                                    <span style="background:rgba(212,175,55,0.08); color:#D4AF37; border:1px solid rgba(212,175,55,0.25);" class="text-xs px-2 py-0.5 rounded-full font-semibold whitespace-nowrap">Premium</span>
                                 @endif
                                 @if($restaurant->is_claimed)
-                                    <span class="bg-emerald-900/20 text-emerald-400 text-xs px-2 py-0.5 rounded-full border border-emerald-600/20 whitespace-nowrap">Verificado</span>
+                                    <span style="background:rgba(212,175,55,0.06); color:#D4AF37; border:1px solid rgba(212,175,55,0.15);" class="text-xs px-2 py-0.5 rounded-full whitespace-nowrap">Verificado</span>
                                 @endif
                             </div>
                         </div>
@@ -198,7 +200,7 @@ Descubre los {{ number_format($stats->total) }} mejores restaurantes mexicanos e
         {{-- ===================== TOP CITIES GRID ===================== --}}
         <section class="mb-14">
             <div class="flex items-center gap-3 mb-6">
-                <div class="w-1 h-8 bg-[#2A2A2A] rounded-full"></div>
+                <div class="w-1 h-8 bg-[#D4AF37] rounded-full"></div>
                 <h2 class="text-2xl font-bold text-[#F5F5F5]" style="font-family: 'Playfair Display', serif;">
                     Ciudades con Restaurantes Mexicanos en {{ $state->name }}
                 </h2>
@@ -228,7 +230,7 @@ Descubre los {{ number_format($stats->total) }} mejores restaurantes mexicanos e
                         @endif
 
                         @if($city->claimed_count > 0)
-                        <div class="flex items-center gap-1 text-emerald-500">
+                        <div class="flex items-center gap-1" style="color:#D4AF37;">
                             <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                             </svg>

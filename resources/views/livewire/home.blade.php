@@ -7,6 +7,26 @@
 @else
     @include("partials.usa.hero")
 
+    {{-- Near Me CTA Banner --}}
+    <section style="padding:2rem 0; background:#0B0B0B;">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <a href="/restaurantes-mexicanos-cerca-de-mi"
+               style="display:flex; align-items:center; justify-content:space-between; background:linear-gradient(135deg,#1A1A1A 0%,#2A2A2A 100%); border:1px solid #D4AF37; border-radius:16px; padding:1.5rem 2rem; text-decoration:none; flex-wrap:wrap; gap:1rem;"
+               onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+                <div style="display:flex; align-items:center; gap:1rem;">
+                    <span style="font-size:2rem;">📍</span>
+                    <div>
+                        <div style="font-weight:700; color:#F5F5F5; font-size:1.1rem;">Restaurantes Mexicanos Cerca de Mí</div>
+                        <div style="color:#9CA3AF; font-size:0.875rem;">Usa tu ubicación para encontrar los más cercanos</div>
+                    </div>
+                </div>
+                <span style="background:#D4AF37; color:#0B0B0B; font-weight:700; padding:0.625rem 1.25rem; border-radius:9999px; font-size:0.9rem; white-space:nowrap;">
+                    Buscar Ahora →
+                </span>
+            </a>
+        </div>
+    </section>
+
     {{-- Trust / Authority Strip --}}
     <section class="py-6 border-t border-b border-[#D4AF37]/10" style="background-color: #1A1A1A;">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -65,6 +85,31 @@
                 <span class="text-lg font-bold text-white/70 hover:text-[#D4AF37] transition-colors cursor-default">Apple Maps</span>
                 <span class="text-lg font-bold text-white/70 hover:text-[#D4AF37] transition-colors cursor-default">Uber Eats</span>
                 <span class="text-lg font-bold text-white/70 hover:text-[#D4AF37] transition-colors cursor-default">OpenTable</span>
+            </div>
+        </div>
+    </section>
+
+    {{-- Explora por Platillo --}}
+    <section style="padding:3rem 0; background:#0B0B0B;">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 style="font-family:'Playfair Display',serif; font-size:1.75rem; font-weight:700; color:#F5F5F5; margin-bottom:0.5rem;">
+                Explora por Platillo
+            </h2>
+            <p style="color:#9CA3AF; margin-bottom:1.5rem; font-size:0.95rem;">Encuentra restaurantes especializados en tus platillos favoritos</p>
+            <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:0.875rem;">
+                @foreach([
+                    ['birria','Birria','🍲'],['tamales','Tamales','🫔'],['pozole','Pozole','🥣'],
+                    ['enchiladas','Enchiladas','🌯'],['tacos-al-pastor','Tacos al Pastor','🌮'],
+                    ['mole','Mole','🫕'],['menudo','Menudo','🍜'],['chiles-rellenos','Chiles Rellenos','🫑'],
+                    ['carne-asada','Carne Asada','🥩'],['carnitas','Carnitas','🐷'],['barbacoa','Barbacoa','🫕'],
+                ] as [$slug, $name, $emoji])
+                <a href="/{{ $slug }}"
+                   style="display:flex; flex-direction:column; align-items:center; background:#1A1A1A; border:1px solid #2A2A2A; border-radius:12px; padding:1.25rem 0.75rem; text-decoration:none; text-align:center; transition:border-color 0.2s;"
+                   onmouseover="this.style.borderColor='#D4AF37'" onmouseout="this.style.borderColor='#2A2A2A'">
+                    <span style="font-size:2rem; margin-bottom:0.5rem;">{{ $emoji }}</span>
+                    <span style="font-weight:600; color:#F5F5F5; font-size:0.85rem;">{{ $name }}</span>
+                </a>
+                @endforeach
             </div>
         </div>
     </section>

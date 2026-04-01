@@ -1,33 +1,13 @@
-# robots.txt for Famous Mexican Restaurants Directory
-
 User-agent: *
 Allow: /
-Allow: /restaurantes
-Allow: /restaurante/
-Allow: /sugerir
 
-# Disallow admin and private areas
 Disallow: /admin
-Disallow: /admin/
-Disallow: /livewire/
+Disallow: /filament
+Disallow: /owner
+Disallow: /api/
+Disallow: /login
+Disallow: /register
+Disallow: /password/
 
-# Sitemaps (all 3 domains)
 Sitemap: https://restaurantesmexicanosfamosos.com.mx/sitemap.xml
-Sitemap: https://restaurantesmexicanosfamosos.com/sitemap.xml
 Sitemap: https://famousmexicanrestaurants.com/sitemap.xml
-
-# Crawl-delay (be nice to servers)
-Crawl-delay: 1
-
-# Allow common search engines
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Slurp
-Allow: /
-
-User-agent: DuckDuckBot
-Allow: /

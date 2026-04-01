@@ -95,6 +95,43 @@
             </div>
         </div>
 
+        <!-- Quick links: back to main dish + near-me -->
+        <div style="margin-top:3rem; padding-top:2rem; border-top:1px solid #2A2A2A; display:flex; flex-wrap:wrap; gap:0.75rem; align-items:center;">
+            <a href="/{{ $dish }}"
+               style="display:inline-flex; align-items:center; gap:0.5rem; background:#1A1A1A; border:1px solid #2A2A2A; color:#D4AF37; padding:0.5rem 1.25rem; border-radius:9999px; font-size:0.875rem; font-weight:600; text-decoration:none;"
+               onmouseover="this.style.borderColor='#D4AF37'" onmouseout="this.style.borderColor='#2A2A2A'">
+                &larr; Todos los restaurantes de {{ $dishData['name'] }}
+            </a>
+            @if(in_array($dish, ['birria','tamales','pozole','carnitas','barbacoa','mole','carne-asada']))
+            <a href="/{{ $dish }}-cerca-de-mi"
+               style="display:inline-flex; align-items:center; gap:0.5rem; background:#1A1A1A; border:1px solid #2A2A2A; color:#9CA3AF; padding:0.5rem 1.25rem; border-radius:9999px; font-size:0.875rem; text-decoration:none;"
+               onmouseover="this.style.borderColor='#D4AF37';this.style.color='#D4AF37'" onmouseout="this.style.borderColor='#2A2A2A';this.style.color='#9CA3AF'">
+                &#128205; {{ $dishData['name'] }} cerca de mí
+            </a>
+            @endif
+        </div>
+
+        <!-- También en: other states for same dish -->
+        @php
+            $allStates = ['tx'=>'Texas','ca'=>'California','il'=>'Illinois','az'=>'Arizona','fl'=>'Florida','co'=>'Colorado','nv'=>'Nevada','nm'=>'N. México','ny'=>'N. York','ga'=>'Georgia','wa'=>'Washington','nc'=>'N. Carolina','or'=>'Oregón','ut'=>'Utah','tn'=>'Tennessee'];
+        @endphp
+        <div style="margin-top:2rem; padding-top:2rem; border-top:1px solid #2A2A2A;">
+            <p style="font-size:0.8125rem; font-weight:600; color:#6B7280; text-transform:uppercase; letter-spacing:0.075em; margin-bottom:0.875rem;">
+                {{ $dishData['name'] }} también en...
+            </p>
+            <div style="display:flex; flex-wrap:wrap; gap:0.5rem;">
+                @foreach($allStates as $code => $name)
+                @if($code !== $stateCode)
+                <a href="/{{ $dish }}-en-{{ $code }}"
+                   style="display:inline-block; border:1px solid #2A2A2A; color:#9CA3AF; padding:0.3125rem 0.875rem; border-radius:9999px; font-size:0.8125rem; text-decoration:none; background:#1A1A1A;"
+                   onmouseover="this.style.borderColor='#D4AF37';this.style.color='#D4AF37'" onmouseout="this.style.borderColor='#2A2A2A';this.style.color='#9CA3AF'">
+                    {{ $name }}
+                </a>
+                @endif
+                @endforeach
+            </div>
+        </div>
+
         <!-- SEO text -->
         <div style="margin-top:4rem; padding-top:3rem; border-top:1px solid #2A2A2A;">
             <h2 style="font-family:'Playfair Display',serif; font-size:1.5rem; font-weight:700; color:#F5F5F5; margin-bottom:1rem;">

@@ -42,6 +42,17 @@
         </div>
     </div>
 
+    @if(in_array($dish, ['birria','tamales','pozole','carnitas','barbacoa','mole','carne-asada']))
+    <!-- Cerca de mí pill -->
+    <div style="background:#0B0B0B; padding:0.75rem 0; text-align:center;">
+        <a href="/{{ $dish }}-cerca-de-mi"
+           style="display:inline-block; background:#1A1A1A; border:1px solid #D4AF37; color:#D4AF37; padding:0.5rem 1.5rem; border-radius:9999px; font-size:0.875rem; font-weight:600; text-decoration:none; transition:background 0.2s;"
+           onmouseover="this.style.background='#2A2A2A'" onmouseout="this.style.background='#1A1A1A'">
+            Buscar cerca de mí →
+        </a>
+    </div>
+    @endif
+
     <!-- Main Content -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -149,6 +160,27 @@
                 </div>
             </div>
         </div>
+        @if(in_array($dish, ['birria','tamales','pozole','carnitas','barbacoa','mole']))
+        <!-- Dish por Estado -->
+        <section style="margin-top:3rem; padding-top:3rem; border-top:1px solid #2A2A2A;">
+            <h2 style="font-family:'Playfair Display',serif; font-size:1.5rem; font-weight:700; color:#F5F5F5; margin-bottom:1.25rem;">
+                {{ $data['name'] }} por Estado
+            </h2>
+            <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:0.75rem;">
+                @php
+                $stateNames = ['tx'=>'Texas','ca'=>'California','il'=>'Illinois','az'=>'Arizona','fl'=>'Florida','co'=>'Colorado','nv'=>'Nevada','nm'=>'Nuevo México','ny'=>'Nueva York','ga'=>'Georgia','wa'=>'Washington','nc'=>'Carolina del Norte','or'=>'Oregón','ut'=>'Utah','tn'=>'Tennessee'];
+                @endphp
+                @foreach($stateNames as $code => $name)
+                <a href="/{{ $dish }}-en-{{ $code }}"
+                   style="display:block; background:#1A1A1A; border:1px solid #2A2A2A; border-radius:10px; padding:0.875rem; text-decoration:none; text-align:center; transition:border-color 0.2s;"
+                   onmouseover="this.style.borderColor='#D4AF37'" onmouseout="this.style.borderColor='#2A2A2A'">
+                    <div style="font-weight:600; color:#F5F5F5; font-size:0.875rem;">{{ $name }}</div>
+                    <div style="color:#D4AF37; font-size:0.75rem; margin-top:0.25rem;">{{ strtoupper($code) }}</div>
+                </a>
+                @endforeach
+            </div>
+        </section>
+        @endif
     </div>
 </div>
 @endsection
