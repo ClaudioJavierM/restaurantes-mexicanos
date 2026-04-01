@@ -16,7 +16,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                     </svg>
                     <div>
-                        <div class="text-[#D4AF37] font-bold text-lg leading-tight">12,000+</div>
+                        <div class="text-[#D4AF37] font-bold text-lg leading-tight">{{ number_format($stats['total_restaurants'] ?? 0) }}+</div>
                         <div class="text-gray-400 text-xs font-medium">Restaurants</div>
                     </div>
                 </div>
@@ -52,91 +52,173 @@
         </div>
     </section>
 
-    @include("partials.usa.top-restaurants")
-
-    {{-- Owner Conversion Block --}}
-    <section class="py-16 md:py-20" style="background-color: #1A1A1A;">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col lg:flex-row items-center gap-10 lg:gap-16">
-                {{-- Left: Copy --}}
-                <div class="flex-1 text-center lg:text-left">
-                    <h2 class="text-3xl md:text-4xl font-display font-black text-[#F5F5F5] mb-3 leading-tight">
-                        Own a Mexican Restaurant?
-                    </h2>
-                    <p class="text-[#CCCCCC] text-lg mb-8">
-                        Your customers are already searching for you.
-                    </p>
-                    <ul class="space-y-4 mb-8 inline-block text-left">
-                        <li class="flex items-start gap-3">
-                            <svg class="w-5 h-5 text-[#D4AF37] mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                            </svg>
-                            <span class="text-gray-300">Be found by more customers searching nearby</span>
-                        </li>
-                        <li class="flex items-start gap-3">
-                            <svg class="w-5 h-5 text-[#D4AF37] mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                            </svg>
-                            <span class="text-gray-300">Appear in top city rankings</span>
-                        </li>
-                        <li class="flex items-start gap-3">
-                            <svg class="w-5 h-5 text-[#D4AF37] mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                            </svg>
-                            <span class="text-gray-300">Add menus, photos, and promotions</span>
-                        </li>
-                        <li class="flex items-start gap-3">
-                            <svg class="w-5 h-5 text-[#D4AF37] mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                            </svg>
-                            <span class="text-gray-300">Turn visibility into real sales</span>
-                        </li>
-                    </ul>
-                </div>
-                {{-- Right: CTA --}}
-                <div class="shrink-0">
-                    <a href="/claim" class="inline-flex items-center justify-center px-10 py-5 bg-[#D4AF37] text-[#0B0B0B] font-bold text-lg rounded-xl hover:bg-[#c9a432] transition-all shadow-lg shadow-[#D4AF37]/20 hover:shadow-[#D4AF37]/30 transform hover:-translate-y-0.5">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                        </svg>
-                        Claim Your Restaurant
-                    </a>
-                    <p class="text-gray-500 text-sm mt-3 text-center">Free to get started</p>
-                </div>
+    {{-- Review Sources Strip --}}
+    <section class="py-8" style="background-color: #1A1A1A; border-top: 1px solid rgba(212,175,55,0.1); border-bottom: 1px solid rgba(212,175,55,0.1);">
+        <div class="max-w-7xl mx-auto px-4">
+            <p class="text-center text-[#D4AF37] text-xs font-semibold uppercase tracking-[0.2em] mb-5">{{ __('app.reviews_from_platforms') }}</p>
+            <div class="flex flex-wrap justify-center items-center gap-6 md:gap-10">
+                <span class="text-lg font-bold text-white/70 hover:text-[#D4AF37] transition-colors cursor-default">Google</span>
+                <span class="text-lg font-bold text-white/70 hover:text-[#D4AF37] transition-colors cursor-default">Yelp</span>
+                <span class="text-lg font-bold text-white/70 hover:text-[#D4AF37] transition-colors cursor-default">TripAdvisor</span>
+                <span class="text-lg font-bold text-white/70 hover:text-[#D4AF37] transition-colors cursor-default">Facebook</span>
+                <span class="text-lg font-bold text-white/70 hover:text-[#D4AF37] transition-colors cursor-default">Foursquare</span>
+                <span class="text-lg font-bold text-white/70 hover:text-[#D4AF37] transition-colors cursor-default">Apple Maps</span>
+                <span class="text-lg font-bold text-white/70 hover:text-[#D4AF37] transition-colors cursor-default">Uber Eats</span>
+                <span class="text-lg font-bold text-white/70 hover:text-[#D4AF37] transition-colors cursor-default">OpenTable</span>
             </div>
         </div>
     </section>
 
+    {{-- Recent Activity Section --}}
+    <section class="py-14 md:py-20" style="background-color: #0B0B0B;">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            {{-- Section Header --}}
+            <div class="text-center mb-10">
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#D4AF37]/30 mb-4" style="background-color: rgba(212,175,55,0.08);">
+                    <svg class="w-4 h-4 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                    <span class="text-[#D4AF37] text-xs font-semibold uppercase tracking-[0.15em]">Live</span>
+                </div>
+                <h2 class="text-3xl md:text-4xl font-display font-black text-[#F5F5F5]">
+                    What's Happening Near You
+                </h2>
+                @if($detectedLocation && isset($detectedLocation['state_code']))
+                    <p class="text-gray-400 mt-2 text-base">Recent activity in {{ $detectedLocation['state'] ?? $detectedLocation['state_code'] }}</p>
+                @else
+                    <p class="text-gray-400 mt-2 text-base">Latest reviews and additions across the platform</p>
+                @endif
+            </div>
+
+            @if($recentActivity->count() > 0)
+                {{-- Grid: 1 col mobile, 2 cols tablet, 3 cols desktop --}}
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    @foreach($recentActivity as $item)
+                        <a href="/restaurante/{{ $item->restaurant_slug }}"
+                           class="group block rounded-2xl overflow-hidden border border-white/5 hover:border-[#D4AF37]/30 transition-all duration-300 hover:shadow-lg hover:shadow-[#D4AF37]/5"
+                           style="background-color: #1A1A1A;">
+
+                            {{-- Image --}}
+                            <div class="relative h-40 overflow-hidden">
+                                @if($item->image)
+                                    <img src="{{ $item->image }}" alt="{{ $item->restaurant_name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy"
+                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div class="hidden w-full h-full items-center justify-center" style="background: linear-gradient(135deg, #1A1A1A, #2A2A2A);">
+                                        <svg class="w-10 h-10 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                                    </div>
+                                @else
+                                    <div class="w-full h-full flex items-center justify-center" style="background: linear-gradient(135deg, #1A1A1A, #2A2A2A);">
+                                        <svg class="w-10 h-10 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                                    </div>
+                                @endif
+                                {{-- Badge overlay --}}
+                                <div class="absolute top-3 left-3">
+                                    @if($item->type === 'review')
+                                        <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-[#D4AF37]/90 text-[#0B0B0B]">
+                                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                            Review
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/90 text-white">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                                            New
+                                        </span>
+                                    @endif
+                                </div>
+                                <div class="absolute top-3 right-3">
+                                    <span class="text-white/70 text-[10px] bg-black/50 px-2 py-0.5 rounded-full backdrop-blur-sm">{{ $item->time_ago }}</span>
+                                </div>
+                            </div>
+
+                            {{-- Content --}}
+                            <div class="p-4">
+                                <h3 class="text-[#F5F5F5] font-bold text-sm leading-snug group-hover:text-[#D4AF37] transition-colors mb-1 truncate">
+                                    {{ $item->restaurant_name }}
+                                </h3>
+                                <p class="text-gray-500 text-xs mb-2">
+                                    @if($item->city && $item->state_code)
+                                        {{ $item->city }}, {{ $item->state_code }}
+                                    @elseif($item->state_name)
+                                        {{ $item->state_name }}
+                                    @endif
+                                </p>
+
+                                @if($item->type === 'review')
+                                    <div class="flex items-center gap-1 mb-1">
+                                        @for($i = 1; $i <= 5; $i++)
+                                            <svg class="w-3.5 h-3.5 {{ $i <= $item->rating ? 'text-[#D4AF37]' : 'text-gray-600' }}" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                            </svg>
+                                        @endfor
+                                        @if($item->reviewer)
+                                            <span class="text-gray-500 text-[10px] ml-1">by {{ $item->reviewer }}</span>
+                                        @endif
+                                    </div>
+                                    @if($item->snippet)
+                                        <p class="text-gray-400 text-xs leading-relaxed line-clamp-2">"{{ $item->snippet }}"</p>
+                                    @endif
+                                @else
+                                    @if($item->rating)
+                                        <div class="flex items-center gap-1">
+                                            <svg class="w-3.5 h-3.5 text-[#D4AF37]" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                            </svg>
+                                            <span class="text-gray-400 text-xs">{{ number_format($item->rating, 1) }} on Google</span>
+                                        </div>
+                                    @endif
+                                @endif
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+            @else
+                {{-- Empty state --}}
+                <div class="text-center py-12">
+                    <div class="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center" style="background-color: rgba(212,175,55,0.08);">
+                        <svg class="w-8 h-8 text-[#D4AF37]/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </div>
+                    <p class="text-gray-400 text-lg mb-2">Explore restaurants near you</p>
+                    <a href="/restaurantes" class="inline-flex items-center gap-2 text-[#D4AF37] font-semibold hover:underline text-sm">
+                        Browse all restaurants
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+            @endif
+        </div>
+    </section>
+
+    @include("partials.usa.top-restaurants")
     @include("partials.usa.categories")
     @include("partials.usa.top-states")
     @include("partials.usa.about")
 
-    {{-- Final Double CTA --}}
+    {{-- Final CTA --}}
     <section class="py-16 md:py-20" style="background-color: #0B0B0B;">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid md:grid-cols-2 gap-8">
-                {{-- Left: Visitors --}}
-                <div class="rounded-2xl p-8 md:p-10 border border-white/10 text-center" style="background-color: #1A1A1A;">
-                    <svg class="w-10 h-10 text-[#D4AF37] mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-3xl md:text-4xl font-display font-black text-[#F5F5F5] mb-4">
+                Ready to Find Your Next Favorite Spot?
+            </h2>
+            <p class="text-[#CCCCCC] text-lg mb-8 max-w-2xl mx-auto">
+                Explore thousands of top-rated Mexican restaurants across all 50 states. Curated by real reviews from 5+ sources.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="/restaurantes" class="inline-flex items-center justify-center px-10 py-5 bg-[#D4AF37] text-[#0B0B0B] font-bold text-lg rounded-xl hover:bg-[#c9a432] transition-all shadow-lg shadow-[#D4AF37]/20">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                     </svg>
-                    <h3 class="text-2xl font-display font-bold text-[#F5F5F5] mb-2">Looking for the best Mexican restaurant?</h3>
-                    <p class="text-[#CCCCCC] mb-6">Browse top-rated spots near you, curated by real reviews.</p>
-                    <a href="/restaurantes" class="inline-flex items-center justify-center px-8 py-4 bg-[#D4AF37] text-[#0B0B0B] font-bold rounded-xl hover:bg-[#c9a432] transition-all shadow-lg shadow-[#D4AF37]/20 w-full sm:w-auto">
-                        Explore Restaurants
-                    </a>
-                </div>
-                {{-- Right: Owners --}}
-                <div class="rounded-2xl p-8 md:p-10 border border-[#D4AF37]/20 text-center" style="background-color: #1A1A1A;">
-                    <svg class="w-10 h-10 text-[#D4AF37] mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                    Explore Restaurants
+                </a>
+                <a href="/guia" class="inline-flex items-center justify-center px-10 py-5 border-2 border-[#D4AF37] text-[#D4AF37] font-bold text-lg rounded-xl hover:bg-[#D4AF37]/10 transition-all">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                     </svg>
-                    <h3 class="text-2xl font-display font-bold text-[#F5F5F5] mb-2">Own a restaurant? Get discovered today.</h3>
-                    <p class="text-[#CCCCCC] mb-6">Claim your listing and reach thousands of hungry customers.</p>
-                    <a href="/claim" class="inline-flex items-center justify-center px-8 py-4 border-2 border-[#D4AF37] text-[#D4AF37] font-bold rounded-xl hover:bg-[#D4AF37]/10 transition-all w-full sm:w-auto">
-                        Claim Your Listing
-                    </a>
-                </div>
+                    Browse by City
+                </a>
             </div>
         </div>
     </section>

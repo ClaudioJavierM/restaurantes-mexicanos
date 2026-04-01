@@ -1,10 +1,15 @@
 {{-- Hero Section for USA - Premium Dark Design --}}
 <div class="relative overflow-hidden" style="background-color: #0B0B0B;">
-    {{-- Subtle geometric pattern overlay --}}
-    <div class="absolute inset-0 opacity-[0.03]" style="background-image: url('data:image/svg+xml,%3Csvg width=%2240%22 height=%2240%22 viewBox=%220 0 40 40%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cpath d=%22M20 0L40 20L20 40L0 20Z%22 fill=%22none%22 stroke=%22%23D4AF37%22 stroke-width=%220.5%22/%3E%3C/svg%3E'); background-size: 40px 40px;"></div>
+    {{-- Background image: elegant Mexican restaurant --}}
+    <div class="absolute inset-0">
+        <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1920&q=80&auto=format&fit=crop"
+             alt="" class="w-full h-full object-cover" loading="eager">
+        {{-- Dark overlay for readability --}}
+        <div class="absolute inset-0 bg-gradient-to-b from-[#0B0B0B]/85 via-[#0B0B0B]/75 to-[#0B0B0B]/95"></div>
+    </div>
 
-    {{-- Radial gold glow at top center --}}
-    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] opacity-[0.07]" style="background: radial-gradient(ellipse at center, #D4AF37 0%, transparent 70%);"></div>
+    {{-- Subtle gold glow at top center --}}
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] opacity-[0.05]" style="background: radial-gradient(ellipse at center, #D4AF37 0%, transparent 70%);"></div>
 
     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 lg:py-28">
         <div class="text-center">
@@ -85,11 +90,11 @@
                     </svg>
                     {{ __('app.explore_restaurants') }}
                 </a>
-                <a href="/claim" class="inline-flex items-center justify-center px-8 py-4 border-2 border-[#D4AF37] text-[#D4AF37] font-bold text-lg rounded-xl hover:bg-[#D4AF37]/10 transition-all transform hover:-translate-y-0.5">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                <a href="/restaurantes?sort=rating" class="inline-flex items-center justify-center px-8 py-4 border-2 border-[#D4AF37] text-[#D4AF37] font-bold text-lg rounded-xl hover:bg-[#D4AF37]/10 transition-all transform hover:-translate-y-0.5">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                     </svg>
-                    Claim Your Restaurant
+                    {{ __('app.view_top_rated') }}
                 </a>
             </div>
         </div>

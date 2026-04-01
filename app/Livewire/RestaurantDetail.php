@@ -8,6 +8,7 @@ use App\Models\AnalyticsEvent;
 use App\Models\Coupon;
 use App\Models\RestaurantVote;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 use Livewire\Component;
 
 class RestaurantDetail extends Component
@@ -244,15 +245,48 @@ class RestaurantDetail extends Component
             }
         );
 
+        $r = $this->restaurant;
+        $stateCode = $r->state?->code ?? $r->state?->name ?? '';
+        $isEn = app()->getLocale() === 'en';
+
+        // SEO-optimized title: Name | Best Mexican Restaurant in City, ST | FAMER
+        $seoTitle = $isEn
+            ? "{$r->name} | Best Mexican Restaurant in {$r->city}, {$stateCode} | FAMER"
+            : "{$r->name} | Restaurante Mexicano en {$r->city}, {$stateCode} | FAMER";
+
+        // Rich meta description with rating + review count for higher CTR
+        $totalReviews = (int)(($r->google_reviews_count ?? 0) + ($r->yelp_reviews_count ?? 0)
+            + $r->reviews()->where('status', 'approved')->count());
+        $displayRating = $r->google_rating ?? $r->yelp_rating ?? null;
+
+        if ($r->description) {
+            $descBase = Str::limit(strip_tags($r->description), 120);
+        } elseif ($isEn) {
+            $descBase = "Authentic Mexican restaurant in {$r->city}, {$stateCode}";
+        } else {
+            $descBase = "Restaurante mexicano en {$r->city}, {$stateCode}";
+        }
+
+        $ratingSnippet = ($displayRating && $totalReviews > 0)
+            ? ($isEn ? " Rated {$displayRating}/5 from " . number_format($totalReviews) . " reviews."
+                     : " Calificación {$displayRating}/5 con " . number_format($totalReviews) . " reseñas.")
+            : '';
+
+        $ctaSnippet = $isEn ? ' View menu, hours & reserve a table.'
+                            : ' Ver menú, horarios y reservar mesa.';
+
+        $seoDescription = $descBase . $ratingSnippet . $ctaSnippet;
+
         return view('livewire.restaurant-detail', [
-            'restaurant' => $this->restaurant,
+            'restaurant' => $r,
             'menuItems' => $menuItems,
             'popularMenuItems' => $popularMenuItems,
             'availableCategories' => $availableCategories,
             'visitorStats' => $visitorStats,
         ])->layout('layouts.app', [
-            'title' => $this->restaurant->name . ' — ' . $this->restaurant->city . ', ' . ($this->restaurant->state?->name ?? ''),
-            'seoRestaurant' => $this->restaurant,
+            'title'           => $seoTitle,
+            'metaDescription' => $seoDescription,
+            'seoRestaurant'   => $r,
         ]);
     }
 }

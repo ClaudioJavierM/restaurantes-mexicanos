@@ -14,8 +14,8 @@
     <link rel="icon" type="image/png" sizes="192x192" href="/images/branding/icon.png">
 
     <!-- SEO: Dynamic Title and Description -->
-    <title>@yield('title', ($title ?? __('app.site_name')) . ' - ' . __('app.tagline'))</title>
-    <meta name="description" content="@yield('meta_description', __('app.tagline') . ' - Descubre los mejores restaurantes mexicanos auténticos en Estados Unidos')">
+    <title>{{ $title ?? (__('app.site_name') . ' - ' . __('app.tagline')) }}</title>
+    <meta name="description" content="{{ $metaDescription ?? null ?: (__('app.tagline') . ' - Descubre los mejores restaurantes mexicanos auténticos en Estados Unidos') }}">
 
     <!-- SEO: Canonical URL -->
     <link rel="canonical" href="{{ url()->current() }}">
@@ -280,33 +280,71 @@
     <!-- End Google Tag Manager (noscript) -->
 
     <!-- Navigation -->
+    @php
+        $isOwnerPage = request()->is('claim*') || request()->is('for-owners*') || request()->is('sugerir*') || request()->is('grader*');
+    @endphp
     <nav class="bg-[#0B0B0B] sticky top-0 border-b border-[#D4AF37]/20" style="z-index:9999;">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-18 items-center">
+            <div class="flex justify-between h-24 items-center">
                 <!-- Logo -->
                 <div class="flex items-center">
-                    <a href="/" class="flex items-center gap-3 group">
-                        <img src="/images/branding/famer55.png" alt="FAMER" class="h-10 w-auto group-hover:scale-105 transition-transform duration-300">
-                        <div class="hidden sm:flex flex-col leading-tight">
-                            <span class="font-display font-black text-lg text-[#D4AF37] tracking-wide">FAMER</span>
-                            <span class="text-[10px] text-[#CCCCCC] tracking-widest uppercase">Famous Mexican Restaurants</span>
-                        </div>
+                    <a href="/" class="flex items-center group">
+                        <img src="/images/branding/famer55.png?v=5" alt="FAMER - Famous Mexican Restaurants" class="h-16 md:h-20 w-auto group-hover:scale-105 transition-transform duration-300" style="mix-blend-mode:lighten;">
                     </a>
+                    @if($isOwnerPage)
+                        <span class="hidden sm:inline-block ml-3 px-2 py-1 bg-[#D4AF37]/10 text-[#D4AF37] text-xs font-semibold rounded border border-[#D4AF37]/20">
+                            {{ app()->getLocale() === 'en' ? 'For Owners' : 'Para Duenos' }}
+                        </span>
+                    @endif
                 </div>
 
                 <!-- Desktop Navigation -->
                 <div class="hidden lg:flex items-center space-x-1">
+                @if($isOwnerPage)
+                    {{-- Owner Navigation --}}
+                    <a href="/" class="text-gray-400 hover:text-[#D4AF37] px-4 py-2 text-sm font-medium transition-colors duration-200">
+                        ← {{ app()->getLocale() === 'en' ? 'Back to Site' : 'Volver al Sitio' }}
+                    </a>
+                    <a href="/sugerir" class="text-gray-400 hover:text-[#D4AF37] px-4 py-2 text-sm font-medium transition-colors duration-200 {{ request()->is('sugerir*') ? 'text-[#D4AF37]' : '' }}">
+                        {{ app()->getLocale() === 'en' ? 'Add Restaurant' : 'Agregar Restaurante' }}
+                    </a>
+                    <a href="/claim" class="text-gray-400 hover:text-[#D4AF37] px-4 py-2 text-sm font-medium transition-colors duration-200 {{ request()->is('claim*') ? 'text-[#D4AF37]' : '' }}">
+                        {{ app()->getLocale() === 'en' ? 'Claim Free' : 'Reclamar Gratis' }}
+                    </a>
+                    <a href="/for-owners#pricing" class="text-gray-400 hover:text-[#D4AF37] px-4 py-2 text-sm font-medium transition-colors duration-200">
+                        {{ app()->getLocale() === 'en' ? 'Plans & Pricing' : 'Planes y Precios' }}
+                    </a>
+                    <a href="/grader" class="text-gray-400 hover:text-[#D4AF37] px-4 py-2 text-sm font-medium transition-colors duration-200 {{ request()->is('grader*') ? 'text-[#D4AF37]' : '' }}">
+                        FAMER Score
+                    </a>
+
+                    <!-- Language Switcher (Desktop) -->
+                    <x-language-switcher />
+
+                    @auth
+                        @if(auth()->user()->ownedRestaurants && auth()->user()->ownedRestaurants->first())
+                            <a href="/owner/{{ auth()->user()->ownedRestaurants->first()->id }}" class="text-[#D4AF37] hover:text-[#E8C67A] px-3 py-2 text-sm font-medium transition-colors duration-200">
+                                {{ app()->getLocale() === 'en' ? 'My Dashboard' : 'Mi Dashboard' }}
+                            </a>
+                        @endif
+                    @else
+                        <a href="/login" class="text-gray-400 hover:text-[#F5F5F5] px-3 py-2 text-sm font-medium transition-colors duration-200">
+                            Login
+                        </a>
+                        <a href="/register" class="bg-[#D4AF37] text-[#0B0B0B] px-5 py-2 rounded-lg text-sm font-bold hover:bg-[#E8C67A] transition-colors duration-200 ml-2">
+                            {{ app()->getLocale() === 'en' ? 'Register' : 'Registrarse' }}
+                        </a>
+                    @endauth
+                @else
+                    {{-- Customer Navigation --}}
                     <a href="/restaurantes" class="text-gray-400 hover:text-[#D4AF37] px-4 py-2 text-sm font-medium transition-colors duration-200">
                         {{ __('app.restaurants') }}
                     </a>
                     <a href="/mejores-restaurantes-mexicanos" class="text-gray-400 hover:text-[#D4AF37] px-4 py-2 text-sm font-medium transition-colors duration-200">
                         Top 10
                     </a>
-                    <a href="/for-owners" class="text-gray-400 hover:text-[#D4AF37] px-4 py-2 text-sm font-medium transition-colors duration-200">
-                        {{ app()->getLocale() === 'en' ? 'For Owners' : 'Para Duenos' }}
-                    </a>
-                    <a href="/for-owners#pricing" class="text-gray-400 hover:text-[#D4AF37] px-4 py-2 text-sm font-medium transition-colors duration-200">
-                        {{ app()->getLocale() === 'en' ? 'Pricing' : 'Planes' }}
+                    <a href="/guia" class="text-gray-400 hover:text-[#D4AF37] px-4 py-2 text-sm font-medium transition-colors duration-200">
+                        {{ app()->getLocale() === 'en' ? 'City Guide' : 'Guia' }}
                     </a>
                     <a href="/famer-awards" class="text-gray-400 hover:text-[#D4AF37] px-4 py-2 text-sm font-medium transition-colors duration-200">
                         FAMER Awards
@@ -330,12 +368,15 @@
                         <a href="/login" class="text-gray-400 hover:text-[#F5F5F5] px-3 py-2 text-sm font-medium transition-colors duration-200">
                             Login
                         </a>
+                        <a href="/register" class="border border-[#D4AF37] text-[#D4AF37] px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#D4AF37]/10 transition-colors duration-200">
+                            {{ app()->getLocale() === 'en' ? 'Register' : 'Registro' }}
+                        </a>
                     @endauth
 
-                    <!-- Claim CTA Button -->
-                    <a href="/claim" class="bg-[#D4AF37] text-[#0B0B0B] px-5 py-2 rounded-lg text-sm font-bold hover:bg-[#E8C67A] transition-colors duration-200 ml-2">
-                        {{ app()->getLocale() === 'en' ? 'Claim Restaurant' : 'Reclamar Restaurante' }}
+                    <a href="/for-owners" class="text-gray-400 hover:text-[#D4AF37] px-4 py-2 text-sm font-medium transition-colors duration-200">
+                        FAMER Business
                     </a>
+                @endif
                 </div>
 
                 <!-- Mobile menu button -->
@@ -357,24 +398,53 @@
         <!-- Mobile menu -->
         <div id="mobile-menu" class="hidden lg:hidden bg-[#0B0B0B] border-t border-[#2A2A2A]">
             <div class="px-4 pt-2 pb-4 space-y-1">
+            @if($isOwnerPage)
+                {{-- Owner Mobile Menu --}}
+                <a href="/" class="block text-gray-400 hover:text-[#D4AF37] px-3 py-2.5 rounded-lg text-base font-medium transition-colors duration-200">
+                    ← {{ app()->getLocale() === 'en' ? 'Back to Site' : 'Volver al Sitio' }}
+                </a>
+                <a href="/sugerir" class="block text-gray-400 hover:text-[#D4AF37] px-3 py-2.5 rounded-lg text-base font-medium transition-colors duration-200">
+                    {{ app()->getLocale() === 'en' ? 'Add Restaurant' : 'Agregar Restaurante' }}
+                </a>
+                <a href="/claim" class="block text-gray-400 hover:text-[#D4AF37] px-3 py-2.5 rounded-lg text-base font-medium transition-colors duration-200">
+                    {{ app()->getLocale() === 'en' ? 'Claim Free' : 'Reclamar Gratis' }}
+                </a>
+                <a href="/for-owners#pricing" class="block text-gray-400 hover:text-[#D4AF37] px-3 py-2.5 rounded-lg text-base font-medium transition-colors duration-200">
+                    {{ app()->getLocale() === 'en' ? 'Plans & Pricing' : 'Planes y Precios' }}
+                </a>
+                <a href="/grader" class="block text-gray-400 hover:text-[#D4AF37] px-3 py-2.5 rounded-lg text-base font-medium transition-colors duration-200">
+                    FAMER Score
+                </a>
+                <div class="border-t border-[#2A2A2A] my-2"></div>
+                @auth
+                    @if(auth()->user()->ownedRestaurants && auth()->user()->ownedRestaurants->first())
+                        <a href="/owner/{{ auth()->user()->ownedRestaurants->first()->id }}" class="block text-[#D4AF37] px-3 py-2.5 rounded-lg text-base font-medium">
+                            {{ app()->getLocale() === 'en' ? 'My Dashboard' : 'Mi Dashboard' }}
+                        </a>
+                    @endif
+                @else
+                    <a href="/login" class="block text-gray-400 hover:text-[#F5F5F5] px-3 py-2.5 rounded-lg text-base font-medium transition-colors duration-200">
+                        Login
+                    </a>
+                    <a href="/register" class="block bg-[#D4AF37] text-[#0B0B0B] text-center px-3 py-2.5 rounded-lg text-base font-bold transition-colors duration-200 hover:bg-[#E8C67A] mt-2">
+                        {{ app()->getLocale() === 'en' ? 'Register' : 'Registrarse' }}
+                    </a>
+                @endauth
+            @else
+                {{-- Customer Mobile Menu --}}
                 <a href="/restaurantes" class="block text-gray-400 hover:text-[#D4AF37] px-3 py-2.5 rounded-lg text-base font-medium transition-colors duration-200">
                     {{ __('app.restaurants') }}
                 </a>
                 <a href="/mejores-restaurantes-mexicanos" class="block text-gray-400 hover:text-[#D4AF37] px-3 py-2.5 rounded-lg text-base font-medium transition-colors duration-200">
                     Top 10
                 </a>
-                <a href="/for-owners" class="block text-gray-400 hover:text-[#D4AF37] px-3 py-2.5 rounded-lg text-base font-medium transition-colors duration-200">
-                    {{ app()->getLocale() === 'en' ? 'For Owners' : 'Para Duenos' }}
-                </a>
-                <a href="/for-owners#pricing" class="block text-gray-400 hover:text-[#D4AF37] px-3 py-2.5 rounded-lg text-base font-medium transition-colors duration-200">
-                    {{ app()->getLocale() === 'en' ? 'Pricing' : 'Planes' }}
+                <a href="/guia" class="block text-gray-400 hover:text-[#D4AF37] px-3 py-2.5 rounded-lg text-base font-medium transition-colors duration-200">
+                    {{ app()->getLocale() === 'en' ? 'City Guide' : 'Guia' }}
                 </a>
                 <a href="/famer-awards" class="block text-gray-400 hover:text-[#D4AF37] px-3 py-2.5 rounded-lg text-base font-medium transition-colors duration-200">
                     FAMER Awards
                 </a>
-
                 <div class="border-t border-[#2A2A2A] my-2"></div>
-
                 @auth
                     <a href="/my-favorites" class="block text-gray-400 hover:text-[#D4AF37] px-3 py-2.5 rounded-lg text-base font-medium transition-colors duration-200">
                         {{ app()->getLocale() === 'en' ? 'My Favorites' : 'Mis Favoritos' }}
@@ -387,10 +457,10 @@
                         Login
                     </a>
                 @endauth
-
-                <a href="/claim" class="block bg-[#D4AF37] text-[#0B0B0B] text-center px-3 py-2.5 rounded-lg text-base font-bold transition-colors duration-200 hover:bg-[#E8C67A] mt-2">
-                    {{ app()->getLocale() === 'en' ? 'Claim Restaurant' : 'Reclamar Restaurante' }}
+                <a href="/for-owners" class="block text-gray-400 hover:text-[#D4AF37] px-3 py-2.5 rounded-lg text-base font-medium transition-colors duration-200">
+                    FAMER Business
                 </a>
+            @endif
             </div>
         </div>
     </nav>
@@ -442,11 +512,9 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 mb-12">
                 <!-- Logo & About -->
                 <div class="lg:col-span-1">
-                    <div class="flex items-center gap-3 mb-4">
-                        <img src="/images/branding/famer55.png" alt="FAMER" class="h-16 w-auto">
+                    <div class="mb-4">
+                        <img src="/images/branding/famer55.png?v=5" alt="FAMER - Famous Mexican Restaurants" class="h-28 md:h-32 w-auto" style="mix-blend-mode:lighten;">
                     </div>
-                    <span class="font-display font-black text-xl text-[#D4AF37] tracking-wide block">FAMER</span>
-                    <span class="text-xs text-[#CCCCCC] tracking-widest uppercase block mt-1 mb-4">Famous Mexican Restaurants</span>
                     <p class="text-gray-500 text-sm leading-relaxed">
                         {{ app()->getLocale() === 'en' ? 'The most complete directory of authentic Mexican restaurants in the United States.' : 'El directorio mas completo de restaurantes mexicanos autenticos en Estados Unidos.' }}
                     </p>

@@ -92,7 +92,7 @@
                         id="search"
                         wire:model.live.debounce.300ms="search"
                         placeholder="Nombre, ciudad, descripción..."
-                        class="w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500"
+                        class="w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 text-gray-900 placeholder-gray-400"
                     >
                 </div>
 
@@ -104,7 +104,7 @@
                     <select
                         id="state"
                         wire:model.live="selectedState"
-                        class="w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500"
+                        class="w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 text-gray-900"
                     >
                         <option value="">Todos los estados</option>
                         @foreach($states as $state)
@@ -121,7 +121,7 @@
                     <select
                         id="category"
                         wire:model.live="selectedCategory"
-                        class="w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500"
+                        class="w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 text-gray-900"
                     >
                         <option value="">Todas las categorías</option>
                         @foreach($categories as $category)

@@ -1,32 +1,94 @@
-{{-- Platform Benefits + About Section --}}
+{{-- How We Rank + Platform Section --}}
 <section class="py-20 lg:py-28" style="background-color: #1A1A1A;">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {{-- Title --}}
         <div class="text-center mb-16">
             <span class="inline-block px-5 py-1.5 bg-[#D4AF37]/10 text-[#D4AF37] rounded-full text-xs font-semibold tracking-[0.2em] uppercase border border-[#D4AF37]/20 mb-6">
-                The Platform
+                {{ __('app.how_we_select') }}
             </span>
             <h2 class="text-3xl md:text-5xl font-display font-bold text-white mb-5 tracking-tight">
-                Everything Diners Need.<br class="hidden sm:block"> Everything Restaurants Need.
+                Rankings Powered by Real Data
             </h2>
-            <p class="text-gray-400 max-w-2xl mx-auto text-lg leading-relaxed">
-                {!! __('app.about_famer_description') !!}
+            <p class="text-gray-400 max-w-3xl mx-auto text-lg leading-relaxed">
+                We aggregate and analyze reviews from multiple platforms to create the most trusted ranking of Mexican restaurants in the United States.
             </p>
         </div>
 
-        {{-- Two-Track Layout --}}
+        {{-- Review Platforms Grid --}}
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-16 max-w-4xl mx-auto">
+            <div class="bg-[#0B0B0B] rounded-xl p-5 text-center border border-white/5 hover:border-[#D4AF37]/20 transition-colors">
+                <div class="text-2xl font-bold text-white mb-1">Google</div>
+                <div class="text-gray-500 text-xs">Reviews & Ratings</div>
+            </div>
+            <div class="bg-[#0B0B0B] rounded-xl p-5 text-center border border-white/5 hover:border-[#D4AF37]/20 transition-colors">
+                <div class="text-2xl font-bold text-white mb-1">Yelp</div>
+                <div class="text-gray-500 text-xs">Reviews & Ratings</div>
+            </div>
+            <div class="bg-[#0B0B0B] rounded-xl p-5 text-center border border-white/5 hover:border-[#D4AF37]/20 transition-colors">
+                <div class="text-2xl font-bold text-white mb-1">TripAdvisor</div>
+                <div class="text-gray-500 text-xs">Reviews & Ratings</div>
+            </div>
+            <div class="bg-[#0B0B0B] rounded-xl p-5 text-center border border-white/5 hover:border-[#D4AF37]/20 transition-colors">
+                <div class="text-2xl font-bold text-white mb-1">Facebook</div>
+                <div class="text-gray-500 text-xs">Reviews & Ratings</div>
+            </div>
+        </div>
+
+        {{-- How It Works - For Diners --}}
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-20">
 
-            {{-- For Diners --}}
+            {{-- Left: Our Algorithm --}}
             <div class="bg-[#0B0B0B] rounded-2xl p-8 lg:p-10 border border-white/5">
                 <div class="flex items-center mb-8">
                     <div class="w-10 h-10 rounded-xl bg-[#D4AF37]/10 flex items-center justify-center mr-4">
                         <svg class="w-5 h-5 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-white">Our Algorithm</h3>
+                </div>
+                <div class="space-y-5">
+                    <div class="flex items-start">
+                        <span class="flex-shrink-0 w-7 h-7 rounded-full bg-[#D4AF37] text-[#0B0B0B] flex items-center justify-center text-xs font-bold mr-4 mt-0.5">1</span>
+                        <div>
+                            <h4 class="text-white font-medium text-sm mb-1">Average Rating</h4>
+                            <p class="text-gray-500 text-sm">Combined rating across Google, Yelp, TripAdvisor, and Facebook.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="flex-shrink-0 w-7 h-7 rounded-full bg-[#D4AF37] text-[#0B0B0B] flex items-center justify-center text-xs font-bold mr-4 mt-0.5">2</span>
+                        <div>
+                            <h4 class="text-white font-medium text-sm mb-1">Total Reviews</h4>
+                            <p class="text-gray-500 text-sm">Volume of reviews measures real popularity, not just scores.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="flex-shrink-0 w-7 h-7 rounded-full bg-[#D4AF37] text-[#0B0B0B] flex items-center justify-center text-xs font-bold mr-4 mt-0.5">3</span>
+                        <div>
+                            <h4 class="text-white font-medium text-sm mb-1">Consistency</h4>
+                            <p class="text-gray-500 text-sm">Quality consistency across time and platforms matters.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <span class="flex-shrink-0 w-7 h-7 rounded-full bg-[#D4AF37] text-[#0B0B0B] flex items-center justify-center text-xs font-bold mr-4 mt-0.5">4</span>
+                        <div>
+                            <h4 class="text-white font-medium text-sm mb-1">Verification</h4>
+                            <p class="text-gray-500 text-sm">Every restaurant is verified as active and operating.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Right: What You Get --}}
+            <div class="bg-[#0B0B0B] rounded-2xl p-8 lg:p-10 border border-white/5">
+                <div class="flex items-center mb-8">
+                    <div class="w-10 h-10 rounded-xl bg-[#1F3D2B]/40 flex items-center justify-center mr-4">
+                        <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-semibold text-white">For Diners</h3>
+                    <h3 class="text-xl font-semibold text-white">For You</h3>
                 </div>
                 <div class="space-y-6">
                     <div class="flex items-start">
@@ -75,72 +137,13 @@
                     </div>
                 </div>
             </div>
-
-            {{-- For Restaurants --}}
-            <div class="bg-[#0B0B0B] rounded-2xl p-8 lg:p-10 border border-white/5">
-                <div class="flex items-center mb-8">
-                    <div class="w-10 h-10 rounded-xl bg-[#D4AF37]/10 flex items-center justify-center mr-4">
-                        <svg class="w-5 h-5 text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-semibold text-white">For Restaurants</h3>
-                </div>
-                <div class="space-y-6">
-                    <div class="flex items-start">
-                        <div class="flex-shrink-0 w-9 h-9 rounded-lg bg-[#8B1E1E]/30 flex items-center justify-center mr-4 mt-0.5">
-                            <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <h4 class="text-white font-medium text-sm mb-1">Claim Your Listing</h4>
-                            <p class="text-gray-500 text-sm leading-relaxed">Take control of your restaurant profile and keep it accurate and up-to-date.</p>
-                        </div>
-                    </div>
-                    <div class="flex items-start">
-                        <div class="flex-shrink-0 w-9 h-9 rounded-lg bg-[#8B1E1E]/30 flex items-center justify-center mr-4 mt-0.5">
-                            <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <h4 class="text-white font-medium text-sm mb-1">Get Discovered Faster</h4>
-                            <p class="text-gray-500 text-sm leading-relaxed">Appear in search results and recommendations across the platform.</p>
-                        </div>
-                    </div>
-                    <div class="flex items-start">
-                        <div class="flex-shrink-0 w-9 h-9 rounded-lg bg-[#8B1E1E]/30 flex items-center justify-center mr-4 mt-0.5">
-                            <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <h4 class="text-white font-medium text-sm mb-1">Promote with Ease</h4>
-                            <p class="text-gray-500 text-sm leading-relaxed">Run promotions, feature specials, and attract new customers effortlessly.</p>
-                        </div>
-                    </div>
-                    <div class="flex items-start">
-                        <div class="flex-shrink-0 w-9 h-9 rounded-lg bg-[#8B1E1E]/30 flex items-center justify-center mr-4 mt-0.5">
-                            <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <h4 class="text-white font-medium text-sm mb-1">Upgrade Visibility</h4>
-                            <p class="text-gray-500 text-sm leading-relaxed">Premium and Elite tiers boost your ranking and unlock powerful marketing tools.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
 
         {{-- Stats Section --}}
         <div class="rounded-2xl p-8 lg:p-12" style="background-color: #0B0B0B;">
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
                 <div class="bg-[#1A1A1A] rounded-xl p-6 text-center border-t-2 border-[#D4AF37] hover:scale-[1.02] transition-transform duration-300">
-                    <div class="text-3xl lg:text-4xl font-bold text-white mb-1">10K+</div>
+                    <div class="text-3xl lg:text-4xl font-bold text-white mb-1">{{ number_format(floor(($stats['total_restaurants'] ?? 24000) / 1000) * 1000) }}+</div>
                     <div class="text-gray-500 text-sm">{{ __('app.verified_restaurants') }}</div>
                 </div>
                 <div class="bg-[#1A1A1A] rounded-xl p-6 text-center border-t-2 border-[#1F3D2B] hover:scale-[1.02] transition-transform duration-300">
@@ -148,12 +151,12 @@
                     <div class="text-gray-500 text-sm">{{ __('app.states_covered') }}</div>
                 </div>
                 <div class="bg-[#1A1A1A] rounded-xl p-6 text-center border-t-2 border-[#8B1E1E] hover:scale-[1.02] transition-transform duration-300">
-                    <div class="text-3xl lg:text-4xl font-bold text-white mb-1">5+</div>
-                    <div class="text-gray-500 text-sm">Fuentes de Datos</div>
+                    <div class="text-3xl lg:text-4xl font-bold text-white mb-1">8+</div>
+                    <div class="text-gray-500 text-sm">Review Platforms</div>
                 </div>
                 <div class="bg-[#1A1A1A] rounded-xl p-6 text-center border-t-2 border-[#F5F5F5]/30 hover:scale-[1.02] transition-transform duration-300">
                     <div class="text-3xl lg:text-4xl font-bold text-white mb-1">2M+</div>
-                    <div class="text-gray-500 text-sm">Resenas Analizadas</div>
+                    <div class="text-gray-500 text-sm">Reviews Analyzed</div>
                 </div>
             </div>
 

@@ -451,57 +451,67 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 items-start">
             {{-- FREE Plan --}}
             <div class="rounded-2xl p-8" style="background-color: #1A1A1A; border: 1px solid rgba(255,255,255,0.05);">
-                <h3 class="text-lg font-bold mb-2" style="color: #F5F5F5;">Free</h3>
+                <h3 class="text-lg font-bold mb-2" style="color: #F5F5F5;">Listado Gratis</h3>
                 <div class="mb-6">
                     <span class="text-4xl font-black" style="color: #F5F5F5;">$0</span>
-                    <span class="text-sm" style="color: #CCCCCC;">/{{ app()->getLocale() === 'en' ? 'mo' : 'mes' }}</span>
+                    <span class="text-sm" style="color: #CCCCCC;">/mes</span>
                 </div>
                 <ul class="space-y-3 mb-8">
-                    @php
-                        $freeFeatures = app()->getLocale() === 'en'
-                            ? ['Basic listing', 'Public profile', 'Customer reviews', 'Business hours & contact']
-                            : ['Listado basico', 'Perfil publico', 'Resenas de clientes', 'Horarios y contacto'];
-                    @endphp
-                    @foreach($freeFeatures as $feature)
+                    @foreach(['Aparece en el directorio', 'Info basica (nombre, direccion, telefono)', 'Integracion con Google Maps', 'Verificar propiedad del restaurante', 'Editar informacion basica', 'Resenas de clientes', 'Horarios y contacto', 'Hasta 5 fotos'] as $feature)
                     <li class="flex items-center gap-3">
-                        <svg class="w-4 h-4 flex-shrink-0" style="color: #CCCCCC;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        <svg class="w-4 h-4 flex-shrink-0" style="color: #4ade80;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                         <span class="text-sm" style="color: #CCCCCC;">{{ $feature }}</span>
+                    </li>
+                    @endforeach
+                    @foreach(['Sin prioridad en busquedas', 'Sin analiticas avanzadas'] as $excluded)
+                    <li class="flex items-center gap-3 opacity-40">
+                        <svg class="w-4 h-4 flex-shrink-0" style="color: #666;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        <span class="text-sm" style="color: #666;">{{ $excluded }}</span>
                     </li>
                     @endforeach
                 </ul>
                 <a href="{{ route('claim.restaurant') }}" class="block w-full text-center py-3 px-6 rounded-xl font-semibold transition-all duration-300 hover:bg-white/10" style="border: 1px solid rgba(255,255,255,0.1); color: #F5F5F5;">
-                    {{ app()->getLocale() === 'en' ? 'Get Started Free' : 'Empieza Gratis' }}
+                    Reclamar Gratis
                 </a>
             </div>
 
             {{-- PREMIUM Plan (Highlighted) --}}
             <div class="rounded-2xl p-8 relative md:-mt-4 md:mb-0" style="background-color: #1A1A1A; border: 2px solid #D4AF37; box-shadow: 0 0 40px rgba(212,175,55,0.1);">
-                <div class="absolute -top-4 left-1/2 -translate-x-1/2">
-                    <span class="px-4 py-1.5 rounded-full text-xs font-bold" style="background-color: #D4AF37; color: #0B0B0B;">
-                        {{ app()->getLocale() === 'en' ? 'MOST POPULAR' : 'MAS POPULAR' }}
-                    </span>
+                <div class="absolute -top-4 left-1/2 -translate-x-1/2 flex gap-2">
+                    <span class="px-4 py-1.5 rounded-full text-xs font-bold" style="background-color: #D4AF37; color: #0B0B0B;">MAS POPULAR</span>
                 </div>
                 <h3 class="text-lg font-bold mb-2" style="color: #D4AF37;">Premium</h3>
-                <div class="mb-6">
-                    <span class="text-4xl font-black" style="color: #F5F5F5;">$29</span>
-                    <span class="text-sm" style="color: #CCCCCC;">/{{ app()->getLocale() === 'en' ? 'mo' : 'mes' }}</span>
+                <div class="mb-2">
+                    <span class="text-2xl line-through" style="color: #666;">$39</span>
+                    <span class="text-4xl font-black ml-2" style="color: #F5F5F5;">$9.99</span>
+                    <span class="text-sm" style="color: #CCCCCC;">/primer mes</span>
                 </div>
+                <p class="text-sm mb-6" style="color: #D4AF37;">Despues $39/mes. Cancela cuando quieras.</p>
                 <ul class="space-y-3 mb-8">
-                    @php
-                        $premiumFeatures = app()->getLocale() === 'en'
-                            ? ['Everything in Free', 'Top visibility in rankings', 'Featured badge', 'Digital menus & promotions', 'Analytics dashboard', 'Priority support']
-                            : ['Todo lo de Free', 'Top visibilidad en rankings', 'Insignia destacada', 'Menus digitales y promociones', 'Dashboard de analytics', 'Soporte prioritario'];
-                    @endphp
-                    @foreach($premiumFeatures as $feature)
+                    @foreach([
+                        'Todo lo de Free PLUS:' => true,
+                        'Badge Destacado "Premium"' => false,
+                        'Top 3 en busquedas locales' => false,
+                        'Menu Digital + QR Code' => false,
+                        'Widget de Pedidos Online' => false,
+                        'Sistema de Reservaciones' => false,
+                        'Dashboard de Analiticas' => false,
+                        'Fotos y Videos Ilimitados' => false,
+                        'Chatbot AI (ES/EN) 24/7' => false,
+                        'Programa de Lealtad' => false,
+                        'Cupones y Promociones' => false,
+                        'Soporte Prioritario' => false,
+                    ] as $feature => $isBold)
                     <li class="flex items-center gap-3">
                         <svg class="w-4 h-4 flex-shrink-0" style="color: #D4AF37;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                        <span class="text-sm" style="color: #F5F5F5;">{{ $feature }}</span>
+                        <span class="text-sm {{ $isBold ? 'font-bold' : '' }}" style="color: #F5F5F5;">{{ $feature }}</span>
                     </li>
                     @endforeach
                 </ul>
-                <a href="{{ route('claim.restaurant') }}" class="block w-full text-center py-3 px-6 rounded-xl font-bold transition-all duration-300 hover:scale-105" style="background-color: #D4AF37; color: #0B0B0B; box-shadow: 0 4px 20px rgba(212,175,55,0.25);">
-                    {{ app()->getLocale() === 'en' ? 'Upgrade to Premium' : 'Actualizar a Premium' }}
+                <a href="{{ route('claim.restaurant') }}?plan=premium" class="block w-full text-center py-3 px-6 rounded-xl font-bold transition-all duration-300 hover:scale-105" style="background-color: #D4AF37; color: #0B0B0B; box-shadow: 0 4px 20px rgba(212,175,55,0.25);">
+                    Suscribirse por $9.99
                 </a>
+                <p class="text-center text-xs mt-3" style="color: #999;">4 Cupones Trimestrales (10% off) en MF Group</p>
             </div>
 
             {{-- ELITE Plan --}}
@@ -509,23 +519,30 @@
                 <h3 class="text-lg font-bold mb-2" style="color: #F5F5F5;">Elite</h3>
                 <div class="mb-6">
                     <span class="text-4xl font-black" style="color: #F5F5F5;">$79</span>
-                    <span class="text-sm" style="color: #CCCCCC;">/{{ app()->getLocale() === 'en' ? 'mo' : 'mes' }}</span>
+                    <span class="text-sm" style="color: #CCCCCC;">/mes</span>
                 </div>
                 <ul class="space-y-3 mb-8">
-                    @php
-                        $eliteFeatures = app()->getLocale() === 'en'
-                            ? ['Everything in Premium', 'Maximum exposure', 'Priority ranking placement', 'Advanced analytics', 'Dedicated account manager', 'Custom branding']
-                            : ['Todo lo de Premium', 'Exposicion maxima', 'Posicion prioritaria en rankings', 'Analytics avanzados', 'Gerente de cuenta dedicado', 'Branding personalizado'];
-                    @endphp
-                    @foreach($eliteFeatures as $feature)
+                    @foreach([
+                        'Todo lo de Premium PLUS:' => true,
+                        'App Movil White Label' => false,
+                        'Website Builder Completo' => false,
+                        'Exposicion Maxima Nacional' => false,
+                        'Posicion #1 en Rankings' => false,
+                        'Analytics Avanzados + Reportes' => false,
+                        'Gerente de Cuenta Dedicado' => false,
+                        'Branding Personalizado' => false,
+                        'Integracion con Redes Sociales' => false,
+                        'Campanas de Email Marketing' => false,
+                        'Sin anuncios de competidores' => false,
+                    ] as $feature => $isBold)
                     <li class="flex items-center gap-3">
-                        <svg class="w-4 h-4 flex-shrink-0" style="color: #CCCCCC;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                        <span class="text-sm" style="color: #CCCCCC;">{{ $feature }}</span>
+                        <svg class="w-4 h-4 flex-shrink-0" style="color: #a78bfa;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        <span class="text-sm {{ $isBold ? 'font-bold' : '' }}" style="color: #CCCCCC;">{{ $feature }}</span>
                     </li>
                     @endforeach
                 </ul>
-                <a href="{{ route('claim.restaurant') }}" class="block w-full text-center py-3 px-6 rounded-xl font-semibold transition-all duration-300 hover:bg-white/10" style="border: 1px solid rgba(255,255,255,0.1); color: #F5F5F5;">
-                    {{ app()->getLocale() === 'en' ? 'Go Elite' : 'Ir a Elite' }}
+                <a href="{{ route('claim.restaurant') }}?plan=elite" class="block w-full text-center py-3 px-6 rounded-xl font-semibold transition-all duration-300 hover:bg-white/10" style="border: 1px solid rgba(255,255,255,0.1); color: #F5F5F5;">
+                    Ir a Elite
                 </a>
             </div>
         </div>

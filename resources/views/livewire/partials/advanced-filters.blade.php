@@ -14,7 +14,7 @@
                 </label>
                 <select
                     wire:model.live="selectedBusinessType"
-                    class="w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 bg-white"
+                    class="w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 bg-white text-gray-900"
                 >
                     <option value="">Todos los tipos</option>
                     @foreach($businessTypes as $key => $type)
@@ -127,7 +127,7 @@
                 </label>
                 <select
                     wire:model.live="selectedRegion"
-                    class="w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 bg-white"
+                    class="w-full rounded-lg border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 bg-white text-gray-900"
                 >
                     <option value="">Todas las regiones</option>
                     @foreach(\App\Models\Restaurant::getMexicanRegions() as $key => $region)

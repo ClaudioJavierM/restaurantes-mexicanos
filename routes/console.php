@@ -29,42 +29,63 @@ function notifyN8nFailure(string $jobName, string $description): void
 // ============================================================================
 
 /**
- * SMART IMPORT - Runs daily and automatically:
- * - Tracks progress per city
- * - Skips cities that are 80%+ duplicates (exhausted)
- * - Processes 30 cities per run
- * - ~100-150 new restaurants per day
- * - No manual state rotation needed
+ * SMART IMPORT - 4 runs/day to exhaust 15,000 trial calls in ~12 days
+ * - 3× Enhanced plan keys = 15,000 calls/month (trial, expires ~Apr 28)
+ * - 48 cities/day × ~26 avg calls = ~1,250 calls/day → done in ~12 days
+ * - Budget guard auto-stops if monthly limit reached
  */
-// Budget: 2× Enhanced plans = 10,000 calls/month (~333/day)
-// Each city: 1 search + ~20-50 detail calls = ~21-51 calls/city
-// 8+6 = 14 cities/day × ~26 avg calls = ~364 calls/day → within budget
-// Budget guard in YelpFusionService auto-stops if limit reached
-Schedule::command('yelp:import-smart --cities=8 --limit=50 --min-rating=3.5 --delay=2')
+// RUN 1 — 2:00 AM
+Schedule::command('yelp:import-smart --cities=12 --limit=50 --min-rating=3.5 --delay=1')
     ->dailyAt('02:00')
     ->timezone('America/New_York')
-    ->description('DAILY smart import: 8 cities (2x Enhanced plan budget)')
-    ->onSuccess(function () {
-        \Log::info('Daily smart import completed successfully');
-    })
+    ->description('Import run 1/4: 12 cities')
+    ->onSuccess(function () { \Log::info('Yelp import run 1 completed'); })
     ->onFailure(function () {
-        \Log::error('Daily smart import failed');
-        notifyN8nFailure('yelp:import-smart', 'Daily smart import (30 cities)');
+        \Log::error('Yelp import run 1 failed');
+        notifyN8nFailure('yelp:import-smart', 'Import run 1 (12 cities)');
     });
 
-/**
- * SECOND RUN at 2:00 PM - Additional import for faster growth
- */
-Schedule::command('yelp:import-smart --cities=6 --limit=50 --min-rating=3.5 --delay=2')
+// RUN 2 — 8:00 AM
+Schedule::command('yelp:import-smart --cities=12 --limit=50 --min-rating=3.5 --delay=1')
+    ->dailyAt('08:00')
+    ->timezone('America/New_York')
+    ->description('Import run 2/4: 12 cities')
+    ->onSuccess(function () { \Log::info('Yelp import run 2 completed'); })
+    ->onFailure(function () {
+        \Log::error('Yelp import run 2 failed');
+        notifyN8nFailure('yelp:import-smart', 'Import run 2 (12 cities)');
+    });
+
+// RUN 3 — 2:00 PM
+Schedule::command('yelp:import-smart --cities=12 --limit=50 --min-rating=3.5 --delay=1')
     ->dailyAt('14:00')
     ->timezone('America/New_York')
-    ->description('Afternoon smart import: 6 additional cities')
-    ->onSuccess(function () {
-        \Log::info('Afternoon smart import completed successfully');
-    })
+    ->description('Import run 3/4: 12 cities')
+    ->onSuccess(function () { \Log::info('Yelp import run 3 completed'); })
     ->onFailure(function () {
-        \Log::error('Afternoon smart import failed');
-        notifyN8nFailure('yelp:import-smart', 'Afternoon smart import (20 cities)');
+        \Log::error('Yelp import run 3 failed');
+        notifyN8nFailure('yelp:import-smart', 'Import run 3 (12 cities)');
+    });
+
+// RUN 4 — 8:00 PM
+Schedule::command('yelp:import-smart --cities=12 --limit=50 --min-rating=3.5 --delay=1')
+    ->dailyAt('20:00')
+    ->timezone('America/New_York')
+    ->description('Import run 4/4: 12 cities')
+    ->onSuccess(function () { \Log::info('Yelp import run 4 completed'); })
+    ->onFailure(function () {
+        \Log::error('Yelp import run 4 failed');
+        notifyN8nFailure('yelp:import-smart', 'Import run 4 (12 cities)');
+    });
+
+// BACKFILL — 6:00 AM & 6:00 PM (enrich existing restaurants with photos/hours)
+Schedule::command('yelp:backfill --limit=300')
+    ->twiceDaily(6, 18)
+    ->timezone('America/New_York')
+    ->description('Backfill photos/hours/attributes for existing restaurants')
+    ->onSuccess(function () { \Log::info('Yelp backfill completed'); })
+    ->onFailure(function () {
+        notifyN8nFailure('yelp:backfill', 'Backfill photos/hours');
     });
 
 // ============================================================================
