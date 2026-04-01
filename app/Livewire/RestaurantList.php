@@ -420,6 +420,14 @@ class RestaurantList extends Component
             'food_stand' => 'Puesto de Comida',
         ];
 
+        $isEn = app()->getLocale() === 'en';
+        $listTitle = $isEn
+            ? 'Find Mexican Restaurants Near You | Browse 25,000+ Locations | FAMER'
+            : 'Buscar Restaurantes Mexicanos | Más de 25,000 Ubicaciones | FAMER';
+        $listDesc = $isEn
+            ? 'Search and filter authentic Mexican restaurants by city, state, cuisine type, and ratings. Discover top-rated birria spots, taco trucks, family restaurants, and more across the USA.'
+            : 'Busca y filtra restaurantes mexicanos auténticos por ciudad, estado, tipo de cocina y calificación. Descubre los mejores lugares de birria, taquerías, fondas familiares y más en todo EE.UU.';
+
         return view('livewire.restaurant-list', [
             'restaurants' => $restaurants,
             'states' => $states,
@@ -430,7 +438,10 @@ class RestaurantList extends Component
             'userLatitude' => $this->userLatitude,
             'userLongitude' => $this->userLongitude,
             'locationSource' => $this->locationSource,
-        ])->layout('layouts.app', ['title' => 'Restaurantes Mexicanos']);
+        ])->layout('layouts.app', [
+            'title'           => $listTitle,
+            'metaDescription' => $listDesc,
+        ]);
     }
 
     public function getDistanceToRestaurant($restaurant): ?float

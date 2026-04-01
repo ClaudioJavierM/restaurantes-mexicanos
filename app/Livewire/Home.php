@@ -430,6 +430,14 @@ class Home extends Component
         // Get recent activity for USA homepage
         $recentActivity = $isMexico ? collect() : $this->getRecentActivity();
 
+        $isEn = app()->getLocale() === 'en';
+        $seoTitle = $isEn
+            ? 'Best Mexican Restaurants in the USA | FAMER — Famous Mexican Restaurants'
+            : 'Los Mejores Restaurantes Mexicanos | FAMER — Restaurantes Mexicanos Famosos';
+        $seoDesc = $isEn
+            ? 'Discover the best authentic Mexican restaurants near you. Browse 25,000+ restaurants across the USA — verified ratings, menus, hours, and reviews. Find birria, tacos, tamales & more.'
+            : 'Descubre los mejores restaurantes mexicanos auténticos cerca de ti. Más de 25,000 restaurantes en EE.UU. — calificaciones verificadas, menús, horarios y reseñas. Encuentra birria, tacos, tamales y más.';
+
         return view('livewire.home', [
             'categories' => $categories,
             'states' => $states,
@@ -438,7 +446,10 @@ class Home extends Component
             'isMexico' => $isMexico,
             'userLocation' => $this->detectedLocation,
             'recentActivity' => $recentActivity,
-        ])->layout('layouts.app', ['title' => 'Inicio']);
+        ])->layout('layouts.app', [
+            'title'           => $seoTitle,
+            'metaDescription' => $seoDesc,
+        ]);
     }
 
     public function searchRestaurants()
