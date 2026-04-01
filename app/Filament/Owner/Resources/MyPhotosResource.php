@@ -194,7 +194,8 @@ class MyPhotosResource extends Resource
         
         return match($plan) {
             'free' => 5,
-            'premium' => 999,
+            'claimed' => 10,
+            'premium' => 25,
             'elite' => 999, // Unlimited
             default => 5,
         };

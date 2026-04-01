@@ -95,7 +95,7 @@
             {{-- Main Content --}}
             <div class="lg:w-2/3">
                 <h2 class="text-2xl font-bold text-gray-900 mb-6">
-                    Top 50 Mejores Restaurantes Mexicanos {{ $year }}
+                    Top 100 Restaurantes Mexicanos que Debes Visitar en Estados Unidos
                 </h2>
 
                 <div class="space-y-4">

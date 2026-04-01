@@ -171,6 +171,119 @@
     @if($seoImage)
         <meta name="twitter:image" content="{{ $seoImage }}">
     @endif
+
+    {{-- ═══════════════════════════════════════════════════════
+         SCHEMA.ORG — Restaurant + AggregateRating + Breadcrumb
+         Enables Google rich snippets (stars, address, hours)
+         ═══════════════════════════════════════════════════════ --}}
+    @php
+        $schemaCountry = $restaurant->state?->country ?? 'US';
+        $schemaStateCode = $restaurant->state?->code ?? '';
+
+        // Build Restaurant schema
+        $restaurantSchema = [
+            '@context'      => 'https://schema.org',
+            '@type'         => 'Restaurant',
+            'name'          => $restaurant->name,
+            'url'           => url()->current(),
+            'servesCuisine' => 'Mexican',
+        ];
+
+        if ($seoImage) {
+            $restaurantSchema['image'] = $seoImage;
+        }
+        if ($restaurant->phone) {
+            $restaurantSchema['telephone'] = $restaurant->phone;
+        }
+        if ($restaurant->website) {
+            $restaurantSchema['hasMap'] = $restaurant->website;
+        }
+        if ($restaurant->price_range) {
+            $restaurantSchema['priceRange'] = $restaurant->price_range;
+        }
+        if ($restaurant->address) {
+            $restaurantSchema['address'] = [
+                '@type'           => 'PostalAddress',
+                'streetAddress'   => $restaurant->address,
+                'addressLocality' => $restaurant->city,
+                'addressRegion'   => $schemaStateCode,
+                'postalCode'      => $restaurant->zip_code ?? '',
+                'addressCountry'  => $schemaCountry,
+            ];
+        }
+        if ($restaurant->latitude && $restaurant->longitude) {
+            $restaurantSchema['geo'] = [
+                '@type'     => 'GeoCoordinates',
+                'latitude'  => (float) $restaurant->latitude,
+                'longitude' => (float) $restaurant->longitude,
+            ];
+        }
+        // AggregateRating — only if we have real review data (Google requires reviewCount ≥ 1)
+        if ($seoCombinedReviews > 0 && $seoDisplayRating > 0) {
+            $restaurantSchema['aggregateRating'] = [
+                '@type'       => 'AggregateRating',
+                'ratingValue' => (string) $seoDisplayRating,
+                'reviewCount' => (string) $seoCombinedReviews,
+                'bestRating'  => '5',
+                'worstRating' => '1',
+            ];
+        }
+        // sameAs for cross-platform authority signals
+        $sameAs = [];
+        if ($restaurant->yelp_url ?? null) { $sameAs[] = $restaurant->yelp_url; }
+        if ($restaurant->google_place_id ?? null) {
+            $sameAs[] = 'https://maps.google.com/?cid=' . $restaurant->google_place_id;
+        }
+        if (count($sameAs)) { $restaurantSchema['sameAs'] = $sameAs; }
+
+        // BreadcrumbList schema
+        $breadcrumbSchema = [
+            '@context'        => 'https://schema.org',
+            '@type'           => 'BreadcrumbList',
+            'itemListElement' => [
+                [
+                    '@type'    => 'ListItem',
+                    'position' => 1,
+                    'name'     => 'FAMER',
+                    'item'     => url('/'),
+                ],
+                [
+                    '@type'    => 'ListItem',
+                    'position' => 2,
+                    'name'     => app()->getLocale() === 'en' ? 'Restaurants' : 'Restaurantes',
+                    'item'     => url('/restaurantes'),
+                ],
+            ],
+        ];
+        if ($restaurant->state) {
+            $breadcrumbSchema['itemListElement'][] = [
+                '@type'    => 'ListItem',
+                'position' => 3,
+                'name'     => $restaurant->state->name,
+                'item'     => url('/restaurantes?state=' . urlencode($restaurant->state->name)),
+            ];
+            $breadcrumbSchema['itemListElement'][] = [
+                '@type'    => 'ListItem',
+                'position' => 4,
+                'name'     => $restaurant->name,
+                'item'     => url()->current(),
+            ];
+        } else {
+            $breadcrumbSchema['itemListElement'][] = [
+                '@type'    => 'ListItem',
+                'position' => 3,
+                'name'     => $restaurant->name,
+                'item'     => url()->current(),
+            ];
+        }
+    @endphp
+
+    <script type="application/ld+json">
+    {!! json_encode($restaurantSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) !!}
+    </script>
+    <script type="application/ld+json">
+    {!! json_encode($breadcrumbSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) !!}
+    </script>
 @endpush
 
 <div>

@@ -40,9 +40,9 @@ class FamerAwards2026 extends Component
 
     public function mount()
     {
-        $this->totalRestaurants = Restaurant::where('status', 'approved')->count();
-        $this->totalCities = Restaurant::where('status', 'approved')->distinct('city')->count('city');
-        $this->totalStates = Restaurant::where('status', 'approved')->distinct('state_id')->count('state_id');
+        $this->totalRestaurants = Restaurant::approved()->forCurrentCountry()->count();
+        $this->totalCities = Restaurant::approved()->forCurrentCountry()->distinct('city')->count('city');
+        $this->totalStates = Restaurant::approved()->forCurrentCountry()->distinct('state_id')->count('state_id');
         
         $startDate = \Carbon\Carbon::create(2026, 1, 1);
         $this->daysUntilStart = max(0, now()->diffInDays($startDate, false));

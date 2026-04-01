@@ -342,10 +342,9 @@ class FamerScoreService
 
         // Menu Categories Coverage (25 points)
         $categories = $restaurant->menuItems()
-            ->whereNotNull('category')
-            ->distinct()
-            ->pluck('category')
-            ->count();
+            ->whereNotNull('menu_category_id')
+            ->distinct('menu_category_id')
+            ->count('menu_category_id');
 
         $breakdown['category_count'] = $categories;
 

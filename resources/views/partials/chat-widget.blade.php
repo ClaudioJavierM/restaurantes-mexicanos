@@ -825,7 +825,7 @@ function rmfShowPricing() {
         '<div style="margin:8px 0;padding:8px;background:white;border-radius:8px;">' +
         '<strong style="color:#006847;">GRATIS</strong> - $0/mes<br><small>Perfil basico, resenas, contacto</small></div>' +
         '<div style="margin:8px 0;padding:8px;background:white;border-radius:8px;">' +
-        '<strong style="color:#CE1126;">PRO</strong> - $29/mes<br><small>Menu digital, fotos, reservaciones</small></div>' +
+        '<strong style="color:#CE1126;">PRO</strong> - $39/mes<br><small>Menu digital, fotos, reservaciones</small></div>' +
         '<div style="margin:8px 0;padding:8px;background:white;border-radius:8px;">' +
         '<strong style="color:#D4AF37;">PREMIUM</strong> - $79/mes<br><small>Todo Pro + anuncios, analytics, soporte VIP</small></div>' +
         '<a href="/for-owners#pricing" class="rmf-cta-btn">Comenzar Gratis</a></div>' :
@@ -833,7 +833,7 @@ function rmfShowPricing() {
         '<div style="margin:8px 0;padding:8px;background:white;border-radius:8px;">' +
         '<strong style="color:#006847;">FREE</strong> - $0/month<br><small>Basic profile, reviews, contact</small></div>' +
         '<div style="margin:8px 0;padding:8px;background:white;border-radius:8px;">' +
-        '<strong style="color:#CE1126;">PRO</strong> - $29/month<br><small>Digital menu, photos, reservations</small></div>' +
+        '<strong style="color:#CE1126;">PRO</strong> - $39/month<br><small>Digital menu, photos, reservations</small></div>' +
         '<div style="margin:8px 0;padding:8px;background:white;border-radius:8px;">' +
         '<strong style="color:#D4AF37;">PREMIUM</strong> - $79/month<br><small>All Pro + ads, analytics, VIP support</small></div>' +
         '<a href="/for-owners#pricing" class="rmf-cta-btn">Start Free</a></div>';

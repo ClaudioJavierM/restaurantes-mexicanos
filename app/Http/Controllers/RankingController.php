@@ -21,13 +21,13 @@ class RankingController extends Controller
         $cacheKey = "ranking_mejores_nacional_{$country}";
 
         $data = Cache::remember($cacheKey, 3600, function () use ($country) {
-            // Get top 50 restaurants by weighted rating
+            // Get top 100 restaurants by weighted rating
             $restaurants = Restaurant::where('status', 'approved')
                 ->where('country', $country)
                 ->with(['state', 'category', 'media'])
                 ->orderByRaw('(average_rating * 0.7 + LEAST(total_reviews / 100, 1) * 0.3 * 5) DESC')
                 ->orderByDesc('total_reviews')
-                ->limit(50)
+                ->limit(100)
                 ->get();
 
             // Stats
