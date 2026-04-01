@@ -103,18 +103,18 @@ Restaurantes {{ $category->name }} | FAMER
 @push('scripts')
 <script type="application/ld+json">
 {
-    "@context": "https://schema.org",
-    "@type": "ItemList",
+    "@@context": "https://schema.org",
+    "@@type": "ItemList",
     "name": "Restaurantes de {{ addslashes($category->name) }}",
     "description": "Los mejores restaurantes mexicanos de {{ addslashes($category->name) }} en FAMER",
     "numberOfItems": {{ $restaurants->total() }},
     "itemListElement": [
         @foreach($restaurants->take(10) as $i => $restaurant)
         {
-            "@type": "ListItem",
+            "@@type": "ListItem",
             "position": {{ $i + 1 }},
             "item": {
-                "@type": "Restaurant",
+                "@@type": "Restaurant",
                 "name": "{{ addslashes($restaurant->name) }}",
                 "url": "{{ url('/restaurante/' . $restaurant->slug) }}"
             }
