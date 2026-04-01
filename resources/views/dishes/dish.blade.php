@@ -72,11 +72,11 @@
                                 <p style="font-size:0.875rem; color:#9CA3AF; margin:0 0 0.5rem;">
                                     {{ $restaurant->city }}@if($restaurant->state), {{ $restaurant->state->code ?? $restaurant->state->name }}@endif
                                 </p>
-                                @if($restaurant->rating)
+                                @if($restaurant->average_rating)
                                 <div style="display:flex; align-items:center; gap:0.5rem;">
-                                    <span style="color:#D4AF37; font-size:0.875rem;">★ {{ number_format($restaurant->rating, 1) }}</span>
-                                    @if($restaurant->review_count)
-                                    <span style="color:#6B7280; font-size:0.75rem;">({{ number_format($restaurant->review_count) }} reseñas)</span>
+                                    <span style="color:#D4AF37; font-size:0.875rem;">★ {{ number_format($restaurant->average_rating, 1) }}</span>
+                                    @if($restaurant->total_reviews)
+                                    <span style="color:#6B7280; font-size:0.75rem;">({{ number_format($restaurant->total_reviews) }} reseñas)</span>
                                     @endif
                                 </div>
                                 @endif
@@ -177,11 +177,11 @@
                     "addressRegion": "{{ addslashes($restaurant->state->code ?? $restaurant->state->name ?? '') }}"
                     @endif
                 }
-                @if($restaurant->rating),
+                @if($restaurant->average_rating),
                 "aggregateRating": {
                     "@@type": "AggregateRating",
-                    "ratingValue": "{{ $restaurant->rating }}",
-                    "reviewCount": "{{ $restaurant->review_count ?? 0 }}"
+                    "ratingValue": "{{ $restaurant->average_rating }}",
+                    "reviewCount": "{{ $restaurant->total_reviews ?? 0 }}"
                 }
                 @endif
             }

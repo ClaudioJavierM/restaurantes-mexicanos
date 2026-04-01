@@ -25,9 +25,9 @@ class NearMeController extends Controller
 
         $featuredRestaurants = Restaurant::approved()
             ->with(['state'])
-            ->select(['id', 'name', 'slug', 'city', 'state_id', 'rating', 'review_count', 'cover_image'])
-            ->orderByDesc('rating')
-            ->orderByDesc('review_count')
+            ->select(['id', 'name', 'slug', 'city', 'state_id', 'average_rating', 'total_reviews', 'cover_image'])
+            ->orderByDesc('average_rating')
+            ->orderByDesc('total_reviews')
             ->limit(12)
             ->get();
 

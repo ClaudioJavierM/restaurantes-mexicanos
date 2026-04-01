@@ -50,20 +50,20 @@ class DishController extends Controller
 
         $restaurants = Restaurant::approved()
             ->where($column, true)
-            ->with(['state', 'category'])
-            ->select(['id', 'name', 'slug', 'city', 'state_id', 'address', 'rating', 'review_count', 'description', 'cover_image', 'logo_image', $column])
-            ->orderByDesc('rating')
-            ->orderByDesc('review_count')
+            ->with(['state'])
+            ->select(['id', 'name', 'slug', 'city', 'state_id', 'address', 'average_rating', 'total_reviews', 'description', 'cover_image', 'logo_image'])
+            ->orderByDesc('average_rating')
+            ->orderByDesc('total_reviews')
             ->limit(50)
             ->get();
 
         // Fallback: if no specific column data, get top Mexican restaurants
         if ($restaurants->isEmpty()) {
             $restaurants = Restaurant::approved()
-                ->with(['state', 'category'])
-                ->select(['id', 'name', 'slug', 'city', 'state_id', 'address', 'rating', 'review_count', 'description', 'cover_image', 'logo_image'])
-                ->orderByDesc('rating')
-                ->orderByDesc('review_count')
+                ->with(['state'])
+                ->select(['id', 'name', 'slug', 'city', 'state_id', 'address', 'average_rating', 'total_reviews', 'description', 'cover_image', 'logo_image'])
+                ->orderByDesc('average_rating')
+                ->orderByDesc('total_reviews')
                 ->limit(50)
                 ->get();
         }

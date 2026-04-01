@@ -105,8 +105,8 @@ Restaurantes Mexicanos Cerca de Mí | FAMER
                         <p style="color:#9CA3AF; font-size:0.8125rem; margin-bottom:0.5rem;">
                             {{ $restaurant->city }}@if($restaurant->state), {{ $restaurant->state->code ?? '' }}@endif
                         </p>
-                        @if($restaurant->rating)
-                        <span style="color:#D4AF37; font-size:0.875rem;">★ {{ number_format($restaurant->rating, 1) }}</span>
+                        @if($restaurant->average_rating)
+                        <span style="color:#D4AF37; font-size:0.875rem;">★ {{ number_format($restaurant->average_rating, 1) }}</span>
                         @endif
                     </div>
                 </a>
