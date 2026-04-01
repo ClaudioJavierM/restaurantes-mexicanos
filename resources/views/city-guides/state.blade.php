@@ -1,7 +1,11 @@
 @extends('layouts.app')
 
-@section('title')Mejores Restaurantes Mexicanos en {{ $state->name }} | FAMER@endsection
-@section('meta_description')Descubre los {{ number_format($stats->total) }} mejores restaurantes mexicanos en {{ $state->name }}. {{ $cities->count() }} ciudades, ratings verificados y más.@endsection
+@section('title')
+Mejores Restaurantes Mexicanos en {{ $state->name }} | FAMER
+@endsection
+@section('meta_description')
+Descubre los {{ number_format($stats->total) }} mejores restaurantes mexicanos en {{ $state->name }}. {{ $cities->count() }} ciudades, ratings verificados y más.
+@endsection
 
 @push('meta')
 <!-- Open Graph / Facebook -->
