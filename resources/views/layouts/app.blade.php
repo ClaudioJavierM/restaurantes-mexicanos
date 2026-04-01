@@ -20,14 +20,25 @@
     <!-- SEO: Canonical URL -->
     <link rel="canonical" href="{{ url()->current() }}">
 
-    <!-- SEO: Hreflang Tags for Bilingual Support -->
-    @php $hrefPath = request()->path() === '/' ? '' : '/' . request()->path(); @endphp
-    <link rel="alternate" hreflang="en" href="https://famousmexicanrestaurants.com{{ $hrefPath }}" />
-    <link rel="alternate" hreflang="es" href="https://restaurantesmexicanosfamosos.com{{ $hrefPath }}" />
-    <link rel="alternate" hreflang="x-default" href="https://famousmexicanrestaurants.com{{ $hrefPath }}" />
+    {{-- SEO: Hreflang — 3 domains (es-MX, es-US, en-US) --}}
+    @php
+        $rawPath = request()->path();
+        $hrefPath = $rawPath === '/' ? '' : '/' . $rawPath;
+        // EN domain uses /restaurant/ instead of /restaurante/
+        $enPath = str_replace('/restaurante/', '/restaurant/', $hrefPath);
+    @endphp
+    <link rel="alternate" hreflang="es-MX" href="https://restaurantesmexicanosfamosos.com.mx{{ $hrefPath }}" />
+    <link rel="alternate" hreflang="es-US" href="https://restaurantesmexicanosfamosos.com{{ $hrefPath }}" />
+    <link rel="alternate" hreflang="en-US" href="https://famousmexicanrestaurants.com{{ $enPath }}" />
+    <link rel="alternate" hreflang="x-default" href="https://restaurantesmexicanosfamosos.com.mx{{ $hrefPath }}" />
 
     <!-- Open Graph Locale -->
-    <meta property="og:locale" content="{{ app()->getLocale() === 'en' ? 'en_US' : 'es_US' }}" />
+    @php
+        $ogLocale = str_contains(request()->getHost(), 'famousmexicanrestaurants') ? 'en_US'
+            : (str_contains(request()->getHost(), '.com.mx') ? 'es_MX' : 'es_US');
+    @endphp
+    <meta property="og:locale" content="{{ $ogLocale }}" />
+    <meta property="og:locale:alternate" content="{{ $ogLocale === 'en_US' ? 'es_MX' : 'en_US' }}" />
     <meta property="og:site_name" content="{{ __('app.site_name') }}" />
 
     <!-- Dynamic Meta Tags (Open Graph, Twitter Cards) -->
