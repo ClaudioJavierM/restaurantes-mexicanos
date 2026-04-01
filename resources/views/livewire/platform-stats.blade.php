@@ -240,7 +240,7 @@
 
                 <div class="grid md:grid-cols-3 gap-6 text-center">
                     <div class="p-6">
-                        <div class="text-5xl font-bold text-white mb-2">$29</div>
+                        <div class="text-5xl font-bold text-white mb-2">$39</div>
                         <div class="text-gray-400">Premium Plan / month</div>
                     </div>
                     <div class="p-6 flex items-center justify-center">
@@ -310,7 +310,7 @@
                             </svg>
                         @endfor
                     </div>
-                    <p class="text-gray-300 mb-6 italic">"The analytics dashboard shows me exactly where my customers are finding me. Worth every penny of the $29/month."</p>
+                    <p class="text-gray-300 mb-6 italic">"The analytics dashboard shows me exactly where my customers are finding me. Worth every penny of the $39/month."</p>
                     <div class="flex items-center gap-4">
                         <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center text-white font-bold">J</div>
                         <div>

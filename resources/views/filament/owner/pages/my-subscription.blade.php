@@ -104,7 +104,7 @@
                             <div style="text-align: center; margin-bottom: 1.5rem;">
                                 <h4 style="font-size: 1.5rem; font-weight: bold; color: #ffffff; margin: 0;">⭐ Premium</h4>
                                 <div style="margin-top: 0.5rem;">
-                                    <span style="font-size: 2.5rem; font-weight: bold; color: #ffffff;">$29</span>
+                                    <span style="font-size: 2.5rem; font-weight: bold; color: #ffffff;">$39</span>
                                     <span style="font-size: 1rem; color: #9ca3af;">/mes</span>
                                 </div>
                                 <span style="display: inline-block; margin-top: 0.5rem; background: linear-gradient(135deg, #f97316, #dc2626); color: white; font-size: 0.75rem; padding: 0.25rem 0.75rem; border-radius: 9999px; font-weight: 600;">10% descuento FAMER</span>

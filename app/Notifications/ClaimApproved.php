@@ -47,7 +47,7 @@ class ClaimApproved extends Notification
             ->line('')
             ->action('Acceder a Mi Panel', $this->loginUrl)
             ->line('')
-            ->line('¿Quieres más? Actualiza a Premium ($29/mes) o Elite ($79/mes) para:')
+            ->line('¿Quieres más? Actualiza a Premium ($39/mes) o Elite ($79/mes) para:')
             ->line('• Fotos ilimitadas')
             ->line('• Análisis avanzados')
             ->line('• Publicidad destacada')

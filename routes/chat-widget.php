@@ -130,8 +130,8 @@ Route::prefix('chat')->group(function () {
                 // Pricing/cost questions
                 if (preg_match('/(precio|cost|cuanto|how much|tarifa|rate|cobr|charge|pago|payment|plan)/i', $message)) {
                     $response = $language === 'es' ?
-                        'Tenemos 3 planes:\n\n• GRATIS - Perfil basico, responder resenas\n• PRO ($29/mes) - Menu digital, fotos ilimitadas, reservaciones\n• PREMIUM ($79/mes) - Anuncios destacados, analytics, soporte VIP\n\n¿Te gustaria comenzar con el plan gratuito?' :
-                        'We have 3 plans:\n\n• FREE - Basic profile, respond to reviews\n• PRO ($29/mo) - Digital menu, unlimited photos, reservations\n• PREMIUM ($79/mo) - Featured listings, analytics, VIP support\n\nWould you like to start with the free plan?';
+                        'Tenemos 3 planes:\n\n• GRATIS - Perfil basico, responder resenas\n• PRO ($39/mes) - Menu digital, fotos ilimitadas, reservaciones\n• PREMIUM ($79/mes) - Anuncios destacados, analytics, soporte VIP\n\n¿Te gustaria comenzar con el plan gratuito?' :
+                        'We have 3 plans:\n\n• FREE - Basic profile, respond to reviews\n• PRO ($39/mo) - Digital menu, unlimited photos, reservations\n• PREMIUM ($79/mo) - Featured listings, analytics, VIP support\n\nWould you like to start with the free plan?';
                 }
                 // Claim/register questions
                 elseif (preg_match('/(reclamar|claim|registr|register|como|how|empez|start|unir|join)/i', $message)) {

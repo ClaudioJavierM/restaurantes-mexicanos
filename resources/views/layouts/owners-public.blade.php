@@ -93,7 +93,7 @@
             <div class="flex items-center justify-between h-16">
                 <!-- Logo -->
                 <a href="{{ route('home') }}" class="flex items-center gap-3 group">
-                    <img src="/images/branding/famer55.png" alt="FAMER" class="h-10 w-auto group-hover:scale-105 transition-transform duration-300">
+                    <img src="/images/branding/famer55.png?v=5" alt="FAMER" class="h-14 md:h-16 w-auto group-hover:scale-105 transition-transform duration-300" style="mix-blend-mode:lighten;">
                     <div class="flex items-center gap-2">
                         <span class="font-display font-black text-lg text-[#D4AF37]">FAMER</span>
                         <span class="text-[#2A2A2A]">|</span>
@@ -152,7 +152,7 @@
     <footer class="bg-[#0B0B0B] border-t border-[#D4AF37]/20 py-10 mt-12">
         <div class="max-w-7xl mx-auto px-4 text-center">
             <div class="flex items-center justify-center gap-3 mb-4">
-                <img src="/images/branding/famer55.png" alt="FAMER" class="h-10 w-auto">
+                <img src="/images/branding/famer55.png?v=5" alt="FAMER" class="h-24 md:h-28 w-auto" style="mix-blend-mode:lighten;">
                 <div class="text-left">
                     <span class="font-display font-black text-lg text-[#D4AF37] block leading-tight">FAMER</span>
                     <span class="text-[10px] text-[#CCCCCC] tracking-widest uppercase">Famous Mexican Restaurants</span>
