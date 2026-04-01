@@ -8,6 +8,7 @@ use App\Http\Controllers\TeamInvitationController;
 // Public Routes
 Route::get('/', \App\Livewire\Home::class)->name('home');
 Route::get('/restaurantes', \App\Livewire\RestaurantList::class)->name('restaurants.index');
+Route::get('/restaurantes/categoria/{slug}', [\App\Http\Controllers\CategoryController::class, 'show'])->name('categories.show');
 Route::get('/restaurante/{slug}', \App\Livewire\RestaurantDetail::class)->name('restaurants.show');
 // English URL alias for famousmexicanrestaurants.com domain
 Route::get('/restaurant/{slug}', fn($slug) => redirect('/restaurante/' . $slug, 301));
@@ -18,6 +19,17 @@ Route::get('/restaurantes-mexicanos-cerca-de-mi', [\App\Http\Controllers\NearMeC
 Route::get('/birria', [\App\Http\Controllers\DishController::class, 'birria'])->name('dishes.birria');
 Route::get('/tamales', [\App\Http\Controllers\DishController::class, 'tamales'])->name('dishes.tamales');
 Route::get('/pozole', [\App\Http\Controllers\DishController::class, 'pozole'])->name('dishes.pozole');
+Route::get('/enchiladas', [\App\Http\Controllers\DishController::class, 'enchiladas'])->name('dishes.enchiladas');
+Route::get('/tacos-al-pastor', [\App\Http\Controllers\DishController::class, 'tacosAlPastor'])->name('dishes.tacos-al-pastor');
+Route::get('/mole', [\App\Http\Controllers\DishController::class, 'mole'])->name('dishes.mole');
+Route::get('/menudo', [\App\Http\Controllers\DishController::class, 'menudo'])->name('dishes.menudo');
+Route::get('/chiles-rellenos', [\App\Http\Controllers\DishController::class, 'chilesRellenos'])->name('dishes.chiles-rellenos');
+Route::get('/carne-asada', [\App\Http\Controllers\DishController::class, 'carneAsada'])->name('dishes.carne-asada');
+
+// Dish near-me landing pages (SEO)
+Route::get('/birria-cerca-de-mi', [\App\Http\Controllers\DishNearMeController::class, 'birria'])->name('dish-near-me.birria');
+Route::get('/tamales-cerca-de-mi', [\App\Http\Controllers\DishNearMeController::class, 'tamales'])->name('dish-near-me.tamales');
+Route::get('/pozole-cerca-de-mi', [\App\Http\Controllers\DishNearMeController::class, 'pozole'])->name('dish-near-me.pozole');
 
 // For Business Owners
 Route::get("/for-owners", \App\Livewire\ForOwners::class)->name("for-owners");

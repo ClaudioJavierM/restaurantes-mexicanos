@@ -92,3 +92,118 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script type="application/ld+json">
+{
+    "@@context": "https://schema.org",
+    "@@type": "FAQPage",
+    "mainEntity": [
+        {
+            "@@type": "Question",
+            "name": "Que es FAMER?",
+            "acceptedAnswer": {
+                "@@type": "Answer",
+                "text": "FAMER (Famous Mexican Restaurants) es el directorio mas completo de restaurantes mexicanos en Estados Unidos. Recopilamos informacion de multiples fuentes para ayudar a los comensales a encontrar autentica comida mexicana cerca de ellos."
+            }
+        },
+        {
+            "@@type": "Question",
+            "name": "Que son los FAMER Awards?",
+            "acceptedAnswer": {
+                "@@type": "Answer",
+                "text": "Los FAMER Awards son reconocimientos anuales que destacan a los mejores restaurantes mexicanos. Se basan en calificaciones de Yelp, Google, votos de la comunidad y otros factores de calidad. Hay premios a nivel ciudad, estado y nacional."
+            }
+        },
+        {
+            "@@type": "Question",
+            "name": "Por que mi restaurante ya aparece en FAMER?",
+            "acceptedAnswer": {
+                "@@type": "Answer",
+                "text": "FAMER recopila informacion de fuentes publicas como Yelp, Google Maps y otros directorios. Si tu restaurante esta listado en estas plataformas, es probable que aparezca automaticamente en nuestro directorio. Esto nos permite ofrecer un catalogo completo sin requerir que cada restaurante se registre manualmente."
+            }
+        },
+        {
+            "@@type": "Question",
+            "name": "De donde obtienen la informacion de los restaurantes?",
+            "acceptedAnswer": {
+                "@@type": "Answer",
+                "text": "Agregamos datos de Yelp, Google Places, y otras fuentes publicas. Combinamos calificaciones y resenas de multiples plataformas para dar una vision mas completa de cada restaurante."
+            }
+        },
+        {
+            "@@type": "Question",
+            "name": "Puedo eliminar mi restaurante del directorio?",
+            "acceptedAnswer": {
+                "@@type": "Answer",
+                "text": "Si deseas que tu restaurante no aparezca en FAMER, puedes contactarnos. Sin embargo, te recomendamos reclamar tu perfil en lugar de eliminarlo, ya que aparecer en directorios ayuda a que mas clientes te encuentren."
+            }
+        },
+        {
+            "@@type": "Question",
+            "name": "Por que mi calificacion es diferente a Yelp o Google?",
+            "acceptedAnswer": {
+                "@@type": "Answer",
+                "text": "FAMER combina calificaciones de multiples fuentes (Yelp, Google, votos de usuarios) para crear un puntaje unificado. Esto puede resultar en una calificacion ligeramente diferente a la de una sola plataforma."
+            }
+        },
+        {
+            "@@type": "Question",
+            "name": "Como reclamo mi restaurante?",
+            "acceptedAnswer": {
+                "@@type": "Answer",
+                "text": "Busca tu restaurante en FAMER, haz clic en Reclamar este restaurante y sigue el proceso de verificacion. Necesitaras demostrar que eres el propietario o gerente autorizado."
+            }
+        },
+        {
+            "@@type": "Question",
+            "name": "Que beneficios tiene reclamar mi restaurante?",
+            "acceptedAnswer": {
+                "@@type": "Answer",
+                "text": "Al reclamar tu restaurante puedes: actualizar fotos e informacion, responder a resenas, acceder a estadisticas de visitas, generar codigos QR para votacion, y participar activamente en los FAMER Awards."
+            }
+        },
+        {
+            "@@type": "Question",
+            "name": "Es gratis reclamar mi restaurante?",
+            "acceptedAnswer": {
+                "@@type": "Answer",
+                "text": "Si, reclamar y gestionar tu restaurante en FAMER es completamente gratis. No hay cargos ocultos ni suscripciones obligatorias."
+            }
+        },
+        {
+            "@@type": "Question",
+            "name": "Como actualizo la informacion de mi restaurante?",
+            "acceptedAnswer": {
+                "@@type": "Answer",
+                "text": "Una vez que hayas reclamado tu restaurante, puedes acceder a tu dashboard y editar toda la informacion: horarios, menu, fotos, descripcion, y mas."
+            }
+        },
+        {
+            "@@type": "Question",
+            "name": "Como funcionan los rankings FAMER?",
+            "acceptedAnswer": {
+                "@@type": "Answer",
+                "text": "Los rankings se calculan usando un algoritmo que considera: calificacion promedio de Yelp y Google, numero total de resenas, votos de la comunidad FAMER, y otros factores de calidad. Se actualizan periodicamente."
+            }
+        },
+        {
+            "@@type": "Question",
+            "name": "Como puedo obtener mas votos para mi restaurante?",
+            "acceptedAnswer": {
+                "@@type": "Answer",
+                "text": "Reclama tu restaurante y usa el codigo QR que te proporcionamos. Colocalo en tu local para que tus clientes puedan escanearlo y votar facilmente. Tambien puedes compartir el enlace en tus redes sociales."
+            }
+        },
+        {
+            "@@type": "Question",
+            "name": "Cada cuanto pueden votar los clientes?",
+            "acceptedAnswer": {
+                "@@type": "Answer",
+                "text": "Cada cliente puede votar una vez al mes por cada restaurante. Esto asegura que los votos reflejen experiencias recientes y evita manipulacion."
+            }
+        }
+    ]
+}
+</script>
+@endpush

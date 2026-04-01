@@ -226,32 +226,6 @@ Los {{ number_format($stats->total) }} mejores restaurantes mexicanos en {{ $sta
 <script type="application/ld+json">
 {
     "@@context": "https://schema.org",
-    "@@type": "BreadcrumbList",
-    "itemListElement": [
-        {
-            "@@type": "ListItem",
-            "position": 1,
-            "name": "Inicio",
-            "item": "{{ route('home') }}"
-        },
-        {
-            "@@type": "ListItem",
-            "position": 2,
-            "name": "Mejores Restaurantes",
-            "item": "{{ route('rankings.mejores-nacional') }}"
-        },
-        {
-            "@@type": "ListItem",
-            "position": 3,
-            "name": "{{ $state->name }}",
-            "item": "{{ url()->current() }}"
-        }
-    ]
-}
-</script>
-<script type="application/ld+json">
-{
-    "@@context": "https://schema.org",
     "@@type": "ItemList",
     "name": "Mejores Restaurantes Mexicanos en {{ $state->name }} {{ $year }}",
     "description": "Ranking de los mejores restaurantes mexicanos en {{ $state->name }}",
@@ -283,6 +257,32 @@ Los {{ number_format($stats->total) }} mejores restaurantes mexicanos en {{ $sta
             }
         }@if(!$loop->last),@endif
         @endforeach
+    ]
+}
+</script>
+<script type="application/ld+json">
+{
+    "@@context": "https://schema.org",
+    "@@type": "BreadcrumbList",
+    "itemListElement": [
+        {
+            "@@type": "ListItem",
+            "position": 1,
+            "name": "FAMER",
+            "item": "{{ url('/') }}"
+        },
+        {
+            "@@type": "ListItem",
+            "position": 2,
+            "name": "Mejores Restaurantes Mexicanos",
+            "item": "{{ url('/mejores-restaurantes-mexicanos') }}"
+        },
+        {
+            "@@type": "ListItem",
+            "position": 3,
+            "name": "{{ addslashes($state->name) }}",
+            "item": "{{ url('/mejores/' . ($state->slug ?? strtolower($state->code ?? ''))) }}"
+        }
     ]
 }
 </script>

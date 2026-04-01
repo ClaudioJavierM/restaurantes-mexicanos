@@ -80,9 +80,14 @@ class SitemapController extends Controller
             $xml .= $this->addUrl($baseUrl . '/sugerir', now()->subMonth(), 'monthly', '0.5');
 
             // Dish-specific landing pages
-            $xml .= $this->addUrl($baseUrl . '/birria', now()->subWeek(), 'weekly', '0.8');
-            $xml .= $this->addUrl($baseUrl . '/tamales', now()->subWeek(), 'weekly', '0.8');
-            $xml .= $this->addUrl($baseUrl . '/pozole', now()->subWeek(), 'weekly', '0.8');
+            foreach (['birria','tamales','pozole','enchiladas','tacos-al-pastor','mole','menudo','chiles-rellenos','carne-asada'] as $dish) {
+                $xml .= $this->addUrl($baseUrl . '/' . $dish, now()->subWeek(), 'weekly', '0.8');
+            }
+
+            // Dish near-me pages
+            foreach (['birria','tamales','pozole'] as $dish) {
+                $xml .= $this->addUrl($baseUrl . '/' . $dish . '-cerca-de-mi', now()->subWeek(), 'weekly', '0.8');
+            }
 
             // Near-me page
             $xml .= $this->addUrl($baseUrl . '/restaurantes-mexicanos-cerca-de-mi', now()->subWeek(), 'weekly', '0.8');

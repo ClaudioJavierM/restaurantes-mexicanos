@@ -303,20 +303,26 @@ Los {{ $restaurants->count() }} mejores restaurantes mexicanos en {{ $cityName }
         {
             "@@type": "ListItem",
             "position": 1,
-            "name": "Mejores Restaurantes",
-            "item": "{{ route('rankings.mejores-nacional') }}"
+            "name": "FAMER",
+            "item": "{{ url('/') }}"
         },
         {
             "@@type": "ListItem",
             "position": 2,
-            "name": "{{ $state->name }}",
-            "item": "{{ route('rankings.mejores-estado', $state->slug ?? strtolower($state->code)) }}"
+            "name": "Mejores Restaurantes Mexicanos",
+            "item": "{{ url('/mejores-restaurantes-mexicanos') }}"
         },
         {
             "@@type": "ListItem",
             "position": 3,
-            "name": "{{ $cityName }}",
-            "item": "{{ url()->current() }}"
+            "name": "{{ addslashes($state->name) }}",
+            "item": "{{ url('/mejores/' . ($state->slug ?? strtolower($state->code ?? ''))) }}"
+        },
+        {
+            "@@type": "ListItem",
+            "position": 4,
+            "name": "{{ addslashes($city) }}",
+            "item": "{{ url('/mejores/' . strtolower($state->code ?? '') . '/' . \Illuminate\Support\Str::slug($city)) }}"
         }
     ]
 }

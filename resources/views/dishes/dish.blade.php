@@ -112,7 +112,7 @@
                 <div style="background:#1A1A1A; border:1px solid #2A2A2A; border-radius:12px; padding:1.5rem;">
                     <h3 style="font-size:1rem; font-weight:600; color:#F5F5F5; margin-bottom:1rem;">Otros Platillos</h3>
                     <div style="display:flex; flex-direction:column; gap:0.5rem;">
-                        @foreach([['birria','Birria'],['tamales','Tamales'],['pozole','Pozole']] as [$slug,$label])
+                        @foreach([['birria','Birria'],['tamales','Tamales'],['pozole','Pozole'],['enchiladas','Enchiladas'],['tacos-al-pastor','Tacos al Pastor'],['mole','Mole'],['menudo','Menudo'],['chiles-rellenos','Chiles Rellenos'],['carne-asada','Carne Asada']] as [$slug,$label])
                         @if($slug !== $dish)
                         <a href="/{{ $slug }}" style="display:block; background:#0B0B0B; border:1px solid #2A2A2A; border-radius:8px; padding:0.75rem 1rem; color:#D4AF37; text-decoration:none; font-size:0.875rem; font-weight:500; transition:border-color 0.2s;"
                            onmouseover="this.style.borderColor='#D4AF37'" onmouseout="this.style.borderColor='#2A2A2A'">
