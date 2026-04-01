@@ -55,17 +55,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="dns-prefetch" href="https://maps.googleapis.com">
 
-    <!-- Fonts -->
+    <!-- Fonts: non-render-blocking async load -->
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=poppins:400,500,600,700,800|playfair-display:400,700,900&display=swap" rel="stylesheet" />
+    <link rel="preload" href="https://fonts.bunny.net/css?family=poppins:400,500,600,700,800|playfair-display:400,700,900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://fonts.bunny.net/css?family=poppins:400,500,600,700,800|playfair-display:400,700,900&display=swap" rel="stylesheet"></noscript>
 
-    <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','{{ app()->getLocale() === "en" ? "GTM-NLKPXHKM" : "GTM-M53NLTND" }}');</script>
-    <!-- End Google Tag Manager -->
+    <!-- GTM moved to body bottom for performance -->
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -219,88 +214,9 @@
         })();
     </script>
 
-    <!-- MF Group Universal Conversion Tracking -->
-    <script data-cfasync="false">
-    (function() {
-        'use strict';
-
-        function trackEvent(eventName, eventData) {
-            if (typeof umami !== 'undefined') {
-                try { umami.track(eventName, eventData); } catch(e) {}
-            }
-            if (typeof gtag !== 'undefined') {
-                try { gtag('event', eventName, eventData); } catch(e) {}
-            }
-        }
-
-        document.addEventListener('submit', function(e) {
-            var form = e.target;
-            if (form && form.tagName === 'FORM') {
-                trackEvent('form_submit', {
-                    form_id: form.id || '',
-                    form_name: form.getAttribute('name') || '',
-                    form_action: form.getAttribute('action') || window.location.href
-                });
-            }
-        }, true);
-
-        document.addEventListener('click', function(e) {
-            var link = e.target.closest('a[href]');
-            if (!link) return;
-
-            var href = link.getAttribute('href') || '';
-            var hrefLower = href.toLowerCase();
-
-            if (hrefLower.indexOf('wa.me') !== -1 || hrefLower.indexOf('whatsapp.com') !== -1 || hrefLower.indexOf('api.whatsapp.com') !== -1) {
-                trackEvent('whatsapp_click', { whatsapp_url: href });
-                return;
-            }
-
-            if (hrefLower.indexOf('tel:') === 0) {
-                trackEvent('phone_click', { phone_number: href.replace(/^tel:/i, '') });
-                return;
-            }
-
-            if (hrefLower.indexOf('mailto:') === 0) {
-                trackEvent('email_click', { email_address: href.replace(/^mailto:/i, '').split('?')[0] });
-                return;
-            }
-
-            try {
-                var linkUrl = new URL(href, window.location.origin);
-                if (linkUrl.hostname && linkUrl.hostname !== window.location.hostname) {
-                    trackEvent('external_link', { destination_url: href });
-                }
-            } catch(e) {}
-        }, true);
-    })();
-    </script>
-
-    <!-- Microsoft Clarity -->
-    <script type="text/javascript">
-        (function(){
-            var clarityIds = {
-                'restaurantesmexicanosfamosos.com.mx': 'vhh4lzctxt',
-                'restaurantesmexicanosfamosos.com': 'vhh5aptees',
-                'famousmexicanrestaurants.com': 'vhh61fn5an'
-            };
-            var id = clarityIds[window.location.hostname];
-            if (id) {
-                (function(c,l,a,r,i,t,y){
-                    c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-                    t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-                    y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-                })(window, document, "clarity", "script", id);
-            }
-        })();
-    </script>
+    <!-- Conversion Tracking + Clarity moved to body bottom for performance -->
 </head>
 <body class="bg-[#0B0B0B] antialiased text-[#F5F5F5]">
-    <!-- Google Tag Manager (noscript) -->
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ app()->getLocale() === 'en' ? 'GTM-NLKPXHKM' : 'GTM-M53NLTND' }}"
-    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-    <!-- End Google Tag Manager (noscript) -->
-
     <!-- Navigation -->
     @php
         $isOwnerPage = request()->is('claim*') || request()->is('for-owners*') || request()->is('sugerir*') || request()->is('grader*');
@@ -637,5 +553,26 @@
     @if($chatRestaurant && in_array($chatRestaurant->subscription_tier, ['premium', 'elite']))
         @include("partials.chat-widget")
     @endif
+
+    <!-- Google Tag Manager (body) -->
+    @php $gtmId = app()->getLocale() === 'en' ? 'GTM-NLKPXHKM' : 'GTM-M53NLTND'; @endphp
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={{ $gtmId }}"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','{{ $gtmId }}');</script>
+
+    <!-- MF Group Universal Conversion Tracking -->
+    <script>
+    (function() {
+        'use strict';
+        function trackEvent(e,d){if(typeof umami!=='undefined'){try{umami.track(e,d);}catch(x){}}if(typeof gtag!=='undefined'){try{gtag('event',e,d);}catch(x){}}}
+        document.addEventListener('submit',function(e){var f=e.target;if(f&&f.tagName==='FORM'){trackEvent('form_submit',{form_id:f.id||'',form_name:f.getAttribute('name')||'',form_action:f.getAttribute('action')||window.location.href});}},true);
+        document.addEventListener('click',function(e){var l=e.target.closest('a[href]');if(!l)return;var h=l.getAttribute('href')||'',hl=h.toLowerCase();if(hl.indexOf('wa.me')!==-1||hl.indexOf('whatsapp.com')!==-1){trackEvent('whatsapp_click',{whatsapp_url:h});return;}if(hl.indexOf('tel:')===0){trackEvent('phone_click',{phone_number:h.replace(/^tel:/i,'')});return;}if(hl.indexOf('mailto:')===0){trackEvent('email_click',{email_address:h.replace(/^mailto:/i,'').split('?')[0]});return;}try{var u=new URL(h,window.location.origin);if(u.hostname&&u.hostname!==window.location.hostname){trackEvent('external_link',{destination_url:h});}}catch(x){}},true);
+    })();
+    </script>
+
+    <!-- Microsoft Clarity -->
+    <script>
+    (function(){var ids={'restaurantesmexicanosfamosos.com.mx':'vhh4lzctxt','restaurantesmexicanosfamosos.com':'vhh5aptees','famousmexicanrestaurants.com':'vhh61fn5an'};var id=ids[window.location.hostname];if(id){(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script",id);}})();
+    </script>
 </body>
 </html>
