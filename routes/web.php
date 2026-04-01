@@ -32,6 +32,10 @@ Route::get('/barbacoa', [\App\Http\Controllers\DishController::class, 'barbacoa'
 Route::get('/birria-cerca-de-mi', [\App\Http\Controllers\DishNearMeController::class, 'birria'])->name('dish-near-me.birria');
 Route::get('/tamales-cerca-de-mi', [\App\Http\Controllers\DishNearMeController::class, 'tamales'])->name('dish-near-me.tamales');
 Route::get('/pozole-cerca-de-mi', [\App\Http\Controllers\DishNearMeController::class, 'pozole'])->name('dish-near-me.pozole');
+Route::get('/carnitas-cerca-de-mi', [\App\Http\Controllers\DishNearMeController::class, 'carnitas'])->name('dish-near-me.carnitas');
+Route::get('/barbacoa-cerca-de-mi', [\App\Http\Controllers\DishNearMeController::class, 'barbacoa'])->name('dish-near-me.barbacoa');
+Route::get('/mole-cerca-de-mi', [\App\Http\Controllers\DishNearMeController::class, 'mole'])->name('dish-near-me.mole');
+Route::get('/carne-asada-cerca-de-mi', [\App\Http\Controllers\DishNearMeController::class, 'carneAsada'])->name('dish-near-me.carne-asada');
 
 // State-level dish pages (SEO: "birria en texas", "tamales en california")
 Route::get('/{dish}-en-{state}', [\App\Http\Controllers\DishStateController::class, 'show'])

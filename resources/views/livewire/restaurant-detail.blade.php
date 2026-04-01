@@ -427,6 +427,25 @@
         </div>
     @endif
 
+    {{-- Google Places Photo Gallery (up to 5 photos from photos JSON column) --}}
+    @if(!empty($restaurant->photos) && count($restaurant->photos) > 1)
+    <div style="background:#1A1A1A; border-bottom:1px solid #2A2A2A; padding:0.75rem 1rem;">
+        <div class="max-w-7xl mx-auto">
+            <div style="display:flex; gap:0.5rem; overflow-x:auto; padding:0.25rem 0; scrollbar-width:thin; scrollbar-color:#2A2A2A #1A1A1A;">
+                @foreach(array_slice($restaurant->photos ?? [], 0, 5) as $photo)
+                <img src="{{ Storage::url($photo) }}"
+                     alt="{{ $restaurant->name }}"
+                     loading="lazy"
+                     onclick="window.open(this.src,'_blank')"
+                     style="height:160px; width:auto; min-width:200px; object-fit:cover; border-radius:8px; border:2px solid #2A2A2A; cursor:pointer; flex-shrink:0; transition:border-color 0.2s;"
+                     onmouseover="this.style.borderColor='#D4AF37'"
+                     onmouseout="this.style.borderColor='#2A2A2A'">
+                @endforeach
+            </div>
+        </div>
+    </div>
+    @endif
+
     <!-- Breadcrumb Navigation -->
     <div style="background:#0B0B0B; padding:0.75rem 0; border-bottom:1px solid #1A1A1A;">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

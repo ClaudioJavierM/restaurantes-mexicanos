@@ -85,7 +85,7 @@ class SitemapController extends Controller
             }
 
             // Dish near-me pages
-            foreach (['birria','tamales','pozole'] as $dish) {
+            foreach (['birria','tamales','pozole','carnitas','barbacoa','mole','carne-asada'] as $dish) {
                 $xml .= $this->addUrl($baseUrl . '/' . $dish . '-cerca-de-mi', now()->subWeek(), 'weekly', '0.8');
             }
 

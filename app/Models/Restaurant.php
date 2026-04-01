@@ -172,6 +172,7 @@ class Restaurant extends Model implements HasMedia
         'owner_phone',
         // Images
         'image',
+        'photos',
         'logo',
         // FAMER Email Sequence
         'famer_email_1_sent_at',
@@ -254,6 +255,8 @@ class Restaurant extends Model implements HasMedia
         'reservation_notify_email' => 'boolean',
         'reservation_send_confirmation' => 'boolean',
         'reservation_send_reminder' => 'boolean',
+        // Photo gallery
+        'photos' => 'array',
     ];
 
     public function getSlugOptions(): SlugOptions
