@@ -97,6 +97,26 @@ class DishController extends Controller
             'hero_text' => 'Carne Asada Mexicana Auténtica',
             'body' => 'La carne asada es un platillo central de la cultura norteña mexicana, especialmente en Sonora, Chihuahua y Sinaloa. Arrachera o corte de res marinado en cítricos y especias, asado a las brasas y servido con tortillas, guacamole, frijoles y salsa.',
         ],
+        'carnitas' => [
+            'name' => 'Carnitas',
+            'column' => 'has_carnitas',
+            'title' => 'Mejores Restaurantes de Carnitas Mexicanas',
+            'title_en' => 'Best Mexican Carnitas Restaurants',
+            'description' => 'Los mejores restaurantes de carnitas auténticas. Cerdo confitado en manteca al estilo michoacano.',
+            'description_en' => 'Best authentic Mexican carnitas restaurants. Michoacan-style pork confit with tortillas and salsa.',
+            'hero_text' => 'Carnitas Mexicanas Auténticas',
+            'body' => 'Las carnitas son carne de cerdo cocida en su propia manteca a fuego lento, originarias del estado de Michoacán. El resultado es carne tierna y jugosa con una capa exterior crujiente. Se sirven en tortillas con cebolla, cilantro y salsa verde o roja.',
+        ],
+        'barbacoa' => [
+            'name' => 'Barbacoa',
+            'column' => 'has_barbacoa',
+            'title' => 'Mejores Restaurantes de Barbacoa Mexicana',
+            'title_en' => 'Best Mexican Barbacoa Restaurants',
+            'description' => 'Los mejores restaurantes de barbacoa auténtica. Carne cocida lentamente en hoyo de tierra o vapor al estilo tradicional.',
+            'description_en' => 'Best authentic Mexican barbacoa restaurants. Slow-cooked beef or lamb in the traditional pit style.',
+            'hero_text' => 'Barbacoa Mexicana Auténtica',
+            'body' => 'La barbacoa es una técnica milenaria de cocción lenta donde la carne de res, borrego o cabeza se envuelve en pencas de maguey y se cuece bajo tierra o al vapor. Es un platillo dominical por excelencia en México central, especialmente en Hidalgo y el Estado de México.',
+        ],
     ];
 
     public function show(string $dish): View
@@ -143,4 +163,6 @@ class DishController extends Controller
     public function menudo(): View        { return $this->show('menudo'); }
     public function chilesRellenos(): View{ return $this->show('chiles-rellenos'); }
     public function carneAsada(): View    { return $this->show('carne-asada'); }
+    public function carnitas(): View  { return $this->show('carnitas'); }
+    public function barbacoa(): View  { return $this->show('barbacoa'); }
 }

@@ -645,6 +645,33 @@
                     </div>
                 </div>
 
+                {{-- Dish Badges (internal links to dish pages) --}}
+                @php
+                    $dishBadges = [];
+                    if (!empty($restaurant->has_birria))         $dishBadges[] = ['slug' => 'birria',      'label' => 'Birria'];
+                    if (!empty($restaurant->has_tamales))        $dishBadges[] = ['slug' => 'tamales',     'label' => 'Tamales'];
+                    if (!empty($restaurant->has_pozole_menudo))  $dishBadges[] = ['slug' => 'pozole',      'label' => 'Pozole'];
+                    if (!empty($restaurant->has_homemade_mole))  $dishBadges[] = ['slug' => 'mole',        'label' => 'Mole'];
+                    if (!empty($restaurant->has_charcoal_grill)) $dishBadges[] = ['slug' => 'carne-asada', 'label' => 'Carne Asada'];
+                    if (!empty($restaurant->has_carnitas))       $dishBadges[] = ['slug' => 'carnitas',    'label' => 'Carnitas'];
+                    if (!empty($restaurant->has_barbacoa))       $dishBadges[] = ['slug' => 'barbacoa',    'label' => 'Barbacoa'];
+                @endphp
+
+                @if(count($dishBadges) > 0)
+                <div style="background:#1A1A1A; border:1px solid #2A2A2A; border-radius:1rem; padding:1.25rem 1.5rem; margin-bottom:1.5rem;">
+                    <h3 style="font-size:0.8125rem; font-weight:600; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.75rem;">Especialidades</h3>
+                    <div style="display:flex; flex-wrap:wrap; gap:0.5rem;">
+                        @foreach($dishBadges as $badge)
+                        <a href="/{{ $badge['slug'] }}"
+                           style="display:inline-flex; align-items:center; background:#0B0B0B; border:1px solid #2A2A2A; color:#D4AF37; padding:0.375rem 0.875rem; border-radius:9999px; font-size:0.8125rem; font-weight:500; text-decoration:none; transition:border-color 0.2s;"
+                           onmouseover="this.style.borderColor='#D4AF37'" onmouseout="this.style.borderColor='#2A2A2A'">
+                            {{ $badge['label'] }}
+                        </a>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+
                 <!-- Popular Dishes (shown in info tab if restaurant has popular items) -->
                 @if($popularMenuItems->isNotEmpty())
                 <div class="bg-white rounded-lg shadow-lg p-6 mb-6">

@@ -25,11 +25,19 @@ Route::get('/mole', [\App\Http\Controllers\DishController::class, 'mole'])->name
 Route::get('/menudo', [\App\Http\Controllers\DishController::class, 'menudo'])->name('dishes.menudo');
 Route::get('/chiles-rellenos', [\App\Http\Controllers\DishController::class, 'chilesRellenos'])->name('dishes.chiles-rellenos');
 Route::get('/carne-asada', [\App\Http\Controllers\DishController::class, 'carneAsada'])->name('dishes.carne-asada');
+Route::get('/carnitas', [\App\Http\Controllers\DishController::class, 'carnitas'])->name('dishes.carnitas');
+Route::get('/barbacoa', [\App\Http\Controllers\DishController::class, 'barbacoa'])->name('dishes.barbacoa');
 
 // Dish near-me landing pages (SEO)
 Route::get('/birria-cerca-de-mi', [\App\Http\Controllers\DishNearMeController::class, 'birria'])->name('dish-near-me.birria');
 Route::get('/tamales-cerca-de-mi', [\App\Http\Controllers\DishNearMeController::class, 'tamales'])->name('dish-near-me.tamales');
 Route::get('/pozole-cerca-de-mi', [\App\Http\Controllers\DishNearMeController::class, 'pozole'])->name('dish-near-me.pozole');
+
+// State-level dish pages (SEO: "birria en texas", "tamales en california")
+Route::get('/{dish}-en-{state}', [\App\Http\Controllers\DishStateController::class, 'show'])
+    ->where('dish', 'birria|tamales|pozole|carnitas|barbacoa|mole')
+    ->where('state', 'tx|ca|il|az|fl|co|nv|nm|ny|ga|wa|nc|or|ut|tn')
+    ->name('dish-state');
 
 // For Business Owners
 Route::get("/for-owners", \App\Livewire\ForOwners::class)->name("for-owners");

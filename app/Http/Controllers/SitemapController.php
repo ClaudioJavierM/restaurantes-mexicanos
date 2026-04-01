@@ -80,7 +80,7 @@ class SitemapController extends Controller
             $xml .= $this->addUrl($baseUrl . '/sugerir', now()->subMonth(), 'monthly', '0.5');
 
             // Dish-specific landing pages
-            foreach (['birria','tamales','pozole','enchiladas','tacos-al-pastor','mole','menudo','chiles-rellenos','carne-asada'] as $dish) {
+            foreach (['birria','tamales','pozole','enchiladas','tacos-al-pastor','mole','menudo','chiles-rellenos','carne-asada','carnitas','barbacoa'] as $dish) {
                 $xml .= $this->addUrl($baseUrl . '/' . $dish, now()->subWeek(), 'weekly', '0.8');
             }
 
@@ -91,6 +91,15 @@ class SitemapController extends Controller
 
             // Near-me page
             $xml .= $this->addUrl($baseUrl . '/restaurantes-mexicanos-cerca-de-mi', now()->subWeek(), 'weekly', '0.8');
+
+            // State-level dish pages (90 URLs: 6 dishes x 15 states)
+            $dishStates = ['birria','tamales','pozole','carnitas','barbacoa','mole'];
+            $statesForDish = ['tx','ca','il','az','fl','co','nv','nm','ny','ga','wa','nc','or','ut','tn'];
+            foreach ($dishStates as $dish) {
+                foreach ($statesForDish as $state) {
+                    $xml .= $this->addUrl($baseUrl . '/' . $dish . '-en-' . $state, now()->subMonth(), 'monthly', '0.7');
+                }
+            }
 
             // Category pages (clean URLs, not query strings)
             $categories = Category::has('restaurants')->select('slug', 'updated_at')->get();
