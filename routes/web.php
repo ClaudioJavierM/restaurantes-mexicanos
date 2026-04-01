@@ -32,14 +32,12 @@ Route::get('/team/accept/{token}', [TeamInvitationController::class, 'show'])->n
 Route::post('/team/accept/{token}', [TeamInvitationController::class, 'accept'])->name('team.invitation.accept');
 Route::post('/team/decline/{token}', [TeamInvitationController::class, 'decline'])->name('team.invitation.decline');
 
-// SEO Routes — Sitemap index + sub-sitemaps (no session/CSRF middleware — XML responses)
-Route::withoutMiddleware([\Illuminate\Session\Middleware\StartSession::class, \App\Http\Middleware\VerifyCsrfToken::class])->group(function () {
-    Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
-    Route::get('/sitemap-main.xml', [SitemapController::class, 'main'])->name('sitemap.main');
-    Route::get('/sitemap-restaurants-{page}.xml', [SitemapController::class, 'restaurants'])->where('page', '[0-9]+')->name('sitemap.restaurants');
-    Route::get('/sitemap-guides.xml', [SitemapController::class, 'guides'])->name('sitemap.guides');
-    Route::get('/sitemap-rankings.xml', [SitemapController::class, 'rankings'])->name('sitemap.rankings');
-});
+// SEO Routes — Sitemap index + sub-sitemaps
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
+Route::get('/sitemap-main.xml', [SitemapController::class, 'main'])->name('sitemap.main');
+Route::get('/sitemap-restaurants-{page}.xml', [SitemapController::class, 'restaurants'])->where('page', '[0-9]+')->name('sitemap.restaurants');
+Route::get('/sitemap-guides.xml', [SitemapController::class, 'guides'])->name('sitemap.guides');
+Route::get('/sitemap-rankings.xml', [SitemapController::class, 'rankings'])->name('sitemap.rankings');
 
 // City Guides (SEO)
 Route::prefix('guia')->group(function () {
