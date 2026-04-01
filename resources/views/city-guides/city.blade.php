@@ -377,29 +377,29 @@
 {{-- BreadcrumbList Schema --}}
 <script type="application/ld+json">
 {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
+    "@@context": "https://schema.org",
+    "@@type": "BreadcrumbList",
     "itemListElement": [
         {
-            "@type": "ListItem",
+            "@@type": "ListItem",
             "position": 1,
             "name": "Inicio",
             "item": "{{ url('/') }}"
         },
         {
-            "@type": "ListItem",
+            "@@type": "ListItem",
             "position": 2,
             "name": "Guía por Ciudad",
             "item": "{{ route('city-guides.states') }}"
         },
         {
-            "@type": "ListItem",
+            "@@type": "ListItem",
             "position": 3,
             "name": "{{ $state->name }}",
             "item": "{{ route('city-guides.state', strtolower($state->code)) }}"
         },
         {
-            "@type": "ListItem",
+            "@@type": "ListItem",
             "position": 4,
             "name": "{{ $cityName }}",
             "item": "{{ url()->current() }}"
@@ -411,15 +411,15 @@
 {{-- ItemList Schema for Top 10 --}}
 <script type="application/ld+json">
 {
-    "@context": "https://schema.org",
-    "@type": "ItemList",
+    "@@context": "https://schema.org",
+    "@@type": "ItemList",
     "name": "Mejores Restaurantes Mexicanos en {{ $cityName }}, {{ $state->name }}",
     "description": "Top {{ $top10Restaurants->count() }} mejores restaurantes mexicanos en {{ $cityName }}, {{ $state->name }}. Calificaciones verificadas de Google.",
     "numberOfItems": {{ $top10Restaurants->count() }},
     "itemListElement": [
         @foreach($top10Restaurants as $schemaIndex => $schemaRest)
         {
-            "@type": "ListItem",
+            "@@type": "ListItem",
             "position": {{ $schemaIndex + 1 }},
             "name": "{{ addslashes($schemaRest->name) }}",
             "url": "{{ route('restaurants.show', $schemaRest->slug) }}"
@@ -432,17 +432,17 @@
 {{-- WebPage Schema --}}
 <script type="application/ld+json">
 {
-    "@context": "https://schema.org",
-    "@type": "WebPage",
+    "@@context": "https://schema.org",
+    "@@type": "WebPage",
     "name": "Mejores Restaurantes Mexicanos en {{ $cityName }}, {{ $state->name }}",
     "description": "Descubre los {{ $stats->total }} mejores restaurantes mexicanos en {{ $cityName }}, {{ $state->name }}. Calificaciones verificadas, menús, horarios y más.",
     "url": "{{ url()->current() }}",
     "inLanguage": "es",
     "about": {
-        "@type": "City",
+        "@@type": "City",
         "name": "{{ $cityName }}",
         "containedInPlace": {
-            "@type": "State",
+            "@@type": "State",
             "name": "{{ $state->name }}"
         }
     }
