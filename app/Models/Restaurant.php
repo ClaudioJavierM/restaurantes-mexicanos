@@ -32,6 +32,10 @@ class Restaurant extends Model implements HasMedia
         'name',
         'slug',
         'description',
+        'ai_description',
+        'ai_description_generated_at',
+        'ai_description_en',
+        'ai_description_en_generated_at',
         'email',
         'phone',
         'website',
@@ -176,6 +180,8 @@ class Restaurant extends Model implements HasMedia
     ];
 
     protected $casts = [
+        'ai_description_generated_at' => 'datetime',
+        'ai_description_en_generated_at' => 'datetime',
         'hours' => 'array',
         'is_featured' => 'boolean',
         'is_active' => 'boolean',
