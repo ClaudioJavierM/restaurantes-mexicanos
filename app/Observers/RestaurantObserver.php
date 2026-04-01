@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Models\Restaurant;
 use App\Models\State;
+use App\Services\IndexNowService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -83,6 +84,10 @@ class RestaurantObserver
     {
         $this->clearRestaurantCaches();
         Log::info("Restaurant created, cache cleared", ['restaurant_id' => $restaurant->id]);
+
+        if ($restaurant->status === 'approved' && $restaurant->slug) {
+            IndexNowService::notifyRestaurant($restaurant->slug);
+        }
     }
 
     /**
@@ -92,6 +97,11 @@ class RestaurantObserver
     {
         $this->clearRestaurantCaches();
         Log::info("Restaurant updated, cache cleared", ['restaurant_id' => $restaurant->id]);
+
+        // Notify IndexNow when status changes TO approved
+        if ($restaurant->wasChanged('status') && $restaurant->status === 'approved' && $restaurant->slug) {
+            IndexNowService::notifyRestaurant($restaurant->slug);
+        }
     }
 
     /**
