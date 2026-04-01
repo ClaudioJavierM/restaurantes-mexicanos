@@ -79,6 +79,14 @@ class SitemapController extends Controller
             // Suggest page
             $xml .= $this->addUrl($baseUrl . '/sugerir', now()->subMonth(), 'monthly', '0.5');
 
+            // Dish-specific landing pages
+            $xml .= $this->addUrl($baseUrl . '/birria', now()->subWeek(), 'weekly', '0.8');
+            $xml .= $this->addUrl($baseUrl . '/tamales', now()->subWeek(), 'weekly', '0.8');
+            $xml .= $this->addUrl($baseUrl . '/pozole', now()->subWeek(), 'weekly', '0.8');
+
+            // Near-me page
+            $xml .= $this->addUrl($baseUrl . '/restaurantes-mexicanos-cerca-de-mi', now()->subWeek(), 'weekly', '0.8');
+
             // Category pages (clean URLs, not query strings)
             $categories = Category::has('restaurants')->select('slug', 'updated_at')->get();
             foreach ($categories as $category) {

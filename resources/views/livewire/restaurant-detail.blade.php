@@ -427,6 +427,45 @@
         </div>
     @endif
 
+    <!-- Breadcrumb Navigation -->
+    <div style="background:#0B0B0B; padding:0.75rem 0; border-bottom:1px solid #1A1A1A;">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <nav aria-label="Breadcrumb">
+                <ol style="display:flex; flex-wrap:wrap; gap:0.25rem; align-items:center; list-style:none; margin:0; padding:0; font-size:0.8125rem; color:#6B7280;">
+                    <li>
+                        <a href="/" style="color:#D4AF37; text-decoration:none;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">FAMER</a>
+                    </li>
+                    <li style="color:#374151; margin:0 0.25rem;">/</li>
+                    <li>
+                        <a href="/restaurantes" style="color:#D4AF37; text-decoration:none;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">Restaurantes</a>
+                    </li>
+                    @if($restaurant->state)
+                    <li style="color:#374151; margin:0 0.25rem;">/</li>
+                    <li>
+                        <a href="/guia/{{ strtolower($restaurant->state->code ?? \Illuminate\Support\Str::slug($restaurant->state->name)) }}"
+                           style="color:#D4AF37; text-decoration:none;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+                            {{ $restaurant->state->name }}
+                        </a>
+                    </li>
+                    @endif
+                    @if($restaurant->city)
+                    <li style="color:#374151; margin:0 0.25rem;">/</li>
+                    <li>
+                        <a href="/guia/{{ strtolower($restaurant->state->code ?? \Illuminate\Support\Str::slug($restaurant->state->name ?? '')) }}/{{ \Illuminate\Support\Str::slug($restaurant->city) }}"
+                           style="color:#D4AF37; text-decoration:none;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+                            {{ $restaurant->city }}
+                        </a>
+                    </li>
+                    @endif
+                    <li style="color:#374151; margin:0 0.25rem;">/</li>
+                    <li style="color:#9CA3AF; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:200px;" title="{{ $restaurant->name }}">
+                        {{ $restaurant->name }}
+                    </li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
     <!-- Main Content Area - Overlapping Card -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" style="margin-top:-80px; position:relative; z-index:20;">
         <div class="lg:flex lg:gap-8">
