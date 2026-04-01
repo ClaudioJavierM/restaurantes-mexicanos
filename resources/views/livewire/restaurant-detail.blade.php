@@ -1121,24 +1121,6 @@
                     <!-- Live Statistics -->
                     @livewire('live-visits', ['restaurant' => $restaurant])
 
-                    <!-- Claim CTA -->
-                    @if(!$restaurant->is_claimed)
-                        <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-5">
-                            <div class="flex items-start gap-4">
-                                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                                </div>
-                                <div class="flex-1">
-                                    <h3 class="font-bold text-gray-900">¿Es tu restaurante?</h3>
-                                    <p class="text-gray-600 text-sm mt-1">Reclama tu negocio para actualizar la información, responder reseñas y más.</p>
-                                    <a href="/claim?restaurant={{ $restaurant->slug }}" data-turbo="false" class="inline-block mt-3 text-blue-600 hover:text-blue-700 font-semibold text-sm">
-                                        Reclamar este negocio
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
-
                     <!-- Ad Space -->
                     @livewire('advertisement-banner', ['placement' => 'sidebar', 'stateId' => $restaurant->state_id])
                 </div>
