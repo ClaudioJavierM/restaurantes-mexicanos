@@ -321,8 +321,8 @@ Los {{ $restaurants->count() }} mejores restaurantes mexicanos en {{ $cityName }
         {
             "@@type": "ListItem",
             "position": 4,
-            "name": "{{ addslashes($city) }}",
-            "item": "{{ url('/mejores/' . strtolower($state->code ?? '') . '/' . \Illuminate\Support\Str::slug($city)) }}"
+            "name": "{{ addslashes($cityName) }}",
+            "item": "{{ url('/mejores/' . strtolower($state->code ?? '') . '/' . $citySlug) }}"
         }
     ]
 }
