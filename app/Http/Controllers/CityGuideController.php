@@ -123,11 +123,23 @@ class CityGuideController extends Controller
             ];
         });
 
+        // Top 10 restaurants in state ordered by reviews then rating
+        $top10Restaurants = Cache::remember("city_guide_top10_state_{$state->id}", 3600, function () use ($state) {
+            return Restaurant::where('state_id', $state->id)
+                ->where('status', 'approved')
+                ->with(['state', 'category', 'media'])
+                ->orderByDesc('google_reviews_count')
+                ->orderByDesc('google_rating')
+                ->limit(10)
+                ->get();
+        });
+
         return view('city-guides.state', [
             'state' => $state,
             'cities' => $data['cities'],
             'stats' => $data['stats'],
             'topRestaurants' => $data['topRestaurants'],
+            'top10Restaurants' => $top10Restaurants,
         ]);
     }
 
