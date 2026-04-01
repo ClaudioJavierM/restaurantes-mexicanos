@@ -151,7 +151,13 @@
     {{-- Open Graph for social sharing --}}
     <meta property="og:type" content="restaurant">
     <meta property="og:title" content="{{ $restaurant->name }} — {{ $restaurant->city }}, {{ $restaurant->state?->name ?? '' }}">
-    <meta property="og:description" content="{{ Str::limit(strip_tags(($restaurant->ai_description ?: $restaurant->description) ?: 'Descubre ' . $restaurant->name . ', uno de los mejores restaurantes mexicanos en ' . $restaurant->city), 200) }}">
+    @php
+        $ogDesc = app()->getLocale() === 'en'
+            ? ($restaurant->ai_description_en ?: $restaurant->ai_description ?: $restaurant->description)
+            : ($restaurant->ai_description ?: $restaurant->description);
+        $ogDesc = $ogDesc ?: 'Descubre ' . $restaurant->name . ', uno de los mejores restaurantes mexicanos en ' . $restaurant->city;
+    @endphp
+    <meta property="og:description" content="{{ Str::limit(strip_tags($ogDesc), 200) }}">
     <meta property="og:url" content="{{ url()->current() }}">
     @php
         $hasRankings = $restaurant->rankings()->where('year', now()->year - 1)->where('position', '<=', 25)->where('is_published', true)->exists();
@@ -573,7 +579,11 @@
                 <!-- About / Description Section (SEO) -->
                 <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
                     <h2 class="text-xl font-bold text-gray-900 mb-4">Acerca de {{ $restaurant->name }}</h2>
-                    @php $displayDescription = $restaurant->ai_description ?: $restaurant->description; @endphp
+                    @php
+                        $displayDescription = app()->getLocale() === 'en'
+                            ? ($restaurant->ai_description_en ?: $restaurant->ai_description ?: $restaurant->description)
+                            : ($restaurant->ai_description ?: $restaurant->description);
+                    @endphp
                     @if($displayDescription)
                         <div class="prose prose-gray max-w-none">
                             <p class="text-gray-700 leading-relaxed">{{ $displayDescription }}</p>

@@ -271,8 +271,11 @@ class RestaurantDetail extends Component
             + $r->reviews()->where('status', 'approved')->count());
         $displayRating = $r->google_rating ?? $r->yelp_rating ?? null;
 
-        // Prefer AI description (rich, unique) over generic template description
-        $bestDescription = $r->ai_description ?: $r->description;
+        // Prefer locale-specific AI description, fallback chain: ai_en → ai_es → description
+        $bestDescription = $isEn
+            ? ($r->ai_description_en ?: $r->ai_description ?: $r->description)
+            : ($r->ai_description ?: $r->description);
+        $hasAiDesc = $isEn ? (bool) $r->ai_description_en : (bool) $r->ai_description;
 
         if ($bestDescription) {
             $descBase = Str::limit(strip_tags($bestDescription), 155);
@@ -284,7 +287,7 @@ class RestaurantDetail extends Component
 
         // Only append rating snippet if description doesn't already mention it
         $ratingSnippet = '';
-        if ($displayRating && $totalReviews > 0 && ! $r->ai_description) {
+        if ($displayRating && $totalReviews > 0 && ! $hasAiDesc) {
             $ratingSnippet = $isEn
                 ? " Rated {$displayRating}/5 from " . number_format($totalReviews) . " reviews."
                 : " Calificación {$displayRating}/5 con " . number_format($totalReviews) . " reseñas.";
