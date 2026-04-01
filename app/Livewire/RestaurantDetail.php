@@ -245,6 +245,18 @@ class RestaurantDetail extends Component
             }
         );
 
+        // Related restaurants: same city first, fallback to same state/category
+        $nearbyRestaurants = Restaurant::approved()
+            ->where('id', '!=', $this->restaurant->id)
+            ->with(['state', 'media'])
+            ->where(function($q) {
+                $q->where('city', $this->restaurant->city)
+                  ->orWhere('state_id', $this->restaurant->state_id);
+            })
+            ->orderByRaw("CASE WHEN city = ? THEN 0 ELSE 1 END, google_reviews_count DESC", [$this->restaurant->city])
+            ->limit(6)
+            ->get();
+
         $r = $this->restaurant;
         $stateCode = $r->state?->code ?? $r->state?->name ?? '';
         $isEn = app()->getLocale() === 'en';
@@ -259,18 +271,24 @@ class RestaurantDetail extends Component
             + $r->reviews()->where('status', 'approved')->count());
         $displayRating = $r->google_rating ?? $r->yelp_rating ?? null;
 
-        if ($r->description) {
-            $descBase = Str::limit(strip_tags($r->description), 120);
+        // Prefer AI description (rich, unique) over generic template description
+        $bestDescription = $r->ai_description ?: $r->description;
+
+        if ($bestDescription) {
+            $descBase = Str::limit(strip_tags($bestDescription), 155);
         } elseif ($isEn) {
             $descBase = "Authentic Mexican restaurant in {$r->city}, {$stateCode}";
         } else {
             $descBase = "Restaurante mexicano en {$r->city}, {$stateCode}";
         }
 
-        $ratingSnippet = ($displayRating && $totalReviews > 0)
-            ? ($isEn ? " Rated {$displayRating}/5 from " . number_format($totalReviews) . " reviews."
-                     : " Calificación {$displayRating}/5 con " . number_format($totalReviews) . " reseñas.")
-            : '';
+        // Only append rating snippet if description doesn't already mention it
+        $ratingSnippet = '';
+        if ($displayRating && $totalReviews > 0 && ! $r->ai_description) {
+            $ratingSnippet = $isEn
+                ? " Rated {$displayRating}/5 from " . number_format($totalReviews) . " reviews."
+                : " Calificación {$displayRating}/5 con " . number_format($totalReviews) . " reseñas.";
+        }
 
         $ctaSnippet = $isEn ? ' View menu, hours & reserve a table.'
                             : ' Ver menú, horarios y reservar mesa.';
@@ -283,6 +301,7 @@ class RestaurantDetail extends Component
             'popularMenuItems' => $popularMenuItems,
             'availableCategories' => $availableCategories,
             'visitorStats' => $visitorStats,
+            'nearbyRestaurants' => $nearbyRestaurants,
         ])->layout('layouts.app', [
             'title'           => $seoTitle,
             'metaDescription' => $seoDescription,
