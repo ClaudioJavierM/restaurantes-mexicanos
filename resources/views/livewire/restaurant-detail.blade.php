@@ -517,6 +517,14 @@
                         <a href="#reviews" wire:click="switchTab('reviews')" class="text-gray-500 hover:text-red-600">({{ number_format($combinedReviews) }} reviews)</a>
                     </div>
 
+                    <!-- Visitor Social Proof -->
+                    @if(isset($visitorStats) && ($visitorStats['monthly'] ?? 0) > 10)
+                    <div class="flex items-center gap-1.5 text-sm text-gray-500 mb-4">
+                        <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/></svg>
+                        <span>{{ number_format($visitorStats['monthly']) }} {{ app()->getLocale() === 'en' ? 'people viewed this page this month' : 'personas vieron esta página este mes' }}</span>
+                    </div>
+                    @endif
+
                     <!-- Call to Action Button -->
                     @if($restaurant->phone)
                         <div class="mb-4">
@@ -597,6 +605,43 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Popular Dishes (shown in info tab if restaurant has popular items) -->
+                @if($popularMenuItems->isNotEmpty())
+                <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+                    <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                        {{ app()->getLocale() === 'en' ? 'Popular Dishes' : 'Platos Populares' }}
+                    </h2>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        @foreach($popularMenuItems as $item)
+                        <button wire:click="showMenuItem({{ $item->id }})"
+                                class="flex flex-col text-left rounded-xl overflow-hidden border border-gray-100 hover:border-red-200 hover:shadow-md transition-all group">
+                            @if($item->image)
+                            <div class="h-24 overflow-hidden bg-gray-100">
+                                <img src="{{ asset('storage/' . $item->image) }}" alt="{{ $item->name }}"
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                                     loading="lazy" decoding="async">
+                            </div>
+                            @else
+                            <div class="h-24 bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center text-3xl">🍽️</div>
+                            @endif
+                            <div class="p-2">
+                                <p class="font-semibold text-gray-900 text-sm line-clamp-1">{{ $item->name }}</p>
+                                @if($item->price)
+                                <p class="text-red-600 text-sm font-medium">${{ number_format($item->price, 2) }}</p>
+                                @endif
+                            </div>
+                        </button>
+                        @endforeach
+                    </div>
+                    <p class="mt-3 text-xs text-gray-400 text-center">
+                        <button wire:click="switchTab('menu')" class="hover:text-red-600 transition-colors">
+                            {{ app()->getLocale() === 'en' ? 'View full menu →' : 'Ver menú completo →' }}
+                        </button>
+                    </p>
+                </div>
+                @endif
 
                 <!-- About / Description Section (SEO) -->
                 <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
