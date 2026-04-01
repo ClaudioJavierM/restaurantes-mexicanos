@@ -290,6 +290,28 @@
     <script type="application/ld+json">
     {!! json_encode($breadcrumbSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) !!}
     </script>
+
+    {{-- FAQPage Schema --}}
+    @if(count($faqItems) > 0)
+    <script type="application/ld+json">
+    {
+        "@@context": "https://schema.org",
+        "@@type": "FAQPage",
+        "mainEntity": [
+            @foreach($faqItems as $faqItem)
+            {
+                "@@type": "Question",
+                "name": "{{ addslashes($faqItem['q']) }}",
+                "acceptedAnswer": {
+                    "@@type": "Answer",
+                    "text": "{{ addslashes($faqItem['a']) }}"
+                }
+            }{{ $loop->last ? '' : ',' }}
+            @endforeach
+        ]
+    }
+    </script>
+    @endif
 @endpush
 
 <div>
@@ -626,6 +648,28 @@
                         @endif
                     </div>
                 </div>
+
+                {{-- FAQ Accordion --}}
+                @if(count($faqItems) > 0)
+                <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+                    <h2 class="text-xl font-bold text-gray-900 mb-4">
+                        {{ app()->getLocale() === 'en' ? 'Frequently Asked Questions' : 'Preguntas Frecuentes' }}
+                    </h2>
+                    <div class="space-y-3">
+                        @foreach($faqItems as $i => $faqItem)
+                        <div x-data="{ open: false }" class="border border-gray-200 rounded-lg overflow-hidden">
+                            <button @click="open = !open" class="w-full flex items-center justify-between p-4 text-left font-semibold text-gray-800 hover:bg-gray-50 transition-colors">
+                                <span>{{ $faqItem['q'] }}</span>
+                                <svg :class="open ? 'rotate-180' : ''" class="w-5 h-5 text-gray-400 transition-transform flex-shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                            </button>
+                            <div x-show="open" x-transition class="px-4 pb-4 text-gray-600 text-sm leading-relaxed">
+                                {{ $faqItem['a'] }}
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
 
                 <!-- Rating Distribution Section -->
                 <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
