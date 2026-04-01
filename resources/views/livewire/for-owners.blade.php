@@ -3,9 +3,21 @@
 {{-- ============================================ --}}
 {{-- 1. HERO SECTION --}}
 {{-- ============================================ --}}
-<section class="relative overflow-hidden" style="background-color: #0B0B0B;">
-    {{-- Subtle radial gradient glow --}}
-    <div class="absolute inset-0" style="background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(212,175,55,0.08) 0%, transparent 70%);"></div>
+<section class="relative overflow-hidden" style="background-color: #0B0B0B; min-height: 70vh;">
+    {{-- Restaurant background photo --}}
+    @php
+        $heroRestaurant = \App\Models\Restaurant::approved()
+            ->whereNotNull('image')->where('image','!=','')
+            ->orderByDesc('total_reviews')->first(['image','name']);
+        $heroBg = $heroRestaurant ? \Illuminate\Support\Facades\Storage::url($heroRestaurant->image) : null;
+    @endphp
+    @if($heroBg)
+    <div class="absolute inset-0" style="background-image:url('{{ $heroBg }}'); background-size:cover; background-position:center; background-repeat:no-repeat;"></div>
+    @endif
+    {{-- Dark overlay so text is readable --}}
+    <div class="absolute inset-0" style="background: linear-gradient(135deg, rgba(11,11,11,0.92) 0%, rgba(11,11,11,0.75) 50%, rgba(11,11,11,0.88) 100%);"></div>
+    {{-- Subtle gold glow --}}
+    <div class="absolute inset-0" style="background: radial-gradient(ellipse 60% 50% at 50% 60%, rgba(212,175,55,0.06) 0%, transparent 70%);"></div>
 
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16 md:pt-32 md:pb-24 relative z-10">
         <div class="text-center">
