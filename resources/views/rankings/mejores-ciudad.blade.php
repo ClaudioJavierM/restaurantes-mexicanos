@@ -1,10 +1,258 @@
 @extends('layouts.app')
 
-@section('title', 'Mejores Restaurantes Mexicanos en ' . $cityName . ', ' . $state->code . ' ' . $year)
-@section('meta_description', 'Los mejores restaurantes mexicanos en ' . $cityName . ', ' . $state->name . ' ' . $year . '. Top ' . $restaurants->count() . ' restaurantes con las mejores calificaciones.')
+@section('title')
+Mejores Restaurantes Mexicanos en {{ $cityName }}, {{ $state->code }} {{ $year }} | FAMER
+@endsection
+
+@section('meta_description')
+Los {{ $restaurants->count() }} mejores restaurantes mexicanos en {{ $cityName }}, {{ $state->name }} {{ $year }}. Rating promedio {{ number_format($stats->avg_rating, 1) }} estrellas basado en {{ number_format($stats->total_reviews) }} reseñas verificadas.
+@endsection
+
+@push('head')
+<meta name="geo.region" content="US-{{ $state->code }}" />
+<meta name="geo.placename" content="{{ $cityName }}, {{ $state->name }}" />
+<x-open-graph
+    title="Mejores Restaurantes Mexicanos en {{ $cityName }} {{ $year }}"
+    description="Top {{ $restaurants->count() }} restaurantes mexicanos en {{ $cityName }}, {{ $state->code }}. Rating promedio: {{ number_format($stats->avg_rating, 1) }} estrellas."
+    type="website"
+/>
+@endpush
 
 @section('content')
-{{-- Schema.org ItemList --}}
+<div class="min-h-screen bg-[#0B0B0B]">
+
+    {{-- Hero --}}
+    <div class="bg-[#0B0B0B] border-b border-[#2A2A2A]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-12">
+
+            {{-- Breadcrumb --}}
+            <nav class="text-sm mb-8" aria-label="Breadcrumb">
+                <ol class="flex items-center flex-wrap gap-x-2 gap-y-1">
+                    <li>
+                        <a href="{{ route('home') }}" class="text-gray-500 hover:text-[#D4AF37] transition-colors">Inicio</a>
+                    </li>
+                    <li><span class="text-[#2A2A2A]">/</span></li>
+                    <li>
+                        <a href="{{ route('rankings.mejores-nacional') }}" class="text-gray-500 hover:text-[#D4AF37] transition-colors">Mejores</a>
+                    </li>
+                    <li><span class="text-[#2A2A2A]">/</span></li>
+                    <li>
+                        <a href="{{ route('rankings.mejores-estado', $state->slug ?? strtolower($state->code)) }}"
+                           class="text-gray-500 hover:text-[#D4AF37] transition-colors">{{ $state->name }}</a>
+                    </li>
+                    <li><span class="text-[#2A2A2A]">/</span></li>
+                    <li class="text-[#F5F5F5] font-medium">{{ $cityName }}</li>
+                </ol>
+            </nav>
+
+            {{-- H1 --}}
+            <h1 class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-[#F5F5F5] leading-tight mb-4">
+                Los Mejores Restaurantes Mexicanos en<br>
+                <span class="text-[#D4AF37]">{{ $cityName }}, {{ $state->code }}</span>
+                <span class="text-gray-400 text-2xl md:text-3xl font-semibold"> {{ $year }}</span>
+            </h1>
+
+            <p class="text-gray-400 text-lg max-w-2xl mb-10">
+                Ranking de los {{ $restaurants->count() }} mejores restaurantes de cocina mexicana en {{ $cityName }},
+                basado en {{ number_format($stats->total_reviews) }} reseñas verificadas.
+            </p>
+
+            {{-- Stats bar --}}
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div class="bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl px-5 py-4">
+                    <div class="text-2xl font-bold text-[#F5F5F5]">{{ number_format($stats->total) }}</div>
+                    <div class="text-xs text-gray-500 mt-1 uppercase tracking-wide">Restaurantes</div>
+                </div>
+                <div class="bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl px-5 py-4">
+                    <div class="text-2xl font-bold text-[#D4AF37]">{{ number_format($stats->avg_rating, 1) }} <span class="text-lg">★</span></div>
+                    <div class="text-xs text-gray-500 mt-1 uppercase tracking-wide">Rating promedio</div>
+                </div>
+                <div class="bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl px-5 py-4">
+                    <div class="text-2xl font-bold text-[#F5F5F5]">{{ number_format($stats->total_reviews) }}</div>
+                    <div class="text-xs text-gray-500 mt-1 uppercase tracking-wide">Reseñas totales</div>
+                </div>
+                <div class="bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl px-5 py-4">
+                    <div class="text-2xl font-bold text-[#F5F5F5]">{{ $year }}</div>
+                    <div class="text-xs text-gray-500 mt-1 uppercase tracking-wide">Actualización</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Main content --}}
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="lg:grid lg:grid-cols-3 lg:gap-10">
+
+            {{-- Ranked list --}}
+            <div class="lg:col-span-2">
+                <h2 class="text-xl font-bold text-[#F5F5F5] mb-6">
+                    Top {{ $restaurants->count() }} Restaurantes en {{ $cityName }}
+                </h2>
+
+                <div class="space-y-3">
+                    @foreach($restaurants as $restaurant)
+                    <a href="{{ route('restaurants.show', $restaurant->slug) }}"
+                       class="flex items-center gap-4 bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl p-4 hover:border-[#D4AF37]/40 transition-all group">
+
+                        {{-- Rank badge --}}
+                        <div class="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-lg
+                            @if($loop->index === 0) bg-[#D4AF37] text-black
+                            @elseif($loop->index === 1) bg-gray-400 text-black
+                            @elseif($loop->index === 2) bg-amber-700 text-white
+                            @else bg-[#2A2A2A] text-gray-400 @endif">
+                            #{{ $loop->index + 1 }}
+                        </div>
+
+                        {{-- Thumbnail --}}
+                        <div class="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+                            @php
+                                $imageUrl = $restaurant->getFirstMediaUrl('photos', 'thumb')
+                                    ?: ($restaurant->yelp_photos[0] ?? '/images/placeholder-restaurant.jpg');
+                            @endphp
+                            <img src="{{ $imageUrl }}"
+                                 alt="{{ $restaurant->name }}"
+                                 class="w-full h-full object-cover"
+                                 loading="lazy">
+                        </div>
+
+                        {{-- Info --}}
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-bold text-[#F5F5F5] group-hover:text-[#D4AF37] transition-colors truncate">
+                                {{ $restaurant->name }}
+                            </h3>
+                            <p class="text-sm text-gray-400 truncate">{{ $restaurant->city }}, {{ $state->code }}</p>
+                            @if($restaurant->average_rating)
+                            <div class="flex items-center gap-1 mt-1">
+                                <span class="text-[#D4AF37] text-sm">★</span>
+                                <span class="text-sm font-semibold text-[#F5F5F5]">{{ number_format($restaurant->average_rating, 1) }}</span>
+                                <span class="text-xs text-gray-500">({{ number_format($restaurant->total_reviews ?? 0) }})</span>
+                            </div>
+                            @endif
+                            @if($restaurant->address)
+                            <p class="text-xs text-gray-600 truncate mt-0.5">{{ $restaurant->address }}</p>
+                            @endif
+                        </div>
+
+                        {{-- Price + arrow --}}
+                        <div class="flex items-center gap-3 flex-shrink-0">
+                            @if($restaurant->price_range)
+                            <span class="text-[#D4AF37] text-sm font-semibold">{{ $restaurant->price_range }}</span>
+                            @endif
+                            <svg class="w-4 h-4 text-gray-600 group-hover:text-[#D4AF37] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </div>
+                    </a>
+                    @endforeach
+                </div>
+
+                {{-- CTA --}}
+                <div class="mt-10 text-center">
+                    <a href="{{ route('restaurants.index', ['state' => $state->name, 'city' => $citySlug]) }}"
+                       class="inline-flex items-center gap-2 px-8 py-4 bg-[#D4AF37] text-black font-bold rounded-xl hover:bg-[#C49B2D] transition-colors text-lg">
+                        Ver todos los restaurantes en {{ $cityName }}
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+            {{-- Sidebar --}}
+            <aside class="mt-12 lg:mt-0">
+                <div class="lg:sticky lg:top-6 space-y-6">
+
+                    {{-- City stats card --}}
+                    <div class="bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl p-6">
+                        <h3 class="text-[#D4AF37] font-bold text-sm uppercase tracking-widest mb-5">
+                            {{ $cityName }}, {{ $state->code }}
+                        </h3>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center border-b border-[#2A2A2A] pb-3">
+                                <span class="text-gray-400 text-sm">Restaurantes en ranking</span>
+                                <span class="text-[#F5F5F5] font-bold">{{ $restaurants->count() }}</span>
+                            </div>
+                            <div class="flex justify-between items-center border-b border-[#2A2A2A] pb-3">
+                                <span class="text-gray-400 text-sm">Rating promedio</span>
+                                <span class="text-[#D4AF37] font-bold">{{ number_format($stats->avg_rating, 1) }} ★</span>
+                            </div>
+                            <div class="flex justify-between items-center border-b border-[#2A2A2A] pb-3">
+                                <span class="text-gray-400 text-sm">Reseñas totales</span>
+                                <span class="text-[#F5F5F5] font-bold">{{ number_format($stats->total_reviews) }}</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-400 text-sm">Estado</span>
+                                <span class="text-[#F5F5F5] font-bold">{{ $state->name }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Navigation links --}}
+                    <div class="bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl p-6 space-y-3">
+                        <h3 class="text-[#F5F5F5] font-semibold text-sm uppercase tracking-widest mb-4">Explorar</h3>
+
+                        <a href="{{ route('rankings.mejores-estado', $state->slug ?? strtolower($state->code)) }}"
+                           class="flex items-center gap-3 text-gray-400 hover:text-[#D4AF37] transition-colors text-sm group">
+                            <svg class="w-4 h-4 flex-shrink-0 group-hover:text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                            </svg>
+                            Ranking de {{ $state->name }}
+                        </a>
+
+                        <a href="{{ route('restaurants.index', ['state' => $state->name, 'city' => $citySlug]) }}"
+                           class="flex items-center gap-3 text-gray-400 hover:text-[#D4AF37] transition-colors text-sm group">
+                            <svg class="w-4 h-4 flex-shrink-0 group-hover:text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+                            </svg>
+                            Todos los restaurantes en {{ $cityName }}
+                        </a>
+
+                        <a href="{{ route('rankings.mejores-nacional') }}"
+                           class="flex items-center gap-3 text-gray-400 hover:text-[#D4AF37] transition-colors text-sm group">
+                            <svg class="w-4 h-4 flex-shrink-0 group-hover:text-[#D4AF37]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064"/>
+                            </svg>
+                            Ranking nacional
+                        </a>
+                    </div>
+
+                    {{-- Top 3 highlight --}}
+                    @if($restaurants->count() >= 1)
+                    <div class="bg-[#1A1A1A] border border-[#D4AF37]/20 rounded-xl p-6">
+                        <h3 class="text-[#D4AF37] font-bold text-sm uppercase tracking-widest mb-4">Top 3 en {{ $cityName }}</h3>
+                        <div class="space-y-3">
+                            @foreach($restaurants->take(3) as $top)
+                            <a href="{{ route('restaurants.show', $top->slug) }}"
+                               class="flex items-center gap-3 group">
+                                <span class="text-xs font-bold w-5 text-center
+                                    @if($loop->index === 0) text-[#D4AF37]
+                                    @elseif($loop->index === 1) text-gray-400
+                                    @else text-amber-700 @endif">
+                                    #{{ $loop->index + 1 }}
+                                </span>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm text-[#F5F5F5] group-hover:text-[#D4AF37] transition-colors truncate font-medium">
+                                        {{ $top->name }}
+                                    </p>
+                                    @if($top->average_rating)
+                                    <p class="text-xs text-gray-500">{{ number_format($top->average_rating, 1) }} ★</p>
+                                    @endif
+                                </div>
+                            </a>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
+
+                </div>
+            </aside>
+
+        </div>
+    </div>
+</div>
+@endsection
+
+@push('scripts')
 <script type="application/ld+json">
 {
     "@@context": "https://schema.org",
@@ -19,36 +267,34 @@
             "position": {{ $index + 1 }},
             "item": {
                 "@@type": "Restaurant",
-                "name": "{{ $restaurant->name }}",
+                "name": "{{ addslashes($restaurant->name) }}",
                 "url": "{{ route('restaurants.show', $restaurant->slug) }}",
                 "address": {
                     "@@type": "PostalAddress",
-                    "streetAddress": "{{ $restaurant->address }}",
+                    "streetAddress": "{{ addslashes($restaurant->address ?? '') }}",
                     "addressLocality": "{{ $cityName }}",
                     "addressRegion": "{{ $state->code }}",
                     "postalCode": "{{ $restaurant->zip_code }}",
                     "addressCountry": "US"
                 },
                 "servesCuisine": "Mexican",
-                "telephone": "{{ $restaurant->phone }}",
+                "telephone": "{{ $restaurant->phone }}"
                 @if($restaurant->average_rating)
-                "aggregateRating": {
+                ,"aggregateRating": {
                     "@@type": "AggregateRating",
                     "ratingValue": "{{ number_format($restaurant->average_rating, 1) }}",
                     "reviewCount": "{{ $restaurant->total_reviews ?? 0 }}",
                     "bestRating": "5",
                     "worstRating": "1"
-                },
+                }
                 @endif
-                "priceRange": "{{ $restaurant->price_range ?? '$$' }}"
+                ,"priceRange": "{{ $restaurant->price_range ?? '$$' }}"
             }
         }@if(!$loop->last),@endif
         @endforeach
     ]
 }
 </script>
-
-{{-- BreadcrumbList Schema --}}
 <script type="application/ld+json">
 {
     "@@context": "https://schema.org",
@@ -75,156 +321,4 @@
     ]
 }
 </script>
-
-{{-- Geographic Meta --}}
-<meta name="geo.region" content="US-{{ $state->code }}" />
-<meta name="geo.placename" content="{{ $cityName }}, {{ $state->name }}" />
-
-{{-- Open Graph --}}
-<x-open-graph
-    title="Mejores Restaurantes Mexicanos en {{ $cityName }} {{ $year }}"
-    description="Top {{ $restaurants->count() }} restaurantes mexicanos en {{ $cityName }}, {{ $state->code }}. Rating promedio: {{ number_format($stats->avg_rating, 1) }} estrellas."
-    type="website"
-/>
-
-<div class="min-h-screen bg-gray-50">
-    {{-- Hero --}}
-    <div class="bg-gradient-to-br from-red-700 via-red-600 to-orange-500 text-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <nav class="text-sm mb-6">
-                <ol class="flex items-center space-x-2">
-                    <li><a href="{{ route('home') }}" class="hover:underline opacity-80">Inicio</a></li>
-                    <li><span class="opacity-60">/</span></li>
-                    <li><a href="{{ route('rankings.mejores-nacional') }}" class="hover:underline opacity-80">Mejores Restaurantes</a></li>
-                    <li><span class="opacity-60">/</span></li>
-                    <li><a href="{{ route('rankings.mejores-estado', $state->slug ?? strtolower($state->code)) }}" class="hover:underline opacity-80">{{ $state->name }}</a></li>
-                    <li><span class="opacity-60">/</span></li>
-                    <li class="font-semibold">{{ $cityName }}</li>
-                </ol>
-            </nav>
-
-            <h1 class="text-3xl md:text-4xl lg:text-5xl font-extrabold mb-4">
-                Los Mejores Restaurantes Mexicanos<br>
-                <span class="text-yellow-300">en {{ $cityName }}, {{ $state->code }} {{ $year }}</span>
-            </h1>
-
-            <p class="text-lg opacity-90 max-w-2xl mb-6">
-                Descubre los {{ $restaurants->count() }} mejores restaurantes de comida mexicana en {{ $cityName }}.
-                Ranking basado en {{ number_format($stats->total_reviews) }} resenas verificadas.
-            </p>
-
-            <div class="flex flex-wrap gap-6">
-                <div class="bg-white/10 rounded-lg px-4 py-3">
-                    <div class="text-2xl font-bold">{{ number_format($stats->total) }}</div>
-                    <div class="text-sm opacity-80">Restaurantes</div>
-                </div>
-                <div class="bg-white/10 rounded-lg px-4 py-3">
-                    <div class="text-2xl font-bold">{{ number_format($stats->avg_rating, 1) }} ⭐</div>
-                    <div class="text-sm opacity-80">Rating Promedio</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <h2 class="text-2xl font-bold text-gray-900 mb-6">
-            Top {{ $restaurants->count() }} Restaurantes Mexicanos en {{ $cityName }}
-        </h2>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            @foreach($restaurants as $index => $restaurant)
-                <a href="{{ route('restaurants.show', $restaurant->slug) }}"
-                   class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-xl transition-all group relative">
-
-                    {{-- Rank Badge --}}
-                    <div class="absolute top-3 left-3 z-10
-                        @if($index < 3) bg-gradient-to-br from-yellow-400 to-amber-500
-                        @else bg-red-600
-                        @endif text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg shadow-lg">
-                        {{ $index + 1 }}
-                    </div>
-
-                    {{-- Image --}}
-                    <div class="h-48 overflow-hidden">
-                        @php
-                            $imageUrl = $restaurant->getFirstMediaUrl('photos', 'thumb')
-                                ?: ($restaurant->yelp_photos[0] ?? '/images/placeholder-restaurant.jpg');
-                        @endphp
-                        <img src="{{ $imageUrl }}" alt="{{ $restaurant->name }}"
-                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
-                    </div>
-
-                    {{-- Content --}}
-                    <div class="p-4">
-                        <h3 class="text-lg font-bold text-gray-900 group-hover:text-red-600 transition-colors line-clamp-1">
-                            {{ $restaurant->name }}
-                        </h3>
-
-                        {{-- Rating --}}
-                        <div class="mt-2 flex items-center gap-2">
-                            <div class="flex items-center">
-                                @for($i = 1; $i <= 5; $i++)
-                                    <svg class="w-4 h-4 {{ $i <= round($restaurant->average_rating) ? 'text-yellow-400' : 'text-gray-300' }}"
-                                         fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                    </svg>
-                                @endfor
-                            </div>
-                            <span class="font-bold text-gray-900">{{ number_format($restaurant->average_rating, 1) }}</span>
-                            <span class="text-sm text-gray-500">({{ number_format($restaurant->total_reviews ?? 0) }})</span>
-                        </div>
-
-                        {{-- Address --}}
-                        <p class="mt-2 text-sm text-gray-600 line-clamp-1">
-                            📍 {{ $restaurant->address }}
-                        </p>
-
-                        {{-- Tags --}}
-                        <div class="mt-3 flex flex-wrap gap-2">
-                            @if($restaurant->category)
-                                <span class="px-2 py-1 bg-red-50 text-red-700 text-xs font-medium rounded">
-                                    {{ $restaurant->category->name }}
-                                </span>
-                            @endif
-                            @if($restaurant->price_range)
-                                <span class="px-2 py-1 bg-green-50 text-green-700 text-xs font-medium rounded">
-                                    {{ $restaurant->price_range }}
-                                </span>
-                            @endif
-                        </div>
-                    </div>
-                </a>
-            @endforeach
-        </div>
-
-        {{-- CTAs --}}
-        <div class="mt-12 text-center space-y-4">
-            <a href="{{ route('restaurants.index', ['state' => $state->name]) }}"
-               class="inline-flex items-center px-6 py-3 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700">
-                Ver Todos los Restaurantes en {{ $state->name }}
-            </a>
-            <div>
-                <a href="{{ route('rankings.mejores-estado', $state->slug ?? strtolower($state->code)) }}"
-                   class="text-red-600 hover:underline font-medium">
-                    ← Volver a ranking de {{ $state->name }}
-                </a>
-            </div>
-        </div>
-
-        {{-- Related Cities (would need to pass this from controller) --}}
-        {{--
-        <div class="mt-16">
-            <h3 class="text-xl font-bold text-gray-900 mb-6">Otras Ciudades en {{ $state->name }}</h3>
-            <div class="flex flex-wrap gap-3">
-                @foreach($relatedCities ?? [] as $city)
-                    <a href="{{ route('rankings.mejores-ciudad', [$state->slug ?? strtolower($state->code), Str::slug($city)]) }}"
-                       class="px-4 py-2 bg-white border border-gray-200 rounded-lg hover:border-red-300 hover:bg-red-50 transition-colors">
-                        {{ $city }}
-                    </a>
-                @endforeach
-            </div>
-        </div>
-        --}}
-    </div>
-</div>
-@endsection
+@endpush
