@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', "Mejores Restaurantes Mexicanos en {$cityName}, {$state->name} | FAMER")
-@section('meta_description', "Descubre los {$stats->total} mejores restaurantes mexicanos en {$cityName}, {$state->name}. Calificaciones verificadas, menús, horarios y más.")
+@section('title')Mejores Restaurantes Mexicanos en {{ $cityName }}, {{ $state->name }} | FAMER@endsection
+@section('meta_description')Descubre los {{ $stats->total }} mejores restaurantes mexicanos en {{ $cityName }}, {{ $state->name }}. Calificaciones verificadas, menús, horarios y más.@endsection
 
 @push('meta')
 <!-- Open Graph / Facebook -->

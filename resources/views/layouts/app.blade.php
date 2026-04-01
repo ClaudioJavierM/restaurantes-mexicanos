@@ -14,8 +14,8 @@
     <link rel="icon" type="image/png" sizes="192x192" href="/images/branding/icon.png">
 
     <!-- SEO: Dynamic Title and Description -->
-    <title>{{ $title ?? (__('app.site_name') . ' - ' . __('app.tagline')) }}</title>
-    <meta name="description" content="{{ $metaDescription ?? null ?: (__('app.tagline') . ' - Descubre los mejores restaurantes mexicanos auténticos en Estados Unidos') }}">
+    <title>{{ $title ?? $__env->yieldContent('title', __('app.site_name') . ' - ' . __('app.tagline')) }}</title>
+    <meta name="description" content="{{ $metaDescription ?? ($__env->yieldContent('meta_description') ?: (__('app.tagline') . ' - Descubre los mejores restaurantes mexicanos auténticos en Estados Unidos')) }}">
 
     <!-- SEO: Canonical URL -->
     <link rel="canonical" href="{{ url()->current() }}">
