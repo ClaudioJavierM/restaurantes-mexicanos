@@ -151,7 +151,7 @@
     {{-- Open Graph for social sharing --}}
     <meta property="og:type" content="restaurant">
     <meta property="og:title" content="{{ $restaurant->name }} — {{ $restaurant->city }}, {{ $restaurant->state?->name ?? '' }}">
-    <meta property="og:description" content="{{ Str::limit(strip_tags($restaurant->description ?: 'Descubre ' . $restaurant->name . ', uno de los mejores restaurantes mexicanos en ' . $restaurant->city), 200) }}">
+    <meta property="og:description" content="{{ Str::limit(strip_tags(($restaurant->ai_description ?: $restaurant->description) ?: 'Descubre ' . $restaurant->name . ', uno de los mejores restaurantes mexicanos en ' . $restaurant->city), 200) }}">
     <meta property="og:url" content="{{ url()->current() }}">
     @php
         $hasRankings = $restaurant->rankings()->where('year', now()->year - 1)->where('position', '<=', 25)->where('is_published', true)->exists();
@@ -298,69 +298,59 @@
             ->get();
         $bestRanking = $heroRankings->first();
     @endphp
+    {{-- Trophy animation keyframes — injected once --}}
+    @once
+    @push('styles')
+    <style>
+        @keyframes trophy-glow {
+            0%, 100% { filter: drop-shadow(0 0 4px rgba(212,175,55,0.6)) drop-shadow(0 0 8px rgba(212,175,55,0.3)); transform: scale(1); }
+            50%       { filter: drop-shadow(0 0 10px rgba(245,208,96,0.9)) drop-shadow(0 0 20px rgba(212,175,55,0.5)); transform: scale(1.08); }
+        }
+        .famer-trophy { animation: trophy-glow 2.4s ease-in-out infinite; display:inline-block; }
+    </style>
+    @endpush
+    @endonce
+
     @if($coverImageUrl)
-        <div style="position:relative; {{ $bestRanking ? 'height:320px;' : 'height:260px;' }} overflow:hidden; background:#111;">
+        <div style="position:relative; height:260px; overflow:hidden; background:#111;">
             <img src="{{ $coverImageUrl }}"
                  alt="{{ $restaurant->name }}"
                  style="width:100%; height:100%; object-fit:cover; object-position:center; display:block;"
+                 fetchpriority="high"
+                 decoding="async"
                  onerror="this.style.display='none';">
-            <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.2) 40%, transparent 70%);pointer-events:none;"></div>
+            <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.1) 50%, transparent 80%); pointer-events:none;"></div>
 
-            {{-- Award Banner - centered at bottom of hero --}}
+            {{-- Award Badge — top-LEFT, animated trophy emoji --}}
             @if($bestRanking)
-            <div style="position:absolute; bottom:0; left:0; right:0; z-index:10;">
-                <div style="max-width:900px; margin:0 auto; padding:0 16px 16px;">
-                    <a href="{{ url('/guia') }}?scope={{ $bestRanking->ranking_type }}{{ $bestRanking->ranking_type !== 'national' ? '&state=' . $bestRanking->ranking_scope : '' }}"
-                       style="text-decoration:none; display:block;">
-                        <div style="background:linear-gradient(135deg, #B8860B, #D4AF37 40%, #F5D060 70%, #D4AF37); border-radius:16px; padding:16px 28px; display:flex; align-items:center; gap:20px; box-shadow:0 12px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -2px 0 rgba(0,0,0,0.15); border:1px solid rgba(255,255,255,0.2);">
-
-                            {{-- Trophy circle --}}
-                            <div style="width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow:0 4px 16px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.3);
-                                {{ $bestRanking->position == 1 ? 'background:linear-gradient(135deg, #1a1a2e, #16213e);' : ($bestRanking->position <= 3 ? 'background:linear-gradient(135deg, #1a1a2e, #16213e);' : 'background:linear-gradient(135deg, #374151, #1F2937);') }}">
-                                <svg width="30" height="30" fill="#F5D060" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 2a2 2 0 00-2 2v1a2 2 0 002 2h1.06a7.04 7.04 0 003.272 4.35L8.12 15.7A2 2 0 009.98 18h.04a2 2 0 001.86-2.3l-1.212-4.35A7.04 7.04 0 0013.94 7H15a2 2 0 002-2V4a2 2 0 00-2-2H5z" clip-rule="evenodd"/></svg>
+            <div style="position:absolute; top:12px; left:16px; z-index:10; display:flex; flex-direction:column; align-items:flex-start; gap:6px;">
+                <a href="{{ url('/guia') }}?scope={{ $bestRanking->ranking_type }}{{ $bestRanking->ranking_type !== 'national' ? '&state=' . $bestRanking->ranking_scope : '' }}"
+                   style="text-decoration:none;">
+                    <div style="background:linear-gradient(135deg,#B8860B,#D4AF37 40%,#F5D060 70%,#D4AF37); border-radius:14px; padding:8px 16px 8px 10px; display:flex; align-items:center; gap:10px; box-shadow:0 4px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.35); border:1px solid rgba(255,255,255,0.2);">
+                        <span class="famer-trophy" style="font-size:30px; line-height:1;">🏆</span>
+                        <div>
+                            <div style="display:flex; align-items:baseline; gap:6px; line-height:1;">
+                                <span style="font-size:22px; font-weight:900; color:#1a1a2e;">#{{ $bestRanking->position }}</span>
+                                <span style="font-size:13px; font-weight:800; color:#1a1a2e; text-transform:uppercase; letter-spacing:0.5px;">{{ $bestRanking->ranking_type === 'city' ? $bestRanking->ranking_scope : ($bestRanking->ranking_type === 'state' ? $bestRanking->ranking_scope : 'USA') }}</span>
                             </div>
-
-                            {{-- Position + Scope --}}
-                            <div style="flex:1; min-width:0;">
-                                <div style="display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;">
-                                    <span style="font-size:34px; font-weight:900; line-height:1; color:#1a1a2e; text-shadow:0 1px 0 rgba(255,255,255,0.3);">
-                                        #{{ $bestRanking->position }}
-                                    </span>
-                                    <span style="font-size:20px; font-weight:800; color:#1a1a2e; text-transform:uppercase; letter-spacing:1px;">
-                                        {{ $bestRanking->ranking_type === 'city' ? $bestRanking->ranking_scope : ($bestRanking->ranking_type === 'state' ? $bestRanking->ranking_scope : 'USA') }}
-                                    </span>
-                                </div>
-                                <div style="font-size:12px; color:rgba(30,30,30,0.6); text-transform:uppercase; letter-spacing:3px; font-weight:700; margin-top:3px;">
-                                    FAMER Awards {{ $bestRanking->year }}
-                                </div>
-                            </div>
-
-                            {{-- Additional rankings --}}
-                            @if($heroRankings->count() > 1)
-                            <div style="display:flex; flex-wrap:wrap; gap:8px; flex-shrink:0;">
-                                @foreach($heroRankings->skip(1)->take(3) as $ranking)
-                                    <div style="background:rgba(26,26,46,0.85); border-radius:10px; padding:6px 14px; text-align:center; box-shadow:0 2px 8px rgba(0,0,0,0.2);">
-                                        <div style="font-size:18px; font-weight:800; color:#F5D060;">
-                                            #{{ $ranking->position }}
-                                        </div>
-                                        <div style="font-size:10px; color:rgba(255,255,255,0.7); text-transform:uppercase; letter-spacing:1px; font-weight:600; white-space:nowrap;">
-                                            {{ Str::limit($ranking->ranking_scope, 12) }}
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                            @endif
-
-                            {{-- Arrow icon --}}
-                            <svg width="22" height="22" fill="none" stroke="rgba(26,26,46,0.4)" viewBox="0 0 24 24" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                            <div style="font-size:9px; color:rgba(26,26,46,0.55); text-transform:uppercase; letter-spacing:2px; font-weight:700; margin-top:2px;">FAMER Awards {{ $bestRanking->year }}</div>
                         </div>
-                    </a>
-                </div>
+                    </div>
+                </a>
+                {{-- Additional rankings as small dark pills --}}
+                @foreach($heroRankings->skip(1)->take(2) as $ranking)
+                    <div style="background:rgba(0,0,0,0.72); backdrop-filter:blur(8px); border-radius:8px; padding:4px 12px; display:flex; align-items:center; gap:8px; border:1px solid rgba(212,175,55,0.35);">
+                        <span style="font-size:13px;">🏆</span>
+                        <span style="font-size:14px; font-weight:800; color:#F5D060;">#{{ $ranking->position }}</span>
+                        <span style="font-size:10px; color:rgba(255,255,255,0.75); text-transform:uppercase; letter-spacing:1px; font-weight:600;">{{ Str::limit($ranking->ranking_scope, 14) }}</span>
+                    </div>
+                @endforeach
             </div>
             @endif
 
+            {{-- Photos button — always bottom-right --}}
             @if($totalPhotos > 0)
-                <div style="position:absolute; {{ $bestRanking ? 'top:12px;' : 'bottom:12px;' }} right:16px; z-index:10;">
+                <div style="position:absolute; bottom:12px; right:16px; z-index:10;">
                     <button wire:click="switchTab('photos')" style="background:rgba(255,255,255,0.92); color:#111; padding:7px 16px; border-radius:8px; font-size:13px; font-weight:600; border:none; cursor:pointer; display:flex; align-items:center; gap:6px; box-shadow:0 2px 8px rgba(0,0,0,0.3);">
                         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                         Ver {{ $totalPhotos }} fotos
@@ -369,36 +359,37 @@
             @endif
         </div>
     @else
-        <div style="position:relative; {{ $bestRanking ? 'height:260px;' : 'height:200px;' }} background:linear-gradient(135deg, #1F2937, #111827); display:flex; align-items:center; justify-content:center;">
+        <div style="position:relative; height:200px; background:linear-gradient(135deg, #1F2937, #111827); display:flex; align-items:center; justify-content:center;">
             <div style="text-align:center; color:white;">
                 <span style="font-size:64px; display:block; margin-bottom:8px;">🍽️</span>
                 <p style="font-size:16px; opacity:0.8;">{{ $restaurant->name }}</p>
             </div>
 
-            {{-- Award Banner on fallback --}}
+            {{-- Award Badge on fallback — top-LEFT --}}
             @if($bestRanking)
-            <div style="position:absolute; bottom:0; left:0; right:0; z-index:10;">
-                <div style="max-width:900px; margin:0 auto; padding:0 16px 16px;">
-                    <div style="background:linear-gradient(135deg, #B8860B, #D4AF37 40%, #F5D060 70%, #D4AF37); border-radius:16px; padding:14px 24px; display:flex; align-items:center; gap:16px; box-shadow:0 8px 32px rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.2);">
-                        <div style="width:48px; height:48px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; background:linear-gradient(135deg, #1a1a2e, #16213e); box-shadow:0 3px 12px rgba(0,0,0,0.3);">
-                            <svg width="24" height="24" fill="#F5D060" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 2a2 2 0 00-2 2v1a2 2 0 002 2h1.06a7.04 7.04 0 003.272 4.35L8.12 15.7A2 2 0 009.98 18h.04a2 2 0 001.86-2.3l-1.212-4.35A7.04 7.04 0 0013.94 7H15a2 2 0 002-2V4a2 2 0 00-2-2H5z" clip-rule="evenodd"/></svg>
+            <div style="position:absolute; top:12px; left:16px; z-index:10; display:flex; flex-direction:column; align-items:flex-start; gap:6px;">
+                <div style="background:linear-gradient(135deg,#B8860B,#D4AF37 40%,#F5D060 70%,#D4AF37); border-radius:14px; padding:8px 16px 8px 10px; display:flex; align-items:center; gap:10px; box-shadow:0 4px 20px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.35); border:1px solid rgba(255,255,255,0.2);">
+                    <span class="famer-trophy" style="font-size:30px; line-height:1;">🏆</span>
+                    <div>
+                        <div style="display:flex; align-items:baseline; gap:6px; line-height:1;">
+                            <span style="font-size:22px; font-weight:900; color:#1a1a2e;">#{{ $bestRanking->position }}</span>
+                            <span style="font-size:13px; font-weight:800; color:#1a1a2e; text-transform:uppercase; letter-spacing:0.5px;">{{ $bestRanking->ranking_type === 'city' ? $bestRanking->ranking_scope : ($bestRanking->ranking_type === 'state' ? $bestRanking->ranking_scope : 'USA') }}</span>
                         </div>
-                        <div style="flex:1;">
-                            <div style="display:flex; align-items:baseline; gap:8px;">
-                                <span style="font-size:28px; font-weight:900; color:#1a1a2e; text-shadow:0 1px 0 rgba(255,255,255,0.3);">#{{ $bestRanking->position }}</span>
-                                <span style="font-size:16px; font-weight:800; color:#1a1a2e; text-transform:uppercase; letter-spacing:1px;">
-                                    {{ $bestRanking->ranking_type === 'city' ? $bestRanking->ranking_scope : ($bestRanking->ranking_type === 'state' ? $bestRanking->ranking_scope : 'USA') }}
-                                </span>
-                            </div>
-                            <div style="font-size:11px; color:rgba(30,30,30,0.6); text-transform:uppercase; letter-spacing:3px; font-weight:700;">FAMER Awards {{ $bestRanking->year }}</div>
-                        </div>
+                        <div style="font-size:9px; color:rgba(26,26,46,0.55); text-transform:uppercase; letter-spacing:2px; font-weight:700; margin-top:2px;">FAMER Awards {{ $bestRanking->year }}</div>
                     </div>
                 </div>
+                @foreach($heroRankings->skip(1)->take(2) as $ranking)
+                    <div style="background:rgba(0,0,0,0.72); backdrop-filter:blur(8px); border-radius:8px; padding:4px 12px; display:flex; align-items:center; gap:8px; border:1px solid rgba(212,175,55,0.35);">
+                        <span style="font-size:13px;">🏆</span>
+                        <span style="font-size:14px; font-weight:800; color:#F5D060;">#{{ $ranking->position }}</span>
+                        <span style="font-size:10px; color:rgba(255,255,255,0.75); text-transform:uppercase; letter-spacing:1px; font-weight:600;">{{ Str::limit($ranking->ranking_scope, 14) }}</span>
+                    </div>
+                @endforeach
             </div>
             @endif
 
             @if($totalPhotos > 0)
-                <div style="position:absolute; {{ $bestRanking ? 'top:12px;' : 'bottom:12px;' }} right:16px; z-index:10;">
+                <div style="position:absolute; bottom:12px; right:16px; z-index:10;">
                     <button wire:click="switchTab('photos')" style="background:rgba(255,255,255,0.92); color:#111; padding:7px 16px; border-radius:8px; font-size:13px; font-weight:600; border:none; cursor:pointer; display:flex; align-items:center; gap:6px; box-shadow:0 2px 8px rgba(0,0,0,0.3);">
                         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                         Ver {{ $totalPhotos }} fotos
@@ -455,7 +446,7 @@
                     <!-- Restaurant Name with Logo -->
                     <div class="flex items-center gap-4 mb-3">
                         @if($restaurant->logo)
-                            <img src="{{ asset('storage/' . $restaurant->logo) }}" alt="{{ $restaurant->name }}" class="w-16 h-16 md:w-20 md:h-20 rounded-full object-cover border-2 border-gray-200 shadow-sm flex-shrink-0">
+                            <img src="{{ asset('storage/' . $restaurant->logo) }}" alt="{{ $restaurant->name }}" class="w-16 h-16 md:w-20 md:h-20 rounded-full object-cover border-2 border-gray-200 shadow-sm flex-shrink-0" loading="lazy" decoding="async">
                         @endif
                         <h1 class="text-3xl md:text-4xl font-bold text-gray-900">{{ $restaurant->name }}</h1>
                     </div>
@@ -582,9 +573,10 @@
                 <!-- About / Description Section (SEO) -->
                 <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
                     <h2 class="text-xl font-bold text-gray-900 mb-4">Acerca de {{ $restaurant->name }}</h2>
-                    @if($restaurant->description)
+                    @php $displayDescription = $restaurant->ai_description ?: $restaurant->description; @endphp
+                    @if($displayDescription)
                         <div class="prose prose-gray max-w-none">
-                            <p class="text-gray-700 leading-relaxed">{{ $restaurant->description }}</p>
+                            <p class="text-gray-700 leading-relaxed">{{ $displayDescription }}</p>
                         </div>
                     @else
                         <div class="bg-gray-50 rounded-lg p-4 border border-dashed border-gray-300">
@@ -763,7 +755,7 @@
                             <div wire:click="showMenuItem({{ $item->id }})" class="cursor-pointer group">
                                 <div class="aspect-square rounded-lg overflow-hidden bg-gray-100 mb-2 relative">
                                     @if($item->image)
-                                        <img src="{{ asset('storage/' . $item->image) }}" alt="{{ $item->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform">
+                                        <img src="{{ asset('storage/' . $item->image) }}" alt="{{ $item->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform" loading="lazy" decoding="async">
                                     @else
                                         <div class="w-full h-full flex items-center justify-center text-4xl">🌮</div>
                                     @endif
