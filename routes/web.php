@@ -9,6 +9,8 @@ use App\Http\Controllers\TeamInvitationController;
 Route::get('/', \App\Livewire\Home::class)->name('home');
 Route::get('/restaurantes', \App\Livewire\RestaurantList::class)->name('restaurants.index');
 Route::get('/restaurante/{slug}', \App\Livewire\RestaurantDetail::class)->name('restaurants.show');
+// English URL alias for famousmexicanrestaurants.com domain
+Route::redirect('/restaurant/{slug}', '/restaurante/{slug}', 301);
 Route::get('/sugerir', \App\Livewire\SmartSuggestionForm::class)->name('suggestions.create');
 
 // For Business Owners

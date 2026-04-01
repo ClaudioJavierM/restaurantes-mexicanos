@@ -117,7 +117,7 @@ class SitemapController extends Controller
 
             foreach ($restaurants as $restaurant) {
                 $xml .= $this->addUrl(
-                    $baseUrl . '/restaurante/' . $restaurant->slug,
+                    $baseUrl . $this->getRestaurantPath() . $restaurant->slug,
                     $restaurant->updated_at,
                     'weekly',
                     '0.8'
@@ -243,6 +243,12 @@ class SitemapController extends Controller
             str_contains($currentDomain, 'restaurantesmexicanosfamosos') => 'https://restaurantesmexicanosfamosos.com',
             default => url('/'),
         };
+    }
+
+    protected function getRestaurantPath(): string
+    {
+        $host = request()->getHost();
+        return str_contains($host, 'famousmexicanrestaurants') ? '/restaurant/' : '/restaurante/';
     }
 
     protected function getTopCities(int $limit): \Illuminate\Support\Collection
