@@ -93,7 +93,8 @@ Los {{ number_format($stats->total) }} mejores restaurantes mexicanos en {{ $sta
                     @foreach($restaurants as $index => $restaurant)
                         @php
                             $imageUrl = $restaurant->getFirstMediaUrl('photos', 'thumb')
-                                ?: ($restaurant->yelp_photos[0] ?? '/images/placeholder-restaurant.jpg');
+                                ?: ($restaurant->yelp_photos[0] ?? null)
+                                ?: ($restaurant->image ? \Illuminate\Support\Facades\Storage::url($restaurant->image) : '/images/placeholder-restaurant.jpg');
                         @endphp
                         <a href="{{ route('restaurants.show', $restaurant->slug) }}"
                            class="flex items-center gap-4 rounded-xl p-4 border transition-all group"

@@ -115,7 +115,8 @@
                                 <div class="flex-shrink-0 w-24 md:w-32 h-24 md:h-32">
                                     @php
                                         $imageUrl = $restaurant->getFirstMediaUrl('photos', 'thumb')
-                                            ?: ($restaurant->yelp_photos[0] ?? '/images/placeholder-restaurant.jpg');
+                                            ?: ($restaurant->yelp_photos[0] ?? null)
+                                            ?: ($restaurant->image ? \Illuminate\Support\Facades\Storage::url($restaurant->image) : '/images/placeholder-restaurant.jpg');
                                     @endphp
                                     <img src="{{ $imageUrl }}" alt="{{ $restaurant->name }}"
                                          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">

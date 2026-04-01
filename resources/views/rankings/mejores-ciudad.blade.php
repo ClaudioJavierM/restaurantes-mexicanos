@@ -107,7 +107,8 @@ Los {{ $restaurants->count() }} mejores restaurantes mexicanos en {{ $cityName }
                         <div class="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
                             @php
                                 $imageUrl = $restaurant->getFirstMediaUrl('photos', 'thumb')
-                                    ?: ($restaurant->yelp_photos[0] ?? '/images/placeholder-restaurant.jpg');
+                                    ?: ($restaurant->yelp_photos[0] ?? null)
+                                    ?: ($restaurant->image ? \Illuminate\Support\Facades\Storage::url($restaurant->image) : '/images/placeholder-restaurant.jpg');
                             @endphp
                             <img src="{{ $imageUrl }}"
                                  alt="{{ $restaurant->name }}"
