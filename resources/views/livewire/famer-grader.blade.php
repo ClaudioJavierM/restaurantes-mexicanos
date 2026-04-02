@@ -1,3 +1,22 @@
+@section('title', 'FAMER Grader — Analiza el Perfil de Tu Restaurante Mexicano')
+@section('meta_description', 'Obtén una calificación gratis de tu restaurante mexicano. FAMER Grader analiza tu presencia online, reseñas, horarios y más en segundos.')
+
+@push('meta')
+<meta property="og:type" content="website">
+<meta property="og:title" content="🏅 FAMER Grader — ¿Cuánto Vale el Perfil de Tu Restaurante?">
+<meta property="og:description" content="Analiza tu restaurante mexicano gratis en segundos. FAMER Grader revisa tus reseñas, horarios, fotos y presencia online — y te da una calificación de 0 a 100.">
+<meta property="og:image" content="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1200&h=630&q=85">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="FAMER Grader — Analiza el perfil de tu restaurante mexicano">
+<meta property="og:url" content="{{ url()->current() }}">
+<meta property="og:site_name" content="FAMER - Famous Mexican Restaurants">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="🏅 FAMER Grader — ¿Cuánto Vale el Perfil de Tu Restaurante?">
+<meta name="twitter:description" content="Analiza tu restaurante mexicano gratis. Reseñas, fotos, horarios y más — calificación de 0 a 100 en segundos.">
+<meta name="twitter:image" content="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1200&h=630&q=85">
+@endpush
+
 <div class="min-h-screen bg-[#0B0B0B]">
     {{-- GSAP CDN --}}
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12/dist/gsap.min.js"></script>

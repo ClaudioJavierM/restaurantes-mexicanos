@@ -1,17 +1,6 @@
 @php
-    // Determine the best image for SEO/OG with external URL support
-    $seoImage = null;
-    if ($restaurant->image) {
-        $seoImage = str_starts_with($restaurant->image, 'http')
-            ? $restaurant->image
-            : asset('storage/' . $restaurant->image);
-    } elseif ($restaurant->getFirstMediaUrl('images')) {
-        $seoImage = $restaurant->getFirstMediaUrl('images');
-    } elseif (is_array($restaurant->yelp_photos) && count($restaurant->yelp_photos) > 0) {
-        $seoImage = $restaurant->yelp_photos[0];
-    } else {
-        $seoImage = asset('images/restaurant-placeholder.jpg');
-    }
+    // Determine the best image for SEO/OG — uses getDisplayImageUrl() which prioritizes CDN URLs over potentially-empty local files
+    $seoImage = $restaurant->getDisplayImageUrl() ?? asset('images/restaurant-placeholder.jpg');
 
     // Calculate weighted average rating for SEO and display
     $seoInternalReviewCount = $restaurant->reviews()->where('status', 'approved')->count();

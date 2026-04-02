@@ -5,6 +5,22 @@
     ? 'See exactly how FAMER helps Mexican restaurant owners get discovered, collect reviews, manage menus, and grow — all in one platform.'
     : 'Descubre cómo FAMER ayuda a dueños de restaurantes mexicanos a ser encontrados, obtener reseñas, gestionar su menú y crecer — todo en una plataforma.')
 
+@push('meta')
+<meta property="og:type" content="website">
+<meta property="og:title" content="{{ $isEn ? '🍽️ How FAMER Works — Get Your Mexican Restaurant Discovered' : '🍽️ Cómo Funciona FAMER — Haz Que Tu Restaurante Mexicano Crezca' }}">
+<meta property="og:description" content="{{ $isEn ? 'FAMER puts your Mexican restaurant in front of 26,000+ listings. Get reviews, manage your menu, track rankings — free to start.' : 'FAMER pone tu restaurante mexicano frente a millones de comensales. Obtén reseñas, gestiona tu menú, aparece en rankings — gratis para empezar.' }}">
+<meta property="og:image" content="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&h=630&q=85">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="{{ $isEn ? 'FAMER — Grow Your Mexican Restaurant' : 'FAMER — Haz Crecer Tu Restaurante Mexicano' }}">
+<meta property="og:url" content="{{ url()->current() }}">
+<meta property="og:site_name" content="FAMER - Famous Mexican Restaurants">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ $isEn ? '🍽️ How FAMER Works — Get Your Restaurant Discovered' : '🍽️ Cómo Funciona FAMER — Haz Crecer Tu Restaurante' }}">
+<meta name="twitter:description" content="{{ $isEn ? 'FAMER puts your Mexican restaurant in front of thousands of hungry customers. Free to start.' : 'FAMER pone tu restaurante frente a miles de comensales. Gratis para empezar.' }}">
+<meta name="twitter:image" content="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&h=630&q=85">
+@endpush
+
 @section('content')
 <div style="min-height:100vh; background:#0B0B0B; color:#F5F5F5; font-family:'Poppins',sans-serif;">
 

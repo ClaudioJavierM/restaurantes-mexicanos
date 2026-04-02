@@ -6,6 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', $title ?? 'For Owners') - FAMER | Famous Mexican Restaurants</title>
     <meta name="description" content="@yield('meta_description', '')">
+    @stack('meta')
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
     @stack('styles')

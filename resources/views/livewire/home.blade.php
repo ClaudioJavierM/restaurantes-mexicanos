@@ -1,3 +1,32 @@
+@section('title', $isMexico
+    ? 'Restaurantes Mexicanos Famosos — El Directorio #1 de México'
+    : 'Restaurantes Mexicanos Famosos en USA — FAMER | 26,000+ Restaurantes')
+@section('meta_description', $isMexico
+    ? 'Descubre los mejores restaurantes mexicanos en todo México. Reseñas reales, horarios, menús y rankings por estado y ciudad.'
+    : 'Directorio de 26,000+ restaurantes mexicanos auténticos en Estados Unidos. Encuentra el mejor cerca de ti con calificaciones reales, fotos y reseñas.')
+
+@push('meta')
+<meta property="og:type" content="website">
+@if($isMexico)
+<meta property="og:title" content="🇲🇽 Restaurantes Mexicanos Famosos — El Directorio #1 de México">
+<meta property="og:description" content="Descubre los mejores restaurantes de cocina mexicana auténtica. Reseñas reales, horarios, fotos y rankings por estado. Encuentra el tuyo en segundos.">
+<meta property="og:image" content="https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=1200&h=630&q=85">
+@else
+<meta property="og:title" content="🇲🇽 Los Mejores Restaurantes Mexicanos en USA — FAMER | 26,000+ Opciones">
+<meta property="og:description" content="El directorio más completo de cocina mexicana auténtica en Estados Unidos. 26,000+ restaurantes con reseñas reales, fotos, horarios y rankings. ¿Cuál está cerca de ti?">
+<meta property="og:image" content="https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=1200&h=630&q=85">
+@endif
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="FAMER — Famous Mexican Restaurants">
+<meta property="og:url" content="{{ url()->current() }}">
+<meta property="og:site_name" content="FAMER - Famous Mexican Restaurants">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ $isMexico ? '🇲🇽 Restaurantes Mexicanos Famosos — El Directorio #1' : '🇲🇽 Los Mejores Restaurantes Mexicanos en USA — FAMER' }}">
+<meta name="twitter:description" content="{{ $isMexico ? 'El directorio más completo de cocina mexicana. Reseñas reales, rankings, fotos y horarios.' : '26,000+ restaurantes mexicanos auténticos en Estados Unidos. Encuentra el mejor cerca de ti.' }}">
+<meta name="twitter:image" content="https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=1200&h=630&q=85">
+@endpush
+
 <div>
 @if($isMexico)
     @include("partials.mexico.hero")
