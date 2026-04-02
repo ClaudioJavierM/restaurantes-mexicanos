@@ -1391,9 +1391,4 @@
         @include('livewire.partials.menu-item-modal')
     @endif
 
-    @livewire('similar-restaurants', [
-        'restaurantId' => $restaurant->id,
-        'city'         => $restaurant->city ?? '',
-        'stateId'      => $restaurant->state_id,
-    ])
 </div>
