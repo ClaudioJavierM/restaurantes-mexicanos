@@ -37,9 +37,9 @@
                     {{ app()->getLocale() === 'en' ? 'Claim Your Restaurant' : 'Reclama Tu Restaurante' }}
                     <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
                 </a>
-                <a href="#how-it-works" class="inline-flex items-center px-8 py-4 text-lg font-semibold rounded-xl transition-all duration-300 hover:bg-white/5" style="border: 1px solid #D4AF37; color: #D4AF37;">
-                    {{ app()->getLocale() === 'en' ? 'See How It Works' : 'Como Funciona' }}
-                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+                <a href="{{ app()->getLocale() === 'en' ? '/how-famer-works' : '/como-funciona-famer' }}" class="inline-flex items-center px-8 py-4 text-lg font-semibold rounded-xl transition-all duration-300 hover:bg-white/5" style="border: 1px solid #D4AF37; color: #D4AF37;">
+                    {{ app()->getLocale() === 'en' ? 'See How It Works' : 'Cómo Funciona' }}
+                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
                 </a>
             </div>
 
