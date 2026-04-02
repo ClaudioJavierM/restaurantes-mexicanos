@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Restaurant;
+use App\Services\ApiUsageTracker;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
@@ -34,6 +35,13 @@ class DownloadRestaurantPhotos extends Command
 
         if (empty($this->apiKey)) {
             $this->error('❌ Google Places API key not found in config/services.php');
+            return 1;
+        }
+
+        // Check budget before starting
+        $check = ApiUsageTracker::canMakeRequest('google_places_details', 1);
+        if (!$check['allowed']) {
+            $this->error('❌ API budget limit reached: ' . $check['message']);
             return 1;
         }
 
@@ -163,6 +171,12 @@ class DownloadRestaurantPhotos extends Command
     protected function getPhotoReferences(string $placeId): array
     {
         try {
+            $check = ApiUsageTracker::canMakeRequest('google_places_details', 1);
+            if (!$check['allowed']) {
+                \Log::warning('DownloadRestaurantPhotos: budget limit reached, stopping', ['reason' => $check['reason']]);
+                return [];
+            }
+
             $response = Http::timeout(30)->get("{$this->baseUrl}/details/json", [
                 'place_id' => $placeId,
                 'key' => $this->apiKey,
@@ -187,7 +201,15 @@ class DownloadRestaurantPhotos extends Command
             }
 
             // Extract up to 10 photo references (Google Places API max per call)
-            return array_column(array_slice($result['photos'], 0, 10), 'photo_reference');
+            $references = array_column(array_slice($result['photos'], 0, 10), 'photo_reference');
+
+            ApiUsageTracker::track('google_places_details', 'place/details/photos', 1, [
+                'place_id' => $placeId,
+                'photo_count' => count($result['photos'] ?? []),
+                'source' => 'DownloadRestaurantPhotos',
+            ]);
+
+            return $references;
 
         } catch (\Exception $e) {
             \Log::error('Exception in getPhotoReferences', ['place_id' => $placeId, 'error' => $e->getMessage()]);
@@ -198,6 +220,11 @@ class DownloadRestaurantPhotos extends Command
     protected function downloadPhotoToPath(string $photoReference, string $storagePath): bool
     {
         try {
+            $check = ApiUsageTracker::canMakeRequest('google_places_photo', 1);
+            if (!$check['allowed']) {
+                return false;
+            }
+
             $photoUrl = "{$this->baseUrl}/photo?" . http_build_query([
                 'photoreference' => $photoReference,
                 'maxwidth' => 1200,
@@ -211,6 +238,10 @@ class DownloadRestaurantPhotos extends Command
             }
 
             Storage::disk('public')->put($storagePath, $response->body());
+
+            ApiUsageTracker::track('google_places_photo', 'place/photo', 1, [
+                'source' => 'DownloadRestaurantPhotos',
+            ]);
 
             return true;
 

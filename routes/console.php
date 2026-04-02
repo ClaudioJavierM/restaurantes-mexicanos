@@ -89,6 +89,21 @@ Schedule::command('yelp:backfill --limit=300')
     });
 
 // ============================================================================
+// Google Photo Backfill — 50 restaurants/day at 3:30 AM
+// Cost: ~$4.35/day ($0.017 details + 10 × $0.007 photos per restaurant)
+// Monthly: ~$130 — stays within $200 free credit even with other usage
+// ============================================================================
+Schedule::command('restaurants:download-photos --limit=50')
+    ->dailyAt('03:30')
+    ->timezone('America/New_York')
+    ->description('DAILY: Backfill Google photos for 50 restaurants (budget-safe rate)')
+    ->onSuccess(function () { \Log::info('Photo backfill completed (50 restaurants)'); })
+    ->onFailure(function () {
+        \Log::error('Photo backfill failed');
+        notifyN8nFailure('restaurants:download-photos', 'Daily Google photo backfill');
+    });
+
+// ============================================================================
 // Data Quality & Maintenance Tasks
 // ============================================================================
 

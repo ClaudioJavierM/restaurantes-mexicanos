@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Models\Restaurant;
 use App\Models\State;
+use App\Services\ApiUsageTracker;
 use App\Services\IndexNowService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -11,12 +12,19 @@ use Illuminate\Support\Facades\Log;
 
 class RestaurantObserver
 {
+    /** Set to true during bulk imports to prevent geocoding charges */
+    public static bool $skipGeocoding = false;
+
     /**
      * Handle the Restaurant "saving" event.
      * Auto-geocode address to coordinates if address changed.
      */
     public function saving(Restaurant $restaurant): void
     {
+        if (self::$skipGeocoding) {
+            return;
+        }
+
         // Check if address-related fields have changed
         $addressFields = ['address', 'city', 'state_id', 'zip_code'];
         $addressChanged = false;
@@ -28,10 +36,14 @@ class RestaurantObserver
             }
         }
 
+        // Skip geocoding if this save is already providing coordinates (e.g. Yelp/Google import)
+        $coordinatesBeingSet = $restaurant->isDirty('latitude') && $restaurant->latitude;
+
         // Only geocode if address changed and we have the minimum required fields
         // Also geocode if lat/lng are empty
-        $needsGeocode = ($addressChanged || (!$restaurant->latitude && !$restaurant->longitude)) 
-                        && $restaurant->address 
+        $needsGeocode = !$coordinatesBeingSet
+                        && ($addressChanged || (!$restaurant->latitude && !$restaurant->longitude))
+                        && $restaurant->address
                         && $restaurant->city;
 
         if ($needsGeocode) {
@@ -60,6 +72,13 @@ class RestaurantObserver
                 'key' => $apiKey,
             ]);
 
+            // Check budget before geocoding
+            $check = ApiUsageTracker::canMakeRequest('google_places_text_search', 1);
+            if (!$check['allowed']) {
+                Log::warning("Geocoding skipped for restaurant {$restaurant->id}: budget limit reached");
+                return;
+            }
+
             $response = Http::timeout(10)->get($url);
             $data = $response->json();
 
@@ -67,7 +86,12 @@ class RestaurantObserver
                 $location = $data['results'][0]['geometry']['location'];
                 $restaurant->latitude = round($location['lat'], 8);
                 $restaurant->longitude = round($location['lng'], 8);
-                
+
+                ApiUsageTracker::track('google_places_text_search', 'geocode/observer', 1, [
+                    'restaurant_id' => $restaurant->id,
+                    'address' => $fullAddress,
+                ]);
+
                 Log::info("Geocoded restaurant {$restaurant->id}: {$fullAddress} -> {$location['lat']}, {$location['lng']}");
             } else {
                 Log::warning("Geocoding failed for restaurant {$restaurant->id}: {$fullAddress} - Status: {$data['status']}");
