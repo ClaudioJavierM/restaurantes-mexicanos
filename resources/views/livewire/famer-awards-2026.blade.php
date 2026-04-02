@@ -6,7 +6,7 @@
     <section style="background:linear-gradient(135deg,#0B0B0B 0%,#1A1A1A 50%,#0B0B0B 100%); border-bottom:1px solid rgba(212,175,55,0.25); padding:5rem 1.5rem 4rem; position:relative; overflow:hidden;">
         <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1600&q=80"
              alt="" aria-hidden="true"
-             style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0.1; pointer-events:none;">
+             style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0.20; pointer-events:none;">
         {{-- Subtle gold radial glow --}}
         <div style="position:absolute; inset:0; background:radial-gradient(ellipse 70% 60% at 50% 40%, rgba(212,175,55,0.07) 0%, transparent 70%); pointer-events:none;"></div>
 
