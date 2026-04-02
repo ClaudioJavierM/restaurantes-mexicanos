@@ -55,8 +55,12 @@
 <div style="min-height:100vh; background:#0B0B0B; color:#F5F5F5;">
 
     {{-- Hero Section --}}
-    <div style="background:linear-gradient(135deg,#0B0B0B 0%,#1A1A1A 50%,#0B0B0B 100%); border-bottom:1px solid rgba(212,175,55,0.3);">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div style="background:#0B0B0B; border-bottom:1px solid rgba(212,175,55,0.3); position:relative; overflow:hidden;">
+        <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1600&q=80"
+             alt="" aria-hidden="true"
+             style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0.35; pointer-events:none;">
+        <div style="position:absolute; inset:0; background:rgba(0,0,0,0.55); pointer-events:none;"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16" style="position:relative; z-index:1;">
 
             {{-- Breadcrumb --}}
             <nav style="margin-bottom:1.5rem;">
@@ -123,16 +127,23 @@
                                 </div>
 
                                 {{-- Restaurant Image --}}
-                                <div style="flex-shrink:0; width:7rem; height:7rem;">
+                                <div style="flex-shrink:0; width:7rem; height:7rem; position:relative; overflow:hidden;">
                                     @php
                                         $imageUrl = $restaurant->getFirstMediaUrl('photos', 'thumb')
                                             ?: ($restaurant->yelp_photos[0] ?? null)
-                                            ?: ($restaurant->image ? \Illuminate\Support\Facades\Storage::url($restaurant->image) : '/images/placeholder-restaurant.jpg');
+                                            ?: ($restaurant->image ? \Illuminate\Support\Facades\Storage::url($restaurant->image) : null);
                                     @endphp
+                                    @if($imageUrl)
                                     <img src="{{ $imageUrl }}" alt="{{ $restaurant->name }}"
                                          style="width:100%; height:100%; object-fit:cover; transition:transform 0.3s;"
                                          onmouseover="this.style.transform='scale(1.05)';"
-                                         onmouseout="this.style.transform='scale(1)';">
+                                         onmouseout="this.style.transform='scale(1)';"
+                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    @endif
+                                    <div style="display:{{ $imageUrl ? 'none' : 'flex' }}; width:100%; height:100%; align-items:center; justify-content:center; background:#111; flex-direction:column; gap:0.25rem;">
+                                        <span style="font-size:1.75rem;">🍽️</span>
+                                        <span style="font-size:0.6rem; color:#4B5563; text-align:center; padding:0 0.25rem; line-height:1.2;">{{ Str::limit($restaurant->name, 18) }}</span>
+                                    </div>
                                 </div>
 
                                 {{-- Restaurant Info --}}
