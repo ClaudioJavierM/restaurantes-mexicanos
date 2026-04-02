@@ -76,6 +76,11 @@ class SitemapController extends Controller
             // Restaurant listing
             $xml .= $this->addUrl($baseUrl . '/restaurantes', now(), 'daily', '0.9');
 
+            // High-value owner/tool pages
+            $xml .= $this->addUrl($baseUrl . '/for-owners', now()->subMonth(), 'monthly', '0.8');
+            $xml .= $this->addUrl($baseUrl . '/grader', now()->subMonth(), 'monthly', '0.8');
+            $xml .= $this->addUrl($baseUrl . '/famer-awards', now()->subMonth(), 'monthly', '0.7');
+
             // Suggest page
             $xml .= $this->addUrl($baseUrl . '/sugerir', now()->subMonth(), 'monthly', '0.5');
 
@@ -165,7 +170,7 @@ class SitemapController extends Controller
             $xml = $this->openUrlset();
 
             // Guides index
-            $xml .= $this->addUrl($baseUrl . '/guia', now(), 'weekly', '0.8');
+            $xml .= $this->addUrl($baseUrl . '/guia', now(), 'weekly', '0.9');
 
             $states = State::has('restaurants')
                 ->select('id', 'name', 'code', 'slug', 'updated_at')

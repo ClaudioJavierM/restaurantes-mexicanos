@@ -778,4 +778,236 @@
     </div>
 </section>
 
+{{-- ============================================ --}}
+{{-- 9. FAQ SECTION --}}
+{{-- ============================================ --}}
+<section class="py-20 md:py-28" style="background-color: #0B0B0B;">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        {{-- Section Header --}}
+        <div class="text-center mb-14">
+            <span class="text-xs font-bold tracking-widest uppercase mb-4 block" style="color: #D4AF37;">
+                {{ app()->getLocale() === 'en' ? 'FAQ' : 'Preguntas Frecuentes' }}
+            </span>
+            <h2 class="text-3xl md:text-5xl font-bold" style="color: #F5F5F5; font-family: 'Playfair Display', Georgia, serif;">
+                {{ app()->getLocale() === 'en' ? 'Common Questions' : 'Preguntas Comunes' }}
+            </h2>
+        </div>
+
+        {{-- FAQ Accordion --}}
+        <div class="space-y-3" id="famer-faq">
+
+            @php
+            $isEn = app()->getLocale() === 'en';
+            $faqs = [
+                [
+                    'q_es' => '¿Cuánto cuesta FAMER?',
+                    'q_en' => 'How much does FAMER cost?',
+                    'a_es' => 'FAMER es gratis para siempre en el plan básico. El plan Premium cuesta $39/mes e incluye menú digital, reservaciones, pedidos online, loyalty program y más. El plan Elite a $79/mes agrega website propio, email marketing y gestión avanzada.',
+                    'a_en' => 'FAMER is free forever on the basic plan. Premium is $39/month and includes digital menu, reservations, online ordering, loyalty program, and more. Elite at $79/month adds your own website, email marketing, and advanced management.',
+                ],
+                [
+                    'q_es' => '¿Cómo verifico que soy el dueño de mi restaurante?',
+                    'q_en' => 'How do I verify I\'m the restaurant owner?',
+                    'a_es' => 'Buscas tu restaurante en FAMER, haces clic en "Reclamar", y verificamos tu propiedad por teléfono o email. El proceso toma menos de 24 horas.',
+                    'a_en' => 'Search for your restaurant on FAMER, click "Claim", and we verify ownership by phone or email. The process takes less than 24 hours.',
+                ],
+                [
+                    'q_es' => '¿Qué pasa si mi restaurante no está en FAMER?',
+                    'q_en' => 'What if my restaurant isn\'t listed on FAMER?',
+                    'a_es' => 'Puedes agregarlo gratis en minutos desde la sección "Agregar Restaurante". Aparecerá en el directorio inmediatamente después de la revisión.',
+                    'a_en' => 'You can add it for free in minutes from the "Add Restaurant" section. It will appear in the directory immediately after review.',
+                ],
+                [
+                    'q_es' => '¿FAMER reemplaza a Yelp, Google My Business o DoorDash?',
+                    'q_en' => 'Does FAMER replace Yelp, Google My Business or DoorDash?',
+                    'a_es' => 'FAMER complementa y en muchos casos reemplaza varias plataformas. Tienes directorio, reseñas, menú digital, pedidos online, reservaciones y marketing — todo en uno. Sin las altas comisiones de DoorDash ni las cuotas de Yelp.',
+                    'a_en' => 'FAMER complements and in many cases replaces multiple platforms. You get directory, reviews, digital menu, online ordering, reservations and marketing — all in one. Without DoorDash\'s high commissions or Yelp\'s fees.',
+                ],
+                [
+                    'q_es' => '¿Puedo cancelar en cualquier momento?',
+                    'q_en' => 'Can I cancel at any time?',
+                    'a_es' => 'Sí, puedes cancelar cuando quieras. Tu perfil básico permanece activo en el directorio de forma gratuita. Sin contratos ni penalizaciones.',
+                    'a_en' => 'Yes, you can cancel whenever you want. Your basic profile remains active in the directory for free. No contracts or penalties.',
+                ],
+                [
+                    'q_es' => '¿FAMER funciona para restaurantes en México también?',
+                    'q_en' => 'Does FAMER work for restaurants in Mexico too?',
+                    'a_es' => 'Sí. FAMER incluye los 32 estados de México además de los 50 estados de EE.UU. Si tienes restaurantes en ambos países, puedes gestionarlos desde un solo panel.',
+                    'a_en' => 'Yes. FAMER includes all 32 Mexican states plus all 50 US states. If you have restaurants in both countries, you can manage them from a single dashboard.',
+                ],
+                [
+                    'q_es' => '¿Qué es el FAMER Score?',
+                    'q_en' => 'What is the FAMER Score?',
+                    'a_es' => 'Es una calificación de 0 a 100 que mide qué tan completo y visible es tu restaurante en línea. Evalúa fotos, calificaciones, información de contacto, horarios y más. Es gratis y te dice exactamente qué mejorar.',
+                    'a_en' => 'It\'s a 0-100 score that measures how complete and visible your restaurant is online. It evaluates photos, ratings, contact info, hours, and more. It\'s free and tells you exactly what to improve.',
+                ],
+                [
+                    'q_es' => '¿Hay soporte en español?',
+                    'q_en' => 'Is there Spanish support?',
+                    'a_es' => 'Sí, FAMER fue construido para la comunidad mexicana. Todo el soporte, la plataforma y las comunicaciones están disponibles en español.',
+                    'a_en' => 'Yes, FAMER was built for the Mexican community. All support, the platform, and communications are available in Spanish.',
+                ],
+            ];
+            @endphp
+
+            @foreach($faqs as $i => $faq)
+            <div class="famer-faq-item rounded-xl overflow-hidden transition-all duration-300"
+                 style="background-color: #1A1A1A; border: 1px solid #2A2A2A;"
+                 onmouseenter="this.style.borderColor='#D4AF37'"
+                 onmouseleave="if(!this.classList.contains('famer-faq-open')) this.style.borderColor='#2A2A2A'">
+
+                {{-- Question row --}}
+                <button type="button"
+                        class="w-full flex items-center justify-between px-6 py-5 text-left focus:outline-none"
+                        onclick="famerToggleFaq({{ $i }})"
+                        aria-expanded="false"
+                        id="faq-btn-{{ $i }}">
+                    <span class="text-base font-semibold pr-4" style="color: #D4AF37;">
+                        {{ $isEn ? $faq['q_en'] : $faq['q_es'] }}
+                    </span>
+                    <svg id="faq-chevron-{{ $i }}"
+                         class="w-5 h-5 flex-shrink-0 transition-transform duration-300"
+                         style="color: #D4AF37;"
+                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </button>
+
+                {{-- Answer panel --}}
+                <div id="faq-answer-{{ $i }}"
+                     style="max-height: 0; overflow: hidden; transition: max-height 0.35s ease;">
+                    <p class="px-6 pb-5 text-sm leading-relaxed" style="color: #CCCCCC;">
+                        {{ $isEn ? $faq['a_en'] : $faq['a_es'] }}
+                    </p>
+                </div>
+            </div>
+            @endforeach
+
+        </div>{{-- /FAQ accordion --}}
+
+        {{-- Bottom CTA --}}
+        <div class="text-center mt-12">
+            <p class="text-sm mb-4" style="color: #CCCCCC;">
+                {{ $isEn ? 'Still have questions?' : '¿Tienes más preguntas?' }}
+            </p>
+            <a href="mailto:hola@restaurantesmexicanosfamosos.com.mx"
+               class="inline-flex items-center px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 hover:bg-white/5"
+               style="border: 1px solid #D4AF37; color: #D4AF37;">
+                {{ $isEn ? 'Contact Us' : 'Contáctanos' }}
+                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                </svg>
+            </a>
+        </div>
+
+    </div>
+</section>
+
+{{-- FAQ Accordion JS --}}
+<script>
+function famerToggleFaq(index) {
+    var answer = document.getElementById('faq-answer-' + index);
+    var chevron = document.getElementById('faq-chevron-' + index);
+    var btn = document.getElementById('faq-btn-' + index);
+    var item = btn.closest('.famer-faq-item');
+    var isOpen = item.classList.contains('famer-faq-open');
+
+    // Close all other items
+    document.querySelectorAll('.famer-faq-item').forEach(function(el, i) {
+        el.classList.remove('famer-faq-open');
+        el.style.borderColor = '#2A2A2A';
+        var a = document.getElementById('faq-answer-' + i);
+        var c = document.getElementById('faq-chevron-' + i);
+        var b = document.getElementById('faq-btn-' + i);
+        if (a) a.style.maxHeight = '0';
+        if (c) c.style.transform = 'rotate(0deg)';
+        if (b) b.setAttribute('aria-expanded', 'false');
+    });
+
+    // Toggle clicked item
+    if (!isOpen) {
+        item.classList.add('famer-faq-open');
+        item.style.borderColor = '#D4AF37';
+        answer.style.maxHeight = answer.scrollHeight + 'px';
+        chevron.style.transform = 'rotate(180deg)';
+        btn.setAttribute('aria-expanded', 'true');
+    }
+}
+</script>
+
+{{-- FAQPage JSON-LD Schema --}}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+        {
+            "@type": "Question",
+            "name": "¿Cuánto cuesta FAMER? / How much does FAMER cost?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "FAMER es gratis para siempre en el plan básico. El plan Premium cuesta $39/mes e incluye menú digital, reservaciones, pedidos online, loyalty program y más. El plan Elite a $79/mes agrega website propio, email marketing y gestión avanzada. | FAMER is free forever on the basic plan. Premium is $39/month and includes digital menu, reservations, online ordering, loyalty program, and more. Elite at $79/month adds your own website, email marketing, and advanced management."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "¿Cómo verifico que soy el dueño de mi restaurante? / How do I verify I'm the restaurant owner?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Buscas tu restaurante en FAMER, haces clic en 'Reclamar', y verificamos tu propiedad por teléfono o email. El proceso toma menos de 24 horas. | Search for your restaurant on FAMER, click 'Claim', and we verify ownership by phone or email. The process takes less than 24 hours."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "¿Qué pasa si mi restaurante no está en FAMER? / What if my restaurant isn't listed on FAMER?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Puedes agregarlo gratis en minutos desde la sección 'Agregar Restaurante'. Aparecerá en el directorio inmediatamente después de la revisión. | You can add it for free in minutes from the 'Add Restaurant' section. It will appear in the directory immediately after review."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "¿FAMER reemplaza a Yelp, Google My Business o DoorDash? / Does FAMER replace Yelp, Google My Business or DoorDash?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "FAMER complementa y en muchos casos reemplaza varias plataformas. Tienes directorio, reseñas, menú digital, pedidos online, reservaciones y marketing — todo en uno. Sin las altas comisiones de DoorDash ni las cuotas de Yelp. | FAMER complements and in many cases replaces multiple platforms. You get directory, reviews, digital menu, online ordering, reservations and marketing — all in one. Without DoorDash's high commissions or Yelp's fees."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "¿Puedo cancelar en cualquier momento? / Can I cancel at any time?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Sí, puedes cancelar cuando quieras. Tu perfil básico permanece activo en el directorio de forma gratuita. Sin contratos ni penalizaciones. | Yes, you can cancel whenever you want. Your basic profile remains active in the directory for free. No contracts or penalties."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "¿FAMER funciona para restaurantes en México también? / Does FAMER work for restaurants in Mexico too?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Sí. FAMER incluye los 32 estados de México además de los 50 estados de EE.UU. Si tienes restaurantes en ambos países, puedes gestionarlos desde un solo panel. | Yes. FAMER includes all 32 Mexican states plus all 50 US states. If you have restaurants in both countries, you can manage them from a single dashboard."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "¿Qué es el FAMER Score? / What is the FAMER Score?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Es una calificación de 0 a 100 que mide qué tan completo y visible es tu restaurante en línea. Evalúa fotos, calificaciones, información de contacto, horarios y más. Es gratis y te dice exactamente qué mejorar. | It's a 0-100 score that measures how complete and visible your restaurant is online. It evaluates photos, ratings, contact info, hours, and more. It's free and tells you exactly what to improve."
+            }
+        },
+        {
+            "@type": "Question",
+            "name": "¿Hay soporte en español? / Is there Spanish support?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Sí, FAMER fue construido para la comunidad mexicana. Todo el soporte, la plataforma y las comunicaciones están disponibles en español. | Yes, FAMER was built for the Mexican community. All support, the platform, and communications are available in Spanish."
+            }
+        }
+    ]
+}
+</script>
+
 </div>
