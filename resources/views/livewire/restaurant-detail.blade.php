@@ -79,9 +79,32 @@
                 $parsedHours[$index] = $text;
             }
         }
-        $isOpenNow = $hoursData['open_now'] ?? false;
         $todayIndex = $today == 0 ? 6 : $today - 1;
         $todayHours = $parsedHours[$todayIndex] ?? null;
+
+        // open_now from Google is a real-time field — often not stored or stale.
+        // Compute dynamically when not available.
+        if (isset($hoursData['open_now'])) {
+            $isOpenNow = (bool) $hoursData['open_now'];
+        } elseif ($todayHours) {
+            $hoursPart = preg_replace('/^[^:]+:\s*/', '', $todayHours);
+            if (stripos($hoursPart, 'closed') === false && stripos($hoursPart, 'cerrado') === false) {
+                if (preg_match('/(\d{1,2}:\d{2}\s*(?:AM|PM))\s*[-–]\s*(\d{1,2}:\d{2}\s*(?:AM|PM))/i', $hoursPart, $hm)) {
+                    // Compare using UTC offset adjusted for US Central (UTC-5/6) as default.
+                    // strtotime() uses server UTC — shift back 6h to approximate restaurant local time.
+                    $utcNow     = time();
+                    $localNow   = $utcNow - (6 * 3600); // approx US Central offset
+                    $baseDate   = date('Y-m-d', $localNow);
+                    $openTime   = strtotime($baseDate . ' ' . $hm[1]);
+                    $closeTime  = strtotime($baseDate . ' ' . $hm[2]);
+                    // Handle overnight hours (e.g. 10 PM – 2 AM)
+                    if ($closeTime <= $openTime) $closeTime += 86400;
+                    if ($openTime && $closeTime) {
+                        $isOpenNow = ($localNow >= $openTime && $localNow <= $closeTime);
+                    }
+                }
+            }
+        }
     }
 
     // Fallback to owner-managed hours if opening_hours is empty
