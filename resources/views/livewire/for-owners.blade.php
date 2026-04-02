@@ -173,6 +173,152 @@
 </section>
 
 {{-- ============================================ --}}
+{{-- 3.3 COMPARISON TABLE --}}
+{{-- ============================================ --}}
+<section class="py-20" style="background-color: #1A1A1A;">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-14">
+            <div class="inline-block text-xs font-bold tracking-widest uppercase px-4 py-2 rounded-full mb-4" style="background:rgba(212,175,55,0.12); color:#D4AF37;">
+                {{ app()->getLocale() === 'en' ? 'Stop Paying for 4 Platforms' : 'Deja de Pagar 4 Plataformas' }}
+            </div>
+            <h2 class="text-3xl md:text-5xl font-bold mb-4" style="color:#F5F5F5; font-family:'Playfair Display',Georgia,serif;">
+                {{ app()->getLocale() === 'en' ? 'Everything in One Place' : 'Todo en Un Solo Lugar' }}
+            </h2>
+            <p class="text-lg max-w-2xl mx-auto" style="color:#CCCCCC;">
+                {{ app()->getLocale() === 'en'
+                    ? 'Yelp + Owner.com + OpenTable + DoorDash = over $800/month. FAMER gives you all of that for $39/month, specialized in Mexican restaurants.'
+                    : 'Yelp + Owner.com + OpenTable + DoorDash = más de $800/mes. FAMER te da todo eso por $39/mes, especializado en restaurantes mexicanos.' }}
+            </p>
+        </div>
+
+        {{-- Mobile: cost summary cards --}}
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-10 md:hidden">
+            @foreach([['Yelp', '$300-500/mo'], ['Owner.com', '$199/mo'], ['OpenTable', '$249/mo'], ['DoorDash', '15-30%']] as [$name, $price])
+            <div class="rounded-xl p-4 text-center" style="background:#2A2A2A; border:1px solid #3A3A3A;">
+                <div class="text-sm font-semibold mb-1" style="color:#9CA3AF;">{{ $name }}</div>
+                <div class="text-base font-bold" style="color:#8B1E1E;">{{ $price }}</div>
+            </div>
+            @endforeach
+        </div>
+
+        {{-- Desktop comparison table --}}
+        <div class="overflow-x-auto rounded-2xl hidden md:block" style="border:1px solid #2A2A2A;">
+            <table style="width:100%; border-collapse:collapse;">
+                <thead>
+                    <tr style="background:#0B0B0B;">
+                        <th style="padding:1rem 1.25rem; text-align:left; color:#9CA3AF; font-size:0.8rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; width:30%;">
+                            {{ app()->getLocale() === 'en' ? 'Feature' : 'Característica' }}
+                        </th>
+                        <th style="padding:1rem; text-align:center; color:#9CA3AF; font-size:0.8rem; font-weight:600;">Yelp<br><span style="color:#8B1E1E; font-size:0.75rem;">$300-500/mo</span></th>
+                        <th style="padding:1rem; text-align:center; color:#9CA3AF; font-size:0.8rem; font-weight:600;">Owner.com<br><span style="color:#8B1E1E; font-size:0.75rem;">$199/mo</span></th>
+                        <th style="padding:1rem; text-align:center; color:#9CA3AF; font-size:0.8rem; font-weight:600;">OpenTable<br><span style="color:#8B1E1E; font-size:0.75rem;">$249/mo</span></th>
+                        <th style="padding:1rem; text-align:center; color:#9CA3AF; font-size:0.8rem; font-weight:600;">DoorDash<br><span style="color:#8B1E1E; font-size:0.75rem;">15-30% comisión</span></th>
+                        <th style="padding:1rem 1.25rem; text-align:center; font-size:0.9rem; font-weight:700; border-radius:0 12px 0 0;" style="background:rgba(212,175,55,0.1);">
+                            <span style="color:#D4AF37;">FAMER</span><br>
+                            <span style="color:#D4AF37; font-size:0.8rem;">$39/mo</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @php
+                    $rows = [
+                        ['Directorio + SEO orgánico',    true,  false, false, false, true],
+                        ['Perfil con fotos',              true,  true,  true,  true,  true],
+                        ['Reseñas verificadas',           true,  false, true,  true,  true],
+                        ['Menú digital + QR',             false, true,  false, true,  true],
+                        ['Reservaciones',                 false, false, true,  false, true],
+                        ['Pedidos online (sin comisión)', false, true,  false, false, true],
+                        ['Programa de Lealtad',           false, true,  false, false, true],
+                        ['Email & SMS Marketing',         false, true,  false, false, true],
+                        ['Cupones y Promociones',         '$$$', true,  false, true,  true],
+                        ['Analytics de perfil',           true,  true,  true,  true,  true],
+                        ['AI Chatbot español/inglés',     false, false, false, false, true],
+                        ['Flash Deals',                   false, false, false, true,  true],
+                        ['Gestión de equipo',             false, false, true,  true,  true],
+                        ['Sitio web propio (PWA)',         false, true,  false, false, true],
+                        ['FAMER Score y Awards',          false, false, false, false, true],
+                        ['Especializado en mexicano',     false, false, false, false, true],
+                    ];
+                    if (app()->getLocale() === 'en') {
+                        $rows = [
+                            ['Directory + Organic SEO',      true,  false, false, false, true],
+                            ['Profile with photos',          true,  true,  true,  true,  true],
+                            ['Verified reviews',             true,  false, true,  true,  true],
+                            ['Digital menu + QR code',       false, true,  false, true,  true],
+                            ['Reservations',                 false, false, true,  false, true],
+                            ['Online orders (no commission)',false, true,  false, false, true],
+                            ['Loyalty Program',              false, true,  false, false, true],
+                            ['Email & SMS Marketing',        false, true,  false, false, true],
+                            ['Coupons & Promotions',         '$$$', true,  false, true,  true],
+                            ['Profile analytics',            true,  true,  true,  true,  true],
+                            ['AI Chatbot (ES/EN)',           false, false, false, false, true],
+                            ['Flash Deals',                  false, false, false, true,  true],
+                            ['Team management',              false, false, true,  true,  true],
+                            ['Own website (PWA)',            false, true,  false, false, true],
+                            ['FAMER Score & Awards',         false, false, false, false, true],
+                            ['Specialized in Mexican food',  false, false, false, false, true],
+                        ];
+                    }
+                    @endphp
+
+                    @foreach($rows as $i => $row)
+                    <tr style="border-top:1px solid #2A2A2A; {{ $i % 2 === 0 ? 'background:#1A1A1A;' : 'background:#161616;' }}">
+                        <td style="padding:0.875rem 1.25rem; color:#E5E7EB; font-size:0.875rem;">{{ $row[0] }}</td>
+                        @foreach([1,2,3,4] as $col)
+                        <td style="padding:0.875rem; text-align:center;">
+                            @if($row[$col] === true)
+                                <span style="color:#6B7280; font-size:1rem;">✓</span>
+                            @elseif($row[$col] === false)
+                                <span style="color:#3A3A3A; font-size:1rem;">—</span>
+                            @else
+                                <span style="color:#8B1E1E; font-size:0.75rem; font-weight:600;">{{ $row[$col] }}</span>
+                            @endif
+                        </td>
+                        @endforeach
+                        {{-- FAMER column --}}
+                        <td style="padding:0.875rem 1.25rem; text-align:center; background:rgba(212,175,55,0.04);">
+                            @if($row[5] === true)
+                                <span style="color:#D4AF37; font-size:1.1rem; font-weight:700;">✓</span>
+                            @else
+                                <span style="color:#3A3A3A; font-size:1rem;">—</span>
+                            @endif
+                        </td>
+                    </tr>
+                    @endforeach
+
+                    {{-- Total row --}}
+                    <tr style="border-top:2px solid #2A2A2A; background:#0B0B0B;">
+                        <td style="padding:1.25rem; font-weight:700; color:#F5F5F5; font-size:0.9rem;">
+                            {{ app()->getLocale() === 'en' ? 'Monthly Cost' : 'Costo Mensual' }}
+                        </td>
+                        <td style="padding:1.25rem; text-align:center; font-weight:700; color:#8B1E1E;">$400+</td>
+                        <td style="padding:1.25rem; text-align:center; font-weight:700; color:#8B1E1E;">$199</td>
+                        <td style="padding:1.25rem; text-align:center; font-weight:700; color:#8B1E1E;">$249</td>
+                        <td style="padding:1.25rem; text-align:center; font-weight:700; color:#8B1E1E;">{{ app()->getLocale() === 'en' ? '30% per order' : '30% por pedido' }}</td>
+                        <td style="padding:1.25rem; text-align:center; background:rgba(212,175,55,0.08); border-radius:0 0 12px 0;">
+                            <div style="font-size:1.5rem; font-weight:900; color:#D4AF37;">$39<span style="font-size:0.8rem; font-weight:400;">/mo</span></div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        {{-- Bottom CTA --}}
+        <div class="text-center mt-10">
+            <a href="{{ route('claim.restaurant') }}"
+               class="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 hover:scale-105"
+               style="background:#D4AF37; color:#0B0B0B; box-shadow:0 4px 20px rgba(212,175,55,0.3);">
+                {{ app()->getLocale() === 'en' ? 'Start Free Today' : 'Empieza Gratis Hoy' }}
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+            </a>
+            <p class="mt-3 text-sm" style="color:#6B7280;">
+                {{ app()->getLocale() === 'en' ? 'No credit card required. Free forever.' : 'Sin tarjeta de crédito. Gratis para siempre.' }}
+            </p>
+        </div>
+    </div>
+</section>
+
+{{-- ============================================ --}}
 {{-- 3.5 FAMER SCORE BANNER --}}
 {{-- ============================================ --}}
 <section class="py-16" style="background-color: #0B0B0B;">
