@@ -285,22 +285,27 @@
                                     </span>
 
                                     <!-- Restaurant Image -->
-                                    <div class="aspect-video bg-gray-200 overflow-hidden">
-                                        @if($restaurant->hasMedia('images'))
+                                    @php
+                                        $imgUrl = $restaurant->getFirstMediaUrl('photos', 'thumb')
+                                            ?: $restaurant->getFirstMediaUrl('images')
+                                            ?: ($restaurant->yelp_photos[0] ?? null)
+                                            ?: ($restaurant->image ? \Illuminate\Support\Facades\Storage::url($restaurant->image) : null);
+                                    @endphp
+                                    <div class="aspect-video bg-gray-900 overflow-hidden" style="position:relative;">
+                                        @if($imgUrl)
                                             <img
-                                                src="{{ $restaurant->getFirstMediaUrl('images') }}"
+                                                src="{{ $imgUrl }}"
                                                 alt="{{ $restaurant->name }}"
                                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                                                 loading="lazy"
                                                 decoding="async"
+                                                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
                                             >
-                                        @else
-                                            <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-red-100 to-red-200">
-                                                <svg class="w-16 h-16 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-                                                </svg>
-                                            </div>
                                         @endif
+                                        <div style="display:{{ $imgUrl ? 'none' : 'flex' }}; width:100%; height:100%; align-items:center; justify-content:center; background:#111; flex-direction:column; gap:0.5rem;">
+                                            <span style="font-size:2.5rem;">🍽️</span>
+                                            <span style="font-size:0.65rem; color:#4B5563; text-align:center; padding:0 0.5rem; line-height:1.3;">{{ Str::limit($restaurant->name, 22) }}</span>
+                                        </div>
                                     </div>
 
                                     <!-- Restaurant Info -->
