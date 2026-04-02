@@ -25,7 +25,7 @@ class ListMyCustomers extends ListRecords
     /**
      * Stats bar rendered inline above the table via subheading.
      */
-    protected function getSubheading(): ?string
+    public function getSubheading(): ?string
     {
         $restaurantIds = auth()->user()->restaurants()->pluck('id');
 
