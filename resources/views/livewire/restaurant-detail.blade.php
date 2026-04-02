@@ -457,24 +457,169 @@
         </div>
     @endif
 
-    {{-- Google Places Photo Gallery (up to 5 photos from photos JSON column) --}}
-    @if(!empty($restaurant->photos) && count($restaurant->photos) > 1)
+    {{-- Photo Gallery — Mosaic (desktop) / Scroll strip (mobile) with inline lightbox --}}
+    @php
+        // Merge Google Places photos + user-uploaded photos into one list for lightbox
+        $googlePhotos = collect($restaurant->photos ?? [])->map(function($p) {
+            return str_starts_with($p, 'http') ? $p : \Illuminate\Support\Facades\Storage::url($p);
+        })->toArray();
+        $lightboxPhotos = array_values(array_unique(array_merge($googlePhotos, $allPhotos)));
+        $galleryDisplay = array_slice($lightboxPhotos, 0, 5); // up to 5 for the mosaic
+        $lightboxTotal  = count($lightboxPhotos);
+    @endphp
+
+    @if($lightboxTotal > 1)
+    {{-- Pass full photo list to JS --}}
+    <script>
+        var famerPhotoList = {!! json_encode($lightboxPhotos) !!};
+        var famerRestaurantName = {!! json_encode($restaurant->name) !!};
+    </script>
+
     <div style="background:#1A1A1A; border-bottom:1px solid #2A2A2A; padding:0.75rem 1rem;">
         <div class="max-w-7xl mx-auto">
-            <div style="display:flex; gap:0.5rem; overflow-x:auto; padding:0.25rem 0; scrollbar-width:thin; scrollbar-color:#2A2A2A #1A1A1A;">
-                @foreach(array_slice($restaurant->photos ?? [], 0, 5) as $photo)
-                <img src="{{ str_starts_with($photo, 'http') ? $photo : \Illuminate\Support\Facades\Storage::url($photo) }}"
-                     alt="{{ $restaurant->name }}"
-                     loading="lazy"
-                     onclick="window.open(this.src,'_blank')"
-                     style="height:160px; width:auto; min-width:200px; object-fit:cover; border-radius:8px; border:2px solid #2A2A2A; cursor:pointer; flex-shrink:0; transition:border-color 0.2s;"
-                     onmouseover="this.style.borderColor='#D4AF37'"
-                     onmouseout="this.style.borderColor='#2A2A2A'">
+
+            {{-- DESKTOP: Yelp-style mosaic grid (≥768px) --}}
+            <div class="hidden md:grid" style="grid-template-columns:1fr 1fr; grid-template-rows:160px 160px; gap:4px; border-radius:12px; overflow:hidden; max-width:720px;">
+                {{-- Photo 0: large, spans 2 rows --}}
+                <div style="grid-row:1/3; position:relative; overflow:hidden; cursor:pointer; background:#0B0B0B;"
+                     onclick="famerLightbox(famerPhotoList, 0)">
+                    <img src="{{ $galleryDisplay[0] }}" alt="{{ $restaurant->name }}" loading="lazy"
+                         style="width:100%; height:100%; object-fit:cover; transition:transform 0.25s;"
+                         onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
+                </div>
+
+                {{-- Photos 1-4: 2×2 grid on the right --}}
+                @php $right = array_slice($galleryDisplay, 1, 4); @endphp
+                @foreach($right as $idx => $photo)
+                @php $realIdx = $idx + 1; $isLast = $realIdx === count($galleryDisplay) - 1 && $lightboxTotal > 5; @endphp
+                <div style="position:relative; overflow:hidden; cursor:pointer; background:#0B0B0B;"
+                     onclick="famerLightbox(famerPhotoList, {{ $realIdx }})">
+                    <img src="{{ $photo }}" alt="{{ $restaurant->name }}" loading="lazy"
+                         style="width:100%; height:100%; object-fit:cover; transition:transform 0.25s;"
+                         onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
+                    @if($isLast)
+                    <div style="position:absolute;inset:0;background:rgba(0,0,0,0.55);display:flex;align-items:center;justify-content:center;pointer-events:none;">
+                        <span style="color:#F5F5F5;font-family:Poppins,sans-serif;font-size:0.875rem;font-weight:600;">Ver todas {{ $lightboxTotal }} fotos →</span>
+                    </div>
+                    @endif
+                </div>
                 @endforeach
             </div>
+
+            {{-- MOBILE: horizontal scroll strip --}}
+            <div class="flex md:hidden" style="gap:0.5rem; overflow-x:auto; padding:0.25rem 0; scrollbar-width:thin; scrollbar-color:#2A2A2A #1A1A1A; -webkit-overflow-scrolling:touch;">
+                @foreach($galleryDisplay as $idx => $photo)
+                <img src="{{ $photo }}" alt="{{ $restaurant->name }}" loading="lazy"
+                     onclick="famerLightbox(famerPhotoList, {{ $idx }})"
+                     style="height:140px; width:auto; min-width:180px; object-fit:cover; border-radius:8px; border:2px solid #2A2A2A; cursor:pointer; flex-shrink:0; transition:border-color 0.2s;"
+                     onmouseover="this.style.borderColor='#D4AF37'" onmouseout="this.style.borderColor='#2A2A2A'">
+                @endforeach
+                @if($lightboxTotal > 5)
+                <div onclick="famerLightbox(famerPhotoList, 5)"
+                     style="height:140px; min-width:140px; border-radius:8px; background:#2A2A2A; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; border:2px solid #2A2A2A; color:#F5F5F5; font-family:Poppins,sans-serif; font-size:0.8125rem; font-weight:600; text-align:center; padding:0 1rem;">
+                    +{{ $lightboxTotal - 5 }}<br>fotos
+                </div>
+                @endif
+            </div>
+
         </div>
     </div>
     @endif
+
+    @push('scripts')
+    <script>
+    (function() {
+        // ── Lightbox ──────────────────────────────────────────────────────────
+        var _lbTouchStartX = 0;
+
+        function _lbCreate() {
+            var o = document.createElement('div');
+            o.id = 'famer-lightbox';
+            o.style.display = 'none';
+            o.innerHTML = [
+                '<div id="famer-lb-backdrop" style="position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:9999;',
+                'display:flex;align-items:center;justify-content:center;flex-direction:column;">',
+                  '<div style="position:absolute;top:1rem;right:1rem;display:flex;gap:1rem;align-items:center;">',
+                    '<span id="famer-lb-counter" style="color:#9CA3AF;font-size:0.875rem;font-family:Poppins,sans-serif;"></span>',
+                    '<button onclick="famerLbClose()" style="color:#F5F5F5;background:none;border:none;font-size:1.5rem;cursor:pointer;line-height:1;padding:0.5rem;">✕</button>',
+                  '</div>',
+                  '<div style="position:relative;max-width:90vw;max-height:80vh;display:flex;align-items:center;">',
+                    '<button onclick="famerLbNav(-1)" id="famer-lb-prev" ',
+                    'style="position:absolute;left:-3.5rem;color:#F5F5F5;background:rgba(255,255,255,0.1);border:none;border-radius:50%;',
+                    'width:3rem;height:3rem;font-size:1.5rem;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:1;">‹</button>',
+                    '<img id="famer-lb-img" style="max-width:90vw;max-height:80vh;object-fit:contain;border-radius:4px;',
+                    'touch-action:pan-y;" />',
+                    '<button onclick="famerLbNav(1)" id="famer-lb-next" ',
+                    'style="position:absolute;right:-3.5rem;color:#F5F5F5;background:rgba(255,255,255,0.1);border:none;border-radius:50%;',
+                    'width:3rem;height:3rem;font-size:1.5rem;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:1;">›</button>',
+                  '</div>',
+                  '<p id="famer-lb-caption" style="color:#9CA3AF;font-size:0.875rem;margin-top:0.75rem;font-family:Poppins,sans-serif;max-width:90vw;text-align:center;"></p>',
+                '</div>'
+            ].join('');
+            document.body.appendChild(o);
+
+            // Close on backdrop click (not on image)
+            document.getElementById('famer-lb-backdrop').addEventListener('click', function(e) {
+                if (e.target === this) famerLbClose();
+            });
+
+            // Swipe on mobile
+            var img = document.getElementById('famer-lb-img');
+            img.addEventListener('touchstart', function(e) {
+                _lbTouchStartX = e.changedTouches[0].clientX;
+            }, {passive:true});
+            img.addEventListener('touchend', function(e) {
+                var dx = e.changedTouches[0].clientX - _lbTouchStartX;
+                if (Math.abs(dx) > 40) famerLbNav(dx < 0 ? 1 : -1);
+            }, {passive:true});
+
+            // Keyboard
+            document.addEventListener('keydown', function(e) {
+                var lb = document.getElementById('famer-lightbox');
+                if (!lb || lb.style.display === 'none') return;
+                if (e.key === 'Escape')      famerLbClose();
+                if (e.key === 'ArrowLeft')   famerLbNav(-1);
+                if (e.key === 'ArrowRight')  famerLbNav(1);
+            });
+        }
+
+        window.famerLightbox = function(photos, index) {
+            if (!document.getElementById('famer-lightbox')) _lbCreate();
+            var lb = document.getElementById('famer-lightbox');
+            lb.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            window._famerLbPhotos = photos;
+            window._famerLbIndex  = index;
+            _famerLbUpdate();
+        };
+
+        window.famerLbUpdate = _famerLbUpdate;
+        function _famerLbUpdate() {
+            var photos = window._famerLbPhotos;
+            var i      = window._famerLbIndex;
+            document.getElementById('famer-lb-img').src = photos[i];
+            document.getElementById('famer-lb-counter').textContent = (i + 1) + ' / ' + photos.length;
+            document.getElementById('famer-lb-caption').textContent =
+                (typeof famerRestaurantName !== 'undefined') ? famerRestaurantName : '';
+            var showArrows = photos.length > 1;
+            document.getElementById('famer-lb-prev').style.display = showArrows ? 'flex' : 'none';
+            document.getElementById('famer-lb-next').style.display = showArrows ? 'flex' : 'none';
+        }
+
+        window.famerLbNav = function(dir) {
+            var photos = window._famerLbPhotos;
+            window._famerLbIndex = (window._famerLbIndex + dir + photos.length) % photos.length;
+            _famerLbUpdate();
+        };
+
+        window.famerLbClose = function() {
+            var el = document.getElementById('famer-lightbox');
+            if (el) el.style.display = 'none';
+            document.body.style.overflow = '';
+        };
+    })();
+    </script>
+    @endpush
 
     <!-- Breadcrumb Navigation -->
     <div style="background:#0B0B0B; padding:0.75rem 0; border-bottom:1px solid #1A1A1A;">
