@@ -1285,12 +1285,12 @@
 
     <!-- También te puede gustar / You might also like -->
     @if($nearbyRestaurants->isNotEmpty())
-    <div class="bg-gray-50 border-t border-gray-200 py-10 px-4">
+    <div style="background:#0B0B0B; border-top:1px solid #2A2A2A; padding:2.5rem 1rem 3rem;">
         <div class="max-w-6xl mx-auto">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6" style="font-family: 'Playfair Display', serif;">
-                {{ app()->getLocale() === 'en' ? 'You might also like' : 'También te puede gustar' }}
+            <h2 style="font-family:'Playfair Display',serif; font-size:1.5rem; font-weight:700; color:#F5F5F5; margin-bottom:1.5rem;">
+                {{ app()->getLocale() === 'en' ? 'You Might Also Like' : 'También te puede gustar' }}
             </h2>
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:1rem;">
                 @foreach($nearbyRestaurants as $nr)
                 @php
                     $nrPhoto = null;
@@ -1300,48 +1300,49 @@
                         $nrPhoto = $nr->getFirstMediaUrl('images');
                     } elseif (is_array($nr->yelp_photos) && count($nr->yelp_photos) > 0) {
                         $nrPhoto = $nr->yelp_photos[0];
+                    } elseif (!empty($nr->photos)) {
+                        $p = $nr->photos[0];
+                        $nrPhoto = str_starts_with($p, 'http') ? $p : \Illuminate\Support\Facades\Storage::url($p);
                     }
                     $nrRating = $nr->google_rating ?? $nr->yelp_rating ?? null;
-                    $nrStateCode = $nr->state?->code ?? $nr->state?->name ?? '';
+                    $nrStateCode = $nr->state?->code ?? '';
                 @endphp
                 <a href="/restaurante/{{ $nr->slug }}"
-                   class="bg-white rounded-xl shadow hover:shadow-md transition-shadow overflow-hidden group flex flex-col">
-                    <!-- Photo -->
-                    <div class="relative h-36 md:h-44 overflow-hidden bg-gradient-to-br from-gray-700 to-gray-900 flex-shrink-0">
+                   style="display:flex; flex-direction:column; background:#1A1A1A; border:1px solid #2A2A2A; border-radius:12px; overflow:hidden; text-decoration:none; transition:border-color 0.2s;"
+                   onmouseover="this.style.borderColor='#D4AF37'"
+                   onmouseout="this.style.borderColor='#2A2A2A'">
+                    {{-- Photo --}}
+                    <div style="position:relative; height:160px; overflow:hidden; flex-shrink:0;">
                         @if($nrPhoto)
                             <img src="{{ $nrPhoto }}"
                                  alt="{{ $nr->name }}"
                                  loading="lazy"
-                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                 style="width:100%; height:100%; object-fit:cover; transition:transform 0.3s;"
+                                 onmouseover="this.style.transform='scale(1.04)'"
+                                 onmouseout="this.style.transform='scale(1)'">
                         @else
-                            <div class="w-full h-full flex items-center justify-center"
-                                 style="background: linear-gradient(135deg, #1A1A1A 0%, #8B1E1E 100%);">
-                                <svg class="w-10 h-10 text-white/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                          d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                                </svg>
+                            <div style="width:100%; height:100%; background:linear-gradient(135deg,#1A1A1A 0%,#2A2A2A 100%); display:flex; align-items:center; justify-content:center; font-size:2.5rem;">
+                                🍽️
                             </div>
                         @endif
                         @if($nr->price_range)
-                            <span class="absolute top-2 right-2 bg-black/70 text-white text-xs font-semibold px-2 py-0.5 rounded">
+                            <span style="position:absolute; top:0.5rem; right:0.5rem; background:rgba(0,0,0,0.75); color:#F5F5F5; font-size:0.7rem; font-weight:600; padding:0.2rem 0.5rem; border-radius:4px;">
                                 {{ $nr->price_range }}
                             </span>
                         @endif
                     </div>
-                    <!-- Info -->
-                    <div class="p-3 flex flex-col flex-1">
-                        <h3 class="font-semibold text-gray-900 text-sm leading-tight group-hover:text-red-700 transition-colors line-clamp-2">
+                    {{-- Info --}}
+                    <div style="padding:0.875rem 1rem; flex:1; display:flex; flex-direction:column;">
+                        <h3 style="font-weight:700; color:#F5F5F5; font-size:0.9rem; line-height:1.35; margin:0 0 0.25rem; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">
                             {{ $nr->name }}
                         </h3>
-                        <p class="text-gray-500 text-xs mt-1">
-                            {{ $nr->city }}{{ $nrStateCode ? ', ' . $nrStateCode : '' }}
+                        <p style="color:#9CA3AF; font-size:0.75rem; margin:0 0 0.5rem;">
+                            {{ $nr->city }}{{ $nrStateCode ? ', '.$nrStateCode : '' }}
                         </p>
                         @if($nrRating)
-                            <div class="flex items-center gap-1 mt-auto pt-2">
-                                <svg class="w-3.5 h-3.5 text-yellow-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                                </svg>
-                                <span class="text-xs font-semibold text-gray-700">{{ number_format($nrRating, 1) }}</span>
+                            <div style="display:flex; align-items:center; gap:0.3rem; margin-top:auto;">
+                                <span style="color:#D4AF37; font-size:0.8rem;">★</span>
+                                <span style="font-size:0.8rem; font-weight:600; color:#F5F5F5;">{{ number_format($nrRating, 1) }}</span>
                             </div>
                         @endif
                     </div>
