@@ -330,7 +330,14 @@ Descubre los {{ number_format($stats->total) }} mejores restaurantes mexicanos e
                     "addressLocality": "{{ addslashes($restaurant->city) }}",
                     "addressRegion": "{{ $state->code }}",
                     "addressCountry": "{{ $state->country ?? 'US' }}"
-                }@endif@php $schemaRating = $restaurant->getWeightedRating(); @endphp@if($schemaRating > 0),
+                }@endif@if($restaurant->latitude && $restaurant->longitude),
+                "geo": {
+                    "@@type": "GeoCoordinates",
+                    "latitude": {{ $restaurant->latitude }},
+                    "longitude": {{ $restaurant->longitude }}
+                }@endif,
+                "servesCuisine": "Mexican"@if($restaurant->price_range),
+                "priceRange": "{{ $restaurant->price_range }}"@endif@php $schemaRating = $restaurant->getWeightedRating(); @endphp@if($schemaRating > 0),
                 "aggregateRating": {
                     "@@type": "AggregateRating",
                     "ratingValue": "{{ number_format($schemaRating, 1) }}",

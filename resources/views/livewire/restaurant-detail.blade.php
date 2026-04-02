@@ -201,8 +201,8 @@
         if ($restaurant->phone) {
             $restaurantSchema['telephone'] = $restaurant->phone;
         }
-        if ($restaurant->website) {
-            $restaurantSchema['hasMap'] = $restaurant->website;
+        if ($restaurant->google_maps_url) {
+            $restaurantSchema['hasMap'] = $restaurant->google_maps_url;
         }
         if ($restaurant->price_range) {
             $restaurantSchema['priceRange'] = $restaurant->price_range;
@@ -237,10 +237,25 @@
         // sameAs for cross-platform authority signals
         $sameAs = [];
         if ($restaurant->yelp_url ?? null) { $sameAs[] = $restaurant->yelp_url; }
-        if ($restaurant->google_place_id ?? null) {
+        if ($restaurant->google_maps_url ?? null) {
+            $sameAs[] = $restaurant->google_maps_url;
+        } elseif ($restaurant->google_place_id ?? null) {
             $sameAs[] = 'https://maps.google.com/?cid=' . $restaurant->google_place_id;
         }
         if (count($sameAs)) { $restaurantSchema['sameAs'] = $sameAs; }
+
+        // currenciesAccepted based on country (US = USD, MX = MXN)
+        $restaurantSchema['currenciesAccepted'] = ($schemaCountry === 'MX') ? 'MXN' : 'USD';
+
+        // paymentAccepted — from enrichment data if available
+        if (!empty($restaurant->payment_methods)) {
+            $paymentData = is_string($restaurant->payment_methods)
+                ? json_decode($restaurant->payment_methods, true)
+                : $restaurant->payment_methods;
+            if (is_array($paymentData) && count($paymentData)) {
+                $restaurantSchema['paymentAccepted'] = implode(', ', $paymentData);
+            }
+        }
 
         // BreadcrumbList schema
         $breadcrumbSchema = [
@@ -433,7 +448,7 @@
         <div class="max-w-7xl mx-auto">
             <div style="display:flex; gap:0.5rem; overflow-x:auto; padding:0.25rem 0; scrollbar-width:thin; scrollbar-color:#2A2A2A #1A1A1A;">
                 @foreach(array_slice($restaurant->photos ?? [], 0, 5) as $photo)
-                <img src="{{ Storage::url($photo) }}"
+                <img src="{{ str_starts_with($photo, 'http') ? $photo : \Illuminate\Support\Facades\Storage::url($photo) }}"
                      alt="{{ $restaurant->name }}"
                      loading="lazy"
                      onclick="window.open(this.src,'_blank')"

@@ -6,6 +6,11 @@ Restaurantes Mexicanos Cerca de Mí | FAMER
 
 @section('meta_description')Encuentra los mejores restaurantes mexicanos auténticos cerca de ti. Usa tu ubicación para descubrir birria, tamales, pozole y más platillos tradicionales mexicanos.@endsection
 
+@push('meta')
+<meta name="geo.region" content="US">
+<meta name="geo.placename" content="United States">
+@endpush
+
 @section('content')
 <div class="min-h-screen" style="background:#0B0B0B; color:#F5F5F5;">
     <!-- Hero -->
@@ -220,10 +225,36 @@ function searchNearby(lat, lng) {
 <script type="application/ld+json">
 {
     "@@context": "https://schema.org",
-    "@@type": "WebPage",
-    "name": "Restaurantes Mexicanos Cerca de Mí",
-    "description": "Encuentra los mejores restaurantes mexicanos auténticos cerca de ti.",
-    "url": "{{ url('/restaurantes-mexicanos-cerca-de-mi') }}"
+    "@@type": "SearchResultsPage",
+    "name": "Restaurantes Mexicanos Cerca de Mí | FAMER",
+    "description": "Encuentra los mejores restaurantes mexicanos auténticos cerca de ti. Usa tu ubicación para descubrir birria, tamales, pozole y más platillos tradicionales mexicanos.",
+    "url": "{{ url('/restaurantes-mexicanos-cerca-de-mi') }}",
+    "inLanguage": "es",
+    "about": {
+        "@@type": "Thing",
+        "name": "Restaurantes Mexicanos"
+    }
+}
+</script>
+
+<script type="application/ld+json">
+{
+    "@@context": "https://schema.org",
+    "@@type": "BreadcrumbList",
+    "itemListElement": [
+        {
+            "@@type": "ListItem",
+            "position": 1,
+            "name": "Inicio",
+            "item": "{{ url('/') }}"
+        },
+        {
+            "@@type": "ListItem",
+            "position": 2,
+            "name": "Cerca de Mí",
+            "item": "{{ url('/restaurantes-mexicanos-cerca-de-mi') }}"
+        }
+    ]
 }
 </script>
 @endpush

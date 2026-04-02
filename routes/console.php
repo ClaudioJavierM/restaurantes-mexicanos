@@ -229,6 +229,28 @@ Schedule::command('rankings:calculate')
     });
 
 // ============================================================================
+// Yelp Photo Merge — weekly Sunday 1:00 AM
+// ============================================================================
+
+/**
+ * Merge yelp_photos URLs into photos[] column so gallery shows Google + Yelp together
+ * Runs weekly after rankings (3 AM) and backfills cycle
+ */
+Schedule::command('restaurants:merge-yelp-photos --limit=5000')
+    ->weekly()
+    ->sundays()
+    ->at('01:00')
+    ->timezone('America/New_York')
+    ->description('WEEKLY: Merge Yelp photo URLs into photos column')
+    ->onSuccess(function () {
+        \Log::info('Weekly Yelp photo merge completed successfully');
+    })
+    ->onFailure(function () {
+        \Log::error('Weekly Yelp photo merge failed');
+        notifyN8nFailure('restaurants:merge-yelp-photos', 'Weekly Yelp photo merge');
+    });
+
+// ============================================================================
 // System Maintenance
 // ============================================================================
 

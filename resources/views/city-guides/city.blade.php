@@ -420,11 +420,35 @@
     "numberOfItems": {{ $top10Restaurants->count() }},
     "itemListElement": [
         @foreach($top10Restaurants as $schemaIndex => $schemaRest)
+        @php $schemaRestRating = $schemaRest->getWeightedRating(); @endphp
         {
             "@@type": "ListItem",
             "position": {{ $schemaIndex + 1 }},
-            "name": "{{ addslashes($schemaRest->name) }}",
-            "url": "{{ route('restaurants.show', $schemaRest->slug) }}"
+            "item": {
+                "@@type": "Restaurant",
+                "name": "{{ addslashes($schemaRest->name) }}",
+                "url": "{{ route('restaurants.show', $schemaRest->slug) }}"@if($schemaRest->address || $schemaRest->city),
+                "address": {
+                    "@@type": "PostalAddress"@if($schemaRest->address),
+                    "streetAddress": "{{ addslashes($schemaRest->address) }}"@endif,
+                    "addressLocality": "{{ addslashes($cityName) }}",
+                    "addressRegion": "{{ $state->code }}",
+                    "addressCountry": "{{ $state->country ?? 'US' }}"
+                }@endif@if($schemaRest->latitude && $schemaRest->longitude),
+                "geo": {
+                    "@@type": "GeoCoordinates",
+                    "latitude": {{ $schemaRest->latitude }},
+                    "longitude": {{ $schemaRest->longitude }}
+                }@endif,
+                "servesCuisine": "Mexican"@if($schemaRest->price_range),
+                "priceRange": "{{ $schemaRest->price_range }}"@endif@if($schemaRestRating > 0),
+                "aggregateRating": {
+                    "@@type": "AggregateRating",
+                    "ratingValue": "{{ number_format($schemaRestRating, 1) }}",
+                    "bestRating": "5",
+                    "ratingCount": "{{ $schemaRest->getCombinedReviewCount() }}"
+                }@endif
+            }
         }{{ $loop->last ? '' : ',' }}
         @endforeach
     ]
