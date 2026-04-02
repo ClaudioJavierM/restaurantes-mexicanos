@@ -198,38 +198,31 @@
                 <div class="flex items-center space-x-4">
                     <label class="text-sm font-medium" style="color:#9CA3AF;">Ordenar por:</label>
                     <div class="flex flex-wrap gap-2">
-                        @if($userLatitude && $userLongitude)
+                        {{-- Always request GPS — IP fallback is unreliable for near-me sort --}}
                         <button
-                            wire:click="$set('sortBy', 'nearby')"
+                            type="button"
+                            x-data="{ loading: false }"
+                            @click="
+                                loading = true;
+                                navigator.geolocation.getCurrentPosition(
+                                    (pos) => { $wire.setUserLocation(pos.coords.latitude, pos.coords.longitude); loading = false; },
+                                    (err) => { $wire.$set('sortBy', 'nearby'); loading = false; },
+                                    { enableHighAccuracy: true, timeout: 10000 }
+                                )
+                            "
                             style="{{ $sortBy === 'nearby' ? 'background:#D4AF37; color:#0B0B0B;' : 'background:#2A2A2A; color:#9CA3AF;' }}"
                             class="px-3 py-1 text-sm rounded-md flex items-center"
                         >
-                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg x-show="!loading" class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                             </svg>
-                            Cerca de mi
-                        </button>
-                        @else
-                        <button
-                            type="button"
-                            x-data
-                            @click="navigator.geolocation.getCurrentPosition(
-                                (pos) => { $wire.setUserLocation(pos.coords.latitude, pos.coords.longitude); },
-                                (err) => { alert('No pudimos obtener tu ubicacion. Por favor activa los permisos de ubicacion en tu navegador.'); },
-                                { enableHighAccuracy: true, timeout: 10000 }
-                            )"
-                            class="px-3 py-1 text-sm rounded-md flex items-center"
-                            style="background:#2A2A2A; color:#D4AF37; border:1px solid #D4AF37;"
-                            title="Activa tu ubicacion para ordenar por cercania"
-                        >
-                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            <svg x-show="loading" class="animate-spin w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
                             </svg>
                             Cerca de mi
                         </button>
-                        @endif
                         <button
                             wire:click="$set('sortBy', 'name')"
                             style="{{ $sortBy === 'name' ? 'background:#D4AF37; color:#0B0B0B;' : 'background:#2A2A2A; color:#9CA3AF;' }}"
