@@ -57,10 +57,12 @@ class Restaurant extends Model implements HasMedia
         'dietary_options',
         'atmosphere',
         'special_features',
-        // Authenticity badges
+        // Authenticity badges (boolean flags — legacy)
         'chef_certified',
         'traditional_recipes',
         'imported_ingredients',
+        // Authenticity badges system (JSON array of verified badges)
+        'authenticity_badges',
         // Business features
         'accepts_reservations',
         'reservation_type',
@@ -258,6 +260,26 @@ class Restaurant extends Model implements HasMedia
         // Photo gallery
         'photos' => 'array',
     ];
+
+    // ──────────────────────────────────────────────────────────────
+    // Authenticity Badges
+    // ──────────────────────────────────────────────────────────────
+
+    /**
+     * Return authenticity_badges as an array, always (never null).
+     * Each element: {id, icon, name, name_en, color, verified_at, verified_by}
+     */
+    public function getAuthenticityBadgesAttribute($value): array
+    {
+        return $value ? json_decode($value, true) ?? [] : [];
+    }
+
+    public function authenticityBadgeRequests(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(\App\Models\AuthenticityBadgeRequest::class);
+    }
+
+    // ──────────────────────────────────────────────────────────────
 
     public function getSlugOptions(): SlugOptions
     {

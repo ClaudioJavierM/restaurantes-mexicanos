@@ -262,6 +262,23 @@ Schedule::command('verification:cleanup-audio')
     ->description('Clean up old verification audio files');
 
 // ============================================================================
+// AI Description Generator — twice daily (ES + EN)
+// 100 restaurants/run × 4 runs/day = ~400/day → ~26K done in ~65 days
+// Cost: ~$0.003/restaurant with GPT-4o-mini
+// ============================================================================
+Schedule::command('famer:generate-descriptions --batch=100 --lang=es')
+    ->twiceDaily(1, 13)
+    ->timezone('America/New_York')
+    ->description('Generate AI descriptions (ES) for 100 restaurants per run')
+    ->onFailure(fn() => notifyN8nFailure('famer:generate-descriptions', 'AI descriptions ES'));
+
+Schedule::command('famer:generate-descriptions --batch=100 --lang=en')
+    ->twiceDaily(2, 14)
+    ->timezone('America/New_York')
+    ->description('Generate AI descriptions (EN) for 100 restaurants per run')
+    ->onFailure(fn() => notifyN8nFailure('famer:generate-descriptions', 'AI descriptions EN'));
+
+// ============================================================================
 // Review Request Automation — Hourly
 // Sends SMS review requests to customers 1-4h after completed order/reservation
 // SmsLog deduplication ensures each customer is only contacted once per 7 days

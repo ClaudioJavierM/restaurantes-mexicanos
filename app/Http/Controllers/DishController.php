@@ -282,10 +282,14 @@ class DishController extends Controller
             ->paginate(20)
             ->withQueryString();
 
-        $totalCount = $restaurants->total();
-        $dishName   = $data['name'];
+        $totalCount      = $restaurants->total();
+        $dishName        = $data['name'];
+        $isEnglishDomain = str_contains(request()->getHost(), 'famousmexicanrestaurants.com');
 
-        return view('dishes.show', compact('dish', 'data', 'dishName', 'restaurants', 'totalCount'));
+        return view(
+            $isEnglishDomain ? 'dishes.show-en' : 'dishes.show',
+            compact('dish', 'data', 'dishName', 'restaurants', 'totalCount', 'isEnglishDomain')
+        );
     }
 
     // Named shortcut methods (legacy routes)

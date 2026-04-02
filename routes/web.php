@@ -35,6 +35,18 @@ Route::get('/{dish}-en-{state}', [\App\Http\Controllers\DishStateController::cla
     ->where('state', 'tx|ca|il|az|fl|co|nv|nm|ny|ga|wa|nc|or|ut|tn')
     ->name('dish-state');
 
+// City-level dish pages (SEO: "birria en dallas-tx", "tacos en chicago-il")
+// MUST be before the /{dish} wildcard — more specific pattern
+Route::get('/{dish}-en-{citySlug}-{stateCode}', [\App\Http\Controllers\DishCityController::class, 'show'])
+    ->where('dish', 'birria|tacos|tamales|pozole|enchiladas|mole|chiles-rellenos|menudo|carnitas|barbacoa|ceviche|carne-asada')
+    ->where('stateCode', 'tx|ca|il|az|fl|co|nv|nm|ny|ga|wa|nc|or|ut|tn|mi|oh|pa|nj|md')
+    ->name('dish.city');
+
+// Blog — Mexican food content & SEO authority
+Route::get('/blog', [\App\Http\Controllers\BlogController::class, 'index'])->name('blog.index');
+Route::get('/blog/categoria/{category}', [\App\Http\Controllers\BlogController::class, 'category'])->name('blog.category');
+Route::get('/blog/{post}', [\App\Http\Controllers\BlogController::class, 'show'])->name('blog.show');
+
 // For Business Owners
 Route::get("/for-owners", \App\Livewire\ForOwners::class)->name("for-owners");
 Route::get("/preguntas-frecuentes", \App\Livewire\Faq::class)->name("faq");
