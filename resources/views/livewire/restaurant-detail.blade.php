@@ -169,7 +169,13 @@
             ->first();
         $ogRankingBadge = '';
         if ($ogTopRanking) {
-            $ogRankingBadge = '🏆 #' . $ogTopRanking->position . ' ' . ($ogTopRanking->scope === 'national' ? 'Nacional' : ($ogTopRanking->state?->abbreviation ?? '')) . ' · ';
+            $scopeLabel = match($ogTopRanking->ranking_type ?? '') {
+                'national' => 'Nacional',
+                'state'    => $ogTopRanking->ranking_scope ?? '',
+                'city'     => $ogTopRanking->ranking_scope ?? '',
+                default    => $ogTopRanking->ranking_scope ?? '',
+            };
+            $ogRankingBadge = '🏆 #' . $ogTopRanking->position . ' en ' . $scopeLabel . ' · ';
         }
 
         // Rating stars for title
