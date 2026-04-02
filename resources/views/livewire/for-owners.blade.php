@@ -173,6 +173,53 @@
 </section>
 
 {{-- ============================================ --}}
+{{-- 3.5 FAMER SCORE BANNER --}}
+{{-- ============================================ --}}
+<section class="py-16" style="background-color: #0B0B0B;">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="relative rounded-3xl overflow-hidden" style="background: linear-gradient(135deg, #1A1A1A 0%, #1F3D2B 50%, #1A1A1A 100%); border: 1px solid rgba(212,175,55,0.3);">
+            {{-- Gold glow accent --}}
+            <div class="absolute inset-0" style="background: radial-gradient(ellipse 60% 80% at 80% 50%, rgba(212,175,55,0.07) 0%, transparent 70%);"></div>
+
+            <div class="relative z-10 flex flex-col md:flex-row items-center gap-8 p-10 md:p-14">
+                {{-- Score badge visual --}}
+                <div class="flex-shrink-0 flex items-center justify-center w-28 h-28 rounded-full" style="background: rgba(212,175,55,0.12); border: 2px solid rgba(212,175,55,0.4);">
+                    <div class="text-center">
+                        <div class="text-3xl font-black leading-none" style="color: #D4AF37;">87</div>
+                        <div class="text-xs font-bold mt-1" style="color: #D4AF37;">SCORE</div>
+                    </div>
+                </div>
+
+                {{-- Text --}}
+                <div class="flex-1 text-center md:text-left">
+                    <div class="text-xs font-bold tracking-widest uppercase mb-2" style="color: #D4AF37;">
+                        {{ app()->getLocale() === 'en' ? 'Free Tool' : 'Herramienta Gratuita' }}
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-bold mb-3" style="color: #F5F5F5; font-family: 'Playfair Display', Georgia, serif;">
+                        {{ app()->getLocale() === 'en' ? 'Check Your FAMER Score' : '¿Cuánto vale tu restaurante en línea?' }}
+                    </h2>
+                    <p style="color: #CCCCCC; max-width: 520px;">
+                        {{ app()->getLocale() === 'en'
+                            ? 'Get a free analysis of your restaurant\'s online presence — ratings, photos, completeness, and visibility. See exactly what to fix.'
+                            : 'Obtén un análisis gratis de la presencia online de tu restaurante — calificaciones, fotos, completitud y visibilidad. Ve exactamente qué mejorar.' }}
+                    </p>
+                </div>
+
+                {{-- CTA --}}
+                <div class="flex-shrink-0">
+                    <a href="{{ route('famer.grader') }}"
+                       class="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 hover:scale-105"
+                       style="background-color: #D4AF37; color: #0B0B0B; box-shadow: 0 4px 20px rgba(212,175,55,0.3);">
+                        {{ app()->getLocale() === 'en' ? 'Get My Score' : 'Ver Mi Score' }}
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{{-- ============================================ --}}
 {{-- 4. HOW IT WORKS --}}
 {{-- ============================================ --}}
 <section id="how-it-works" class="py-20 md:py-28" style="background-color: #1A1A1A;">
