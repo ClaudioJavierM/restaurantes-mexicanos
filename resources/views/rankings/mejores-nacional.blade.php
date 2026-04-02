@@ -1,7 +1,24 @@
 @extends('layouts.app')
 
 @section('title', 'Los Mejores Restaurantes Mexicanos en Estados Unidos ' . $year . ' - FAMER')
-@section('meta_description', 'Descubre los mejores restaurantes mexicanos en USA. Ranking ' . $year . ' con ' . number_format($totalRestaurants) . '+ restaurantes evaluados por calificaciones y resenas de clientes.')
+@section('meta_description', 'Descubre los ' . number_format($totalRestaurants) . ' mejores restaurantes mexicanos auténticos en Estados Unidos. Ranking ' . $year . ' con calificaciones reales de clientes. Tacos, enchiladas, mole y más.')
+
+@push('meta')
+{{-- Open Graph para compartir en Facebook, WhatsApp, Twitter --}}
+<meta property="og:type" content="website">
+<meta property="og:title" content="🏆 Los {{ number_format($totalRestaurants) }} Mejores Restaurantes Mexicanos en USA {{ $year }}">
+<meta property="og:description" content="El ranking más completo de cocina mexicana auténtica en Estados Unidos. Evaluados por miles de clientes reales. ¿Cuál es el #1 cerca de ti?">
+<meta property="og:image" content="https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=1200&h=630&q=85">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Los Mejores Restaurantes Mexicanos en Estados Unidos {{ $year }} - FAMER">
+<meta property="og:url" content="{{ url()->current() }}">
+<meta property="og:site_name" content="FAMER - Restaurantes Mexicanos Famosos">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="🏆 Los {{ number_format($totalRestaurants) }} Mejores Restaurantes Mexicanos en USA {{ $year }}">
+<meta name="twitter:description" content="El ranking más completo de cocina mexicana auténtica en Estados Unidos. Evaluados por miles de clientes reales.">
+<meta name="twitter:image" content="https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=1200&h=630&q=85">
+@endpush
 
 @section('content')
 {{-- Schema.org ItemList for Rich Snippets --}}
@@ -44,13 +61,6 @@
     ]
 }
 </script>
-
-{{-- Open Graph --}}
-<x-open-graph
-    title="Los Mejores Restaurantes Mexicanos {{ $year }}"
-    description="Ranking de los mejores restaurantes mexicanos en Estados Unidos. {{ number_format($totalRestaurants) }}+ restaurantes evaluados."
-    type="website"
-/>
 
 <div style="min-height:100vh; background:#0B0B0B; color:#F5F5F5;">
 

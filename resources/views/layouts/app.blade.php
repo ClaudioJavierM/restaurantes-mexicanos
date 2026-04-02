@@ -45,7 +45,7 @@
     <meta property="og:title" content="@yield('title', 'FAMER - Restaurantes Mexicanos Famosos')">
     <meta property="og:description" content="@yield('meta_description', 'Directorio de los mejores restaurantes mexicanos auténticos en Estados Unidos.')">
     <meta property="og:type" content="website">
-    <meta property="og:image" content="https://restaurantesmexicanosfamosos.com.mx/og-image.jpg">
+    <meta property="og:image" content="https://restaurantesmexicanosfamosos.com.mx/images/branding/famer55.png">
 
     <!-- Dynamic Meta Tags (Open Graph, Twitter Cards) -->
     @stack('meta')
