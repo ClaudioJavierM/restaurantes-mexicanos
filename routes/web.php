@@ -15,18 +15,10 @@ Route::get('/restaurant/{slug}', fn($slug) => redirect('/restaurante/' . $slug, 
 Route::get('/sugerir', \App\Livewire\SmartSuggestionForm::class)->name('suggestions.create');
 Route::get('/restaurantes-mexicanos-cerca-de-mi', [\App\Http\Controllers\NearMeController::class, 'index'])->name('near-me');
 
-// Dish-specific landing pages (SEO)
-Route::get('/birria', [\App\Http\Controllers\DishController::class, 'birria'])->name('dishes.birria');
-Route::get('/tamales', [\App\Http\Controllers\DishController::class, 'tamales'])->name('dishes.tamales');
-Route::get('/pozole', [\App\Http\Controllers\DishController::class, 'pozole'])->name('dishes.pozole');
-Route::get('/enchiladas', [\App\Http\Controllers\DishController::class, 'enchiladas'])->name('dishes.enchiladas');
-Route::get('/tacos-al-pastor', [\App\Http\Controllers\DishController::class, 'tacosAlPastor'])->name('dishes.tacos-al-pastor');
-Route::get('/mole', [\App\Http\Controllers\DishController::class, 'mole'])->name('dishes.mole');
-Route::get('/menudo', [\App\Http\Controllers\DishController::class, 'menudo'])->name('dishes.menudo');
-Route::get('/chiles-rellenos', [\App\Http\Controllers\DishController::class, 'chilesRellenos'])->name('dishes.chiles-rellenos');
-Route::get('/carne-asada', [\App\Http\Controllers\DishController::class, 'carneAsada'])->name('dishes.carne-asada');
-Route::get('/carnitas', [\App\Http\Controllers\DishController::class, 'carnitas'])->name('dishes.carnitas');
-Route::get('/barbacoa', [\App\Http\Controllers\DishController::class, 'barbacoa'])->name('dishes.barbacoa');
+// Dish-specific landing pages (SEO) — unified show() route covering 22 dishes
+Route::get('/{dish}', [\App\Http\Controllers\DishController::class, 'show'])
+    ->where('dish', 'birria|tacos|tamales|pozole|enchiladas|mole|chiles-rellenos|tortas|tostadas|quesadillas|flautas|sopes|menudo|carnitas|barbacoa|ceviche|elotes|churros|horchata|margaritas|tacos-al-pastor|carne-asada')
+    ->name('dishes.show');
 
 // Dish near-me landing pages (SEO)
 Route::get('/birria-cerca-de-mi', [\App\Http\Controllers\DishNearMeController::class, 'birria'])->name('dish-near-me.birria');

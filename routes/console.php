@@ -260,3 +260,16 @@ Schedule::command('restaurants:merge-yelp-photos --limit=5000')
 Schedule::command('verification:cleanup-audio')
     ->hourly()
     ->description('Clean up old verification audio files');
+
+// ============================================================================
+// Review Request Automation — Hourly
+// Sends SMS review requests to customers 1-4h after completed order/reservation
+// SmsLog deduplication ensures each customer is only contacted once per 7 days
+// ============================================================================
+Schedule::command('reviews:send-requests')
+    ->hourly()
+    ->timezone('America/New_York')
+    ->description('Send post-visit review request SMS to customers')
+    ->onFailure(function () {
+        notifyN8nFailure('reviews:send-requests', 'Post-visit review request SMS');
+    });

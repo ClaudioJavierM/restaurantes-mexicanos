@@ -8,6 +8,10 @@ use App\Models\Review;
 use App\Observers\ReviewObserver;
 use App\Models\Favorite;
 use App\Observers\FavoriteObserver;
+use App\Models\PickupOrder;
+use App\Observers\PickupOrderObserver;
+use App\Models\Reservation;
+use App\Observers\ReservationObserver;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -39,5 +43,9 @@ class AppServiceProvider extends ServiceProvider
         
         // Register Favorite Observer for notifications
         Favorite::observe(FavoriteObserver::class);
+
+        // WhatsApp notifications to owners on new orders/reservations
+        PickupOrder::observe(PickupOrderObserver::class);
+        Reservation::observe(ReservationObserver::class);
     }
 }

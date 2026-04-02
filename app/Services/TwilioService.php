@@ -76,43 +76,92 @@ class TwilioService
         }
     }
 
+    /**
+     * Send owner WhatsApp notification (wrapper around sendWhatsApp with logging).
+     */
+    public function sendOwnerWhatsApp(string $ownerPhone, string $message): bool
+    {
+        $result = $this->sendWhatsApp($ownerPhone, $message);
+        if ($result) {
+            Log::info("Owner WhatsApp notification sent to: $ownerPhone");
+        }
+        return $result;
+    }
+
     public function sendNewOrderNotification($order, string $restaurantPhone): bool
     {
         $message = $this->buildOrderNotificationMessage($order);
+        // Send via WhatsApp; fall back to SMS if WhatsApp is not configured
+        if ($this->client && !empty($this->whatsappFrom)) {
+            return $this->sendOwnerWhatsApp($restaurantPhone, $message);
+        }
         return $this->sendSms($restaurantPhone, $message);
+    }
+
+    public function sendNewReservationNotification($reservation, string $ownerPhone): bool
+    {
+        $message = $this->buildReservationNotificationMessage($reservation);
+        if ($this->client && !empty($this->whatsappFrom)) {
+            return $this->sendOwnerWhatsApp($ownerPhone, $message);
+        }
+        return $this->sendSms($ownerPhone, $message);
     }
 
     protected function buildOrderNotificationMessage($order): string
     {
-        $itemsList = $order->items->map(function ($item) {
-            return $item->quantity . 'x ' . $item->name;
-        })->join(', ');
+        $items = collect($order->items);
+        $itemCount = $items->sum(fn($item) => $item['quantity'] ?? 1);
 
-        $orderType = match($order->order_type) {
-            'pickup' => 'Recoger en tienda',
-            'delivery' => 'Envio a domicilio',
-            'dine_in' => 'Comer en restaurante',
-            default => $order->order_type
-        };
-
-        $message = "NUEVO PEDIDO #${order->order_number}\n";
+        $message  = "🍽️ NUEVO PEDIDO #{$order->order_number}\n";
         $message .= "Cliente: {$order->customer_name}\n";
         $message .= "Tel: {$order->customer_phone}\n";
-        $message .= "Tipo: $orderType\n";
-        $message .= "Items: $itemsList\n";
+        $message .= "Artículos: {$itemCount} items\n";
         $message .= "Total: \$" . number_format($order->total, 2);
 
-        if ($order->order_type === 'delivery' && $order->delivery_address) {
-            $message .= "\nDireccion: {$order->delivery_address}";
-        }
-
-        if ($order->scheduled_for) {
-            $message .= "\nProgramado: " . $order->scheduled_for->format('h:i A');
+        if ($order->pickup_time) {
+            $message .= "\nRecoger: " . $order->pickup_time->format('d/m/Y h:i A');
         }
 
         if ($order->special_instructions) {
             $message .= "\nNotas: {$order->special_instructions}";
         }
+
+        return $message;
+    }
+
+    protected function buildReservationNotificationMessage($reservation): string
+    {
+        $date = $reservation->reservation_date instanceof \Carbon\Carbon
+            ? $reservation->reservation_date->format('d/m/Y')
+            : \Carbon\Carbon::parse($reservation->reservation_date)->format('d/m/Y');
+
+        $time = $reservation->reservation_time instanceof \Carbon\Carbon
+            ? $reservation->reservation_time->format('h:i A')
+            : \Carbon\Carbon::parse($reservation->reservation_time)->format('h:i A');
+
+        $name = $reservation->user?->name ?? $reservation->guest_name ?? 'N/A';
+        $phone = $reservation->user?->phone ?? $reservation->guest_phone ?? 'N/A';
+
+        $message  = "📅 NUEVA RESERVACIÓN\n";
+        $message .= "Cliente: {$name}\n";
+        $message .= "Personas: {$reservation->party_size}\n";
+        $message .= "Fecha: {$date}\n";
+        $message .= "Hora: {$time}\n";
+
+        if ($reservation->occasion && $reservation->occasion !== 'none') {
+            $occasionLabel = match($reservation->occasion) {
+                'birthday'    => 'Cumpleaños',
+                'anniversary' => 'Aniversario',
+                'date'        => 'Cita romántica',
+                'business'    => 'Reunión de negocios',
+                'celebration' => 'Celebración',
+                'other'       => 'Otro',
+                default       => $reservation->occasion,
+            };
+            $message .= "Ocasión: {$occasionLabel}\n";
+        }
+
+        $message .= "Tel: {$phone}";
 
         return $message;
     }
