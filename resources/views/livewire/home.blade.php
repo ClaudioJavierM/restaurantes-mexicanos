@@ -92,18 +92,18 @@
             <p style="color:#9CA3AF; margin-bottom:1.5rem; font-size:0.95rem;">Encuentra restaurantes especializados en tus platillos favoritos</p>
             <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
                 @foreach([
-                    ['birria',       'Birria',          'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=400&q=75'],
-                    ['tamales',      'Tamales',         'https://images.unsplash.com/photo-1605478371310-a9f1e96b4ff4?auto=format&fit=crop&w=400&q=75'],
-                    ['pozole',       'Pozole',          'https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?auto=format&fit=crop&w=400&q=75'],
-                    ['enchiladas',   'Enchiladas',      'https://images.unsplash.com/photo-1534352956036-cd81e27dd615?auto=format&fit=crop&w=400&q=75'],
-                    ['tacos-al-pastor','Tacos al Pastor','https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=400&q=75'],
-                    ['mole',         'Mole',            'https://images.unsplash.com/photo-1574484284002-952d92456975?auto=format&fit=crop&w=400&q=75'],
-                    ['menudo',       'Menudo',          'https://images.unsplash.com/photo-1527976746453-f363eac4d889?auto=format&fit=crop&w=400&q=75'],
-                    ['chiles-rellenos','Chiles Rellenos','https://images.unsplash.com/photo-1606756790138-261d2b21cd75?auto=format&fit=crop&w=400&q=75'],
-                    ['carne-asada',  'Carne Asada',     'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=400&q=75'],
-                    ['carnitas',     'Carnitas',        'https://images.unsplash.com/photo-1552332386-f8dd00dc2f85?auto=format&fit=crop&w=400&q=75'],
-                    ['barbacoa',     'Barbacoa',        'https://images.unsplash.com/photo-1565299507177-b0ac66763828?auto=format&fit=crop&w=400&q=75'],
-                    ['tacos',        'Tacos',           'https://images.unsplash.com/photo-1613514785940-daed07799d9b?auto=format&fit=crop&w=400&q=75'],
+                    ['birria',       'Birria',          'https://images.unsplash.com/photo-1585803518902-58a3ef005b51?auto=format&fit=crop&w=400&q=75'],
+                    ['tamales',      'Tamales',         'https://images.unsplash.com/photo-1552332386-1634d96809cf?auto=format&fit=crop&w=400&q=75'],
+                    ['pozole',       'Pozole',          'https://images.unsplash.com/photo-1695088220737-9a6d901db8f1?auto=format&fit=crop&w=400&q=75'],
+                    ['enchiladas',   'Enchiladas',      'https://images.unsplash.com/photo-1613514967307-d5b3471b2453?auto=format&fit=crop&w=400&q=75'],
+                    ['tacos-al-pastor','Tacos al Pastor','https://images.unsplash.com/photo-1582234363542-ee64d0ccb0d5?auto=format&fit=crop&w=400&q=75'],
+                    ['mole',         'Mole',            'https://images.unsplash.com/photo-1646678259179-b0c6d5b421a5?auto=format&fit=crop&w=400&q=75'],
+                    ['menudo',       'Menudo',          'https://images.unsplash.com/photo-1730243338482-78d6ffd943df?auto=format&fit=crop&w=400&q=75'],
+                    ['chiles-rellenos','Chiles Rellenos','https://images.unsplash.com/photo-1708536892634-18ccb18cd513?auto=format&fit=crop&w=400&q=75'],
+                    ['carne-asada',  'Carne Asada',     'https://images.unsplash.com/photo-1619719015339-133a130520f6?auto=format&fit=crop&w=400&q=75'],
+                    ['carnitas',     'Carnitas',        'https://images.unsplash.com/photo-1512427691650-15fcce1dc7b1?auto=format&fit=crop&w=400&q=75'],
+                    ['barbacoa',     'Barbacoa',        'https://images.unsplash.com/photo-1605209699023-97227c885c7b?auto=format&fit=crop&w=400&q=75'],
+                    ['tacos',        'Tacos',           'https://images.unsplash.com/photo-1552332386-f8dd00dc2f85?auto=format&fit=crop&w=400&q=75'],
                 ] as [$slug, $name, $photo])
                 <a href="/{{ $slug }}"
                    style="display:block; border-radius:12px; overflow:hidden; border:1px solid #2A2A2A; text-decoration:none; position:relative; transition:border-color 0.2s, transform 0.2s;"
