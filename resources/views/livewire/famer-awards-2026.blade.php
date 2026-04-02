@@ -46,10 +46,15 @@
                         onmouseover="this.style.background='#B8962E'" onmouseout="this.style.background='#D4AF37'">
                     📝 Nominar un Restaurante
                 </button>
+                <a href="{{ url('/votar') }}"
+                   style="display:inline-flex; align-items:center; gap:0.5rem; padding:0.875rem 2rem; background:rgba(212,175,55,0.12); border:1px solid rgba(212,175,55,0.5); color:#D4AF37; font-weight:700; font-size:1rem; border-radius:0.75rem; text-decoration:none; transition:all 0.2s;"
+                   onmouseover="this.style.background='rgba(212,175,55,0.2)'" onmouseout="this.style.background='rgba(212,175,55,0.12)'">
+                    🗳️ Votar Ahora
+                </a>
                 <a href="{{ url('/guia') }}"
-                   style="display:inline-flex; align-items:center; gap:0.5rem; padding:0.875rem 2rem; border:1px solid rgba(212,175,55,0.4); color:#D4AF37; font-weight:600; font-size:1rem; border-radius:0.75rem; text-decoration:none; transition:border-color 0.2s;"
-                   onmouseover="this.style.borderColor='#D4AF37'" onmouseout="this.style.borderColor='rgba(212,175,55,0.4)'">
-                    📊 Ver Rankings Actuales
+                   style="display:inline-flex; align-items:center; gap:0.5rem; padding:0.875rem 2rem; border:1px solid rgba(212,175,55,0.3); color:#9CA3AF; font-weight:600; font-size:1rem; border-radius:0.75rem; text-decoration:none; transition:border-color 0.2s;"
+                   onmouseover="this.style.borderColor='rgba(212,175,55,0.5)';this.style.color='#D4AF37'" onmouseout="this.style.borderColor='rgba(212,175,55,0.3)';this.style.color='#9CA3AF'">
+                    📊 Ver Rankings
                 </a>
             </div>
         </div>

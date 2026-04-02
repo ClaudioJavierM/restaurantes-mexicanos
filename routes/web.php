@@ -203,14 +203,6 @@ Route::post('/webhooks/twilio/status', [\App\Http\Controllers\TwilioWebhookContr
     ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
 require __DIR__.'/chat-widget.php';
 
-// TEMPORARY: Staging auto-login route - REMOVE AFTER TESTING
-Route::get('/staging-login', function () {
-    $user = \App\Models\User::find(16);
-    if (!$user) abort(404);
-    auth()->login($user);
-    return redirect('/owner');
-})->name('staging.login');
-
 // QR Print page for restaurant owners
 Route::get('/owner/qr-print/{restaurant}', function (App\Models\Restaurant $restaurant) {
     $voteUrl = url("/restaurante/{$restaurant->slug}#votar");
@@ -260,26 +252,6 @@ Route::get('/owner/{slug}', function ($slug) {
 
     return redirect('/owner');
 })->middleware(['auth'])->name('owner-legacy-redirect');
-
-
-// Temporary diagnostic route - REMOVE AFTER DEBUGGING
-Route::get('/who-am-i', function () {
-    if (!auth()->check()) {
-        return response()->json(['status' => 'NOT LOGGED IN']);
-    }
-    $user = auth()->user();
-    return response()->json([
-        'id' => $user->id,
-        'name' => $user->name,
-        'email' => $user->email,
-        'role' => $user->role,
-        'email_verified' => $user->email_verified_at ? 'YES' : 'NO',
-        'restaurants_count' => $user->restaurants()->count(),
-        'restaurants' => $user->restaurants->map(fn($r) => ['id' => $r->id, 'name' => $r->name, 'slug' => $r->slug]),
-        'can_access_owner_panel' => in_array($user->role, ['owner', 'admin']) && $user->email_verified_at && $user->restaurants()->exists(),
-        'nav_link_would_go_to' => (in_array($user->role, ['owner', 'admin']) && $user->restaurants->first()) ? '/owner' : '/for-owners',
-    ]);
-})->name('who-am-i');
 
 
 // Certificate preview

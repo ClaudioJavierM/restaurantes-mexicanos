@@ -476,9 +476,10 @@
                     <ul class="space-y-2.5 text-sm">
                         <li><a href="/restaurantes" class="text-gray-500 hover:text-[#D4AF37] transition-colors duration-200">{{ app()->getLocale() === 'en' ? 'Explore Restaurants' : 'Explorar Restaurantes' }}</a></li>
                         <li><a href="/mejores-restaurantes-mexicanos" class="text-gray-500 hover:text-[#D4AF37] transition-colors duration-200">Top 10</a></li>
-                        <li><a href="/categorias" class="text-gray-500 hover:text-[#D4AF37] transition-colors duration-200">{{ app()->getLocale() === 'en' ? 'Categories' : 'Categorias' }}</a></li>
+                        <li><a href="/restaurantes" class="text-gray-500 hover:text-[#D4AF37] transition-colors duration-200">{{ app()->getLocale() === 'en' ? 'Categories' : 'Categorias' }}</a></li>
                         <li><a href="/guia" class="text-gray-500 hover:text-[#D4AF37] transition-colors duration-200">{{ app()->getLocale() === 'en' ? 'City Guide' : 'Guia por Ciudad' }}</a></li>
                         <li><a href="/famer-awards" class="text-gray-500 hover:text-[#D4AF37] transition-colors duration-200">FAMER Awards</a></li>
+                        <li><a href="/votar" class="text-gray-500 hover:text-[#D4AF37] transition-colors duration-200">{{ app()->getLocale() === 'en' ? 'Vote Now' : 'Votar Ahora' }}</a></li>
                     </ul>
                 </div>
 
@@ -498,8 +499,8 @@
                 <div>
                     <h3 class="text-[#D4AF37] font-bold mb-4 text-sm uppercase tracking-wider">{{ app()->getLocale() === 'en' ? 'Company' : 'Empresa' }}</h3>
                     <ul class="space-y-2.5 text-sm">
-                        <li><a href="/about" class="text-gray-500 hover:text-[#D4AF37] transition-colors duration-200">{{ app()->getLocale() === 'en' ? 'About Us' : 'Nosotros' }}</a></li>
                         <li><a href="/contact" class="text-gray-500 hover:text-[#D4AF37] transition-colors duration-200">{{ app()->getLocale() === 'en' ? 'Contact' : 'Contacto' }}</a></li>
+                        <li><a href="/preguntas-frecuentes" class="text-gray-500 hover:text-[#D4AF37] transition-colors duration-200">{{ app()->getLocale() === 'en' ? 'FAQ' : 'Preguntas Frecuentes' }}</a></li>
                         <li><a href="/privacy" class="text-gray-500 hover:text-[#D4AF37] transition-colors duration-200">{{ app()->getLocale() === 'en' ? 'Privacy Policy' : 'Privacidad' }}</a></li>
                         <li><a href="/terms" class="text-gray-500 hover:text-[#D4AF37] transition-colors duration-200">{{ app()->getLocale() === 'en' ? 'Terms of Service' : 'Terminos' }}</a></li>
                     </ul>
