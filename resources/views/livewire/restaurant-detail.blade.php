@@ -635,10 +635,10 @@
             <!-- Left Column - Main Content -->
             <div class="min-w-0" style="flex: 2 1 0%">
                 <!-- Restaurant Header Info - Overlapping Card -->
-                <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 mb-6">
+                <div style="background:#1A1A1A; border:1px solid rgba(212,175,55,0.2); border-radius:1rem; padding:1.5rem 2rem; margin-bottom:1.5rem;">
                     <!-- Category Badge -->
                     <div class="mb-3">
-                        <span class="inline-block bg-gray-100 text-gray-700 text-sm font-semibold px-3 py-1 rounded-full">{{ $restaurant->category?->name }}</span>
+                        <span style="display:inline-block; background:#2A2A2A; color:#9CA3AF; font-size:0.875rem; font-weight:600; padding:0.25rem 0.75rem; border-radius:9999px;">{{ $restaurant->category?->name }}</span>
                     </div>
 
                     {{-- FAMER Ranking Badges --}}
@@ -678,11 +678,11 @@
                         @if($restaurant->logo)
                             <img src="{{ asset('storage/' . $restaurant->logo) }}" alt="{{ $restaurant->name }}" class="w-16 h-16 md:w-20 md:h-20 rounded-full object-cover border-2 border-gray-200 shadow-sm flex-shrink-0" loading="lazy" decoding="async">
                         @endif
-                        <h1 class="text-3xl md:text-4xl font-bold text-gray-900">{{ $restaurant->name }}</h1>
+                        <h1 class="text-3xl md:text-4xl font-bold" style="color:#F5F5F5;">{{ $restaurant->name }}</h1>
                     </div>
 
                     <!-- Location -->
-                    <div class="flex items-center gap-2 mb-3 text-gray-500">
+                    <div class="flex items-center gap-2 mb-3" style="color:#9CA3AF;">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                         <span class="text-base">{{ $restaurant->city }}@if($restaurant->state), {{ $restaurant->state?->name ?? '' }}@endif</span>
                     </div>
@@ -715,13 +715,13 @@
                                 @endif
                             @endfor
                         </div>
-                        <span class="text-xl font-bold text-gray-900">{{ number_format($displayRating, 1) }}</span>
-                        <a href="#reviews" wire:click="switchTab('reviews')" class="text-gray-500 hover:text-red-600">({{ number_format($combinedReviews) }} reviews)</a>
+                        <span class="text-xl font-bold" style="color:#F5F5F5;">{{ number_format($displayRating, 1) }}</span>
+                        <a href="#reviews" wire:click="switchTab('reviews')" style="color:#9CA3AF;">({{ number_format($combinedReviews) }} reviews)</a>
                     </div>
 
                     <!-- Visitor Social Proof -->
                     @if(isset($visitorStats) && ($visitorStats['monthly'] ?? 0) > 10)
-                    <div class="flex items-center gap-1.5 text-sm text-gray-500 mb-4">
+                    <div class="flex items-center gap-1.5 text-sm mb-4" style="color:#9CA3AF;">
                         <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/></svg>
                         <span>{{ number_format($visitorStats['monthly']) }} {{ app()->getLocale() === 'en' ? 'people viewed this page this month' : 'personas vieron esta página este mes' }}</span>
                     </div>
@@ -738,7 +738,7 @@
                     @endif
 
                     <!-- Source Badges & Info Row -->
-                    <div class="flex flex-wrap items-center gap-2 pt-4 border-t border-gray-100">
+                    <div class="flex flex-wrap items-center gap-2 pt-4" style="border-top:1px solid #2A2A2A;">
                         @if($restaurant->is_claimed)
                             <span class="inline-flex items-center bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-1 rounded-full">
                                 <svg class="w-3.5 h-3.5 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
@@ -746,10 +746,10 @@
                             </span>
                         @endif
                         @if($restaurant->price_range)
-                            <span class="text-gray-600 font-medium text-sm">{{ $restaurant->price_range }}</span>
+                            <span class="font-medium text-sm" style="color:#9CA3AF;">{{ $restaurant->price_range }}</span>
                         @endif
                         @if($restaurant->google_verified || $restaurant->google_place_id)
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-white text-gray-700 border border-gray-200 shadow-sm">
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium shadow-sm" style="background:#2A2A2A; color:#9CA3AF; border:1px solid #3A3A3A;">
                                 <svg class="w-3.5 h-3.5 mr-1" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
                                 Google
                             </span>
@@ -761,10 +761,10 @@
                             </span>
                         @endif
                         @if($googleReviews > 0)
-                            <span class="text-xs text-gray-500">Google {{ number_format($googleRating, 1) }} ({{ number_format($googleReviews) }})</span>
+                            <span class="text-xs" style="color:#9CA3AF;">Google {{ number_format($googleRating, 1) }} ({{ number_format($googleReviews) }})</span>
                         @endif
                         @if($yelpReviews > 0)
-                            <span class="text-xs text-gray-500">Yelp {{ number_format($yelpRating, 1) }} ({{ number_format($yelpReviews) }})</span>
+                            <span class="text-xs" style="color:#9CA3AF;">Yelp {{ number_format($yelpRating, 1) }} ({{ number_format($yelpReviews) }})</span>
                         @endif
                     </div>
 
@@ -776,27 +776,27 @@
                             @else
                                 <span class="text-red-600 font-semibold">Cerrado</span>
                             @endif
-                            <span class="text-gray-600">{{ preg_replace('/^[^:]+:\s*/', '', $todayHours) }}</span>
-                            <button onclick="document.getElementById('hours-section').scrollIntoView({behavior: 'smooth'})" class="text-blue-600 hover:underline">Ver horarios</button>
+                            <span style="color:#9CA3AF;">{{ preg_replace('/^[^:]+:\s*/', '', $todayHours) }}</span>
+                            <button onclick="document.getElementById('hours-section').scrollIntoView({behavior: 'smooth'})" style="color:#D4AF37;" class="hover:underline">Ver horarios</button>
                         </div>
                     @endif
 
                     <!-- Action Buttons -->
-                    <div class="flex flex-wrap gap-3 pt-4 mt-4 border-t border-gray-100">
-                        <a href="#write-review" wire:click="switchTab('reviews')" class="inline-flex items-center px-4 py-2.5 bg-gray-900 text-white font-semibold rounded-lg hover:bg-gray-800 transition-colors">
+                    <div class="flex flex-wrap gap-3 pt-4 mt-4" style="border-top:1px solid #2A2A2A;">
+                        <a href="#write-review" wire:click="switchTab('reviews')" class="inline-flex items-center px-4 py-2.5 font-semibold rounded-lg transition-colors" style="background:#D4AF37; color:#0B0B0B;">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
                             Escribir reseña
                         </a>
-                        <button wire:click="switchTab('photos')" class="inline-flex items-center px-4 py-2.5 bg-white border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors">
+                        <button wire:click="switchTab('photos')" class="inline-flex items-center px-4 py-2.5 font-semibold rounded-lg transition-colors" style="background:#2A2A2A; border:1px solid #3A3A3A; color:#F5F5F5;">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                             Añadir foto
                         </button>
                         <div x-data="{ open: false }" class="relative">
-                            <button @click="open = !open" class="inline-flex items-center px-4 py-2.5 bg-white border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors">
+                            <button @click="open = !open" class="inline-flex items-center px-4 py-2.5 font-semibold rounded-lg transition-colors" style="background:#2A2A2A; border:1px solid #3A3A3A; color:#F5F5F5;">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
                                 Compartir
                             </button>
-                            <div x-show="open" @click.away="open = false" x-transition class="absolute left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border z-50">
+                            <div x-show="open" @click.away="open = false" x-transition class="absolute left-0 mt-2 w-48 rounded-lg shadow-lg z-50" style="background:#1A1A1A; border:1px solid #2A2A2A;">
                                 <x-social-share :url="url()->current()" :title="$restaurant->name" :description="$restaurant->description ?: __('app.tagline')" layout="vertical" />
                             </div>
                         </div>
@@ -832,35 +832,35 @@
 
                 <!-- Popular Dishes (shown in info tab if restaurant has popular items) -->
                 @if($popularMenuItems->isNotEmpty())
-                <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
-                    <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                        <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                <div style="background:#1A1A1A; border:1px solid #2A2A2A; border-radius:0.5rem; padding:1.5rem; margin-bottom:1.5rem; box-shadow:0 4px 6px rgba(0,0,0,0.3);">
+                    <h2 class="text-lg font-bold mb-4 flex items-center gap-2" style="color:#F5F5F5;">
+                        <svg class="w-5 h-5" style="color:#D4AF37;" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
                         {{ app()->getLocale() === 'en' ? 'Popular Dishes' : 'Platos Populares' }}
                     </h2>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
                         @foreach($popularMenuItems as $item)
                         <button wire:click="showMenuItem({{ $item->id }})"
-                                class="flex flex-col text-left rounded-xl overflow-hidden border border-gray-100 hover:border-red-200 hover:shadow-md transition-all group">
+                                class="flex flex-col text-left rounded-xl overflow-hidden transition-all group" style="border:1px solid #2A2A2A;">
                             @if($item->image)
-                            <div class="h-24 overflow-hidden bg-gray-100">
+                            <div class="h-24 overflow-hidden" style="background:#2A2A2A;">
                                 <img src="{{ asset('storage/' . $item->image) }}" alt="{{ $item->name }}"
                                      class="w-full h-full object-cover group-hover:scale-105 transition-transform"
                                      loading="lazy" decoding="async">
                             </div>
                             @else
-                            <div class="h-24 bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center text-3xl">🍽️</div>
+                            <div class="h-24 flex items-center justify-center text-3xl" style="background:#2A2A2A;">🍽️</div>
                             @endif
                             <div class="p-2">
-                                <p class="font-semibold text-gray-900 text-sm line-clamp-1">{{ $item->name }}</p>
+                                <p class="font-semibold text-sm line-clamp-1" style="color:#F5F5F5;">{{ $item->name }}</p>
                                 @if($item->price)
-                                <p class="text-red-600 text-sm font-medium">${{ number_format($item->price, 2) }}</p>
+                                <p class="text-sm font-medium" style="color:#D4AF37;">${{ number_format($item->price, 2) }}</p>
                                 @endif
                             </div>
                         </button>
                         @endforeach
                     </div>
-                    <p class="mt-3 text-xs text-gray-400 text-center">
-                        <button wire:click="switchTab('menu')" class="hover:text-red-600 transition-colors">
+                    <p class="mt-3 text-xs text-center" style="color:#6B7280;">
+                        <button wire:click="switchTab('menu')" class="transition-colors" style="color:#D4AF37;">
                             {{ app()->getLocale() === 'en' ? 'View full menu →' : 'Ver menú completo →' }}
                         </button>
                     </p>
@@ -870,8 +870,8 @@
                 @include('partials.claim-banner', ['restaurant' => $restaurant])
 
                 <!-- About / Description Section (SEO) -->
-                <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
-                    <h2 class="text-xl font-bold text-gray-900 mb-4">Acerca de {{ $restaurant->name }}</h2>
+                <div style="background:#1A1A1A; border:1px solid #2A2A2A; border-radius:0.5rem; padding:1.5rem; margin-bottom:1.5rem; box-shadow:0 4px 6px rgba(0,0,0,0.3);">
+                    <h2 class="text-xl font-bold mb-4" style="color:#F5F5F5;">Acerca de {{ $restaurant->name }}</h2>
                     @php
                         $displayDescription = app()->getLocale() === 'en'
                             ? ($restaurant->ai_description_en ?: $restaurant->ai_description ?: $restaurant->description)
@@ -892,42 +892,42 @@
                     @endphp
                     @if($displayDescription)
                         <div class="prose prose-gray max-w-none">
-                            <p class="text-gray-700 leading-relaxed">{{ $displayDescription }}</p>
+                            <p class="leading-relaxed" style="color:#9CA3AF;">{{ $displayDescription }}</p>
                         </div>
                         @if(!$restaurant->is_claimed && ($autoGenerated ?? false))
-                            <p class="text-sm text-gray-500 mt-3">
-                                <a href="/claim?restaurant={{ $restaurant->slug }}" class="text-green-600 font-semibold hover:underline">¿Eres el dueño?</a>
+                            <p class="text-sm mt-3" style="color:#6B7280;">
+                                <a href="/claim?restaurant={{ $restaurant->slug }}" class="font-semibold hover:underline" style="color:#D4AF37;">¿Eres el dueño?</a>
                                 Reclama este negocio para añadir una descripción completa, fotos y menú.
                             </p>
                         @endif
                     @else
-                        <p class="text-gray-500 italic">
+                        <p class="italic" style="color:#6B7280;">
                             Descripción no disponible.
                             @if(!$restaurant->is_claimed)
-                                <a href="/claim?restaurant={{ $restaurant->slug }}" class="text-green-600 font-semibold hover:underline ml-1">¿Eres el dueño? Reclama este negocio.</a>
+                                <a href="/claim?restaurant={{ $restaurant->slug }}" class="font-semibold hover:underline ml-1" style="color:#D4AF37;">¿Eres el dueño? Reclama este negocio.</a>
                             @endif
                         </p>
                     @endif
 
                     <!-- Quick Info Tags -->
-                    <div class="flex flex-wrap gap-2 mt-4 pt-4 border-t border-gray-100">
-                        <span class="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
-                            <svg class="w-4 h-4 mr-1.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    <div class="flex flex-wrap gap-2 mt-4 pt-4" style="border-top:1px solid #2A2A2A;">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm" style="background:#2A2A2A; color:#9CA3AF;">
+                            <svg class="w-4 h-4 mr-1.5" style="color:#6B7280;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                             {{ $restaurant->city }}, {{ $restaurant->state?->code }}
                         </span>
                         @if($restaurant->price_range)
-                            <span class="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
-                                <svg class="w-4 h-4 mr-1.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm" style="background:#2A2A2A; color:#9CA3AF;">
+                                <svg class="w-4 h-4 mr-1.5" style="color:#6B7280;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                 {{ $restaurant->price_range }}
                             </span>
                         @endif
-                        <span class="inline-flex items-center px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm" style="background:#2A2A2A; color:#D4AF37;">
                             <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
                             {{ $restaurant->category?->name }}
                         </span>
                         @if($restaurant->phone)
-                            <span class="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
-                                <svg class="w-4 h-4 mr-1.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm" style="background:#2A2A2A; color:#9CA3AF;">
+                                <svg class="w-4 h-4 mr-1.5" style="color:#6B7280;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
                                 {{ $restaurant->phone }}
                             </span>
                         @endif
@@ -936,18 +936,18 @@
 
                 {{-- FAQ Accordion --}}
                 @if(count($faqItems) > 0)
-                <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
-                    <h2 class="text-xl font-bold text-gray-900 mb-4">
+                <div style="background:#1A1A1A; border:1px solid #2A2A2A; border-radius:0.5rem; padding:1.5rem; margin-bottom:1.5rem; box-shadow:0 4px 6px rgba(0,0,0,0.3);">
+                    <h2 class="text-xl font-bold mb-4" style="color:#F5F5F5;">
                         {{ app()->getLocale() === 'en' ? 'Frequently Asked Questions' : 'Preguntas Frecuentes' }}
                     </h2>
                     <div class="space-y-3">
                         @foreach($faqItems as $i => $faqItem)
-                        <div x-data="{ open: false }" class="border border-gray-200 rounded-lg overflow-hidden">
-                            <button @click="open = !open" class="w-full flex items-center justify-between p-4 text-left font-semibold text-gray-800 hover:bg-gray-50 transition-colors">
+                        <div x-data="{ open: false }" class="rounded-lg overflow-hidden" style="border:1px solid #2A2A2A;">
+                            <button @click="open = !open" class="w-full flex items-center justify-between p-4 text-left font-semibold transition-colors" style="color:#F5F5F5; background:transparent;">
                                 <span>{{ $faqItem['q'] }}</span>
-                                <svg :class="open ? 'rotate-180' : ''" class="w-5 h-5 text-gray-400 transition-transform flex-shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                <svg :class="open ? 'rotate-180' : ''" class="w-5 h-5 transition-transform flex-shrink-0 ml-2" style="color:#6B7280;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                             </button>
-                            <div x-show="open" x-transition class="px-4 pb-4 text-gray-600 text-sm leading-relaxed">
+                            <div x-show="open" x-transition class="px-4 pb-4 text-sm leading-relaxed" style="color:#9CA3AF;">
                                 {{ $faqItem['a'] }}
                             </div>
                         </div>
@@ -957,17 +957,17 @@
                 @endif
 
                 <!-- Rating Distribution Section -->
-                <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
-                    <h2 class="text-xl font-bold text-gray-900 mb-4">Calificación general</h2>
+                <div style="background:#1A1A1A; border:1px solid #2A2A2A; border-radius:0.5rem; padding:1.5rem; margin-bottom:1.5rem; box-shadow:0 4px 6px rgba(0,0,0,0.3);">
+                    <h2 class="text-xl font-bold mb-4" style="color:#F5F5F5;">Calificación general</h2>
                     <div class="flex flex-col md:flex-row gap-8">
                         <!-- Overall Rating -->
                         <div class="text-center md:text-left">
-                            <div class="flex text-red-500 justify-center md:justify-start mb-2">
+                            <div class="flex justify-center md:justify-start mb-2" style="color:#D4AF37;">
                                 @for($i = 0; $i < 5; $i++)
                                     <svg class="w-8 h-8 {{ $i < floor($displayRating) ? 'fill-current' : 'fill-gray-300' }}" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
                                 @endfor
                             </div>
-                            <p class="text-gray-500">{{ number_format($combinedReviews) }} reseñas</p>
+                            <p style="color:#9CA3AF;">{{ number_format($combinedReviews) }} reseñas</p>
                         </div>
 
                         <!-- Rating Distribution Bars -->
@@ -1001,9 +1001,9 @@
                         <div class="flex-1 space-y-2">
                             @for($stars = 5; $stars >= 1; $stars--)
                                 <div class="flex items-center gap-2">
-                                    <span class="w-12 text-sm text-gray-700">{{ $stars }} ★</span>
-                                    <div class="flex-1 h-5 bg-gray-200 rounded-full overflow-hidden">
-                                        <div class="h-full bg-red-500 rounded-full transition-all duration-500" style="width: {{ ($distribution[$stars] / $maxDist) * 100 }}%"></div>
+                                    <span class="w-12 text-sm" style="color:#9CA3AF;">{{ $stars }} ★</span>
+                                    <div class="flex-1 h-5 rounded-full overflow-hidden" style="background:#2A2A2A;">
+                                        <div class="h-full rounded-full transition-all duration-500" style="width: {{ ($distribution[$stars] / $maxDist) * 100 }}%; background:#D4AF37;"></div>
                                     </div>
                                 </div>
                             @endfor
@@ -1012,19 +1012,19 @@
                 </div>
 
                 <!-- Location & Hours Section -->
-                <div id="hours-section" class="bg-white rounded-lg shadow-lg p-6 mb-6">
-                    <h2 class="text-xl font-bold text-gray-900 mb-4">Ubicación y Horarios</h2>
+                <div id="hours-section" style="background:#1A1A1A; border:1px solid #2A2A2A; border-radius:0.5rem; padding:1.5rem; margin-bottom:1.5rem; box-shadow:0 4px 6px rgba(0,0,0,0.3);">
+                    <h2 class="text-xl font-bold mb-4" style="color:#F5F5F5;">Ubicación y Horarios</h2>
                     <div class="grid md:grid-cols-2 gap-6">
                         <!-- Map -->
                         <div>
                             <x-google-map :name="$restaurant->name" :address="$restaurant->address . ', ' . $restaurant->city . ', ' . $restaurant->state?->code . ' ' . $restaurant->zip_code" height="250" zoom="15" />
                             <div class="mt-3">
-                                <a href="https://www.google.com/maps/dir/?api=1&destination={{ urlencode($restaurant->address . ', ' . $restaurant->city . ', ' . $restaurant->state?->code) }}" target="_blank" class="text-blue-600 hover:underline font-medium">
+                                <a href="https://www.google.com/maps/dir/?api=1&destination={{ urlencode($restaurant->address . ', ' . $restaurant->city . ', ' . $restaurant->state?->code) }}" target="_blank" class="hover:underline font-medium" style="color:#D4AF37;">
                                     Cómo llegar
                                 </a>
                             </div>
-                            <p class="text-gray-700 mt-2">{{ $restaurant->address }}</p>
-                            <p class="text-gray-600">{{ $restaurant->city }}, {{ $restaurant->state?->code }} {{ $restaurant->zip_code }}</p>
+                            <p class="mt-2" style="color:#9CA3AF;">{{ $restaurant->address }}</p>
+                            <p style="color:#9CA3AF;">{{ $restaurant->city }}, {{ $restaurant->state?->code }} {{ $restaurant->zip_code }}</p>
                         </div>
                         <!-- Hours -->
                         <div>
@@ -1034,7 +1034,7 @@
                                         @php
                                             $isToday = ($index == ($today == 0 ? 6 : $today - 1));
                                         @endphp
-                                        <div class="flex justify-between py-1 {{ $isToday ? 'font-bold text-gray-900' : 'text-gray-600' }}">
+                                        <div class="flex justify-between py-1 {{ $isToday ? 'font-bold' : '' }}" style="{{ $isToday ? 'color:#F5F5F5;' : 'color:#9CA3AF;' }}">
                                             <span>{{ $hours }}</span>
                                             @if($isToday && $isOpenNow)
                                                 <span class="text-green-600 text-sm">Abierto ahora</span>
@@ -1043,7 +1043,7 @@
                                     @endforeach
                                 </div>
                             @else
-                                <p class="text-gray-500 italic">Horarios no disponibles</p>
+                                <p class="italic" style="color:#6B7280;">Horarios no disponibles</p>
                             @endif
                         </div>
                     </div>
@@ -1051,31 +1051,31 @@
 
                 <!-- Amenities Section -->
                 @if($restaurant->atmosphere || $restaurant->dietary_options || $restaurant->special_features)
-                <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
-                    <h2 class="text-xl font-bold text-gray-900 mb-4">Características</h2>
+                <div style="background:#1A1A1A; border:1px solid #2A2A2A; border-radius:0.5rem; padding:1.5rem; margin-bottom:1.5rem; box-shadow:0 4px 6px rgba(0,0,0,0.3);">
+                    <h2 class="text-xl font-bold mb-4" style="color:#F5F5F5;">Características</h2>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                         @if($restaurant->accepts_reservations)
-                            <div class="flex items-center gap-2 text-gray-700"><svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Acepta reservaciones</div>
+                            <div class="flex items-center gap-2" style="color:#9CA3AF;"><svg class="w-5 h-5" style="color:#D4AF37;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Acepta reservaciones</div>
                         @endif
                         @if($restaurant->online_ordering)
-                            <div class="flex items-center gap-2 text-gray-700"><svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Pedidos en línea</div>
+                            <div class="flex items-center gap-2" style="color:#9CA3AF;"><svg class="w-5 h-5" style="color:#D4AF37;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Pedidos en línea</div>
                         @endif
                         @if(is_array($restaurant->atmosphere))
                             @foreach($restaurant->atmosphere as $atm)
-                                <div class="flex items-center gap-2 text-gray-700">
-                                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                <div class="flex items-center gap-2" style="color:#9CA3AF;">
+                                    <svg class="w-5 h-5" style="color:#D4AF37;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                                     {{ ucfirst(str_replace('_', ' ', $atm)) }}
                                 </div>
                             @endforeach
                         @endif
                         @if($restaurant->has_fresh_tortillas)
-                            <div class="flex items-center gap-2 text-gray-700"><svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Tortillas frescas</div>
+                            <div class="flex items-center gap-2" style="color:#9CA3AF;"><svg class="w-5 h-5" style="color:#D4AF37;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Tortillas frescas</div>
                         @endif
                         @if($restaurant->has_aguas_frescas)
-                            <div class="flex items-center gap-2 text-gray-700"><svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Aguas frescas</div>
+                            <div class="flex items-center gap-2" style="color:#9CA3AF;"><svg class="w-5 h-5" style="color:#D4AF37;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Aguas frescas</div>
                         @endif
                         @if($restaurant->has_homemade_salsa)
-                            <div class="flex items-center gap-2 text-gray-700"><svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Salsa casera</div>
+                            <div class="flex items-center gap-2" style="color:#9CA3AF;"><svg class="w-5 h-5" style="color:#D4AF37;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Salsa casera</div>
                         @endif
                     </div>
                 </div>
@@ -1083,16 +1083,16 @@
 
                 <!-- Menu Section (Popular Dishes) -->
                 @if($menuItems->count() > 0)
-                <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+                <div style="background:#1A1A1A; border:1px solid #2A2A2A; border-radius:0.5rem; padding:1.5rem; margin-bottom:1.5rem; box-shadow:0 4px 6px rgba(0,0,0,0.3);">
                     <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-xl font-bold text-gray-900">Menú</h2>
-                        <button wire:click="switchTab('menu')" class="text-blue-600 hover:underline font-medium">Ver menú completo</button>
+                        <h2 class="text-xl font-bold" style="color:#F5F5F5;">Menú</h2>
+                        <button wire:click="switchTab('menu')" class="hover:underline font-medium" style="color:#D4AF37;">Ver menú completo</button>
                     </div>
-                    <h3 class="text-lg font-semibold text-gray-800 mb-4">Platillos Populares</h3>
+                    <h3 class="text-lg font-semibold mb-4" style="color:#F5F5F5;">Platillos Populares</h3>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                         @foreach($menuItems->take(4) as $item)
                             <div wire:click="showMenuItem({{ $item->id }})" class="cursor-pointer group">
-                                <div class="aspect-square rounded-lg overflow-hidden bg-gray-100 mb-2 relative">
+                                <div class="aspect-square rounded-lg overflow-hidden mb-2 relative" style="background:#2A2A2A;">
                                     @if($item->image)
                                         <img src="{{ asset('storage/' . $item->image) }}" alt="{{ $item->name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform" loading="lazy" decoding="async">
                                     @else
@@ -1102,7 +1102,7 @@
                                         <div class="absolute bottom-2 left-2 bg-black/70 text-white px-2 py-1 rounded text-sm font-semibold">${{ number_format($item->price, 2) }}</div>
                                     @endif
                                 </div>
-                                <p class="font-medium text-gray-900 group-hover:text-red-600 transition-colors truncate">{{ $item->name }}</p>
+                                <p class="font-medium transition-colors truncate" style="color:#F5F5F5;">{{ $item->name }}</p>
                             </div>
                         @endforeach
                     </div>
@@ -1110,9 +1110,9 @@
                 @endif
 
                 <!-- Reviews Section -->
-                <div id="reviews" class="bg-white rounded-lg shadow-lg p-6 mb-6">
+                <div id="reviews" style="background:#1A1A1A; border:1px solid #2A2A2A; border-radius:0.5rem; padding:1.5rem; margin-bottom:1.5rem; box-shadow:0 4px 6px rgba(0,0,0,0.3);">
                     <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-xl font-bold text-gray-900">Reseñas Recomendadas</h2>
+                        <h2 class="text-xl font-bold" style="color:#F5F5F5;">Reseñas Recomendadas</h2>
                     </div>
                     <div id="write-review" class="mb-6">
                         @livewire('write-review', ['restaurant' => $restaurant])
@@ -1130,24 +1130,26 @@
                         $hasAnyOrderOption = $restaurant->order_url || $hasDeliveryOptions;
                     @endphp
                     @if($hasAnyOrderOption)
-                    <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden" x-data="{ activeTab: '{{ $hasDeliveryOptions ? 'delivery' : 'pickup' }}' }">
-                        <div class="p-5 border-b border-gray-100">
-                            <h3 class="text-xl font-bold text-gray-900">Ordenar Comida</h3>
+                    <div style="background:#1A1A1A; border:1px solid #2A2A2A; border-radius:0.75rem; overflow:hidden;" x-data="{ activeTab: '{{ $hasDeliveryOptions ? 'delivery' : 'pickup' }}' }">
+                        <div class="p-5" style="border-bottom:1px solid #2A2A2A;">
+                            <h3 class="text-xl font-bold" style="color:#F5F5F5;">Ordenar Comida</h3>
                         </div>
 
                         <!-- Tabs -->
-                        <div class="flex border-b border-gray-200">
+                        <div class="flex" style="border-bottom:1px solid #2A2A2A;">
                             @if($restaurant->order_url)
                             <button @click="activeTab = 'pickup'"
-                                    :class="activeTab === 'pickup' ? 'border-b-2 border-red-600 text-gray-900' : 'text-gray-500'"
-                                    class="flex-1 py-3 px-4 text-sm font-medium hover:text-gray-900 transition-colors">
+                                    :class="activeTab === 'pickup' ? 'border-b-2 border-[#D4AF37]' : ''"
+                                    :style="activeTab === 'pickup' ? 'color:#F5F5F5;' : 'color:#6B7280;'"
+                                    class="flex-1 py-3 px-4 text-sm font-medium transition-colors">
                                 Para llevar
                             </button>
                             @endif
                             @if($hasDeliveryOptions)
                             <button @click="activeTab = 'delivery'"
-                                    :class="activeTab === 'delivery' ? 'border-b-2 border-red-600 text-gray-900' : 'text-gray-500'"
-                                    class="flex-1 py-3 px-4 text-sm font-medium hover:text-gray-900 transition-colors">
+                                    :class="activeTab === 'delivery' ? 'border-b-2 border-[#D4AF37]' : ''"
+                                    :style="activeTab === 'delivery' ? 'color:#F5F5F5;' : 'color:#6B7280;'"
+                                    class="flex-1 py-3 px-4 text-sm font-medium transition-colors">
                                 Delivery
                             </button>
                             @endif
@@ -1157,13 +1159,13 @@
                             <!-- Pickup Tab -->
                             @if($restaurant->order_url)
                             <div x-show="activeTab === 'pickup'" x-cloak>
-                                <div class="flex items-center gap-4 text-sm text-gray-600 mb-4">
-                                    <span class="font-semibold text-gray-900">Sin cargos extra</span>
-                                    <span class="text-gray-300">|</span>
-                                    <span>Listo en <strong class="text-gray-900">10-20</strong> min</span>
+                                <div class="flex items-center gap-4 text-sm mb-4" style="color:#9CA3AF;">
+                                    <span class="font-semibold" style="color:#F5F5F5;">Sin cargos extra</span>
+                                    <span style="color:#3A3A3A;">|</span>
+                                    <span>Listo en <strong style="color:#F5F5F5;">10-20</strong> min</span>
                                 </div>
                                 <a href="{{ $restaurant->order_url }}" target="_blank" rel="nofollow noopener"
-                                   class="block w-full py-3 px-4 bg-red-600 hover:bg-red-700 text-white font-semibold text-center rounded-lg transition-colors">
+                                   class="block w-full py-3 px-4 font-semibold text-center rounded-lg transition-colors" style="background:#D4AF37; color:#0B0B0B;">
                                     Ordenar Ahora
                                 </a>
                             </div>
@@ -1172,42 +1174,42 @@
                             <!-- Delivery Tab -->
                             @if($hasDeliveryOptions)
                             <div x-show="activeTab === 'delivery'" x-cloak>
-                                <p class="text-sm text-gray-600 mb-4">Ordena delivery a traves de:</p>
+                                <p class="text-sm mb-4" style="color:#9CA3AF;">Ordena delivery a traves de:</p>
                                 <div class="space-y-2">
                                     @if($restaurant->doordash_url)
                                         <a href="{{ $restaurant->doordash_url }}" target="_blank" rel="nofollow noopener"
-                                           class="flex items-center justify-between w-full py-3 px-4 bg-white hover:bg-red-50 text-gray-900 font-medium rounded-lg border border-gray-200 hover:border-red-300 transition-colors group">
+                                           class="flex items-center justify-between w-full py-3 px-4 font-medium rounded-lg transition-colors group" style="background:#2A2A2A; border:1px solid #3A3A3A; color:#F5F5F5;">
                                             <div class="flex items-center gap-3">
                                                 <div class="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center">
                                                     <span class="text-white font-bold text-sm">D</span>
                                                 </div>
                                                 <span>DoorDash</span>
                                             </div>
-                                            <svg class="w-5 h-5 text-gray-400 group-hover:text-red-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                            <svg class="w-5 h-5 group-hover:text-red-500 transition-colors" style="color:#6B7280;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                                         </a>
                                     @endif
                                     @if($restaurant->ubereats_url)
                                         <a href="{{ $restaurant->ubereats_url }}" target="_blank" rel="nofollow noopener"
-                                           class="flex items-center justify-between w-full py-3 px-4 bg-white hover:bg-green-50 text-gray-900 font-medium rounded-lg border border-gray-200 hover:border-green-300 transition-colors group">
+                                           class="flex items-center justify-between w-full py-3 px-4 font-medium rounded-lg transition-colors group" style="background:#2A2A2A; border:1px solid #3A3A3A; color:#F5F5F5;">
                                             <div class="flex items-center gap-3">
                                                 <div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
                                                     <span class="text-white font-bold text-sm">U</span>
                                                 </div>
                                                 <span>Uber Eats</span>
                                             </div>
-                                            <svg class="w-5 h-5 text-gray-400 group-hover:text-green-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                            <svg class="w-5 h-5 group-hover:text-green-500 transition-colors" style="color:#6B7280;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                                         </a>
                                     @endif
                                     @if($restaurant->grubhub_url)
                                         <a href="{{ $restaurant->grubhub_url }}" target="_blank" rel="nofollow noopener"
-                                           class="flex items-center justify-between w-full py-3 px-4 bg-white hover:bg-orange-50 text-gray-900 font-medium rounded-lg border border-gray-200 hover:border-orange-300 transition-colors group">
+                                           class="flex items-center justify-between w-full py-3 px-4 font-medium rounded-lg transition-colors group" style="background:#2A2A2A; border:1px solid #3A3A3A; color:#F5F5F5;">
                                             <div class="flex items-center gap-3">
                                                 <div class="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
                                                     <span class="text-white font-bold text-sm">G</span>
                                                 </div>
                                                 <span>Grubhub</span>
                                             </div>
-                                            <svg class="w-5 h-5 text-gray-400 group-hover:text-orange-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                            <svg class="w-5 h-5 group-hover:text-orange-500 transition-colors" style="color:#6B7280;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                                         </a>
                                     @endif
                                 </div>
@@ -1218,48 +1220,48 @@
                     @endif
 
                     <!-- Contact Card (Yelp Style) -->
-                    <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+                    <div style="background:#1A1A1A; border:1px solid #2A2A2A; border-radius:0.75rem; overflow:hidden;">
                         <!-- Phone -->
                         @if($restaurant->phone)
-                            <a href="tel:{{ $restaurant->phone }}" class="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors border-b border-gray-100">
-                                <span class="text-gray-900 font-medium">{{ $restaurant->phone }}</span>
+                            <a href="tel:{{ $restaurant->phone }}" class="flex items-center justify-between p-4 transition-colors" style="border-bottom:1px solid #2A2A2A;" onmouseover="this.style.background='#2A2A2A'" onmouseout="this.style.background='transparent'">
+                                <span class="font-medium" style="color:#F5F5F5;">{{ $restaurant->phone }}</span>
                                 <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
                             </a>
                         @endif
 
                         <!-- Directions -->
-                        <a href="https://www.google.com/maps/dir/?api=1&destination={{ urlencode($restaurant->address . ', ' . $restaurant->city . ', ' . $restaurant->state?->code) }}" target="_blank" class="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors border-b border-gray-100">
+                        <a href="https://www.google.com/maps/dir/?api=1&destination={{ urlencode($restaurant->address . ', ' . $restaurant->city . ', ' . $restaurant->state?->code) }}" target="_blank" class="flex items-center justify-between p-4 transition-colors" style="border-bottom:1px solid #2A2A2A;" onmouseover="this.style.background='#2A2A2A'" onmouseout="this.style.background='transparent'">
                             <div>
-                                <p class="text-blue-600 font-semibold">Cómo Llegar</p>
-                                <p class="text-gray-600 text-sm">{{ $restaurant->address }} {{ $restaurant->city }}, {{ $restaurant->state?->code }} {{ $restaurant->zip_code }}</p>
+                                <p class="font-semibold" style="color:#D4AF37;">Cómo Llegar</p>
+                                <p class="text-sm" style="color:#9CA3AF;">{{ $restaurant->address }} {{ $restaurant->city }}, {{ $restaurant->state?->code }} {{ $restaurant->zip_code }}</p>
                             </div>
                             <svg class="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                         </a>
 
                         <!-- External Links Row -->
-                        <div class="flex divide-x divide-gray-100">
+                        <div class="flex" style="border-bottom:1px solid #2A2A2A;">
                             @if($restaurant->yelp_url || $restaurant->yelp_id)
-                                <a href="{{ $restaurant->yelp_url ?: 'https://www.yelp.com/biz/' . $restaurant->yelp_id }}" target="_blank" rel="nofollow noopener" class="flex-1 flex items-center justify-center gap-2 p-4 hover:bg-gray-50 transition-colors">
+                                <a href="{{ $restaurant->yelp_url ?: 'https://www.yelp.com/biz/' . $restaurant->yelp_id }}" target="_blank" rel="nofollow noopener" class="flex-1 flex items-center justify-center gap-2 p-4 transition-colors" onmouseover="this.style.background='#2A2A2A'" onmouseout="this.style.background='transparent'">
                                     <svg class="w-5 h-5 text-[#AF0606]" viewBox="0 0 24 24" fill="currentColor"><path d="M20.16 12.594l-4.995 1.433c-.96.276-1.74-.8-1.176-1.63l2.905-4.308a1.072 1.072 0 011.596-.206 9.194 9.194 0 011.67 4.711z"/></svg>
-                                    <span class="text-sm font-medium text-gray-700">Yelp</span>
+                                    <span class="text-sm font-medium" style="color:#9CA3AF;">Yelp</span>
                                 </a>
                             @endif
                             @if($restaurant->google_place_id)
-                                <a href="https://www.google.com/maps/place/?q=place_id:{{ $restaurant->google_place_id }}" target="_blank" rel="nofollow noopener" class="flex-1 flex items-center justify-center gap-2 p-4 hover:bg-gray-50 transition-colors">
+                                <a href="https://www.google.com/maps/place/?q=place_id:{{ $restaurant->google_place_id }}" target="_blank" rel="nofollow noopener" class="flex-1 flex items-center justify-center gap-2 p-4 transition-colors" onmouseover="this.style.background='#2A2A2A'" onmouseout="this.style.background='transparent'">
                                     <svg class="w-5 h-5" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-                                    <span class="text-sm font-medium text-gray-700">Google</span>
+                                    <span class="text-sm font-medium" style="color:#9CA3AF;">Google</span>
                                 </a>
                             @endif
                             @if($restaurant->website)
-                                <a href="{{ $restaurant->website }}" target="_blank" rel="nofollow noopener" class="flex-1 flex items-center justify-center gap-2 p-4 hover:bg-gray-50 transition-colors">
-                                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
-                                    <span class="text-sm font-medium text-gray-700">Web</span>
+                                <a href="{{ $restaurant->website }}" target="_blank" rel="nofollow noopener" class="flex-1 flex items-center justify-center gap-2 p-4 transition-colors" onmouseover="this.style.background='#2A2A2A'" onmouseout="this.style.background='transparent'">
+                                    <svg class="w-5 h-5" style="color:#9CA3AF;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
+                                    <span class="text-sm font-medium" style="color:#9CA3AF;">Web</span>
                                 </a>
                             @endif
                         </div>
 
                         <!-- Suggest Edit -->
-                        <a href="/claim?restaurant={{ $restaurant->slug }}" class="flex items-center justify-center gap-2 p-4 border-t border-gray-100 hover:bg-gray-50 transition-colors text-gray-600">
+                        <a href="/claim?restaurant={{ $restaurant->slug }}" class="flex items-center justify-center gap-2 p-4 transition-colors" style="border-top:1px solid #2A2A2A; color:#6B7280;" onmouseover="this.style.background='#2A2A2A'" onmouseout="this.style.background='transparent'">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                             <span class="text-sm">Sugerir una corrección</span>
                         </a>
@@ -1356,10 +1358,10 @@
     <!-- Photos Tab Modal -->
     @if($activeTab === 'photos')
         <div class="fixed inset-0 z-50 flex items-center justify-center" style="background:rgba(0,0,0,0.6); padding:24px 16px;" wire:click.self="switchTab('info')">
-            <div class="w-full max-w-5xl bg-white rounded-2xl shadow-2xl flex flex-col" style="max-height:calc(100vh - 48px);" wire:click.stop>
-                <div class="flex justify-between items-center px-6 py-4 border-b border-gray-200 flex-shrink-0">
-                    <h2 class="text-xl font-bold text-gray-900">Fotos de {{ $restaurant->name }}</h2>
-                    <button wire:click="switchTab('info')" class="w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 hover:text-gray-900 transition-colors">
+            <div class="w-full max-w-5xl rounded-2xl shadow-2xl flex flex-col" style="max-height:calc(100vh - 48px); background:#1A1A1A; border:1px solid #2A2A2A;" wire:click.stop>
+                <div class="flex justify-between items-center px-6 py-4 flex-shrink-0" style="border-bottom:1px solid #2A2A2A;">
+                    <h2 class="text-xl font-bold" style="color:#F5F5F5;">Fotos de {{ $restaurant->name }}</h2>
+                    <button wire:click="switchTab('info')" class="w-9 h-9 flex items-center justify-center rounded-full transition-colors" style="background:#2A2A2A; color:#9CA3AF;">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                     </button>
                 </div>
@@ -1380,7 +1382,7 @@
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                     </button>
                 </div>
-                <div class="bg-white rounded-xl p-6">
+                <div style="background:#1A1A1A; border:1px solid #2A2A2A; border-radius:0.75rem; padding:1.5rem;">
                     @include('livewire.partials.restaurant-menu')
                 </div>
             </div>

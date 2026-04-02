@@ -120,11 +120,11 @@
         </div>
         @endif
         <!-- Filters Section -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+        <div style="background:#1A1A1A; border:1px solid #2A2A2A; border-radius:0.5rem; padding:1.5rem; margin-bottom:2rem;">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <!-- Search -->
                 <div class="md:col-span-2">
-                    <label for="search" class="block text-sm font-medium text-gray-700 mb-1">
+                    <label for="search" class="block text-sm font-medium mb-1" style="color:#9CA3AF;">
                         Buscar
                     </label>
                     <input
@@ -132,19 +132,19 @@
                         id="search"
                         wire:model.live.debounce.300ms="search"
                         placeholder="Nombre, ciudad, descripción..."
-                        class="w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 text-gray-900 placeholder-gray-400"
+                        style="width:100%; border-radius:0.375rem; border:1px solid #2A2A2A; background:#111; color:#F5F5F5; padding:0.5rem 0.75rem;"
                     >
                 </div>
 
                 <!-- State Filter -->
                 <div>
-                    <label for="state" class="block text-sm font-medium text-gray-700 mb-1">
+                    <label for="state" class="block text-sm font-medium mb-1" style="color:#9CA3AF;">
                         Estado
                     </label>
                     <select
                         id="state"
                         wire:model.live="selectedState"
-                        class="w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 text-gray-900"
+                        style="width:100%; border-radius:0.375rem; border:1px solid #2A2A2A; background:#111; color:#F5F5F5; padding:0.5rem 0.75rem;"
                     >
                         <option value="">Todos los estados</option>
                         @foreach($states as $state)
@@ -155,13 +155,13 @@
 
                 <!-- Category Filter -->
                 <div>
-                    <label for="category" class="block text-sm font-medium text-gray-700 mb-1">
+                    <label for="category" class="block text-sm font-medium mb-1" style="color:#9CA3AF;">
                         Categoría
                     </label>
                     <select
                         id="category"
                         wire:model.live="selectedCategory"
-                        class="w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 text-gray-900"
+                        style="width:100%; border-radius:0.375rem; border:1px solid #2A2A2A; background:#111; color:#F5F5F5; padding:0.5rem 0.75rem;"
                     >
                         <option value="">Todas las categorías</option>
                         @foreach($categories as $category)
@@ -172,11 +172,12 @@
             </div>
 
             <!-- Advanced Filters Toggle -->
-            <div class="mt-4 pt-4 border-t border-gray-200">
+            <div class="mt-4 pt-4" style="border-top:1px solid #2A2A2A;">
                 <button
                     wire:click="toggleAdvancedFilters"
                     type="button"
-                    class="flex items-center space-x-2 text-sm font-medium text-gray-700 hover:text-red-600 transition-colors"
+                    class="flex items-center space-x-2 text-sm font-medium transition-colors"
+                    style="color:#9CA3AF;"
                 >
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
@@ -193,14 +194,15 @@
 
 
             <!-- Sort and Clear -->
-            <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
+            <div class="flex items-center justify-between mt-4 pt-4" style="border-top:1px solid #2A2A2A;">
                 <div class="flex items-center space-x-4">
-                    <label class="text-sm font-medium text-gray-700">Ordenar por:</label>
+                    <label class="text-sm font-medium" style="color:#9CA3AF;">Ordenar por:</label>
                     <div class="flex flex-wrap gap-2">
                         @if($userLatitude && $userLongitude)
                         <button
                             wire:click="$set('sortBy', 'nearby')"
-                            class="px-3 py-1 text-sm rounded-md flex items-center {{ $sortBy === 'nearby' ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}"
+                            style="{{ $sortBy === 'nearby' ? 'background:#D4AF37; color:#0B0B0B;' : 'background:#2A2A2A; color:#9CA3AF;' }}"
+                            class="px-3 py-1 text-sm rounded-md flex items-center"
                         >
                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
@@ -217,7 +219,8 @@
                                 (err) => { alert('No pudimos obtener tu ubicacion. Por favor activa los permisos de ubicacion en tu navegador.'); },
                                 { enableHighAccuracy: true, timeout: 10000 }
                             )"
-                            class="px-3 py-1 text-sm rounded-md flex items-center bg-blue-100 text-blue-700 hover:bg-blue-200 border border-blue-300"
+                            class="px-3 py-1 text-sm rounded-md flex items-center"
+                            style="background:#2A2A2A; color:#D4AF37; border:1px solid #D4AF37;"
                             title="Activa tu ubicacion para ordenar por cercania"
                         >
                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -229,19 +232,22 @@
                         @endif
                         <button
                             wire:click="$set('sortBy', 'name')"
-                            class="px-3 py-1 text-sm rounded-md {{ $sortBy === 'name' ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}"
+                            style="{{ $sortBy === 'name' ? 'background:#D4AF37; color:#0B0B0B;' : 'background:#2A2A2A; color:#9CA3AF;' }}"
+                            class="px-3 py-1 text-sm rounded-md"
                         >
                             Nombre
                         </button>
                         <button
                             wire:click="$set('sortBy', 'rating')"
-                            class="px-3 py-1 text-sm rounded-md {{ $sortBy === 'rating' ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}"
+                            style="{{ $sortBy === 'rating' ? 'background:#D4AF37; color:#0B0B0B;' : 'background:#2A2A2A; color:#9CA3AF;' }}"
+                            class="px-3 py-1 text-sm rounded-md"
                         >
                             Calificacion
                         </button>
                         <button
                             wire:click="$set('sortBy', 'newest')"
-                            class="px-3 py-1 text-sm rounded-md {{ $sortBy === 'newest' ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}"
+                            style="{{ $sortBy === 'newest' ? 'background:#D4AF37; color:#0B0B0B;' : 'background:#2A2A2A; color:#9CA3AF;' }}"
+                            class="px-3 py-1 text-sm rounded-md"
                         >
                             Mas recientes
                         </button>
@@ -254,7 +260,8 @@
                 @if($search || $selectedState || $selectedCategory || $sortBy !== $defaultSort)
                     <button
                         wire:click="clearFilters"
-                        class="text-sm text-red-600 hover:text-red-700 font-medium"
+                        class="text-sm font-medium"
+                        style="color:#D4AF37;"
                     >
                         Limpiar filtros
                     </button>
@@ -268,7 +275,7 @@
                 <!-- Left Column: Restaurant List -->
                 <div class="md:w-3/5 lg:w-2/3">
                     <!-- Results Count -->
-                    <div class="mb-4 text-sm text-gray-600">
+                    <div class="mb-4" style="font-size:0.875rem; color:#9CA3AF;">
                         Mostrando {{ $restaurants->count() }} de {{ $restaurants->total() }} restaurantes
                     </div>
 
