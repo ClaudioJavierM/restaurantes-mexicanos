@@ -287,6 +287,9 @@
                     <a href="/famer-awards" class="text-gray-400 hover:text-[#D4AF37] px-4 py-2 text-sm font-medium transition-colors duration-200">
                         FAMER Awards
                     </a>
+                    <a href="/blog" class="text-gray-400 hover:text-[#D4AF37] px-4 py-2 text-sm font-medium transition-colors duration-200 {{ request()->is('blog*') ? 'text-[#D4AF37]' : '' }}">
+                        Blog
+                    </a>
 
                     <!-- Language Switcher (Desktop) -->
                     <x-language-switcher />
@@ -381,6 +384,9 @@
                 </a>
                 <a href="/famer-awards" class="block text-gray-400 hover:text-[#D4AF37] px-3 py-2.5 rounded-lg text-base font-medium transition-colors duration-200">
                     FAMER Awards
+                </a>
+                <a href="/blog" class="block text-gray-400 hover:text-[#D4AF37] px-3 py-2.5 rounded-lg text-base font-medium transition-colors duration-200 {{ request()->is('blog*') ? 'text-[#D4AF37]' : '' }}">
+                    Blog
                 </a>
                 <div class="border-t border-[#2A2A2A] my-2"></div>
                 @auth
