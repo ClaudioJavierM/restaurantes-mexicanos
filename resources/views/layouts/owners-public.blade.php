@@ -4,7 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ $title ?? 'For Owners' }} - FAMER | Famous Mexican Restaurants</title>
+    <title>@yield('title', $title ?? 'For Owners') - FAMER | Famous Mexican Restaurants</title>
+    <meta name="description" content="@yield('meta_description', '')">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
     @stack('styles')
@@ -112,6 +113,9 @@
                     <a href="/for-owners" class="px-4 py-2 rounded-lg text-sm font-medium {{ request()->is('for-owners*') ? 'text-[#D4AF37]' : 'text-gray-400 hover:text-[#D4AF37]' }} transition-colors duration-200">
                         {{ app()->getLocale() === 'en' ? 'Plans & Pricing' : 'Planes y Precios' }}
                     </a>
+                    <a href="/como-funciona-famer" class="px-4 py-2 rounded-lg text-sm font-medium {{ request()->is('como-funciona-famer') || request()->is('how-famer-works') ? 'text-[#D4AF37]' : 'text-gray-400 hover:text-[#D4AF37]' }} transition-colors duration-200">
+                        {{ app()->getLocale() === 'en' ? 'How It Works' : 'Cómo Funciona' }}
+                    </a>
                 </nav>
 
                 <!-- Right Side -->
@@ -145,7 +149,8 @@
 
     <!-- Main Content -->
     <main>
-        {{ $slot }}
+        {{ $slot ?? '' }}
+        @yield('content')
     </main>
 
     <!-- Footer -->

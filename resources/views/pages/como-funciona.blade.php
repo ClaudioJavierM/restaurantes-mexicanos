@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.owners-public')
 
 @section('title', $isEn ? 'How FAMER Works — Grow Your Mexican Restaurant' : 'Cómo Funciona FAMER — Haz Crecer Tu Restaurante Mexicano')
 @section('meta_description', $isEn
@@ -474,8 +474,8 @@
                     </p>
                     <ul style="list-style:none; padding:0; margin:0 0 1.75rem; display:flex; flex-direction:column; gap:0.6rem;">
                         @foreach($isEn
-                            ? ['Verified "Premium" badge','Digital menu + QR code','Automatic review request SMS','FAMER Score & recommendations','Unlimited photos','Profile analytics','Highlighted in rankings','Review management panel']
-                            : ['Badge Verificado "Premium"','Menú digital + código QR','SMS automáticos de solicitud de reseña','FAMER Score y recomendaciones','Fotos ilimitadas','Analytics del perfil','Destacado en rankings','Panel de gestión de reseñas']
+                            ? ['Everything in Basic, plus:','Verified "Premium" badge','Digital menu + QR code','Automatic review SMS requests','FAMER Score & recommendations','Unlimited photos','Profile analytics','Highlighted in rankings']
+                            : ['Todo lo de Básico PLUS:','Badge Verificado "Premium"','Menú Digital + QR Code','SMS automáticos de solicitud de reseña','FAMER Score y recomendaciones','Fotos ilimitadas','Analytics del perfil','Destacado en rankings']
                         as $item)
                         <li style="display:flex; align-items:flex-start; gap:0.5rem; font-size:0.875rem; color:#CCCCCC;">
                             <span style="color:#D4AF37; flex-shrink:0;">✓</span> {{ $item }}
@@ -499,8 +499,8 @@
                     </p>
                     <ul style="list-style:none; padding:0; margin:0 0 1.75rem; display:flex; flex-direction:column; gap:0.6rem;">
                         @foreach($isEn
-                            ? ['#1 position in city rankings','Advanced analytics + reports','Email marketing campaigns','Your own restaurant website','FAMER Awards eligibility','Priority support','Reservations system']
-                            : ['Posición #1 en rankings de ciudad','Analytics avanzados + reportes','Campañas de email marketing','Website propio del restaurante','Elegible para FAMER Awards','Soporte prioritario','Sistema de reservaciones']
+                            ? ['Everything in Premium, plus:','#1 position in city rankings','Advanced analytics + reports','Email marketing campaigns','Your own restaurant website','FAMER Awards eligibility','Dedicated account manager']
+                            : ['Todo lo de Premium PLUS:','Posición #1 en Rankings','Analytics Avanzados + Reportes','Campañas de Email Marketing','Website Propio del Restaurante','Elegible para FAMER Awards','Gerente de Cuenta Dedicado']
                         as $item)
                         <li style="display:flex; align-items:flex-start; gap:0.5rem; font-size:0.875rem; color:#CCCCCC;">
                             <span style="color:#D4AF37; flex-shrink:0;">✓</span> {{ $item }}
