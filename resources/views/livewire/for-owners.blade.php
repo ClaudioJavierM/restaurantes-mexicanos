@@ -200,17 +200,24 @@
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             @php $cards = [
-                ['icon' => '🔍', 'title_es' => 'Sé Encontrado', 'title_en' => 'Get Discovered', 'desc_es' => 'Rankings de ciudad y estado. Tu restaurante frente a clientes que buscan comida mexicana ahora.', 'desc_en' => 'City and state rankings. Your restaurant in front of customers searching for Mexican food right now.'],
-                ['icon' => '⭐', 'title_es' => 'Más Reseñas', 'title_en' => 'More Reviews', 'desc_es' => 'SMS automáticos post-visita. Más reseñas sin que tengas que hacer nada.', 'desc_en' => 'Automatic post-visit SMS. More reviews without you doing anything.'],
-                ['icon' => '📋', 'title_es' => 'Menú Digital', 'title_en' => 'Digital Menu', 'desc_es' => 'Menú con fotos y precios. Código QR descargable para tus mesas y redes sociales.', 'desc_en' => 'Menu with photos and prices. Downloadable QR code for your tables and social media.'],
-                ['icon' => '📊', 'title_es' => 'Analytics', 'title_en' => 'Analytics', 'desc_es' => 'Ve cuántos clientes vieron tu perfil, llamaron o pidieron direcciones. Datos reales.', 'desc_en' => 'See how many customers viewed your profile, called, or asked for directions. Real data.'],
+                ['icon' => '🔍', 'title_es' => 'Sé Encontrado', 'title_en' => 'Get Discovered', 'desc_es' => 'Rankings de ciudad y estado. Tu restaurante frente a clientes que buscan comida mexicana ahora.', 'desc_en' => 'City and state rankings. Your restaurant in front of customers searching for Mexican food right now.', 'image' => 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=400&q=80'],
+                ['icon' => '⭐', 'title_es' => 'Más Reseñas', 'title_en' => 'More Reviews', 'desc_es' => 'SMS automáticos post-visita. Más reseñas sin que tengas que hacer nada.', 'desc_en' => 'Automatic post-visit SMS. More reviews without you doing anything.', 'image' => 'https://images.unsplash.com/photo-1553729459-efe14ef6055d?auto=format&fit=crop&w=400&q=80'],
+                ['icon' => '📋', 'title_es' => 'Menú Digital', 'title_en' => 'Digital Menu', 'desc_es' => 'Menú con fotos y precios. Código QR descargable para tus mesas y redes sociales.', 'desc_en' => 'Menu with photos and prices. Downloadable QR code for your tables and social media.', 'image' => 'https://images.unsplash.com/photo-1526367790999-0150786686a2?auto=format&fit=crop&w=400&q=80'],
+                ['icon' => '📊', 'title_es' => 'Analytics', 'title_en' => 'Analytics', 'desc_es' => 'Ve cuántos clientes vieron tu perfil, llamaron o pidieron direcciones. Datos reales.', 'desc_en' => 'See how many customers viewed your profile, called, or asked for directions. Real data.', 'image' => 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=400&q=80'],
             ]; @endphp
 
             @foreach($cards as $card)
-            <div class="rounded-2xl p-7 transition-all duration-300 hover:-translate-y-1" style="background-color: #1A1A1A; border: 1px solid rgba(212,175,55,0.12);">
-                <div class="text-3xl mb-4">{{ $card['icon'] }}</div>
-                <h3 class="text-lg font-bold mb-2" style="color: #F5F5F5;">{{ app()->getLocale() === 'en' ? $card['title_en'] : $card['title_es'] }}</h3>
-                <p class="text-sm leading-relaxed" style="color: #9CA3AF;">{{ app()->getLocale() === 'en' ? $card['desc_en'] : $card['desc_es'] }}</p>
+            <div class="rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1" style="background-color: #1A1A1A; border: 1px solid rgba(212,175,55,0.12);">
+                <div style="height:130px; overflow:hidden;">
+                    <img src="{{ $card['image'] }}" alt="{{ $card['title_es'] }}" loading="lazy"
+                         style="width:100%; height:100%; object-fit:cover; transition:transform 0.4s;"
+                         onmouseover="this.style.transform='scale(1.06)'" onmouseout="this.style.transform='scale(1)'">
+                </div>
+                <div class="p-6">
+                    <div class="text-2xl mb-3">{{ $card['icon'] }}</div>
+                    <h3 class="text-lg font-bold mb-2" style="color: #F5F5F5;">{{ app()->getLocale() === 'en' ? $card['title_en'] : $card['title_es'] }}</h3>
+                    <p class="text-sm leading-relaxed" style="color: #9CA3AF;">{{ app()->getLocale() === 'en' ? $card['desc_en'] : $card['desc_es'] }}</p>
+                </div>
             </div>
             @endforeach
         </div>
@@ -242,19 +249,29 @@
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mb-12">
             @php $steps = [
-                ['num' => '01', 'icon' => '🔍', 'title_es' => 'Reclama Tu Restaurante', 'title_en' => 'Claim Your Restaurant', 'desc_es' => 'Tu restaurante ya está en FAMER. Búscalo, haz clic en "Reclamar" y verifica en menos de 24 horas.', 'desc_en' => 'Your restaurant is already on FAMER. Search, click "Claim" and verify in under 24 hours.'],
-                ['num' => '02', 'icon' => '✏️', 'title_es' => 'Completa Tu Perfil', 'title_en' => 'Complete Your Profile', 'desc_es' => 'Agrega fotos, menú, horarios. FAMER Score mide tu progreso y te dice exactamente qué mejorar.', 'desc_en' => 'Add photos, menu, hours. FAMER Score measures progress and tells you exactly what to improve.'],
-                ['num' => '03', 'icon' => '📈', 'title_es' => 'Crece y Aparece en Rankings', 'title_en' => 'Grow & Rank', 'desc_es' => 'Rankings semanales de ciudad y estado. SMS automáticos consiguen reseñas. Tú solo atiende el negocio.', 'desc_en' => 'Weekly city and state rankings. Automatic SMS collects reviews. You just run the restaurant.'],
+                ['num' => '01', 'icon' => '🔍', 'title_es' => 'Reclama Tu Restaurante', 'title_en' => 'Claim Your Restaurant', 'desc_es' => 'Tu restaurante ya está en FAMER. Búscalo, haz clic en "Reclamar" y verifica en menos de 24 horas.', 'desc_en' => 'Your restaurant is already on FAMER. Search, click "Claim" and verify in under 24 hours.', 'image' => 'https://images.unsplash.com/photo-1552332386-f8dd00dc2f85?auto=format&fit=crop&w=600&q=80'],
+                ['num' => '02', 'icon' => '✏️', 'title_es' => 'Completa Tu Perfil', 'title_en' => 'Complete Your Profile', 'desc_es' => 'Agrega fotos, menú, horarios. FAMER Score mide tu progreso y te dice exactamente qué mejorar.', 'desc_en' => 'Add photos, menu, hours. FAMER Score measures progress and tells you exactly what to improve.', 'image' => 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=600&q=80'],
+                ['num' => '03', 'icon' => '📈', 'title_es' => 'Crece y Aparece en Rankings', 'title_en' => 'Grow & Rank', 'desc_es' => 'Rankings semanales de ciudad y estado. SMS automáticos consiguen reseñas. Tú solo atiende el negocio.', 'desc_en' => 'Weekly city and state rankings. Automatic SMS collects reviews. You just run the restaurant.', 'image' => 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80'],
             ]; @endphp
 
             @foreach($steps as $step)
-            <div class="rounded-2xl p-8 text-center relative" style="background-color: #0B0B0B; border: 1px solid rgba(212,175,55,0.15);">
-                <div class="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4" style="background-color: #D4AF37;">
-                    <span class="text-lg font-bold" style="color: #0B0B0B;">{{ $step['num'] }}</span>
+            <div class="rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1" style="background-color: #0B0B0B; border: 1px solid rgba(212,175,55,0.15);">
+                <div style="height:160px; overflow:hidden; position:relative;">
+                    <img src="{{ $step['image'] }}" alt="{{ app()->getLocale() === 'en' ? $step['title_en'] : $step['title_es'] }}" loading="lazy"
+                         style="width:100%; height:100%; object-fit:cover; transition:transform 0.4s;"
+                         onmouseover="this.style.transform='scale(1.06)'" onmouseout="this.style.transform='scale(1)'">
+                    <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(11,11,11,0.5) 0%, transparent 60%);"></div>
+                    <div style="position:absolute; top:1rem; left:50%; transform:translateX(-50%);">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background-color: #D4AF37;">
+                            <span class="text-sm font-bold" style="color: #0B0B0B;">{{ $step['num'] }}</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="text-2xl mb-3">{{ $step['icon'] }}</div>
-                <h3 class="text-lg font-bold mb-3" style="color: #F5F5F5;">{{ app()->getLocale() === 'en' ? $step['title_en'] : $step['title_es'] }}</h3>
-                <p class="text-sm leading-relaxed" style="color: #9CA3AF;">{{ app()->getLocale() === 'en' ? $step['desc_en'] : $step['desc_es'] }}</p>
+                <div class="p-6 text-center">
+                    <div class="text-2xl mb-3">{{ $step['icon'] }}</div>
+                    <h3 class="text-lg font-bold mb-3" style="color: #F5F5F5;">{{ app()->getLocale() === 'en' ? $step['title_en'] : $step['title_es'] }}</h3>
+                    <p class="text-sm leading-relaxed" style="color: #9CA3AF;">{{ app()->getLocale() === 'en' ? $step['desc_en'] : $step['desc_es'] }}</p>
+                </div>
             </div>
             @endforeach
         </div>
@@ -315,7 +332,7 @@
                     'quote_en'    => 'In 3 months I went from 12 reviews to 47. Now I appear in the Top 5 of Dallas. Customers tell me they found me on FAMER.',
                     'metric_es'   => '+35 reseñas en 90 días',
                     'metric_en'   => '+35 reviews in 90 days',
-                    'emoji'       => '🌮',
+                    'photo'       => 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=80&q=80',
                 ],
                 [
                     'name_es'     => 'Ana L.',
@@ -327,7 +344,7 @@
                     'quote_en'    => 'The digital menu with QR was a total game changer. Customers scan and order directly. My weekend revenue went up 22% in the first month.',
                     'metric_es'   => '+22% ingresos fin de semana',
                     'metric_en'   => '+22% weekend revenue',
-                    'emoji'       => '🍽️',
+                    'photo'       => 'https://images.unsplash.com/photo-1494790108755-2616b612b786?auto=format&fit=crop&w=80&q=80',
                 ],
                 [
                     'name_es'     => 'Roberto V.',
@@ -339,7 +356,7 @@
                     'quote_en'    => 'Before I relied 100% on Yelp. Now I have my own profile on FAMER and I pay no commissions. The FAMER Score helped me know exactly what to improve.',
                     'metric_es'   => 'Sin comisiones a terceros',
                     'metric_en'   => 'Zero third-party commissions',
-                    'emoji'       => '🍲',
+                    'photo'       => 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=80&q=80',
                 ],
             ]; @endphp
 
@@ -363,9 +380,11 @@
                 </div>
                 {{-- Owner info --}}
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full flex items-center justify-center text-lg flex-shrink-0" style="background:#2A2A2A;">
-                        {{ $t['emoji'] }}
-                    </div>
+                    <img src="{{ $t['photo'] }}"
+                         alt="{{ $t['name_es'] }}"
+                         loading="lazy"
+                         class="w-12 h-12 rounded-full object-cover flex-shrink-0"
+                         style="border:2px solid rgba(212,175,55,0.4);">
                     <div>
                         <div class="text-sm font-bold" style="color:#F5F5F5;">{{ app()->getLocale() === 'en' ? $t['name_en'] : $t['name_es'] }}</div>
                         <div class="text-xs" style="color:#9CA3AF;">{{ app()->getLocale() === 'en' ? $t['restaurant_en'] : $t['restaurant_es'] }} · {{ $t['location'] }}</div>
