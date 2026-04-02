@@ -290,3 +290,19 @@ Schedule::command('reviews:send-requests')
     ->onFailure(function () {
         notifyN8nFailure('reviews:send-requests', 'Post-visit review request SMS');
     });
+
+// ============================================================================
+// AI Blog Post Auto-Generation — Mon & Thu 10:00 AM (4 posts/week)
+// Uses GPT-4o-mini, ~$0.01/post, skips already-covered topics automatically
+// ============================================================================
+Schedule::command('blog:generate-posts --count=2 --lang=es')
+    ->weeklyOn(1, '10:00')
+    ->timezone('America/New_York')
+    ->description('Auto-generate 2 AI blog posts (Monday)')
+    ->onFailure(fn() => notifyN8nFailure('blog:generate-posts', 'Weekly AI blog generation'));
+
+Schedule::command('blog:generate-posts --count=2 --lang=es')
+    ->weeklyOn(4, '10:00')
+    ->timezone('America/New_York')
+    ->description('Auto-generate 2 AI blog posts (Thursday)')
+    ->onFailure(fn() => notifyN8nFailure('blog:generate-posts', 'Weekly AI blog generation Thu'));

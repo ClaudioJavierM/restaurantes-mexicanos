@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\TeamInvitationController;
+use App\Http\Controllers\StateRestaurantsController;
 
 // Public Routes
 Route::get('/', \App\Livewire\Home::class)->name('home');
@@ -14,6 +15,11 @@ Route::get('/restaurante/{slug}', \App\Livewire\RestaurantDetail::class)->name('
 Route::get('/restaurant/{slug}', fn($slug) => redirect('/restaurante/' . $slug, 301));
 Route::get('/sugerir', \App\Livewire\SmartSuggestionForm::class)->name('suggestions.create');
 Route::get('/restaurantes-mexicanos-cerca-de-mi', [\App\Http\Controllers\NearMeController::class, 'index'])->name('near-me');
+
+// State landing pages (SEO: "restaurantes mexicanos en texas")
+Route::get('/estados', [StateRestaurantsController::class, 'index'])->name('states.index');
+Route::get('/restaurantes-mexicanos-en-{stateSlug}', [StateRestaurantsController::class, 'show'])->name('states.show');
+Route::get('/best-mexican-restaurants-in-{stateSlug}', [StateRestaurantsController::class, 'show'])->name('states.show.en');
 
 // Dish-specific landing pages (SEO) — unified show() route covering 22 dishes
 Route::get('/{dish}', [\App\Http\Controllers\DishController::class, 'show'])
@@ -72,6 +78,9 @@ Route::get('/sitemap-main.xml', [SitemapController::class, 'main'])->name('sitem
 Route::get('/sitemap-restaurants-{page}.xml', [SitemapController::class, 'restaurants'])->where('page', '[0-9]+')->name('sitemap.restaurants');
 Route::get('/sitemap-guides.xml', [SitemapController::class, 'guides'])->name('sitemap.guides');
 Route::get('/sitemap-rankings.xml', [SitemapController::class, 'rankings'])->name('sitemap.rankings');
+Route::get('/sitemap-blog.xml', [SitemapController::class, 'blog'])->name('sitemap.blog');
+Route::get('/sitemap-states.xml', [SitemapController::class, 'states'])->name('sitemap.states');
+Route::get('/sitemap-dishes.xml', [SitemapController::class, 'dishes'])->name('sitemap.dishes');
 
 // City Guides (SEO)
 Route::prefix('guia')->group(function () {

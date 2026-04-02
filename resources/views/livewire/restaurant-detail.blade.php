@@ -867,6 +867,8 @@
                 </div>
                 @endif
 
+                @include('partials.claim-banner', ['restaurant' => $restaurant])
+
                 <!-- About / Description Section (SEO) -->
                 <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
                     <h2 class="text-xl font-bold text-gray-900 mb-4">Acerca de {{ $restaurant->name }}</h2>
@@ -1388,4 +1390,10 @@
     @if($showMenuItemModal && $selectedMenuItem)
         @include('livewire.partials.menu-item-modal')
     @endif
+
+    @livewire('similar-restaurants', [
+        'restaurantId' => $restaurant->id,
+        'city'         => $restaurant->city ?? '',
+        'stateId'      => $restaurant->state_id,
+    ])
 </div>
