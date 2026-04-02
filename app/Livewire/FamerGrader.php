@@ -18,7 +18,7 @@ use Livewire\Attributes\Url;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 
-#[Layout('layouts.app')]
+#[Layout('layouts.owners-public')]
 #[Title('FAMER Score - Califica tu Restaurante Mexicano')]
 class FamerGrader extends Component
 {
