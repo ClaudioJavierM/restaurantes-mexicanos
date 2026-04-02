@@ -152,12 +152,10 @@
                                 3 => ['bg' => 'bg-amber-700', 'text' => 'text-white'],
                                 default => ['bg' => 'bg-[#2A2A2A]', 'text' => 'text-gray-400'],
                             };
-                            $topRestImage = null;
-                            if ($restaurant->image) {
-                                $topRestImage = str_starts_with($restaurant->image, 'http') ? $restaurant->image : asset('storage/' . $restaurant->image);
-                            } elseif ($restaurant->getFirstMediaUrl('images')) {
-                                $topRestImage = $restaurant->getFirstMediaUrl('images');
-                            }
+                            $topRestImage = $restaurant->getFirstMediaUrl('photos', 'thumb')
+                                ?: $restaurant->getFirstMediaUrl('images')
+                                ?: ($restaurant->yelp_photos[0] ?? null)
+                                ?: ($restaurant->image ? (str_starts_with($restaurant->image, 'http') ? $restaurant->image : asset('storage/' . $restaurant->image)) : null);
                             $weightedRating = $restaurant->getWeightedRating();
                             $combinedReviews = $restaurant->getCombinedReviewCount();
                         @endphp
@@ -253,12 +251,10 @@
                         @php
                             $isEliteCard = $restaurant->subscription_tier === 'elite';
                             $isPremiumCard = $restaurant->subscription_tier === 'premium';
-                            $cardRestImage = null;
-                            if ($restaurant->image) {
-                                $cardRestImage = str_starts_with($restaurant->image, 'http') ? $restaurant->image : asset('storage/' . $restaurant->image);
-                            } elseif ($restaurant->getFirstMediaUrl('images')) {
-                                $cardRestImage = $restaurant->getFirstMediaUrl('images');
-                            }
+                            $cardRestImage = $restaurant->getFirstMediaUrl('photos', 'thumb')
+                                ?: $restaurant->getFirstMediaUrl('images')
+                                ?: ($restaurant->yelp_photos[0] ?? null)
+                                ?: ($restaurant->image ? (str_starts_with($restaurant->image, 'http') ? $restaurant->image : asset('storage/' . $restaurant->image)) : null);
                             $cardRating = $restaurant->getWeightedRating();
                             $cardReviews = $restaurant->getCombinedReviewCount();
                         @endphp

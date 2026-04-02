@@ -107,18 +107,19 @@
                         @foreach($restaurants as $restaurant)
                             <a href="{{ route('restaurants.show', $restaurant->slug) }}" class="group bg-white rounded-xl shadow-md hover:shadow-xl transition overflow-hidden">
                                 <div class="aspect-[4/3] relative bg-gray-100">
-                                    @if($restaurant->image)
-                                        <img src="{{ asset('storage/' . $restaurant->image) }}" alt="{{ $restaurant->name }}" class="w-full h-full object-cover group-hover:scale-105 transition" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                        <div class="w-full h-full items-center justify-center bg-gradient-to-br from-red-100 to-orange-100 absolute inset-0" style="display:none;">
-                                            <span class="text-5xl">{{ $category->icon ?? '🍽️' }}</span>
-                                        </div>
-                                    @elseif($restaurant->hasMedia('images'))
-                                        <img src="{{ $restaurant->hasMedia('images') ? $restaurant->getFirstMediaUrl('images') : $restaurant->image }}" alt="{{ $restaurant->name }}" class="w-full h-full object-cover group-hover:scale-105 transition">
-                                    @else
-                                        <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-red-100 to-orange-100">
-                                            <span class="text-5xl">{{ $category->icon ?? '🍽️' }}</span>
-                                        </div>
+                                    @php
+                                        $catImgUrl = $restaurant->getFirstMediaUrl('photos', 'thumb')
+                                            ?: $restaurant->getFirstMediaUrl('images')
+                                            ?: ($restaurant->yelp_photos[0] ?? null)
+                                            ?: ($restaurant->image ? (str_starts_with($restaurant->image, 'http') ? $restaurant->image : asset('storage/' . $restaurant->image)) : null);
+                                    @endphp
+                                    @if($catImgUrl)
+                                        <img src="{{ $catImgUrl }}" alt="{{ $restaurant->name }}" class="w-full h-full object-cover group-hover:scale-105 transition" loading="lazy"
+                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                                     @endif
+                                    <div style="display:{{ $catImgUrl ? 'none' : 'flex' }};" class="w-full h-full items-center justify-center bg-[#111] absolute inset-0 flex-col gap-1">
+                                        <span class="text-5xl">{{ $category->icon ?? '🍽️' }}</span>
+                                    </div>
                                     @if($restaurant->price_range)
                                         <span class="absolute top-3 right-3 bg-white/90 px-2 py-1 rounded-full text-xs font-bold">{{ $restaurant->price_range }}</span>
                                     @endif

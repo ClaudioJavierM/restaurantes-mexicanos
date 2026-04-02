@@ -98,15 +98,20 @@ Restaurantes Mexicanos Cerca de Mí | FAMER
                 <a href="/restaurante/{{ $restaurant->slug }}"
                    style="display:block; background:#1A1A1A; border:1px solid #2A2A2A; border-radius:12px; overflow:hidden; text-decoration:none; transition:border-color 0.2s;"
                    onmouseover="this.style.borderColor='#D4AF37'" onmouseout="this.style.borderColor='#2A2A2A'">
-                    @if($restaurant->image)
-                    <div style="height:160px; overflow:hidden;">
-                        <img src="{{ str_starts_with($restaurant->image, 'http') ? $restaurant->image : \Illuminate\Support\Facades\Storage::url($restaurant->image) }}" alt="{{ $restaurant->name }}" loading="lazy" style="width:100%; height:100%; object-fit:cover;">
+                    @php
+                        $nearMeImg = $restaurant->getFirstMediaUrl('photos', 'thumb')
+                            ?: $restaurant->getFirstMediaUrl('images')
+                            ?: ($restaurant->yelp_photos[0] ?? null)
+                            ?: ($restaurant->image ? (str_starts_with($restaurant->image, 'http') ? $restaurant->image : \Illuminate\Support\Facades\Storage::url($restaurant->image)) : null);
+                    @endphp
+                    <div style="height:160px; overflow:hidden; background:#111; display:flex; align-items:center; justify-content:center; position:relative;">
+                        @if($nearMeImg)
+                        <img src="{{ $nearMeImg }}" alt="{{ $restaurant->name }}" loading="lazy"
+                             style="width:100%; height:100%; object-fit:cover; position:absolute; inset:0;"
+                             onerror="this.style.display='none';">
+                        @endif
+                        <span style="font-size:2.5rem; position:relative; z-index:0;">🌮</span>
                     </div>
-                    @else
-                    <div style="height:100px; background:#2A2A2A; display:flex; align-items:center; justify-content:center;">
-                        <span style="font-size:2rem;">🌮</span>
-                    </div>
-                    @endif
                     <div style="padding:1rem;">
                         <h3 style="font-weight:600; color:#F5F5F5; margin-bottom:0.25rem; font-size:0.9375rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
                             {{ $restaurant->name }}
