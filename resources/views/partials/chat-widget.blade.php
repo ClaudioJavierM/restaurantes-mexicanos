@@ -2,11 +2,16 @@
 {{-- Context-aware: Different behavior on owner pages vs regular pages --}}
 <style>
 :root {
-    --rmf-primary: #006847;
-    --rmf-dark: #004D35;
-    --rmf-soft: #E8F5E9;
-    --rmf-accent: #CE1126;
-    --rmf-gradient: linear-gradient(135deg, #004D35 0%, #006847 50%, #008F4C 100%);
+    --rmf-primary: #D4AF37;
+    --rmf-dark: #B8962E;
+    --rmf-soft: rgba(212,175,55,0.08);
+    --rmf-accent: #D4AF37;
+    --rmf-gradient: linear-gradient(135deg, #1A1A1A 0%, #111 100%);
+    --rmf-bg: #0B0B0B;
+    --rmf-card: #1A1A1A;
+    --rmf-border: rgba(212,175,55,0.2);
+    --rmf-text: #F5F5F5;
+    --rmf-muted: #9CA3AF;
 }
 
 #rmf-chat-widget {
@@ -14,36 +19,37 @@
     bottom: 20px;
     right: 20px;
     z-index: 99999;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Poppins', 'Segoe UI', sans-serif;
 }
 
 #rmf-chat-btn {
     width: 70px;
     height: 70px;
     border-radius: 50%;
-    border: 3px solid var(--rmf-accent);
+    border: 2px solid rgba(212,175,55,0.6);
     cursor: pointer;
-    box-shadow: 0 4px 20px rgba(0, 104, 71, 0.4);
+    box-shadow: 0 4px 24px rgba(212,175,55,0.25);
     transition: all 0.3s ease;
     overflow: hidden;
     padding: 0;
-    background: white;
+    background: #111;
     position: relative;
 }
 
 #rmf-chat-btn:hover {
     transform: scale(1.1);
-    box-shadow: 0 6px 30px rgba(0, 104, 71, 0.6);
+    box-shadow: 0 6px 32px rgba(212,175,55,0.45);
     animation: none;
 }
 
-#rmf-chat-btn img { border-radius: 50%;
+#rmf-chat-btn img {
+    border-radius: 50%;
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-/* Avatar Animation - Breathing/Pulse Effect */
+/* Avatar Animation - Gold pulse */
 #rmf-chat-btn::before {
     content: '';
     position: absolute;
@@ -52,7 +58,7 @@
     right: -4px;
     bottom: -4px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--rmf-dark), var(--rmf-accent));
+    background: linear-gradient(135deg, #D4AF37, #B8962E);
     z-index: -1;
     animation: rmfAvatarGlow 2s ease-in-out infinite;
 }
@@ -65,7 +71,7 @@
     right: -8px;
     bottom: -8px;
     border-radius: 50%;
-    border: 2px solid var(--rmf-primary);
+    border: 2px solid rgba(212,175,55,0.5);
     opacity: 0;
     animation: rmfAvatarRing 2s ease-in-out infinite;
 }
@@ -81,7 +87,6 @@
     100% { opacity: 0; transform: scale(1.2); }
 }
 
-/* Subtle bounce for attention */
 #rmf-chat-btn {
     animation: rmfAvatarBounce 3s ease-in-out infinite;
 }
@@ -98,17 +103,17 @@
     position: absolute;
     bottom: 80px;
     right: 0;
-    background: white;
+    background: #1A1A1A;
     padding: 14px 18px;
     border-radius: 20px 20px 4px 20px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.5);
     max-width: 280px;
     font-size: 14px;
     line-height: 1.5;
-    color: #333;
+    color: var(--rmf-text);
     display: none;
     animation: rmfBubblePop 0.3s ease;
-    border: 2px solid var(--rmf-accent);
+    border: 1px solid var(--rmf-border);
 }
 
 @keyframes rmfBubblePop {
@@ -122,10 +127,10 @@
     left: -8px;
     width: 20px;
     height: 20px;
-    background: var(--rmf-accent);
-    color: white;
+    background: #2A2A2A;
+    color: var(--rmf-muted);
     border-radius: 50%;
-    border: none;
+    border: 1px solid #3A3A3A;
     cursor: pointer;
     font-size: 12px;
     line-height: 20px;
@@ -139,9 +144,9 @@
     max-width: calc(100vw - 40px);
     height: 550px;
     max-height: calc(100vh - 120px);
-    background: white;
+    background: var(--rmf-bg);
     border-radius: 20px;
-    box-shadow: 0 10px 50px rgba(0, 104, 71, 0.3);
+    box-shadow: 0 10px 60px rgba(0,0,0,0.7), 0 0 0 1px var(--rmf-border);
     display: none;
     flex-direction: column;
     overflow: hidden;
@@ -149,51 +154,54 @@
 }
 
 #rmf-chat-header {
-    background: var(--rmf-gradient);
-    color: white;
+    background: #111;
+    color: var(--rmf-text);
     padding: 18px 20px;
     display: flex;
     align-items: center;
     gap: 12px;
-    border-bottom: 3px solid var(--rmf-accent);
+    border-bottom: 1px solid var(--rmf-border);
 }
 
 #rmf-chat-header .avatar {
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    border: 2px solid white;
+    border: 2px solid rgba(212,175,55,0.5);
     object-fit: cover;
 }
 
 #rmf-chat-header .info h3 {
     margin: 0;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 600;
+    color: var(--rmf-text);
+    font-family: 'Playfair Display', serif;
 }
 
 #rmf-chat-header .info span {
-    font-size: 12px;
-    opacity: 0.9;
+    font-size: 11px;
+    color: var(--rmf-muted);
 }
 
 #rmf-chat-header .close-btn {
-    background: rgba(255,255,255,0.2);
-    border: none;
-    color: white;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid #2A2A2A;
+    color: var(--rmf-muted);
     width: 32px;
     height: 32px;
     border-radius: 50%;
     cursor: pointer;
     font-size: 18px;
-    transition: background 0.2s;
+    transition: all 0.2s;
 }
 
 #rmf-chat-header .close-btn:hover {
-    background: rgba(255,255,255,0.3);
+    background: rgba(212,175,55,0.1);
+    border-color: rgba(212,175,55,0.4);
+    color: var(--rmf-primary);
 }
 
-/* Header action buttons */
 #rmf-header-actions {
     display: flex;
     gap: 8px;
@@ -205,9 +213,9 @@
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    border: 1px solid rgba(255,255,255,0.5);
-    background: rgba(255,255,255,0.1);
-    color: white;
+    border: 1px solid #2A2A2A;
+    background: rgba(255,255,255,0.04);
+    color: var(--rmf-muted);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -216,8 +224,9 @@
 }
 
 .rmf-header-btn:hover {
-    background: rgba(255,255,255,0.3);
-    border-color: white;
+    background: rgba(212,175,55,0.1);
+    border-color: rgba(212,175,55,0.4);
+    color: var(--rmf-primary);
 }
 
 .rmf-header-btn svg {
@@ -233,25 +242,33 @@
 
 #rmf-lang-toggle button {
     padding: 4px 8px;
-    border: 1px solid rgba(255,255,255,0.3);
+    border: 1px solid #2A2A2A;
     background: transparent;
-    color: white;
+    color: var(--rmf-muted);
     border-radius: 4px;
     cursor: pointer;
     font-size: 11px;
+    transition: all 0.2s;
 }
 
 #rmf-lang-toggle button.active {
-    background: var(--rmf-accent);
-    border-color: var(--rmf-accent);
+    background: rgba(212,175,55,0.15);
+    border-color: rgba(212,175,55,0.5);
+    color: var(--rmf-primary);
 }
 
 #rmf-chat-messages {
     flex: 1;
     overflow-y: auto;
     padding: 15px;
-    background: #f8fff8;
+    background: #0D0D0D;
+    scrollbar-width: thin;
+    scrollbar-color: #2A2A2A transparent;
 }
+
+#rmf-chat-messages::-webkit-scrollbar { width: 4px; }
+#rmf-chat-messages::-webkit-scrollbar-track { background: transparent; }
+#rmf-chat-messages::-webkit-scrollbar-thumb { background: #2A2A2A; border-radius: 2px; }
 
 .rmf-message {
     margin-bottom: 12px;
@@ -271,15 +288,16 @@
 }
 
 .rmf-message.bot .bubble {
-    background: white;
-    color: #333;
-    border: 1px solid #e0e0e0;
+    background: #1A1A1A;
+    color: var(--rmf-text);
+    border: 1px solid #2A2A2A;
     border-bottom-left-radius: 4px;
 }
 
 .rmf-message.user .bubble {
-    background: var(--rmf-gradient);
-    color: white;
+    background: linear-gradient(135deg, #D4AF37, #B8962E);
+    color: #0B0B0B;
+    font-weight: 500;
     border-bottom-right-radius: 4px;
 }
 
@@ -288,14 +306,14 @@
     flex-wrap: wrap;
     gap: 8px;
     padding: 10px 15px;
-    border-top: 1px solid #e0e0e0;
-    background: white;
+    border-top: 1px solid #1A1A1A;
+    background: #111;
 }
 
 .rmf-quick-btn {
-    background: var(--rmf-soft);
-    border: 1px solid var(--rmf-primary);
-    color: var(--rmf-dark);
+    background: rgba(212,175,55,0.08);
+    border: 1px solid rgba(212,175,55,0.3);
+    color: #D4AF37;
     padding: 8px 14px;
     border-radius: 20px;
     font-size: 12px;
@@ -304,60 +322,68 @@
 }
 
 .rmf-quick-btn:hover {
-    background: var(--rmf-primary);
-    color: white;
+    background: rgba(212,175,55,0.18);
+    border-color: rgba(212,175,55,0.6);
 }
 
 #rmf-chat-input-area {
     display: flex;
     padding: 12px;
-    border-top: 1px solid #e0e0e0;
-    background: white;
+    border-top: 1px solid #1A1A1A;
+    background: #111;
     gap: 8px;
 }
 
 #rmf-chat-input {
     flex: 1;
-    border: 1px solid #e0e0e0;
+    border: 1px solid #2A2A2A;
     border-radius: 25px;
     padding: 12px 18px;
     font-size: 14px;
     outline: none;
+    background: #1A1A1A;
+    color: var(--rmf-text);
+    transition: border-color 0.2s;
 }
 
+#rmf-chat-input::placeholder { color: var(--rmf-muted); }
+
 #rmf-chat-input:focus {
-    border-color: var(--rmf-primary);
+    border-color: rgba(212,175,55,0.5);
 }
 
 #rmf-chat-send {
-    background: var(--rmf-gradient);
+    background: linear-gradient(135deg, #D4AF37, #B8962E);
     border: none;
-    color: white;
+    color: #0B0B0B;
     width: 44px;
     height: 44px;
     border-radius: 50%;
     cursor: pointer;
     font-size: 18px;
+    font-weight: bold;
+    transition: transform 0.2s, opacity 0.2s;
 }
 
 #rmf-chat-send:hover {
     transform: scale(1.05);
+    opacity: 0.9;
 }
 
 .rmf-typing {
     display: flex;
     gap: 4px;
     padding: 12px 16px;
-    background: white;
+    background: #1A1A1A;
     border-radius: 18px;
-    border: 1px solid #e0e0e0;
+    border: 1px solid #2A2A2A;
     width: fit-content;
 }
 
 .rmf-typing span {
     width: 8px;
     height: 8px;
-    background: var(--rmf-primary);
+    background: #D4AF37;
     border-radius: 50%;
     animation: rmfTyping 1.4s infinite;
 }
@@ -371,8 +397,8 @@
 }
 
 .rmf-restaurant-card {
-    background: white;
-    border: 1px solid #e0e0e0;
+    background: #1A1A1A;
+    border: 1px solid rgba(212,175,55,0.2);
     border-radius: 12px;
     padding: 12px;
     margin-top: 8px;
@@ -381,16 +407,16 @@
 .rmf-restaurant-card h4 {
     margin: 0 0 4px 0;
     font-size: 14px;
-    color: var(--rmf-dark);
+    color: var(--rmf-text);
 }
 
 .rmf-restaurant-card .rating {
-    color: #f59e0b;
+    color: #D4AF37;
     font-size: 12px;
 }
 
 .rmf-restaurant-card .location {
-    color: #666;
+    color: var(--rmf-muted);
     font-size: 12px;
     margin: 4px 0;
 }
@@ -399,16 +425,17 @@
     display: inline-block;
     margin-top: 8px;
     padding: 6px 12px;
-    background: var(--rmf-gradient);
-    color: white;
+    background: linear-gradient(135deg, #D4AF37, #B8962E);
+    color: #0B0B0B;
     text-decoration: none;
     border-radius: 15px;
     font-size: 12px;
+    font-weight: 600;
 }
 
 .rmf-benefit-card {
-    background: var(--rmf-soft);
-    border: 1px solid var(--rmf-primary);
+    background: rgba(212,175,55,0.06);
+    border: 1px solid rgba(212,175,55,0.25);
     border-radius: 12px;
     padding: 12px;
     margin-top: 8px;
@@ -417,14 +444,14 @@
 .rmf-benefit-card h4 {
     margin: 0 0 8px 0;
     font-size: 14px;
-    color: var(--rmf-dark);
+    color: #D4AF37;
 }
 
 .rmf-benefit-card ul {
     margin: 0;
     padding-left: 16px;
     font-size: 12px;
-    color: #333;
+    color: var(--rmf-muted);
 }
 
 .rmf-benefit-card li {
@@ -435,17 +462,18 @@
     display: block;
     margin-top: 10px;
     padding: 10px 16px;
-    background: var(--rmf-accent);
-    color: white;
+    background: linear-gradient(135deg, #D4AF37, #B8962E);
+    color: #0B0B0B;
     text-decoration: none;
     border-radius: 8px;
     font-size: 13px;
     text-align: center;
-    font-weight: 600;
+    font-weight: 700;
+    transition: opacity 0.2s;
 }
 
 .rmf-cta-btn:hover {
-    background: #a50e1f;
+    opacity: 0.88;
 }
 
 @media (max-width: 480px) {
