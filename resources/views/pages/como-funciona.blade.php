@@ -115,6 +115,7 @@
                     'detail_es'=> ['Sin costo — el plan básico es gratis para siempre', 'Verificación por llamada o email en < 24 horas', 'Acceso inmediato al panel de dueño', '26,000+ restaurantes ya en el directorio'],
                     'detail_en'=> ['Free — the basic plan is free forever', 'Verification by call or email in < 24 hours', 'Immediate access to owner dashboard', '26,000+ restaurants already in the directory'],
                     'plan'    => 'Gratis / Free',
+                    'image'   => 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=600&q=80',
                 ],
                 [
                     'icon'    => '✏️',
@@ -126,6 +127,7 @@
                     'detail_es'=> ['FAMER Score 0–100: mide tu visibilidad online', 'Fotos de alta calidad — importadas de Google/Yelp', 'Menú digital con categorías y precios', 'Código QR descargable para tu mesa o mostrador', 'Horarios con excepciones por día festivo'],
                     'detail_en'=> ['FAMER Score 0–100: measures your online visibility', 'High-quality photos — imported from Google/Yelp', 'Digital menu with categories and prices', 'Downloadable QR code for your table or counter', 'Hours with holiday exceptions'],
                     'plan'    => 'Premium $29/mo',
+                    'image'   => 'https://images.unsplash.com/photo-1611532736597-de2d4265fba3?auto=format&fit=crop&w=600&q=80',
                 ],
                 [
                     'icon'    => '⭐',
@@ -137,6 +139,7 @@
                     'detail_es'=> ['SMS automáticos post-visita (sin intervención manual)', 'Deduplicación: máximo 1 mensaje cada 7 días por cliente', 'Reseñas en FAMER + redirección a Google', 'Más reseñas = mejor posición en rankings de ciudad', 'Panel de gestión de reseñas — responder en 1 clic'],
                     'detail_en'=> ['Automatic post-visit SMS (no manual intervention)', 'Deduplication: max 1 message per customer every 7 days', 'FAMER reviews + redirect to Google', 'More reviews = better city ranking position', 'Review management panel — respond in 1 click'],
                     'plan'    => 'Premium $29/mo',
+                    'image'   => 'https://images.unsplash.com/photo-1553729459-efe14ef6055d?auto=format&fit=crop&w=600&q=80',
                 ],
                 [
                     'icon'    => '📈',
@@ -148,13 +151,14 @@
                     'detail_es'=> ['Rankings semanales: ciudad, estado y nacional', 'SEO en 3 dominios: .com.mx (MX) + .com (US ES) + .com (US EN)', 'Landing pages de ciudad y estado ya posicionándose', 'Badge "Top 10 en [ciudad]" en tu perfil', 'Hreflang en 3 idiomas para máxima visibilidad'],
                     'detail_en'=> ['Weekly rankings: city, state and national', 'SEO across 3 domains: .com.mx (MX) + .com (US ES) + .com (EN)', 'City and state landing pages already ranking', '"Top 10 in [city]" badge on your profile', 'Hreflang in 3 languages for maximum visibility'],
                     'plan'    => 'Elite $79/mo',
+                    'image'   => 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=600&q=80',
                 ],
             ];
             @endphp
 
             <div style="display:flex; flex-direction:column; gap:0;">
                 @foreach($steps as $i => $step)
-                <div style="display:grid; grid-template-columns:auto 1fr; gap:0; align-items:stretch; {{ $loop->last ? '' : 'margin-bottom:0;' }}">
+                <div style="display:grid; grid-template-columns:auto 1fr; gap:0; align-items:stretch;">
                     {{-- Timeline --}}
                     <div style="display:flex; flex-direction:column; align-items:center; padding:0 2rem 0 0.5rem;">
                         <div style="width:52px; height:52px; border-radius:50%; background:#D4AF37; color:#0B0B0B; display:flex; align-items:center; justify-content:center; font-size:1.25rem; font-weight:900; flex-shrink:0; z-index:1;">
@@ -164,29 +168,40 @@
                         <div style="width:2px; background:rgba(212,175,55,0.2); flex:1; margin:0.25rem 0;"></div>
                         @endif
                     </div>
-                    {{-- Content --}}
+                    {{-- Content card with split layout --}}
                     <div style="padding-bottom:{{ $loop->last ? '0' : '3rem' }};">
-                        <div style="background:#1A1A1A; border:1px solid #2A2A2A; border-radius:16px; padding:1.75rem 2rem; margin-bottom:0;">
-                            <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.75rem;">
-                                <span style="font-size:1.5rem;">{{ $step['icon'] }}</span>
-                                <h3 style="font-family:'Playfair Display',serif; font-size:1.3125rem; font-weight:700; margin:0; color:#F5F5F5;">
-                                    {{ $isEn ? $step['title_en'] : $step['title_es'] }}
-                                </h3>
-                                <span style="margin-left:auto; font-size:0.7rem; font-weight:700; padding:0.2rem 0.6rem; border-radius:999px; background:rgba(212,175,55,0.1); border:1px solid rgba(212,175,55,0.3); color:#D4AF37; white-space:nowrap;">
-                                    {{ $step['plan'] }}
-                                </span>
+                        <div style="background:#1A1A1A; border:1px solid #2A2A2A; border-radius:16px; overflow:hidden; display:grid; grid-template-columns:1fr 280px;">
+                            {{-- Text side --}}
+                            <div style="padding:1.75rem 2rem;">
+                                <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.75rem; flex-wrap:wrap;">
+                                    <span style="font-size:1.5rem;">{{ $step['icon'] }}</span>
+                                    <h3 style="font-family:'Playfair Display',serif; font-size:1.3125rem; font-weight:700; margin:0; color:#F5F5F5;">
+                                        {{ $isEn ? $step['title_en'] : $step['title_es'] }}
+                                    </h3>
+                                    <span style="margin-left:auto; font-size:0.7rem; font-weight:700; padding:0.2rem 0.6rem; border-radius:999px; background:rgba(212,175,55,0.1); border:1px solid rgba(212,175,55,0.3); color:#D4AF37; white-space:nowrap;">
+                                        {{ $step['plan'] }}
+                                    </span>
+                                </div>
+                                <p style="color:#CCCCCC; font-size:0.9375rem; line-height:1.7; margin:0 0 1.25rem;">
+                                    {{ $isEn ? $step['desc_en'] : $step['desc_es'] }}
+                                </p>
+                                <ul style="list-style:none; padding:0; margin:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:0.5rem;">
+                                    @foreach($isEn ? $step['detail_en'] : $step['detail_es'] as $item)
+                                    <li style="display:flex; align-items:flex-start; gap:0.5rem; font-size:0.8125rem;">
+                                        <span style="color:#D4AF37; margin-top:0.1rem; flex-shrink:0;">✓</span>
+                                        <span style="color:#CCCCCC;">{{ $item }}</span>
+                                    </li>
+                                    @endforeach
+                                </ul>
                             </div>
-                            <p style="color:#CCCCCC; font-size:0.9375rem; line-height:1.7; margin:0 0 1.25rem;">
-                                {{ $isEn ? $step['desc_en'] : $step['desc_es'] }}
-                            </p>
-                            <ul style="list-style:none; padding:0; margin:0; display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:0.5rem;">
-                                @foreach($isEn ? $step['detail_en'] : $step['detail_es'] as $item)
-                                <li style="display:flex; align-items:flex-start; gap:0.5rem; font-size:0.8125rem; color:#D4AF37;">
-                                    <span style="margin-top:0.1rem; flex-shrink:0;">✓</span>
-                                    <span style="color:#CCCCCC;">{{ $item }}</span>
-                                </li>
-                                @endforeach
-                            </ul>
+                            {{-- Image side --}}
+                            <div style="overflow:hidden; min-height:220px;">
+                                <img src="{{ $step['image'] }}"
+                                     alt="{{ $isEn ? $step['title_en'] : $step['title_es'] }}"
+                                     loading="lazy"
+                                     style="width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.4s;"
+                                     onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -222,6 +237,7 @@
                     'title_en'=> 'Weekly Rankings',
                     'desc_es' => 'Top 10 por ciudad, Top 10 por estado y Top 100 nacional. Calculados cada semana con base en calificaciones, reseñas y completitud del perfil. Un incentivo real para mejorar constantemente.',
                     'desc_en' => 'Top 10 by city, Top 10 by state and Top 100 national. Calculated weekly based on ratings, reviews and profile completeness. A real incentive to constantly improve.',
+                    'image'  => 'https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?auto=format&fit=crop&w=500&q=80',
                     'unique'  => true,
                 ],
                 [
@@ -230,6 +246,7 @@
                     'title_en'=> 'FAMER Score™',
                     'desc_es' => 'Un score de 0 a 100 que mide qué tan completo y visible estás online. Te dice exactamente qué mejorar: fotos, horarios, menú, reseñas. Es tu GPS para crecer.',
                     'desc_en' => 'A 0–100 score measuring how complete and visible you are online. Tells you exactly what to improve: photos, hours, menu, reviews. It\'s your GPS for growth.',
+                    'image'  => 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=500&q=80',
                     'unique'  => true,
                 ],
                 [
@@ -238,6 +255,7 @@
                     'title_en'=> 'Automatic Post-Visit SMS',
                     'desc_es' => 'FAMER envía mensajes de texto a tus clientes 1–4 horas después de su visita pidiendo una reseña. Completamente automatizado. Sin costo extra por mensaje.',
                     'desc_en' => 'FAMER sends text messages to your customers 1–4 hours after their visit asking for a review. Fully automated. No extra cost per message.',
+                    'image'  => 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=500&q=80',
                     'unique'  => true,
                 ],
                 [
@@ -246,6 +264,7 @@
                     'title_en'=> 'Presence Across 3 Domains',
                     'desc_es' => 'Tu restaurante aparece en .com.mx (México), .com (USA en español) y famousmexicanrestaurants.com (USA en inglés). Tres audiencias, una sola configuración.',
                     'desc_en' => 'Your restaurant appears on .com.mx (Mexico), .com (US in Spanish) and famousmexicanrestaurants.com (US in English). Three audiences, one setup.',
+                    'image'  => 'https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?auto=format&fit=crop&w=500&q=80',
                     'unique'  => true,
                 ],
                 [
@@ -254,6 +273,7 @@
                     'title_en'=> 'Digital Menu + QR Code',
                     'desc_es' => 'Sube tu menú con fotos, precios y categorías. Genera un código QR para imprimir. Los clientes lo escanean desde su mesa. Actualizable en segundos.',
                     'desc_en' => 'Upload your menu with photos, prices and categories. Generate a QR code to print. Customers scan it from their table. Updatable in seconds.',
+                    'image'  => 'https://images.unsplash.com/photo-1526367790999-0150786686a2?auto=format&fit=crop&w=500&q=80',
                     'unique'  => false,
                 ],
                 [
@@ -262,6 +282,7 @@
                     'title_en'=> '"Verified by FAMER" Badge',
                     'desc_es' => 'Un distintivo visual en tu perfil que indica que el dueño verificó y gestiona activamente la información. Genera confianza y diferencia tu perfil de los no reclamados.',
                     'desc_en' => 'A visual badge on your profile showing the owner verified and actively manages the information. Builds trust and differentiates your profile from unclaimed ones.',
+                    'image'  => 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?auto=format&fit=crop&w=500&q=80',
                     'unique'  => false,
                 ],
                 [
@@ -270,6 +291,7 @@
                     'title_en'=> 'City and State Landing Pages',
                     'desc_es' => 'Cada ciudad y estado tiene su propia página SEO en FAMER. "Mejores restaurantes mexicanos en Dallas TX" ya posicionándose en Google — y tu restaurante puede aparecer ahí.',
                     'desc_en' => 'Every city and state has its own SEO page on FAMER. "Best Mexican restaurants in Dallas TX" already ranking on Google — and your restaurant can appear there.',
+                    'image'  => 'https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?auto=format&fit=crop&w=500&q=80',
                     'unique'  => true,
                 ],
                 [
@@ -278,6 +300,7 @@
                     'title_en'=> 'Email Marketing for Owners',
                     'desc_es' => 'Crea campañas de email para tus clientes frecuentes. Promociones, eventos especiales, nuevos platillos. Sin necesidad de herramientas externas ni conocimientos técnicos.',
                     'desc_en' => 'Create email campaigns for your frequent customers. Promotions, special events, new dishes. No external tools or technical knowledge required.',
+                    'image'  => 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=500&q=80',
                     'unique'  => false,
                 ],
                 [
@@ -286,6 +309,7 @@
                     'title_en'=> 'Analytics Dashboard',
                     'desc_es' => 'Ve cuántas personas vieron tu perfil, hicieron clic para llamar, buscaron direcciones o visitaron tu menú. Datos reales para tomar decisiones reales.',
                     'desc_en' => 'See how many people viewed your profile, clicked to call, looked up directions, or visited your menu. Real data to make real decisions.',
+                    'image'  => 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=500&q=80',
                     'unique'  => false,
                 ],
                 [
@@ -294,6 +318,7 @@
                     'title_en'=> '1-Click Review Management',
                     'desc_es' => 'Recibe notificaciones de nuevas reseñas y responde directamente desde tu panel FAMER. Nunca más pierdas una reseña negativa sin responder.',
                     'desc_en' => 'Receive new review notifications and respond directly from your FAMER dashboard. Never miss a negative review without a response again.',
+                    'image'  => 'https://images.unsplash.com/photo-1553729459-efe14ef6055d?auto=format&fit=crop&w=500&q=80',
                     'unique'  => false,
                 ],
                 [
@@ -302,6 +327,7 @@
                     'title_en'=> 'Your Own Website (Elite)',
                     'desc_es' => 'Con Elite obtienes un website completo para tu restaurante, conectado a tu perfil FAMER. Incluye menú, fotos, reservaciones y formulario de contacto.',
                     'desc_en' => 'With Elite you get a full website for your restaurant, connected to your FAMER profile. Includes menu, photos, reservations and contact form.',
+                    'image'  => 'https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?auto=format&fit=crop&w=500&q=80',
                     'unique'  => false,
                 ],
                 [
@@ -310,6 +336,7 @@
                     'title_en'=> 'FAMER Awards',
                     'desc_es' => 'Reconocimientos anuales al mejor restaurante por ciudad, estado y nivel nacional. Un award FAMER en tu perfil y en tu restaurante es marketing gratuito de alto valor.',
                     'desc_en' => 'Annual recognition for the best restaurant by city, state and national level. A FAMER award on your profile and restaurant is high-value free marketing.',
+                    'image'  => 'https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=500&q=80',
                     'unique'  => true,
                 ],
             ];
@@ -317,20 +344,33 @@
 
             <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:1.25rem;">
                 @foreach($features as $feature)
-                <div style="background:#1A1A1A; border:1px solid {{ $feature['unique'] ? 'rgba(212,175,55,0.35)' : '#2A2A2A' }}; border-radius:14px; padding:1.5rem; position:relative; transition:border-color 0.2s;"
+                <div style="background:#1A1A1A; border:1px solid {{ $feature['unique'] ? 'rgba(212,175,55,0.35)' : '#2A2A2A' }}; border-radius:14px; overflow:hidden; position:relative; transition:border-color 0.2s;"
                      onmouseover="this.style.borderColor='#D4AF37'" onmouseout="this.style.borderColor='{{ $feature['unique'] ? 'rgba(212,175,55,0.35)' : '#2A2A2A' }}'">
                     @if($feature['unique'])
-                    <div style="position:absolute; top:-0.65rem; right:1rem; background:#D4AF37; color:#0B0B0B; font-size:0.65rem; font-weight:800; padding:0.15rem 0.6rem; border-radius:999px; letter-spacing:0.05em; text-transform:uppercase;">
+                    <div style="position:absolute; top:0.6rem; right:0.75rem; z-index:2; background:#D4AF37; color:#0B0B0B; font-size:0.65rem; font-weight:800; padding:0.15rem 0.6rem; border-radius:999px; letter-spacing:0.05em; text-transform:uppercase;">
                         {{ $isEn ? 'Exclusive' : 'Exclusivo' }}
                     </div>
                     @endif
-                    <div style="font-size:2rem; margin-bottom:0.75rem;">{{ $feature['icon'] }}</div>
-                    <h3 style="font-size:1rem; font-weight:700; color:#F5F5F5; margin:0 0 0.5rem;">
-                        {{ $isEn ? $feature['title_en'] : $feature['title_es'] }}
-                    </h3>
-                    <p style="font-size:0.875rem; color:#9CA3AF; margin:0; line-height:1.65;">
-                        {{ $isEn ? $feature['desc_en'] : $feature['desc_es'] }}
-                    </p>
+                    {{-- Feature image --}}
+                    @if(!empty($feature['image']))
+                    <div style="height:150px; overflow:hidden;">
+                        <img src="{{ $feature['image'] }}"
+                             alt="{{ $isEn ? $feature['title_en'] : $feature['title_es'] }}"
+                             loading="lazy"
+                             style="width:100%; height:100%; object-fit:cover; transition:transform 0.4s;"
+                             onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    </div>
+                    @endif
+                    {{-- Text content --}}
+                    <div style="padding:1.25rem 1.5rem;">
+                        <div style="font-size:1.75rem; margin-bottom:0.5rem;">{{ $feature['icon'] }}</div>
+                        <h3 style="font-size:1rem; font-weight:700; color:#F5F5F5; margin:0 0 0.5rem;">
+                            {{ $isEn ? $feature['title_en'] : $feature['title_es'] }}
+                        </h3>
+                        <p style="font-size:0.875rem; color:#9CA3AF; margin:0; line-height:1.65;">
+                            {{ $isEn ? $feature['desc_en'] : $feature['desc_es'] }}
+                        </p>
+                    </div>
                 </div>
                 @endforeach
             </div>
