@@ -54,9 +54,12 @@
 
 <div class="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900">
     {{-- Hero Section --}}
-    <div class="relative overflow-hidden">
-        <div class="absolute inset-0 bg-[url('/images/mexican-pattern.svg')] opacity-5"></div>
-        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative">
+    <div class="relative overflow-hidden" style="background:linear-gradient(135deg,#0B0B0B 0%,#1A1A1A 50%,#0B0B0B 100%); border-bottom:1px solid rgba(212,175,55,0.15);">
+        <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1600&q=80"
+             alt="" aria-hidden="true"
+             class="absolute inset-0 w-full h-full object-cover" style="opacity:0.12; pointer-events:none;">
+        <div class="absolute inset-0" style="background:linear-gradient(to bottom, rgba(11,11,11,0.5) 0%, rgba(11,11,11,0.2) 100%); pointer-events:none;"></div>
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative" style="z-index:1;">
             <nav class="text-sm mb-8">
                 <ol class="flex items-center space-x-2 text-gray-400">
                     <li><a href="{{ route('home') }}" class="hover:text-white">Inicio</a></li>

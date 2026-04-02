@@ -39,8 +39,12 @@
 <div class="min-h-screen" style="background:#0B0B0B; color:#F5F5F5;">
 
     {{-- ── Hero ─────────────────────────────────────────────────────────────── --}}
-    <div style="background:linear-gradient(135deg,#0B0B0B 0%,#1A1A1A 50%,#0B0B0B 100%); border-bottom:1px solid #2A2A2A; padding:4rem 0 3rem;">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+    <div style="background:linear-gradient(135deg,#0B0B0B 0%,#1A1A1A 50%,#0B0B0B 100%); border-bottom:1px solid #2A2A2A; padding:4rem 0 3rem; position:relative; overflow:hidden;">
+        <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1600&q=80"
+             alt="" aria-hidden="true"
+             style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0.12; pointer-events:none;">
+        <div style="position:absolute; inset:0; background:linear-gradient(to bottom, rgba(11,11,11,0.6) 0%, rgba(11,11,11,0.3) 100%); pointer-events:none;"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center" style="position:relative; z-index:1;">
             <nav style="margin-bottom:1.5rem;">
                 <ol style="display:flex; justify-content:center; flex-wrap:wrap; gap:0.5rem; align-items:center; font-size:0.875rem; color:#9CA3AF;">
                     <li><a href="/" style="color:#D4AF37; text-decoration:none;">FAMER</a></li>
