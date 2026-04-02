@@ -73,19 +73,13 @@
     </section>
 
     {{-- Review Sources Strip --}}
-    <section class="py-8" style="background-color: #1A1A1A; border-top: 1px solid rgba(212,175,55,0.1); border-bottom: 1px solid rgba(212,175,55,0.1);">
-        <div class="max-w-7xl mx-auto px-4">
-            <p class="text-center text-[#D4AF37] text-xs font-semibold uppercase tracking-[0.2em] mb-5">{{ __('app.reviews_from_platforms') }}</p>
-            <div class="flex flex-wrap justify-center items-center gap-6 md:gap-10">
-                <span class="text-lg font-bold text-white/70 hover:text-[#D4AF37] transition-colors cursor-default">Google</span>
-                <span class="text-lg font-bold text-white/70 hover:text-[#D4AF37] transition-colors cursor-default">Yelp</span>
-                <span class="text-lg font-bold text-white/70 hover:text-[#D4AF37] transition-colors cursor-default">TripAdvisor</span>
-                <span class="text-lg font-bold text-white/70 hover:text-[#D4AF37] transition-colors cursor-default">Facebook</span>
-                <span class="text-lg font-bold text-white/70 hover:text-[#D4AF37] transition-colors cursor-default">Foursquare</span>
-                <span class="text-lg font-bold text-white/70 hover:text-[#D4AF37] transition-colors cursor-default">Apple Maps</span>
-                <span class="text-lg font-bold text-white/70 hover:text-[#D4AF37] transition-colors cursor-default">Uber Eats</span>
-                <span class="text-lg font-bold text-white/70 hover:text-[#D4AF37] transition-colors cursor-default">OpenTable</span>
-            </div>
+    <section style="background:#111111; border-top:1px solid rgba(212,175,55,0.08); border-bottom:1px solid rgba(212,175,55,0.08); padding:0.875rem 1rem;">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-center items-center gap-1">
+            <span style="color:#6B7280; font-size:0.7rem; font-weight:600; text-transform:uppercase; letter-spacing:0.12em; margin-right:0.5rem;">{{ __('app.reviews_from_platforms') }}:</span>
+            @foreach(['Google','Yelp','TripAdvisor','Facebook','Foursquare','Apple Maps','Uber Eats','OpenTable'] as $p)
+            <span style="color:#4B5563; font-size:0.8rem; font-weight:600; padding:0.2rem 0.6rem;">{{ $p }}</span>
+            @if(!$loop->last)<span style="color:#2A2A2A; font-size:0.75rem;">·</span>@endif
+            @endforeach
         </div>
     </section>
 
@@ -96,18 +90,33 @@
                 Explora por Platillo
             </h2>
             <p style="color:#9CA3AF; margin-bottom:1.5rem; font-size:0.95rem;">Encuentra restaurantes especializados en tus platillos favoritos</p>
-            <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:0.875rem;">
+            <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
                 @foreach([
-                    ['birria','Birria','🍲'],['tamales','Tamales','🫔'],['pozole','Pozole','🥣'],
-                    ['enchiladas','Enchiladas','🌯'],['tacos-al-pastor','Tacos al Pastor','🌮'],
-                    ['mole','Mole','🫕'],['menudo','Menudo','🍜'],['chiles-rellenos','Chiles Rellenos','🫑'],
-                    ['carne-asada','Carne Asada','🥩'],['carnitas','Carnitas','🐷'],['barbacoa','Barbacoa','🫕'],
-                ] as [$slug, $name, $emoji])
+                    ['birria',       'Birria',          'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=400&q=75'],
+                    ['tamales',      'Tamales',         'https://images.unsplash.com/photo-1605478371310-a9f1e96b4ff4?auto=format&fit=crop&w=400&q=75'],
+                    ['pozole',       'Pozole',          'https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?auto=format&fit=crop&w=400&q=75'],
+                    ['enchiladas',   'Enchiladas',      'https://images.unsplash.com/photo-1534352956036-cd81e27dd615?auto=format&fit=crop&w=400&q=75'],
+                    ['tacos-al-pastor','Tacos al Pastor','https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=400&q=75'],
+                    ['mole',         'Mole',            'https://images.unsplash.com/photo-1574484284002-952d92456975?auto=format&fit=crop&w=400&q=75'],
+                    ['menudo',       'Menudo',          'https://images.unsplash.com/photo-1527976746453-f363eac4d889?auto=format&fit=crop&w=400&q=75'],
+                    ['chiles-rellenos','Chiles Rellenos','https://images.unsplash.com/photo-1606756790138-261d2b21cd75?auto=format&fit=crop&w=400&q=75'],
+                    ['carne-asada',  'Carne Asada',     'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=400&q=75'],
+                    ['carnitas',     'Carnitas',        'https://images.unsplash.com/photo-1552332386-f8dd00dc2f85?auto=format&fit=crop&w=400&q=75'],
+                    ['barbacoa',     'Barbacoa',        'https://images.unsplash.com/photo-1565299507177-b0ac66763828?auto=format&fit=crop&w=400&q=75'],
+                    ['tacos',        'Tacos',           'https://images.unsplash.com/photo-1613514785940-daed07799d9b?auto=format&fit=crop&w=400&q=75'],
+                ] as [$slug, $name, $photo])
                 <a href="/{{ $slug }}"
-                   style="display:flex; flex-direction:column; align-items:center; background:#1A1A1A; border:1px solid #2A2A2A; border-radius:12px; padding:1.25rem 0.75rem; text-decoration:none; text-align:center; transition:border-color 0.2s;"
-                   onmouseover="this.style.borderColor='#D4AF37'" onmouseout="this.style.borderColor='#2A2A2A'">
-                    <span style="font-size:2rem; margin-bottom:0.5rem;">{{ $emoji }}</span>
-                    <span style="font-weight:600; color:#F5F5F5; font-size:0.85rem;">{{ $name }}</span>
+                   style="display:block; border-radius:12px; overflow:hidden; border:1px solid #2A2A2A; text-decoration:none; position:relative; transition:border-color 0.2s, transform 0.2s;"
+                   onmouseover="this.style.borderColor='#D4AF37';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#2A2A2A';this.style.transform='translateY(0)'">
+                    <div style="height:100px; overflow:hidden;">
+                        <img src="{{ $photo }}" alt="{{ $name }}" loading="lazy"
+                             style="width:100%; height:100%; object-fit:cover; transition:transform 0.4s;"
+                             onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'">
+                    </div>
+                    <div style="background:linear-gradient(to top, rgba(11,11,11,0.95) 0%, rgba(11,11,11,0.5) 60%, transparent 100%); position:absolute; inset:0; pointer-events:none;"></div>
+                    <div style="position:absolute; bottom:0; left:0; right:0; padding:0.5rem 0.6rem;">
+                        <span style="font-weight:600; color:#F5F5F5; font-size:0.75rem; line-height:1.2; display:block; text-shadow:0 1px 3px rgba(0,0,0,0.8);">{{ $name }}</span>
+                    </div>
                 </a>
                 @endforeach
             </div>
