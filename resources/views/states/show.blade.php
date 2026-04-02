@@ -113,10 +113,7 @@
                     $rating = $restaurant->google_rating ?? $restaurant->average_rating ?? null;
                     $reviewsCount = $restaurant->google_reviews_count ?? $restaurant->total_reviews ?? 0;
                     // Get first photo from JSON array
-                    $photoUrl = $restaurant->getFirstMediaUrl('photos', 'thumb')
-                        ?: $restaurant->getFirstMediaUrl('images')
-                        ?: ($restaurant->yelp_photos[0] ?? null)
-                        ?: ($restaurant->image ? (str_starts_with($restaurant->image, 'http') ? $restaurant->image : \Illuminate\Support\Facades\Storage::url($restaurant->image)) : null);
+                    $photoUrl = $restaurant->getDisplayImageUrl();
                 @endphp
                 <a href="/restaurante/{{ $restaurant->slug }}"
                    style="display:block; background:#1A1A1A; border:1px solid #2A2A2A; border-radius:12px; overflow:hidden; text-decoration:none; transition:border-color 0.2s; position:relative;"

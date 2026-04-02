@@ -288,6 +288,37 @@ class Restaurant extends Model implements HasMedia
             ->saveSlugsTo('slug');
     }
 
+    /**
+     * Returns the best available display image URL for listing pages.
+     * Priority: CDN URLs (image col if http, yelp_photos) → Spatie local files.
+     * Avoids 0-byte Spatie files that render as broken images.
+     */
+    public function getDisplayImageUrl(): ?string
+    {
+        // 1. image column — if it's already an absolute CDN URL, use it directly
+        if ($this->image && str_starts_with($this->image, 'http')) {
+            return $this->image;
+        }
+
+        // 2. yelp_photos — also CDN URLs, always valid
+        if (!empty($this->yelp_photos) && is_array($this->yelp_photos) && isset($this->yelp_photos[0])) {
+            return $this->yelp_photos[0];
+        }
+
+        // 3. Spatie 'images' collection — local file (may be 0 bytes)
+        $spatieUrl = $this->getFirstMediaUrl('images');
+        if ($spatieUrl) {
+            return $spatieUrl;
+        }
+
+        // 4. image column — local path fallback
+        if ($this->image) {
+            return \Illuminate\Support\Facades\Storage::url($this->image);
+        }
+
+        return null;
+    }
+
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('images')

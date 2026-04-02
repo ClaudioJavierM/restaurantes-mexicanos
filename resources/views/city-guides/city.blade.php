@@ -152,10 +152,7 @@
                                 3 => ['bg' => 'bg-amber-700', 'text' => 'text-white'],
                                 default => ['bg' => 'bg-[#2A2A2A]', 'text' => 'text-gray-400'],
                             };
-                            $topRestImage = $restaurant->getFirstMediaUrl('photos', 'thumb')
-                                ?: $restaurant->getFirstMediaUrl('images')
-                                ?: ($restaurant->yelp_photos[0] ?? null)
-                                ?: ($restaurant->image ? (str_starts_with($restaurant->image, 'http') ? $restaurant->image : asset('storage/' . $restaurant->image)) : null);
+                            $topRestImage = $restaurant->getDisplayImageUrl();
                             $weightedRating = $restaurant->getWeightedRating();
                             $combinedReviews = $restaurant->getCombinedReviewCount();
                         @endphp
@@ -251,10 +248,7 @@
                         @php
                             $isEliteCard = $restaurant->subscription_tier === 'elite';
                             $isPremiumCard = $restaurant->subscription_tier === 'premium';
-                            $cardRestImage = $restaurant->getFirstMediaUrl('photos', 'thumb')
-                                ?: $restaurant->getFirstMediaUrl('images')
-                                ?: ($restaurant->yelp_photos[0] ?? null)
-                                ?: ($restaurant->image ? (str_starts_with($restaurant->image, 'http') ? $restaurant->image : asset('storage/' . $restaurant->image)) : null);
+                            $cardRestImage = $restaurant->getDisplayImageUrl();
                             $cardRating = $restaurant->getWeightedRating();
                             $cardReviews = $restaurant->getCombinedReviewCount();
                         @endphp

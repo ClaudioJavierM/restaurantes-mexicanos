@@ -108,10 +108,7 @@
                             <a href="{{ route('restaurants.show', $restaurant->slug) }}" class="group bg-white rounded-xl shadow-md hover:shadow-xl transition overflow-hidden">
                                 <div class="aspect-[4/3] relative bg-gray-100">
                                     @php
-                                        $catImgUrl = $restaurant->getFirstMediaUrl('photos', 'thumb')
-                                            ?: $restaurant->getFirstMediaUrl('images')
-                                            ?: ($restaurant->yelp_photos[0] ?? null)
-                                            ?: ($restaurant->image ? (str_starts_with($restaurant->image, 'http') ? $restaurant->image : asset('storage/' . $restaurant->image)) : null);
+                                        $catImgUrl = $restaurant->getDisplayImageUrl();
                                     @endphp
                                     @if($catImgUrl)
                                         <img src="{{ $catImgUrl }}" alt="{{ $restaurant->name }}" class="w-full h-full object-cover group-hover:scale-105 transition" loading="lazy"

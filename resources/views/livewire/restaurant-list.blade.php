@@ -293,10 +293,7 @@
 
                                     <!-- Restaurant Image -->
                                     @php
-                                        $imgUrl = $restaurant->getFirstMediaUrl('photos', 'thumb')
-                                            ?: $restaurant->getFirstMediaUrl('images')
-                                            ?: ($restaurant->yelp_photos[0] ?? null)
-                                            ?: ($restaurant->image ? \Illuminate\Support\Facades\Storage::url($restaurant->image) : null);
+                                        $imgUrl = $restaurant->getDisplayImageUrl();
                                     @endphp
                                     <div class="aspect-video bg-gray-900 overflow-hidden" style="position:relative;">
                                         @if($imgUrl)

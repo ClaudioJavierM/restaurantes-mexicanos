@@ -99,10 +99,7 @@ Restaurantes Mexicanos Cerca de Mí | FAMER
                    style="display:block; background:#1A1A1A; border:1px solid #2A2A2A; border-radius:12px; overflow:hidden; text-decoration:none; transition:border-color 0.2s;"
                    onmouseover="this.style.borderColor='#D4AF37'" onmouseout="this.style.borderColor='#2A2A2A'">
                     @php
-                        $nearMeImg = $restaurant->getFirstMediaUrl('photos', 'thumb')
-                            ?: $restaurant->getFirstMediaUrl('images')
-                            ?: ($restaurant->yelp_photos[0] ?? null)
-                            ?: ($restaurant->image ? (str_starts_with($restaurant->image, 'http') ? $restaurant->image : \Illuminate\Support\Facades\Storage::url($restaurant->image)) : null);
+                        $nearMeImg = $restaurant->getDisplayImageUrl();
                     @endphp
                     <div style="height:160px; overflow:hidden; background:#111; display:flex; align-items:center; justify-content:center; position:relative;">
                         @if($nearMeImg)

@@ -129,10 +129,7 @@
                                 {{-- Restaurant Image --}}
                                 <div style="flex-shrink:0; width:7rem; height:7rem; position:relative; overflow:hidden;">
                                     @php
-                                        $imageUrl = $restaurant->getFirstMediaUrl('photos', 'thumb')
-                                            ?: $restaurant->getFirstMediaUrl('images')
-                                            ?: ($restaurant->yelp_photos[0] ?? null)
-                                            ?: ($restaurant->image ? (str_starts_with($restaurant->image, 'http') ? $restaurant->image : \Illuminate\Support\Facades\Storage::url($restaurant->image)) : null);
+                                        $imageUrl = $restaurant->getDisplayImageUrl();
                                     @endphp
                                     @if($imageUrl)
                                     <img src="{{ $imageUrl }}" alt="{{ $restaurant->name }}"
