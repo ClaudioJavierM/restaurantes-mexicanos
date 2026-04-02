@@ -116,6 +116,16 @@ class RestaurantController extends Controller
         $nearbyRestaurants = $restaurants->map(function ($restaurant) use ($lat, $lng) {
             $distance = $this->calculateDistance($lat, $lng, $restaurant->latitude, $restaurant->longitude);
             $restaurant->distance = round($distance, 2);
+            // Normalize image to full URL for frontend consumption
+            if ($restaurant->image) {
+                $restaurant->image_url = str_starts_with($restaurant->image, 'http')
+                    ? $restaurant->image
+                    : \Illuminate\Support\Facades\Storage::url($restaurant->image);
+            } else {
+                $restaurant->image_url = null;
+            }
+            // Normalize rating field name
+            $restaurant->rating = $restaurant->average_rating;
             return $restaurant;
         })
         ->filter(function ($restaurant) use ($radius) {

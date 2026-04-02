@@ -96,7 +96,7 @@ Restaurantes Mexicanos Cerca de Mí | FAMER
                    onmouseover="this.style.borderColor='#D4AF37'" onmouseout="this.style.borderColor='#2A2A2A'">
                     @if($restaurant->image)
                     <div style="height:160px; overflow:hidden;">
-                        <img src="{{ $restaurant->image }}" alt="{{ $restaurant->name }}" style="width:100%; height:100%; object-fit:cover;">
+                        <img src="{{ str_starts_with($restaurant->image, 'http') ? $restaurant->image : \Illuminate\Support\Facades\Storage::url($restaurant->image) }}" alt="{{ $restaurant->name }}" loading="lazy" style="width:100%; height:100%; object-fit:cover;">
                     </div>
                     @else
                     <div style="height:100px; background:#2A2A2A; display:flex; align-items:center; justify-content:center;">
@@ -196,12 +196,21 @@ function searchNearby(lat, lng) {
             if (restaurants.length > 0) {
                 title.textContent = `${restaurants.length} Restaurantes Cerca de Ti`;
                 grid.innerHTML = restaurants.map(r => `
-                    <a href="/restaurante/${r.slug}" style="display:block; background:#1A1A1A; border:1px solid #2A2A2A; border-radius:12px; padding:1.25rem; text-decoration:none;"
+                    <a href="/restaurante/${r.slug}" style="display:block; background:#1A1A1A; border:1px solid #2A2A2A; border-radius:12px; overflow:hidden; text-decoration:none; transition:border-color 0.2s;"
                        onmouseover="this.style.borderColor='#D4AF37'" onmouseout="this.style.borderColor='#2A2A2A'">
-                        <h3 style="font-weight:600; color:#F5F5F5; margin-bottom:0.25rem; font-size:0.9375rem;">${r.name}</h3>
-                        <p style="color:#9CA3AF; font-size:0.8125rem; margin-bottom:0.5rem;">${r.city || ''}</p>
-                        ${r.rating ? `<span style="color:#D4AF37; font-size:0.875rem;">★ ${parseFloat(r.rating).toFixed(1)}</span>` : ''}
-                        ${r.distance ? `<span style="color:#6B7280; font-size:0.8125rem; margin-left:0.5rem;">${r.distance.toFixed(1)} mi</span>` : ''}
+                        ${r.image_url
+                            ? `<div style="height:160px; overflow:hidden;"><img src="${r.image_url}" alt="${r.name}" loading="lazy" style="width:100%; height:100%; object-fit:cover;"></div>`
+                            : `<div style="height:100px; background:#2A2A2A; display:flex; align-items:center; justify-content:center;"><span style="font-size:2rem;">🌮</span></div>`
+                        }
+                        <div style="padding:1rem;">
+                            <h3 style="font-weight:600; color:#F5F5F5; margin-bottom:0.25rem; font-size:0.9375rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${r.name}</h3>
+                            <p style="color:#9CA3AF; font-size:0.8125rem; margin-bottom:0.5rem;">${r.city || ''}${r.state ? ', ' + r.state.code : ''}</p>
+                            <div style="display:flex; align-items:center; gap:0.75rem; flex-wrap:wrap;">
+                                ${r.rating ? `<span style="color:#D4AF37; font-size:0.875rem;">★ ${parseFloat(r.rating).toFixed(1)}</span>` : ''}
+                                ${r.distance ? `<span style="color:#6B7280; font-size:0.8125rem;">${r.distance.toFixed(1)} mi</span>` : ''}
+                                ${r.price_range ? `<span style="color:#6B7280; font-size:0.8125rem;">${r.price_range}</span>` : ''}
+                            </div>
+                        </div>
                     </a>
                 `).join('');
                 resultsDiv.style.display = 'block';
