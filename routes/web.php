@@ -5,6 +5,7 @@ use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\TeamInvitationController;
 use App\Http\Controllers\StateRestaurantsController;
+use App\Http\Controllers\CityRestaurantsController;
 
 // Public Routes
 Route::get('/', \App\Livewire\Home::class)->name('home');
@@ -15,6 +16,15 @@ Route::get('/restaurante/{slug}', \App\Livewire\RestaurantDetail::class)->name('
 Route::get('/restaurant/{slug}', fn($slug) => redirect('/restaurante/' . $slug, 301));
 Route::get('/sugerir', \App\Livewire\SmartSuggestionForm::class)->name('suggestions.create');
 Route::get('/restaurantes-mexicanos-cerca-de-mi', [\App\Http\Controllers\NearMeController::class, 'index'])->name('near-me');
+
+// City landing pages — MUST be before state routes (more specific slug pattern)
+// Format: /restaurantes-mexicanos-en-dallas-tx  /best-mexican-restaurants-in-dallas-tx
+Route::get('/restaurantes-mexicanos-en-{citySlug}', [CityRestaurantsController::class, 'show'])
+    ->where('citySlug', '[a-z\-]+-[a-z]{2}')
+    ->name('cities.show');
+Route::get('/best-mexican-restaurants-in-{citySlug}', [CityRestaurantsController::class, 'show'])
+    ->where('citySlug', '[a-z\-]+-[a-z]{2}')
+    ->name('cities.show.en');
 
 // State landing pages (SEO: "restaurantes mexicanos en texas")
 Route::get('/estados', [StateRestaurantsController::class, 'index'])->name('states.index');
