@@ -1290,7 +1290,7 @@
             <h2 style="font-family:'Playfair Display',serif; font-size:1.5rem; font-weight:700; color:#F5F5F5; margin-bottom:1.5rem;">
                 {{ app()->getLocale() === 'en' ? 'You Might Also Like' : 'También te puede gustar' }}
             </h2>
-            <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:1rem;">
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                 @foreach($nearbyRestaurants as $nr)
                 @php
                     $nrPhoto = null;
