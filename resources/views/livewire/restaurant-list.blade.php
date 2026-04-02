@@ -13,7 +13,10 @@
     @endpush
 
     <!-- Hero / Header -->
-    <div style="background:linear-gradient(135deg,#0B0B0B 0%,#1A1A1A 50%,#0B0B0B 100%); border-bottom:1px solid #2A2A2A; padding:3rem 0 2.5rem;">
+    <div style="position:relative; border-bottom:1px solid #2A2A2A; padding:3rem 0 2.5rem; overflow:hidden;">
+        <div style="position:absolute; inset:0; background-image:url('https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=1600&q=80'); background-size:cover; background-position:center; z-index:0;"></div>
+        <div style="position:absolute; inset:0; background:linear-gradient(135deg,rgba(11,11,11,0.88) 0%,rgba(26,26,26,0.82) 50%,rgba(11,11,11,0.88) 100%); z-index:1;"></div>
+        <div style="position:relative; z-index:2;">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <!-- Breadcrumb -->
             <nav style="margin-bottom:1rem;">
@@ -51,6 +54,7 @@
                     {{ $isEn ? '100% Authentic Mexican' : '100% Mexicano Auténtico' }}
                 </div>
             </div>
+        </div>
         </div>
     </div>
 

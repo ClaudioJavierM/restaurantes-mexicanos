@@ -14,7 +14,10 @@ Restaurantes Mexicanos Cerca de Mí | FAMER
 @section('content')
 <div class="min-h-screen" style="background:#0B0B0B; color:#F5F5F5;">
     <!-- Hero -->
-    <div style="background:linear-gradient(135deg,#0B0B0B 0%,#1A1A1A 50%,#0B0B0B 100%); border-bottom:1px solid #2A2A2A; padding:4rem 0 3rem;">
+    <div style="position:relative; border-bottom:1px solid #2A2A2A; padding:4rem 0 3rem; overflow:hidden;">
+        <div style="position:absolute; inset:0; background-image:url('https://images.unsplash.com/photo-1565299507177-b0ac66763828?auto=format&fit=crop&w=1600&q=80'); background-size:cover; background-position:center; z-index:0;"></div>
+        <div style="position:absolute; inset:0; background:linear-gradient(135deg,rgba(11,11,11,0.90) 0%,rgba(26,26,26,0.85) 50%,rgba(11,11,11,0.90) 100%); z-index:1;"></div>
+        <div style="position:relative; z-index:2;">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <nav style="margin-bottom:1.5rem;">
                 <ol style="display:flex; justify-content:center; flex-wrap:wrap; gap:0.5rem; align-items:center; font-size:0.875rem; color:#9CA3AF;">
@@ -44,6 +47,7 @@ Restaurantes Mexicanos Cerca de Mí | FAMER
                 </button>
                 <p id="geo-status" style="color:#9CA3AF; font-size:0.875rem; margin-top:1rem; min-height:1.25rem;"></p>
             </div>
+        </div>
         </div>
     </div>
 

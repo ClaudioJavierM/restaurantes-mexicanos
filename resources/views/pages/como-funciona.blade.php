@@ -11,7 +11,10 @@
     {{-- ═══════════════════════════════════════════════════════════ --}}
     {{-- HERO                                                        --}}
     {{-- ═══════════════════════════════════════════════════════════ --}}
-    <section style="background:linear-gradient(135deg,#0B0B0B 0%,#1A1A1A 50%,#0B0B0B 100%); border-bottom:1px solid rgba(212,175,55,0.25); padding:5rem 1.5rem 4rem;">
+    <section style="position:relative; border-bottom:1px solid rgba(212,175,55,0.25); padding:5rem 1.5rem 4rem; overflow:hidden;">
+        <div style="position:absolute; inset:0; background-image:url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1600&q=80'); background-size:cover; background-position:center; z-index:0;"></div>
+        <div style="position:absolute; inset:0; background:linear-gradient(135deg,rgba(11,11,11,0.92) 0%,rgba(26,26,26,0.88) 50%,rgba(11,11,11,0.92) 100%); z-index:1;"></div>
+        <div style="position:relative; z-index:2;">
         <div style="max-width:900px; margin:0 auto; text-align:center;">
             <div style="display:inline-block; background:rgba(212,175,55,0.1); border:1px solid rgba(212,175,55,0.3); border-radius:999px; padding:0.35rem 1.1rem; font-size:0.75rem; font-weight:600; color:#D4AF37; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:1.5rem;">
                 {{ $isEn ? 'For Restaurant Owners' : 'Para Dueños de Restaurantes' }}
@@ -51,6 +54,7 @@
                 <div style="font-size:0.875rem; color:#D4AF37; font-weight:600;">{{ $isEn ? $labelEn : $labelEs }}</div>
             </div>
             @endforeach
+        </div>
         </div>
     </section>
 
@@ -126,7 +130,7 @@
                     'desc_en' => 'Add photos, digital menu with QR code, hours, description, and everything customers need to choose you. FAMER Score measures how complete your profile is and tells you exactly what to improve.',
                     'detail_es'=> ['FAMER Score 0–100: mide tu visibilidad online', 'Fotos de alta calidad — importadas de Google/Yelp', 'Menú digital con categorías y precios', 'Código QR descargable para tu mesa o mostrador', 'Horarios con excepciones por día festivo'],
                     'detail_en'=> ['FAMER Score 0–100: measures your online visibility', 'High-quality photos — imported from Google/Yelp', 'Digital menu with categories and prices', 'Downloadable QR code for your table or counter', 'Hours with holiday exceptions'],
-                    'plan'    => 'Premium $29/mo',
+                    'plan'    => 'Premium $39/mo',
                     'image'   => 'https://images.unsplash.com/photo-1611532736597-de2d4265fba3?auto=format&fit=crop&w=600&q=80',
                 ],
                 [
@@ -138,7 +142,7 @@
                     'desc_en' => 'FAMER automatically sends SMS to your customers 1–4 hours after their visit, inviting them to leave a review. Without you doing anything. Each new review improves your ranking position.',
                     'detail_es'=> ['SMS automáticos post-visita (sin intervención manual)', 'Deduplicación: máximo 1 mensaje cada 7 días por cliente', 'Reseñas en FAMER + redirección a Google', 'Más reseñas = mejor posición en rankings de ciudad', 'Panel de gestión de reseñas — responder en 1 clic'],
                     'detail_en'=> ['Automatic post-visit SMS (no manual intervention)', 'Deduplication: max 1 message per customer every 7 days', 'FAMER reviews + redirect to Google', 'More reviews = better city ranking position', 'Review management panel — respond in 1 click'],
-                    'plan'    => 'Premium $29/mo',
+                    'plan'    => 'Premium $39/mo',
                     'image'   => 'https://images.unsplash.com/photo-1553729459-efe14ef6055d?auto=format&fit=crop&w=600&q=80',
                 ],
                 [
@@ -418,7 +422,7 @@
                             ['Email & SMS marketing',       '✅','❌','❌','❌','❌'],
                             ['No per-order commission',     '✅','✅','❌','✅','✅'],
                             ['Built for Mexican cuisine',   '✅','❌','❌','❌','❌'],
-                            ['Monthly cost',                'Free / $29 / $79','$300+','15–30%','$249+','Free'],
+                            ['Monthly cost',                'Free / $39 / $79','$300+','15–30%','$249+','Free'],
                         ] : [
                             ['Listado en directorio',        '✅','✅','✅','✅','✅'],
                             ['Reseñas verificadas',          '✅','✅','❌','✅','✅'],
@@ -430,7 +434,7 @@
                             ['Email y SMS marketing',        '✅','❌','❌','❌','❌'],
                             ['Sin comisión por pedido',      '✅','✅','❌','✅','✅'],
                             ['Construido para cocina mexicana','✅','❌','❌','❌','❌'],
-                            ['Costo mensual',                'Gratis / $29 / $79','$300+','15–30%','$249+','Gratis'],
+                            ['Costo mensual',                'Gratis / $39 / $79','$300+','15–30%','$249+','Gratis'],
                         ];
                         @endphp
                         @foreach($rows as $ri => $row)
@@ -506,11 +510,13 @@
                         {{ $isEn ? '⭐ Most Popular' : '⭐ Más Popular' }}
                     </div>
                     <p style="font-size:0.75rem; font-weight:700; color:#D4AF37; text-transform:uppercase; letter-spacing:0.1em; margin:0.5rem 0 0.5rem;">Premium</p>
-                    <div style="font-family:'Playfair Display',serif; font-size:2.25rem; font-weight:800; color:#D4AF37; margin:0 0 0.25rem;">
-                        $29<span style="font-size:0.875rem; font-weight:400; color:#9CA3AF; font-family:Poppins,sans-serif;">/{{ $isEn ? 'mo' : 'mes' }}</span>
+                    <div style="display:flex; align-items:baseline; gap:0.5rem; margin:0 0 0.25rem;">
+                        <span style="font-family:'Playfair Display',serif; font-size:1.5rem; font-weight:700; color:#9CA3AF; text-decoration:line-through;">$39</span>
+                        <span style="font-family:'Playfair Display',serif; font-size:2.5rem; font-weight:800; color:#D4AF37;">$9.99</span>
+                        <span style="font-size:0.8rem; color:#9CA3AF;">{{ $isEn ? 'first mo.' : 'primer mes' }}</span>
                     </div>
-                    <p style="font-size:0.875rem; color:#9CA3AF; margin:0 0 1.5rem;">
-                        {{ $isEn ? 'Everything in Basic, plus:' : 'Todo en Básico, más:' }}
+                    <p style="font-size:0.8125rem; color:#D4AF37; margin:0 0 1.5rem; font-weight:600;">
+                        {{ $isEn ? 'Then $39/mo. Cancel anytime.' : 'Después $39/mes. Cancela cuando quieras.' }}
                     </p>
                     <ul style="list-style:none; padding:0; margin:0 0 1.75rem; display:flex; flex-direction:column; gap:0.6rem;">
                         @foreach($isEn
@@ -524,7 +530,7 @@
                     </ul>
                     <a href="{{ route('claim.restaurant') }}?plan=premium" style="display:block; text-align:center; padding:0.75rem; background:#D4AF37; border-radius:0.75rem; color:#0B0B0B; font-weight:700; font-size:0.9375rem; text-decoration:none; transition:background 0.2s;"
                        onmouseover="this.style.background='#B8962E'" onmouseout="this.style.background='#D4AF37'">
-                        {{ $isEn ? 'Start Premium →' : 'Empezar Premium →' }}
+                        {{ $isEn ? 'Start for $9.99 →' : 'Suscribirse por $9.99 →' }}
                     </a>
                 </div>
 
