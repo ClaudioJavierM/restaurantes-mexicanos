@@ -544,7 +544,7 @@ class YelpImportService
         $downloaded = [];
         $index = 1;
 
-        foreach (array_slice($googlePhotos, 0, 5) as $photo) {
+        foreach ($googlePhotos as $photo) {
             $ref = $photo['photo_reference'] ?? null;
             if (!$ref) continue;
 
@@ -568,6 +568,7 @@ class YelpImportService
                 }
 
                 $index++;
+                if ($index > 10) break; // Google Places API max is 10 per call
             } catch (\Exception $e) {
                 Log::warning("Failed to download Google photo for {$restaurant->name}", ['error' => $e->getMessage()]);
             }

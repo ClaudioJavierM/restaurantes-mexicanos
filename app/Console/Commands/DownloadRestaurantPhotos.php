@@ -138,7 +138,7 @@ class DownloadRestaurantPhotos extends Command
                     $photoIndex++;
                 }
 
-                if ($photoIndex > 5) {
+                if ($photoIndex > 10) {
                     break;
                 }
             }
@@ -186,8 +186,8 @@ class DownloadRestaurantPhotos extends Command
                 return [];
             }
 
-            // Extract up to 5 photo references
-            return array_column(array_slice($result['photos'], 0, 5), 'photo_reference');
+            // Extract up to 10 photo references (Google Places API max per call)
+            return array_column(array_slice($result['photos'], 0, 10), 'photo_reference');
 
         } catch (\Exception $e) {
             \Log::error('Exception in getPhotoReferences', ['place_id' => $placeId, 'error' => $e->getMessage()]);
