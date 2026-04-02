@@ -65,6 +65,8 @@ Route::get('/blog/{post}', [\App\Http\Controllers\BlogController::class, 'show']
 
 // For Business Owners
 Route::get("/for-owners", \App\Livewire\ForOwners::class)->name("for-owners");
+Route::get('/como-funciona-famer', \App\Http\Controllers\HowItWorksController::class)->name('how-it-works');
+Route::get('/how-famer-works', \App\Http\Controllers\HowItWorksController::class)->name('how-it-works.en');
 Route::get("/preguntas-frecuentes", \App\Livewire\Faq::class)->name("faq");
 Route::get('/grader', \App\Livewire\FamerGrader::class)->name('famer.grader');
 Route::get('/grader/{slug}', \App\Livewire\FamerGrader::class)->name('famer.grader.restaurant');

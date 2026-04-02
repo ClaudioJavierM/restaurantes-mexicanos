@@ -249,6 +249,9 @@
                     <a href="/claim" class="text-gray-400 hover:text-[#D4AF37] px-4 py-2 text-sm font-medium transition-colors duration-200 {{ request()->is('claim*') ? 'text-[#D4AF37]' : '' }}">
                         {{ app()->getLocale() === 'en' ? 'Claim Free' : 'Reclamar Gratis' }}
                     </a>
+                    <a href="/como-funciona-famer" class="text-gray-400 hover:text-[#D4AF37] px-4 py-2 text-sm font-medium transition-colors duration-200 {{ request()->is('como-funciona-famer') || request()->is('how-famer-works') ? 'text-[#D4AF37]' : '' }}">
+                        {{ app()->getLocale() === 'en' ? 'How It Works' : 'Cómo Funciona' }}
+                    </a>
                     <a href="/for-owners#pricing" class="text-gray-400 hover:text-[#D4AF37] px-4 py-2 text-sm font-medium transition-colors duration-200">
                         {{ app()->getLocale() === 'en' ? 'Plans & Pricing' : 'Planes y Precios' }}
                     </a>
@@ -349,6 +352,9 @@
                 </a>
                 <a href="/claim" class="block text-gray-400 hover:text-[#D4AF37] px-3 py-2.5 rounded-lg text-base font-medium transition-colors duration-200">
                     {{ app()->getLocale() === 'en' ? 'Claim Free' : 'Reclamar Gratis' }}
+                </a>
+                <a href="/como-funciona-famer" class="block text-gray-400 hover:text-[#D4AF37] px-3 py-2.5 rounded-lg text-base font-medium transition-colors duration-200">
+                    {{ app()->getLocale() === 'en' ? 'How It Works' : 'Cómo Funciona' }}
                 </a>
                 <a href="/for-owners#pricing" class="block text-gray-400 hover:text-[#D4AF37] px-3 py-2.5 rounded-lg text-base font-medium transition-colors duration-200">
                     {{ app()->getLocale() === 'en' ? 'Plans & Pricing' : 'Planes y Precios' }}
@@ -480,6 +486,7 @@
                 <div>
                     <h3 class="text-[#D4AF37] font-bold mb-4 text-sm uppercase tracking-wider">{{ app()->getLocale() === 'en' ? 'For Owners' : 'Para Duenos' }}</h3>
                     <ul class="space-y-2.5 text-sm">
+                        <li><a href="/como-funciona-famer" class="text-gray-500 hover:text-[#D4AF37] transition-colors duration-200">{{ app()->getLocale() === 'en' ? 'How It Works' : 'Cómo Funciona' }}</a></li>
                         <li><a href="/claim" class="text-gray-500 hover:text-[#D4AF37] transition-colors duration-200">{{ app()->getLocale() === 'en' ? 'Claim Restaurant' : 'Reclamar Restaurante' }}</a></li>
                         <li><a href="/for-owners#pricing" class="text-gray-500 hover:text-[#D4AF37] transition-colors duration-200">{{ app()->getLocale() === 'en' ? 'Plans & Pricing' : 'Planes y Precios' }}</a></li>
                         <li><a href="/dashboard" class="text-gray-500 hover:text-[#D4AF37] transition-colors duration-200">{{ app()->getLocale() === 'en' ? 'Owner Dashboard' : 'Dashboard' }}</a></li>
