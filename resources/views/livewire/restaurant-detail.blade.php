@@ -160,32 +160,62 @@
 @endphp
 
 @push('meta')
-    {{-- Open Graph for social sharing --}}
-    <meta property="og:type" content="restaurant">
-    <meta property="og:title" content="{{ $restaurant->name }} — {{ $restaurant->city }}, {{ $restaurant->state?->name ?? '' }}">
     @php
-        $ogDesc = app()->getLocale() === 'en'
+        // Ranking badge for OG title
+        $ogTopRanking = $restaurant->rankings()
+            ->where('is_published', true)
+            ->where('position', '<=', 10)
+            ->orderBy('position')
+            ->first();
+        $ogRankingBadge = '';
+        if ($ogTopRanking) {
+            $ogRankingBadge = '🏆 #' . $ogTopRanking->position . ' ' . ($ogTopRanking->scope === 'national' ? 'Nacional' : ($ogTopRanking->state?->abbreviation ?? '')) . ' · ';
+        }
+
+        // Rating stars for title
+        $ogWeightedRating = $seoTotalWeight > 0 ? round($seoTotalWeightedScore / $seoTotalWeight, 1) : 0;
+        $ogRatingStr = $ogWeightedRating > 0 ? '⭐ ' . number_format($ogWeightedRating, 1) . ' · ' : '';
+
+        // Description
+        $ogBaseDesc = app()->getLocale() === 'en'
             ? ($restaurant->ai_description_en ?: $restaurant->ai_description ?: $restaurant->description)
             : ($restaurant->ai_description ?: $restaurant->description);
-        $ogDesc = $ogDesc ?: 'Descubre ' . $restaurant->name . ', uno de los mejores restaurantes mexicanos en ' . $restaurant->city;
+
+        // Build rich description
+        $ogDescParts = [];
+        if ($ogWeightedRating > 0 && $seoCombinedReviews > 0) {
+            $ogDescParts[] = number_format($ogWeightedRating, 1) . '/5 basado en ' . number_format($seoCombinedReviews) . ' reseñas';
+        }
+        if ($restaurant->price_range) {
+            $ogDescParts[] = $restaurant->price_range;
+        }
+        if ($restaurant->address) {
+            $ogDescParts[] = $restaurant->address . ', ' . $restaurant->city;
+        }
+        $ogDescHeader = !empty($ogDescParts) ? implode(' · ', $ogDescParts) . '. ' : '';
+        $ogFinalDesc = $ogDescHeader . ($ogBaseDesc ? Str::limit(strip_tags($ogBaseDesc), 160) : 'Cocina mexicana auténtica en ' . $restaurant->city . ', ' . ($restaurant->state?->name ?? 'USA') . '.');
+
+        $ogTitle = $ogRankingBadge . $ogRatingStr . $restaurant->name . ' — ' . $restaurant->city . ', ' . ($restaurant->state?->abbreviation ?? $restaurant->state?->name ?? '');
     @endphp
-    <meta property="og:description" content="{{ Str::limit(strip_tags($ogDesc), 200) }}">
+
+    {{-- Open Graph for social sharing --}}
+    <meta property="og:type" content="restaurant">
+    <meta property="og:title" content="{{ $ogTitle }}">
+    <meta property="og:description" content="{{ Str::limit($ogFinalDesc, 250) }}">
     <meta property="og:url" content="{{ url()->current() }}">
-    @php
-        $hasRankings = $restaurant->rankings()->where('year', now()->year - 1)->where('position', '<=', 25)->where('is_published', true)->exists();
-    @endphp
     @if($seoImage)
         <meta property="og:image" content="{{ $seoImage }}">
     @endif
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="{{ $restaurant->name }} — {{ $restaurant->city }}">
     <meta property="og:locale" content="{{ app()->getLocale() === 'en' ? 'en_US' : 'es_MX' }}">
-    <meta property="og:site_name" content="Restaurantes Mexicanos Famosos">
+    <meta property="og:site_name" content="FAMER - Famous Mexican Restaurants">
 
     {{-- Twitter Card --}}
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="{{ $restaurant->name }} — {{ $restaurant->city }}">
-    <meta name="twitter:description" content="{{ Str::limit(strip_tags($restaurant->description ?: 'Descubre ' . $restaurant->name), 150) }}">
+    <meta name="twitter:title" content="{{ $ogTitle }}">
+    <meta name="twitter:description" content="{{ Str::limit($ogFinalDesc, 200) }}">
     @if($seoImage)
         <meta name="twitter:image" content="{{ $seoImage }}">
     @endif
