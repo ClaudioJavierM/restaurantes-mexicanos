@@ -257,6 +257,21 @@
             }
         }
 
+        // openingHours — schema.org compact format (Google rich results)
+        if (!empty($restaurant->opening_hours)) {
+            $ohData = is_string($restaurant->opening_hours)
+                ? json_decode($restaurant->opening_hours, true)
+                : $restaurant->opening_hours;
+            $weekdayText = $ohData['weekday_text'] ?? null;
+            if ($weekdayText && is_array($weekdayText)) {
+                $googleService = app(\App\Services\GooglePlacesService::class);
+                $schemaHours = $googleService->parseOpeningHoursSchema($weekdayText);
+                if (!empty($schemaHours)) {
+                    $restaurantSchema['openingHours'] = $schemaHours;
+                }
+            }
+        }
+
         // BreadcrumbList schema
         $breadcrumbSchema = [
             '@context'        => 'https://schema.org',
