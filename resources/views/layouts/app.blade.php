@@ -554,17 +554,18 @@
     <!-- Dynamic Scripts -->
     @stack('scripts')
 
-    {{-- Carmen AI Chat: only on Premium/Elite restaurant detail pages --}}
+    {{-- Carmen AI Chat: owner incentive pages + Premium/Elite restaurant detail pages --}}
     @php
         $chatRestaurant = null;
-        if(request()->route() && request()->route()->getName() === 'restaurants.show') {
+        $isOwnerPage = request()->routeIs('for-owners', 'claim.restaurant', 'famer.grader', 'famer.grader.restaurant');
+        if(!$isOwnerPage && request()->route() && request()->route()->getName() === 'restaurants.show') {
             $chatRestaurant = request()->route()->parameter('restaurant');
             if(is_string($chatRestaurant)) {
                 $chatRestaurant = \App\Models\Restaurant::where('slug', $chatRestaurant)->first();
             }
         }
     @endphp
-    @if($chatRestaurant && in_array($chatRestaurant->subscription_tier, ['premium', 'elite']))
+    @if($isOwnerPage || ($chatRestaurant && in_array($chatRestaurant->subscription_tier, ['premium', 'elite'])))
         @include("partials.chat-widget")
     @endif
 
