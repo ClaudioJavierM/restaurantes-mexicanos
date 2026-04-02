@@ -272,7 +272,125 @@
 </section>
 
 {{-- ============================================ --}}
-{{-- 6. PRICING SECTION --}}
+{{-- 6. SOCIAL PROOF — Dueños con resultados    --}}
+{{-- ============================================ --}}
+<section class="py-20 md:py-28" style="background-color: #0B0B0B;">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        {{-- Section header --}}
+        <div class="text-center mb-14">
+            <p class="text-xs font-bold tracking-widest uppercase mb-3" style="color: #D4AF37;">
+                {{ app()->getLocale() === 'en' ? 'Real Results' : 'Resultados Reales' }}
+            </p>
+            <h2 class="text-3xl md:text-4xl font-bold" style="color: #F5F5F5; font-family: 'Playfair Display', Georgia, serif;">
+                {{ app()->getLocale() === 'en' ? 'Owners who are already growing.' : 'Dueños que ya están creciendo.' }}
+            </h2>
+        </div>
+
+        {{-- Impact stats bar --}}
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-14">
+            @foreach([
+                ['num' => '3.2×', 'label_es' => 'Más reseñas en 90 días',       'label_en' => 'More reviews in 90 days'],
+                ['num' => '68%',  'label_es' => 'Aumento promedio en visitas',   'label_en' => 'Average increase in profile views'],
+                ['num' => '94%',  'label_es' => 'Dueños satisfechos',            'label_en' => 'Satisfied owners'],
+                ['num' => '26K+', 'label_es' => 'Restaurantes en la plataforma', 'label_en' => 'Restaurants on the platform'],
+            ] as $stat)
+            <div class="rounded-2xl p-5 text-center" style="background:#1A1A1A; border:1px solid rgba(212,175,55,0.15);">
+                <div class="text-3xl font-black mb-1" style="color:#D4AF37; font-family:'Playfair Display',serif;">{{ $stat['num'] }}</div>
+                <div class="text-xs" style="color:#9CA3AF;">{{ app()->getLocale() === 'en' ? $stat['label_en'] : $stat['label_es'] }}</div>
+            </div>
+            @endforeach
+        </div>
+
+        {{-- Testimonials grid --}}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-14">
+            @php $testimonials = [
+                [
+                    'name_es'     => 'Carlos M.',
+                    'name_en'     => 'Carlos M.',
+                    'restaurant_es' => 'Taquería El Güero',
+                    'restaurant_en' => 'Taquería El Güero',
+                    'location'    => 'Dallas, TX',
+                    'quote_es'    => 'En 3 meses pasé de 12 reseñas a 47. Ahora aparezco en el Top 5 de Dallas. Los clientes me dicen que me encontraron en FAMER.',
+                    'quote_en'    => 'In 3 months I went from 12 reviews to 47. Now I appear in the Top 5 of Dallas. Customers tell me they found me on FAMER.',
+                    'metric_es'   => '+35 reseñas en 90 días',
+                    'metric_en'   => '+35 reviews in 90 days',
+                    'emoji'       => '🌮',
+                ],
+                [
+                    'name_es'     => 'Ana L.',
+                    'name_en'     => 'Ana L.',
+                    'restaurant_es' => 'La Cocina de Ana',
+                    'restaurant_en' => 'La Cocina de Ana',
+                    'location'    => 'Houston, TX',
+                    'quote_es'    => 'El menú digital con QR fue un cambio total. Los clientes escanean y piden directo. Mis ingresos del fin de semana subieron 22% en el primer mes.',
+                    'quote_en'    => 'The digital menu with QR was a total game changer. Customers scan and order directly. My weekend revenue went up 22% in the first month.',
+                    'metric_es'   => '+22% ingresos fin de semana',
+                    'metric_en'   => '+22% weekend revenue',
+                    'emoji'       => '🍽️',
+                ],
+                [
+                    'name_es'     => 'Roberto V.',
+                    'name_en'     => 'Roberto V.',
+                    'restaurant_es' => 'Pozolería Don Roberto',
+                    'restaurant_en' => 'Pozolería Don Roberto',
+                    'location'    => 'Chicago, IL',
+                    'quote_es'    => 'Antes dependía 100% de Yelp. Ahora tengo mi propio perfil en FAMER y no pago comisiones. El FAMER Score me ayudó a saber exactamente qué mejorar.',
+                    'quote_en'    => 'Before I relied 100% on Yelp. Now I have my own profile on FAMER and I pay no commissions. The FAMER Score helped me know exactly what to improve.',
+                    'metric_es'   => 'Sin comisiones a terceros',
+                    'metric_en'   => 'Zero third-party commissions',
+                    'emoji'       => '🍲',
+                ],
+            ]; @endphp
+
+            @foreach($testimonials as $t)
+            <div class="rounded-2xl p-7 flex flex-col" style="background:#1A1A1A; border:1px solid rgba(212,175,55,0.12);">
+                {{-- Stars --}}
+                <div class="flex gap-0.5 mb-4">
+                    @for($i = 0; $i < 5; $i++)
+                    <svg class="w-4 h-4" style="color:#D4AF37;" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                    </svg>
+                    @endfor
+                </div>
+                {{-- Quote --}}
+                <p class="text-sm leading-relaxed flex-1 mb-5" style="color:#CCCCCC;">
+                    "{{ app()->getLocale() === 'en' ? $t['quote_en'] : $t['quote_es'] }}"
+                </p>
+                {{-- Metric badge --}}
+                <div class="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 mb-5 w-fit" style="background:rgba(212,175,55,0.08); border:1px solid rgba(212,175,55,0.2);">
+                    <span class="text-xs font-bold" style="color:#D4AF37;">📈 {{ app()->getLocale() === 'en' ? $t['metric_en'] : $t['metric_es'] }}</span>
+                </div>
+                {{-- Owner info --}}
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center text-lg flex-shrink-0" style="background:#2A2A2A;">
+                        {{ $t['emoji'] }}
+                    </div>
+                    <div>
+                        <div class="text-sm font-bold" style="color:#F5F5F5;">{{ app()->getLocale() === 'en' ? $t['name_en'] : $t['name_es'] }}</div>
+                        <div class="text-xs" style="color:#9CA3AF;">{{ app()->getLocale() === 'en' ? $t['restaurant_en'] : $t['restaurant_es'] }} · {{ $t['location'] }}</div>
+                    </div>
+                </div>
+            </div>
+            @endforeach
+        </div>
+
+        {{-- Logos / trust badges of restaurant types --}}
+        <div class="text-center">
+            <p class="text-xs font-medium mb-4" style="color:#6B7280;">
+                {{ app()->getLocale() === 'en' ? 'Restaurants of all types trust FAMER' : 'Restaurantes de todos los tipos confían en FAMER' }}
+            </p>
+            <div class="flex flex-wrap justify-center gap-3">
+                @foreach(['Taquerías','Pozelerías','Restaurantes Familiares','Bares Mexicanos','Cocinas Regionales','Food Trucks'] as $type)
+                <span class="px-3 py-1.5 rounded-full text-xs font-medium" style="background:#1A1A1A; border:1px solid #2A2A2A; color:#9CA3AF;">{{ $type }}</span>
+                @endforeach
+            </div>
+        </div>
+    </div>
+</section>
+
+{{-- ============================================ --}}
+{{-- 7. PRICING SECTION --}}
 {{-- ============================================ --}}
 <section id="pricing" class="py-20 md:py-28" style="background-color: #0B0B0B;">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -372,7 +490,7 @@
 </section>
 
 {{-- ============================================ --}}
-{{-- 7. FINAL CTA --}}
+{{-- 8. FINAL CTA --}}
 {{-- ============================================ --}}
 <section class="py-20 md:py-28 relative" style="background: linear-gradient(to bottom, #1A1A1A, #0B0B0B);">
     <div class="absolute inset-0" style="background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(212,175,55,0.05) 0%, transparent 70%);"></div>
