@@ -420,36 +420,29 @@
     "numberOfItems": {{ $top10Restaurants->count() }},
     "itemListElement": [
         @foreach($top10Restaurants as $schemaIndex => $schemaRest)
-        @php $schemaRestRating = $schemaRest->getWeightedRating(); @endphp
-        {
-            "@@type": "ListItem",
-            "position": {{ $schemaIndex + 1 }},
-            "item": {
-                "@@type": "Restaurant",
-                "name": "{{ addslashes($schemaRest->name) }}",
-                "url": "{{ route('restaurants.show', $schemaRest->slug) }}"@if($schemaRest->address || $schemaRest->city),
-                "address": {
-                    "@@type": "PostalAddress"@if($schemaRest->address),
-                    "streetAddress": "{{ addslashes($schemaRest->address) }}"@endif,
-                    "addressLocality": "{{ addslashes($cityName) }}",
-                    "addressRegion": "{{ $state->code }}",
-                    "addressCountry": "{{ $state->country ?? 'US' }}"
-                }@endif@if($schemaRest->latitude && $schemaRest->longitude),
-                "geo": {
-                    "@@type": "GeoCoordinates",
-                    "latitude": {{ $schemaRest->latitude }},
-                    "longitude": {{ $schemaRest->longitude }}
-                }@endif,
-                "servesCuisine": "Mexican"@if($schemaRest->price_range),
-                "priceRange": "{{ $schemaRest->price_range }}"@endif@if($schemaRestRating > 0),
-                "aggregateRating": {
-                    "@@type": "AggregateRating",
-                    "ratingValue": "{{ number_format($schemaRestRating, 1) }}",
-                    "bestRating": "5",
-                    "ratingCount": "{{ $schemaRest->getCombinedReviewCount() }}"
-                }@endif
+        @php
+            $schemaRestRating = $schemaRest->getWeightedRating();
+            $schemaItem = [
+                '@type' => 'Restaurant',
+                'name' => $schemaRest->name,
+                'url' => route('restaurants.show', $schemaRest->slug),
+                'servesCuisine' => 'Mexican',
+            ];
+            if ($schemaRest->address || $schemaRest->city) {
+                $addr = ['@type' => 'PostalAddress', 'addressLocality' => $cityName, 'addressRegion' => $state->code, 'addressCountry' => $state->country ?? 'US'];
+                if ($schemaRest->address) $addr['streetAddress'] = $schemaRest->address;
+                $schemaItem['address'] = $addr;
             }
-        }{{ $loop->last ? '' : ',' }}
+            if ($schemaRest->latitude && $schemaRest->longitude) {
+                $schemaItem['geo'] = ['@type' => 'GeoCoordinates', 'latitude' => (float)$schemaRest->latitude, 'longitude' => (float)$schemaRest->longitude];
+            }
+            if ($schemaRest->price_range) $schemaItem['priceRange'] = $schemaRest->price_range;
+            if ($schemaRestRating > 0) {
+                $schemaItem['aggregateRating'] = ['@type' => 'AggregateRating', 'ratingValue' => number_format($schemaRestRating, 1), 'bestRating' => '5', 'ratingCount' => $schemaRest->getCombinedReviewCount()];
+            }
+            $schemaListItem = ['@type' => 'ListItem', 'position' => $schemaIndex + 1, 'item' => $schemaItem];
+        @endphp
+        {!! json_encode($schemaListItem, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}{{ $loop->last ? '' : ',' }}
         @endforeach
     ]
 }
