@@ -4,86 +4,45 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-
-        <title>{{ config('app.name', 'Restaurantes Mexicanos Famosos') }}</title>
-
-        <!-- Fonts -->
-        <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-
-        <!-- Scripts -->
+        <title>{{ config('app.name', 'FAMER') }}</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans text-gray-900 antialiased">
-        <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gradient-to-br from-amber-50 to-yellow-50">
-            <!-- Logo y Branding -->
-            <div class="mb-6">
-                <a href="/" wire:navigate class="flex flex-col items-center">
-                    <!-- Icon -->
-                    <img src="/images/branding/sombrero-icon.png" alt="FAMER" class="w-16 h-16 drop-shadow-lg mb-3">
-                    <!-- Title -->
-                    <h1 class="text-2xl font-bold text-gray-900">Restaurantes Mexicanos</h1>
-                    <p class="text-sm text-red-600 font-medium">Famosos</p>
+    <body style="background:#0B0B0B; font-family:'Poppins',sans-serif; min-height:100vh; margin:0;">
+
+        {{-- Background photo --}}
+        <div style="position:fixed; inset:0; z-index:0; pointer-events:none;">
+            <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1600&q=80"
+                 alt="" aria-hidden="true"
+                 style="width:100%; height:100%; object-fit:cover; opacity:0.08;">
+            <div style="position:absolute; inset:0; background:radial-gradient(ellipse 80% 60% at 50% 30%, rgba(212,175,55,0.06) 0%, transparent 70%);"></div>
+        </div>
+
+        {{-- Page --}}
+        <div style="position:relative; z-index:1; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2rem 1rem;">
+
+            {{-- Logo --}}
+            <div style="text-align:center; margin-bottom:1.75rem;">
+                <a href="/" wire:navigate style="text-decoration:none; display:inline-flex; flex-direction:column; align-items:center; gap:0.5rem;">
+                    <img src="/images/branding/famer55.png" alt="FAMER"
+                         style="width:64px; height:64px; object-fit:contain;">
+                    <span style="font-family:'Playfair Display',serif; font-size:1.375rem; font-weight:700; color:#F5F5F5; line-height:1;">FAMER</span>
+                    <span style="font-size:0.6875rem; font-weight:700; color:#D4AF37; letter-spacing:0.12em; text-transform:uppercase;">Famous Mexican Restaurants</span>
                 </a>
             </div>
 
-            <!-- Main Form Container -->
-            <div class="w-full sm:max-w-md px-6 py-6 bg-white shadow-xl overflow-hidden sm:rounded-2xl border border-gray-100">
+            {{-- Card --}}
+            <div style="background:#1A1A1A; border:1px solid rgba(212,175,55,0.2); border-radius:1.25rem; width:100%; max-width:460px; padding:2rem 2rem 1.75rem; color:#F5F5F5;">
                 {{ $slot }}
             </div>
 
-            <!-- Social Login - Separate Container -->
-            <div class="w-full sm:max-w-md mt-4 px-6 py-5 bg-white shadow-xl overflow-hidden sm:rounded-2xl border border-gray-100">
-                <div class="relative">
-                    <div class="absolute inset-0 flex items-center">
-                        <div class="w-full border-t border-gray-200"></div>
-                    </div>
-                    <div class="relative flex justify-center text-sm">
-                        <span class="px-3 bg-white text-gray-500">{{ __('O continua con') }}</span>
-                    </div>
-                </div>
-
-                <div class="mt-5 grid grid-cols-2 gap-3">
-                    <!-- Google -->
-                    <a href="{{ route('auth.social.redirect', 'google') }}"
-                       class="w-full inline-flex justify-center py-3 px-4 border border-gray-200 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200">
-                        <svg class="w-5 h-5" viewBox="0 0 24 24">
-                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                        </svg>
-                        <span class="ml-2">Google</span>
-                    </a>
-
-                    <!-- Facebook -->
-                    <a href="{{ route('auth.social.redirect', 'facebook') }}"
-                       class="w-full inline-flex justify-center py-3 px-4 border border-gray-200 rounded-xl shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 hover:border-gray-300 transition-all duration-200">
-                        <svg class="w-5 h-5" fill="#1877F2" viewBox="0 0 24 24">
-                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                        </svg>
-                        <span class="ml-2">Facebook</span>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Footer text -->
-            <p class="mt-6 text-center text-xs text-gray-500">
-                Encuentra los mejores restaurantes mexicanos cerca de ti
+            {{-- Footer --}}
+            <p style="margin-top:1.5rem; font-size:0.75rem; color:#4B5563; text-align:center;">
+                &copy; {{ date('Y') }} FAMER &mdash; Encuentra los mejores restaurantes mexicanos
             </p>
         </div>
-    <script>
-      (function(d,t) {
-        var BASE_URL="https://chat.mefimports.com";
-        var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
-        g.src=BASE_URL+"/packs/js/sdk.js";
-        g.defer = true;
-        s.parentNode.insertBefore(g,s);
-        g.onload=function(){
-            baseUrl: BASE_URL
-          })
-        }
-      })(document,"script");
-    </script>
-</body>
+
+    </body>
 </html>

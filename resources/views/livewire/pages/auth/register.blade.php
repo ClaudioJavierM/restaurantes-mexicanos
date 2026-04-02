@@ -142,72 +142,91 @@ new #[Layout('layouts.guest')] class extends Component
 }; ?>
 
 <div>
+    {{-- Title --}}
+    <h2 style="font-family:'Playfair Display',serif; font-size:1.625rem; font-weight:700; color:#F5F5F5; margin:0 0 1.5rem; text-align:center;">
+        Crear Cuenta
+    </h2>
+
     <form wire:submit="register">
-        <!-- Honeypot field -->
-        <div class="absolute opacity-0 -z-10" aria-hidden="true" style="position: absolute; left: -9999px;">
-            <label for="website">Website</label>
-            <input type="text" wire:model.blur="website" id="website" name="website" tabindex="-1" autocomplete="off" />
+        {{-- Honeypot --}}
+        <div aria-hidden="true" style="position:absolute; left:-9999px; opacity:0;">
+            <input type="text" wire:model.blur="website" id="website" name="website" tabindex="-1" autocomplete="off">
+        </div>
+        <input type="hidden" wire:model.blur="form_loaded_at">
+
+        {{-- Name --}}
+        <div style="margin-bottom:1.125rem;">
+            <label for="name" style="display:block; font-size:0.75rem; font-weight:600; color:#9CA3AF; margin-bottom:0.4rem; text-transform:uppercase; letter-spacing:0.06em;">Nombre</label>
+            <input wire:model.blur="name" id="name" type="text" name="name" required autofocus autocomplete="name"
+                   style="width:100%; background:#111; border:1px solid #2A2A2A; color:#F5F5F5; border-radius:0.625rem; padding:0.75rem 1rem; font-size:0.9375rem; box-sizing:border-box; outline:none; font-family:'Poppins',sans-serif;"
+                   onfocus="this.style.borderColor='rgba(212,175,55,0.5)'" onblur="this.style.borderColor='#2A2A2A'">
+            @error('name') <p style="color:#FCA5A5; font-size:0.8125rem; margin:0.375rem 0 0;">{{ $message }}</p> @enderror
         </div>
 
-        <input type="hidden" wire:model.blur="form_loaded_at" />
-
-        <!-- Name -->
-        <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input wire:model.blur="name" id="name" class="block mt-1 w-full" type="text" name="name" required autofocus autocomplete="name" />
-            <x-input-error :messages="$errors->get('name')" class="mt-2" />
+        {{-- Email --}}
+        <div style="margin-bottom:1.125rem;">
+            <label for="email" style="display:block; font-size:0.75rem; font-weight:600; color:#9CA3AF; margin-bottom:0.4rem; text-transform:uppercase; letter-spacing:0.06em;">Email</label>
+            <input wire:model.blur="email" id="email" type="email" name="email" required autocomplete="username"
+                   style="width:100%; background:#111; border:1px solid #2A2A2A; color:#F5F5F5; border-radius:0.625rem; padding:0.75rem 1rem; font-size:0.9375rem; box-sizing:border-box; outline:none; font-family:'Poppins',sans-serif;"
+                   onfocus="this.style.borderColor='rgba(212,175,55,0.5)'" onblur="this.style.borderColor='#2A2A2A'">
+            @error('email') <p style="color:#FCA5A5; font-size:0.8125rem; margin:0.375rem 0 0;">{{ $message }}</p> @enderror
         </div>
 
-        <!-- Email -->
-        <div class="mt-4">
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input wire:model.blur="email" id="email" class="block mt-1 w-full" type="email" name="email" required autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+        {{-- Phone --}}
+        <div style="margin-bottom:1.125rem;">
+            <label for="phone" style="display:block; font-size:0.75rem; font-weight:600; color:#9CA3AF; margin-bottom:0.4rem; text-transform:uppercase; letter-spacing:0.06em;">Teléfono</label>
+            <input wire:model.blur="phone" id="phone" type="tel" name="phone" required autocomplete="tel" placeholder="(555) 123-4567"
+                   style="width:100%; background:#111; border:1px solid #2A2A2A; color:#F5F5F5; border-radius:0.625rem; padding:0.75rem 1rem; font-size:0.9375rem; box-sizing:border-box; outline:none; font-family:'Poppins',sans-serif;"
+                   onfocus="this.style.borderColor='rgba(212,175,55,0.5)'" onblur="this.style.borderColor='#2A2A2A'">
+            @error('phone') <p style="color:#FCA5A5; font-size:0.8125rem; margin:0.375rem 0 0;">{{ $message }}</p> @enderror
         </div>
 
-        <!-- Phone -->
-        <div class="mt-4">
-            <x-input-label for="phone" :value="__('Phone Number')" />
-            <x-text-input wire:model.blur="phone" id="phone" class="block mt-1 w-full" type="tel" name="phone" required autocomplete="tel" placeholder="(555) 123-4567" />
-            <x-input-error :messages="$errors->get('phone')" class="mt-2" />
+        {{-- Password --}}
+        <div style="margin-bottom:1.125rem;">
+            <label for="password" style="display:block; font-size:0.75rem; font-weight:600; color:#9CA3AF; margin-bottom:0.4rem; text-transform:uppercase; letter-spacing:0.06em;">Contraseña</label>
+            <input wire:model.blur="password" id="password" type="password" name="password" required autocomplete="new-password"
+                   style="width:100%; background:#111; border:1px solid #2A2A2A; color:#F5F5F5; border-radius:0.625rem; padding:0.75rem 1rem; font-size:0.9375rem; box-sizing:border-box; outline:none; font-family:'Poppins',sans-serif;"
+                   onfocus="this.style.borderColor='rgba(212,175,55,0.5)'" onblur="this.style.borderColor='#2A2A2A'">
+            @error('password') <p style="color:#FCA5A5; font-size:0.8125rem; margin:0.375rem 0 0;">{{ $message }}</p> @enderror
         </div>
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-            <x-text-input wire:model.blur="password" id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" />
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
+        {{-- Confirm Password --}}
+        <div style="margin-bottom:1.25rem;">
+            <label for="password_confirmation" style="display:block; font-size:0.75rem; font-weight:600; color:#9CA3AF; margin-bottom:0.4rem; text-transform:uppercase; letter-spacing:0.06em;">Confirmar Contraseña</label>
+            <input wire:model.blur="password_confirmation" id="password_confirmation" type="password" name="password_confirmation" required autocomplete="new-password"
+                   style="width:100%; background:#111; border:1px solid #2A2A2A; color:#F5F5F5; border-radius:0.625rem; padding:0.75rem 1rem; font-size:0.9375rem; box-sizing:border-box; outline:none; font-family:'Poppins',sans-serif;"
+                   onfocus="this.style.borderColor='rgba(212,175,55,0.5)'" onblur="this.style.borderColor='#2A2A2A'">
+            @error('password_confirmation') <p style="color:#FCA5A5; font-size:0.8125rem; margin:0.375rem 0 0;">{{ $message }}</p> @enderror
         </div>
 
-        <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
-            <x-text-input wire:model.blur="password_confirmation" id="password_confirmation" class="block mt-1 w-full" type="password" name="password_confirmation" required autocomplete="new-password" />
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-        </div>
-
-        <!-- SMS Marketing Consent -->
-        <div class="mt-4">
-            <label class="flex items-start gap-3 cursor-pointer">
-                <input type="checkbox" wire:model.blur="sms_marketing_consent" id="sms_marketing_consent" 
-                       class="mt-1 rounded border-gray-300 text-red-600 shadow-sm focus:ring-red-500" />
-                <span class="text-sm text-gray-600 dark:text-gray-400">
-                    {{ __('I agree to receive promotional messages, special offers, and platform updates from FAMER via SMS. Message frequency varies. Reply STOP to opt out at any time. Message and data rates may apply.') }}
+        {{-- SMS consent --}}
+        <div style="margin-bottom:1.5rem;">
+            <label style="display:flex; align-items:flex-start; gap:0.625rem; cursor:pointer;">
+                <input type="checkbox" wire:model.blur="sms_marketing_consent" id="sms_marketing_consent"
+                       style="accent-color:#D4AF37; width:1rem; height:1rem; margin-top:0.2rem; flex-shrink:0; cursor:pointer;">
+                <span style="font-size:0.8125rem; color:#6B7280; line-height:1.5;">
+                    Acepto recibir mensajes promocionales de FAMER vía SMS. Responde STOP para cancelar. Aplican tarifas de mensajes.
                 </span>
             </label>
-            <x-input-error :messages="$errors->get('sms_marketing_consent')" class="mt-2" />
+            @error('sms_marketing_consent') <p style="color:#FCA5A5; font-size:0.8125rem; margin:0.375rem 0 0;">{{ $message }}</p> @enderror
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('login') }}" wire:navigate>
-                {{ __('Already registered?') }}
-            </a>
-
-            <x-primary-button class="ms-4">
-                {{ __('Register') }}
-            </x-primary-button>
-        </div>
+        {{-- Submit --}}
+        <button type="submit"
+                wire:loading.attr="disabled"
+                style="width:100%; background:#D4AF37; color:#0B0B0B; border:none; padding:0.875rem; border-radius:0.75rem; font-weight:700; font-size:1rem; cursor:pointer; transition:background 0.2s; font-family:'Poppins',sans-serif;"
+                onmouseover="this.style.background='#E8C67A'" onmouseout="this.style.background='#D4AF37'">
+            <span wire:loading.remove>Crear Cuenta</span>
+            <span wire:loading>Creando cuenta...</span>
+        </button>
     </form>
 
+    {{-- Social Login --}}
     @include('components.social-login-buttons')
+
+    {{-- Login link --}}
+    <p style="text-align:center; margin-top:1.25rem; font-size:0.875rem; color:#6B7280;">
+        ¿Ya tienes cuenta?
+        <a href="{{ route('login') }}" wire:navigate style="color:#D4AF37; font-weight:600; text-decoration:none;">Iniciar sesión</a>
+    </p>
 </div>

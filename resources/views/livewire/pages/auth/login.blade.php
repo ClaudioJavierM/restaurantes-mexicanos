@@ -25,53 +25,71 @@ new #[Layout('layouts.guest')] class extends Component
 }; ?>
 
 <div>
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+    {{-- Title --}}
+    <h2 style="font-family:'Playfair Display',serif; font-size:1.625rem; font-weight:700; color:#F5F5F5; margin:0 0 1.5rem; text-align:center;">
+        Iniciar Sesión
+    </h2>
 
+    {{-- Status --}}
+    @if (session('status'))
+    <div style="background:rgba(74,222,128,0.1); border:1px solid rgba(74,222,128,0.3); border-radius:0.625rem; padding:0.75rem 1rem; margin-bottom:1.25rem;">
+        <p style="color:#4ADE80; font-size:0.875rem; margin:0;">{{ session('status') }}</p>
+    </div>
+    @endif
     @if (session('error'))
-        <div class="mb-4 p-4 rounded-md bg-red-50 border border-red-200">
-            <p class="text-sm text-red-600">{{ session('error') }}</p>
-        </div>
+    <div style="background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); border-radius:0.625rem; padding:0.75rem 1rem; margin-bottom:1.25rem;">
+        <p style="color:#FCA5A5; font-size:0.875rem; margin:0;">{{ session('error') }}</p>
+    </div>
     @endif
 
     <form wire:submit="login">
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input wire:model="form.email" id="email" class="block mt-1 w-full" type="email" name="email" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('form.email')" class="mt-2" />
+        {{-- Email --}}
+        <div style="margin-bottom:1.125rem;">
+            <label for="email" style="display:block; font-size:0.75rem; font-weight:600; color:#9CA3AF; margin-bottom:0.4rem; text-transform:uppercase; letter-spacing:0.06em;">Email</label>
+            <input wire:model="form.email" id="email" type="email" name="email" required autofocus autocomplete="username"
+                   style="width:100%; background:#111; border:1px solid #2A2A2A; color:#F5F5F5; border-radius:0.625rem; padding:0.75rem 1rem; font-size:0.9375rem; box-sizing:border-box; outline:none; font-family:'Poppins',sans-serif;"
+                   onfocus="this.style.borderColor='rgba(212,175,55,0.5)'" onblur="this.style.borderColor='#2A2A2A'">
+            @error('form.email') <p style="color:#FCA5A5; font-size:0.8125rem; margin:0.375rem 0 0;">{{ $message }}</p> @enderror
         </div>
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input wire:model="form.password" id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
-
-            <x-input-error :messages="$errors->get('form.password')" class="mt-2" />
+        {{-- Password --}}
+        <div style="margin-bottom:1.125rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+                <label for="password" style="font-size:0.75rem; font-weight:600; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.06em;">Contraseña</label>
+                @if (Route::has('password.request'))
+                <a href="{{ route('password.request') }}" wire:navigate style="font-size:0.75rem; color:#D4AF37; text-decoration:none; font-weight:500;">¿Olvidaste tu contraseña?</a>
+                @endif
+            </div>
+            <input wire:model="form.password" id="password" type="password" name="password" required autocomplete="current-password"
+                   style="width:100%; background:#111; border:1px solid #2A2A2A; color:#F5F5F5; border-radius:0.625rem; padding:0.75rem 1rem; font-size:0.9375rem; box-sizing:border-box; outline:none; font-family:'Poppins',sans-serif;"
+                   onfocus="this.style.borderColor='rgba(212,175,55,0.5)'" onblur="this.style.borderColor='#2A2A2A'">
+            @error('form.password') <p style="color:#FCA5A5; font-size:0.8125rem; margin:0.375rem 0 0;">{{ $message }}</p> @enderror
         </div>
 
-        <!-- Remember Me -->
-        <div class="block mt-4">
-            <label for="remember" class="inline-flex items-center">
-                <input wire:model="form.remember" id="remember" type="checkbox" class="rounded dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800" name="remember">
-                <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Remember me') }}</span>
+        {{-- Remember me --}}
+        <div style="margin-bottom:1.5rem;">
+            <label style="display:inline-flex; align-items:center; gap:0.5rem; cursor:pointer;">
+                <input wire:model="form.remember" id="remember" type="checkbox" name="remember" style="accent-color:#D4AF37; width:1rem; height:1rem; cursor:pointer;">
+                <span style="font-size:0.875rem; color:#9CA3AF;">Recordarme</span>
             </label>
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('password.request') }}" wire:navigate>
-                    {{ __('Forgot your password?') }}
-                </a>
-            @endif
-
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-primary-button>
-        </div>
+        {{-- Submit --}}
+        <button type="submit"
+                wire:loading.attr="disabled"
+                style="width:100%; background:#D4AF37; color:#0B0B0B; border:none; padding:0.875rem; border-radius:0.75rem; font-weight:700; font-size:1rem; cursor:pointer; transition:background 0.2s; font-family:'Poppins',sans-serif;"
+                onmouseover="this.style.background='#E8C67A'" onmouseout="this.style.background='#D4AF37'">
+            <span wire:loading.remove>Iniciar Sesión</span>
+            <span wire:loading>Entrando...</span>
+        </button>
     </form>
+
+    {{-- Social Login --}}
+    @include('components.social-login-buttons')
+
+    {{-- Register link --}}
+    <p style="text-align:center; margin-top:1.25rem; font-size:0.875rem; color:#6B7280;">
+        ¿No tienes cuenta?
+        <a href="{{ route('register') }}" wire:navigate style="color:#D4AF37; font-weight:600; text-decoration:none;">Crear cuenta gratis</a>
+    </p>
 </div>
