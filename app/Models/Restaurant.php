@@ -585,20 +585,7 @@ class Restaurant extends Model implements HasMedia
         return str_repeat('🌶️', $this->spice_level);
     }
 
-    public function getAuthenticityBadgesAttribute(): array
-    {
-        $badges = [];
-        if ($this->chef_certified) {
-            $badges[] = ['name' => 'Chef Certificado', 'icon' => '👨‍🍳', 'color' => 'blue'];
-        }
-        if ($this->traditional_recipes) {
-            $badges[] = ['name' => 'Recetas Tradicionales', 'icon' => '📖', 'color' => 'green'];
-        }
-        if ($this->imported_ingredients) {
-            $badges[] = ['name' => 'Ingredientes de México', 'icon' => '🇲🇽', 'color' => 'red'];
-        }
-        return $badges;
-    }
+    // Legacy accessor removed — merged into getAuthenticityBadgesAttribute() at line 269
 
     public function getPriceRangeSymbolAttribute(): string
     {
