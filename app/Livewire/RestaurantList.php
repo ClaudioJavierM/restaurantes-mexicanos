@@ -127,6 +127,8 @@ class RestaurantList extends Component
             'lng' => $longitude,
         ]]);
 
+        $this->dispatch('user-location-updated', lat: $latitude, lng: $longitude);
+
         $this->resetPage();
     }
 

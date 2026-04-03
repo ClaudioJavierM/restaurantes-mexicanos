@@ -432,9 +432,13 @@
                                             {{-- Badge: Datos Fusionados (cuando tiene ambas fuentes) --}}
                                             @include('livewire.partials.data-completeness-badge', ['restaurant' => $restaurant])
 
-                                            @if($restaurant->business_status === 'operational')
+                                            @if($restaurant->open_status === 'open')
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-800">
                                                     Abierto
+                                                </span>
+                                            @elseif($restaurant->open_status === 'closed')
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+                                                    Cerrado
                                                 </span>
                                             @elseif($restaurant->business_status === 'coming_soon')
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">

@@ -731,6 +731,91 @@ class Restaurant extends Model implements HasMedia
         return data_get($this->reservation_hours, strtolower($day));
     }
 
+    /**
+     * Check if restaurant is currently open based on opening_hours + timezone.
+     * Returns: 'open', 'closed', or null (no hours data)
+     */
+    public function getOpenStatusAttribute(): ?string
+    {
+        $hours = $this->opening_hours;
+        if (empty($hours) || empty($hours['periods'])) {
+            return null;
+        }
+
+        try {
+            // Use timezone from hours JSON, fallback to state-based guess
+            $tz = $hours['timezone'] ?? $this->guessTimezone();
+            $now = now()->setTimezone($tz);
+            $currentDay = (int) $now->format('w'); // 0=Sun, 6=Sat
+            $currentTime = (int) $now->format('Hi'); // e.g. 1430 for 2:30pm
+
+            foreach ($hours['periods'] as $period) {
+                $openDay  = $period['open']['day']  ?? null;
+                $closeDay = $period['close']['day'] ?? null;
+                $openTime  = (int) ($period['open']['time']  ?? 0);
+                $closeTime = (int) ($period['close']['time'] ?? 0);
+
+                if ($openDay === null) continue;
+
+                // Same-day period
+                if ($openDay === $currentDay) {
+                    // Closes after midnight (next day)
+                    if ($closeDay !== $openDay) {
+                        if ($currentTime >= $openTime) return 'open';
+                    } else {
+                        if ($currentTime >= $openTime && $currentTime < $closeTime) return 'open';
+                    }
+                }
+
+                // Period that started yesterday and closes today after midnight
+                $yesterday = ($currentDay + 6) % 7;
+                if ($openDay === $yesterday && $closeDay === $currentDay) {
+                    if ($currentTime < $closeTime) return 'open';
+                }
+            }
+
+            return 'closed';
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    protected function guessTimezone(): string
+    {
+        $code = $this->state?->code ?? '';
+        $tzMap = [
+            'HI' => 'Pacific/Honolulu',
+            'AK' => 'America/Anchorage',
+            'WA' => 'America/Los_Angeles', 'OR' => 'America/Los_Angeles',
+            'CA' => 'America/Los_Angeles', 'NV' => 'America/Los_Angeles',
+            'MT' => 'America/Denver', 'ID' => 'America/Denver',
+            'WY' => 'America/Denver', 'UT' => 'America/Denver',
+            'CO' => 'America/Denver', 'AZ' => 'America/Phoenix',
+            'NM' => 'America/Denver',
+            'ND' => 'America/Chicago', 'SD' => 'America/Chicago',
+            'NE' => 'America/Chicago', 'KS' => 'America/Chicago',
+            'MN' => 'America/Chicago', 'IA' => 'America/Chicago',
+            'MO' => 'America/Chicago', 'WI' => 'America/Chicago',
+            'IL' => 'America/Chicago', 'MI' => 'America/Detroit',
+            'IN' => 'America/Indiana/Indianapolis',
+            'OH' => 'America/New_York', 'KY' => 'America/New_York',
+            'TN' => 'America/Chicago', 'AL' => 'America/Chicago',
+            'MS' => 'America/Chicago', 'AR' => 'America/Chicago',
+            'LA' => 'America/Chicago', 'TX' => 'America/Chicago',
+            'OK' => 'America/Chicago',
+            'FL' => 'America/New_York', 'GA' => 'America/New_York',
+            'SC' => 'America/New_York', 'NC' => 'America/New_York',
+            'VA' => 'America/New_York', 'WV' => 'America/New_York',
+            'MD' => 'America/New_York', 'DE' => 'America/New_York',
+            'PA' => 'America/New_York', 'NJ' => 'America/New_York',
+            'NY' => 'America/New_York', 'CT' => 'America/New_York',
+            'RI' => 'America/New_York', 'MA' => 'America/New_York',
+            'VT' => 'America/New_York', 'NH' => 'America/New_York',
+            'ME' => 'America/New_York',
+        ];
+        return $tzMap[$code] ?? 'America/Chicago';
+    }
+
     public function isOpenForReservations(string $day): bool
     {
         $hours = $this->getReservationHoursForDay($day);

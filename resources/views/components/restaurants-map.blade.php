@@ -40,6 +40,7 @@
     x-data="restaurantsMap()"
     x-init="initMap()"
     @highlight-marker.window="highlightMarker($event.detail.index)"
+    @user-location-updated.window="moveToUserLocation($event.detail.lat, $event.detail.lng)"
     {{ $attributes->merge(['class' => 'rounded-lg overflow-hidden shadow-lg border border-gray-200 bg-gray-100']) }}
     style="height: {{ $heightStyle }};"
 >
@@ -195,6 +196,32 @@ function restaurantsMap() {
             });
 
             return marker;
+        },
+
+        moveToUserLocation(lat, lng) {
+            if (!this.map) return;
+            const pos = { lat: parseFloat(lat), lng: parseFloat(lng) };
+            this.map.panTo(pos);
+            this.map.setZoom(11);
+            // Update or add user location dot
+            if (this._userMarker) {
+                this._userMarker.setPosition(pos);
+            } else {
+                this._userMarker = new google.maps.Marker({
+                    position: pos,
+                    map: this.map,
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        scale: 8,
+                        fillColor: '#3B82F6',
+                        fillOpacity: 1,
+                        strokeColor: '#1E40AF',
+                        strokeWeight: 2,
+                    },
+                    title: 'Tu ubicacion',
+                    zIndex: 1000
+                });
+            }
         },
 
         highlightMarker(index) {
