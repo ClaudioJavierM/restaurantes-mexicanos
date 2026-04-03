@@ -178,26 +178,18 @@ function restaurantsMap() {
 
             // Click handler
             marker.addListener('click', () => {
-                const content = `
-                    <div style="max-width: 250px; padding: 8px;">
-                        <div style="font-weight: bold; font-size: 14px; margin-bottom: 4px; color: #111827;">
-                            ${index + 1}. ${restaurant.name}
-                        </div>
-                        <div style="font-size: 12px; color: #6B7280; margin-bottom: 4px;">
-                            ${restaurant.address}${restaurant.city ? ', ' + restaurant.city : ''}${restaurant.state ? ', ' + restaurant.state : ''}
-                        </div>
-                        ${restaurant.rating > 0 ? `
-                        <div style="font-size: 12px; color: #F59E0B; margin-bottom: 8px;">
-                            ${'★'.repeat(Math.round(restaurant.rating))}${'☆'.repeat(5 - Math.round(restaurant.rating))}
-                            <span style="color: #6B7280;">(${restaurant.rating})</span>
-                        </div>
-                        ` : ''}
-                        <a href="/restaurante/${restaurant.slug}"
-                           style="display: inline-block; background: #DC2626; color: white; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; text-decoration: none;">
-                            Ver restaurante
-                        </a>
-                    </div>
-                `;
+                const restaurantUrl = '/restaurante/' + restaurant.slug;
+                const starsHtml = restaurant.rating > 0
+                    ? '<div style="font-size:12px;color:#F59E0B;margin-bottom:8px;">' +
+                      '★'.repeat(Math.round(restaurant.rating)) + '☆'.repeat(5 - Math.round(restaurant.rating)) +
+                      ' <span style="color:#6B7280;">(' + restaurant.rating + ')</span></div>'
+                    : '';
+                const content = '<div style="max-width:250px;padding:8px;">' +
+                    '<div style="font-weight:bold;font-size:14px;margin-bottom:4px;color:#111827;">' + (index + 1) + '. ' + restaurant.name + '</div>' +
+                    '<div style="font-size:12px;color:#6B7280;margin-bottom:4px;">' + restaurant.address + (restaurant.city ? ', ' + restaurant.city : '') + (restaurant.state ? ', ' + restaurant.state : '') + '</div>' +
+                    starsHtml +
+                    '<a href="' + restaurantUrl + '" style="display:inline-block;background:#DC2626;color:white;padding:6px 12px;border-radius:6px;font-size:12px;font-weight:600;text-decoration:none;">Ver restaurante</a>' +
+                    '</div>';
                 this.infoWindow.setContent(content);
                 this.infoWindow.open(this.map, marker);
             });
