@@ -254,12 +254,7 @@ Schedule::command('restaurants:merge-yelp-photos --limit=5000')
 // System Maintenance
 // ============================================================================
 
-/**
- * Clean up old ElevenLabs verification audio files - Hourly
- */
-Schedule::command('verification:cleanup-audio')
-    ->hourly()
-    ->description('Clean up old verification audio files');
+// verification:cleanup-audio command removed (command no longer exists)
 
 // ============================================================================
 // AI Description Generator — twice daily (ES + EN)
