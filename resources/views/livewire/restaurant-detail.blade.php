@@ -371,23 +371,22 @@
 
     {{-- FAQPage Schema --}}
     @if(count($faqItems) > 0)
+    @php
+        $faqSchema = [
+            '@context'   => 'https://schema.org',
+            '@type'      => 'FAQPage',
+            'mainEntity' => array_map(fn($item) => [
+                '@type' => 'Question',
+                'name'  => $item['q'],
+                'acceptedAnswer' => [
+                    '@type' => 'Answer',
+                    'text'  => $item['a'],
+                ],
+            ], $faqItems),
+        ];
+    @endphp
     <script type="application/ld+json">
-    {
-        "@@context": "https://schema.org",
-        "@@type": "FAQPage",
-        "mainEntity": [
-            @foreach($faqItems as $faqItem)
-            {
-                "@@type": "Question",
-                "name": "{{ addslashes($faqItem['q']) }}",
-                "acceptedAnswer": {
-                    "@@type": "Answer",
-                    "text": "{{ addslashes($faqItem['a']) }}"
-                }
-            }{{ $loop->last ? '' : ',' }}
-            @endforeach
-        ]
-    }
+    {!! json_encode($faqSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) !!}
     </script>
     @endif
 @endpush

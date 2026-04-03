@@ -22,44 +22,46 @@
 
 @section('content')
 {{-- Schema.org ItemList for Rich Snippets --}}
+@php
+$itemListSchema = [
+    '@context'        => 'https://schema.org',
+    '@type'           => 'ItemList',
+    'name'            => 'Los Mejores Restaurantes Mexicanos en Estados Unidos ' . $year,
+    'description'     => 'Ranking de los mejores restaurantes mexicanos en USA basado en calificaciones y reseñas de clientes',
+    'numberOfItems'   => $restaurants->count(),
+    'itemListElement' => $restaurants->map(function($restaurant, $index) {
+        $item = [
+            '@type'        => 'ListItem',
+            'position'     => $index + 1,
+            'item'         => [
+                '@type'        => 'Restaurant',
+                'name'         => $restaurant->name,
+                'url'          => route('restaurants.show', $restaurant->slug),
+                'servesCuisine'=> 'Mexican',
+                'priceRange'   => $restaurant->price_range ?? '$$',
+                'address'      => [
+                    '@type'           => 'PostalAddress',
+                    'addressLocality' => $restaurant->city,
+                    'addressRegion'   => $restaurant->state?->code,
+                    'addressCountry'  => 'US',
+                ],
+            ],
+        ];
+        if ($restaurant->average_rating) {
+            $item['item']['aggregateRating'] = [
+                '@type'       => 'AggregateRating',
+                'ratingValue' => number_format($restaurant->average_rating, 1),
+                'reviewCount' => $restaurant->total_reviews ?? 0,
+                'bestRating'  => '5',
+                'worstRating' => '1',
+            ];
+        }
+        return $item;
+    })->values()->all(),
+];
+@endphp
 <script type="application/ld+json">
-{
-    "@@context": "https://schema.org",
-    "@@type": "ItemList",
-    "name": "Los Mejores Restaurantes Mexicanos en Estados Unidos {{ $year }}",
-    "description": "Ranking de los mejores restaurantes mexicanos en USA basado en calificaciones y resenas de clientes",
-    "numberOfItems": {{ $restaurants->count() }},
-    "itemListElement": [
-        @foreach($restaurants as $index => $restaurant)
-        {
-            "@@type": "ListItem",
-            "position": {{ $index + 1 }},
-            "item": {
-                "@@type": "Restaurant",
-                "name": "{{ $restaurant->name }}",
-                "url": "{{ route('restaurants.show', $restaurant->slug) }}",
-                "address": {
-                    "@@type": "PostalAddress",
-                    "addressLocality": "{{ $restaurant->city }}",
-                    "addressRegion": "{{ $restaurant->state?->code }}",
-                    "addressCountry": "US"
-                },
-                "servesCuisine": "Mexican",
-                @if($restaurant->average_rating)
-                "aggregateRating": {
-                    "@@type": "AggregateRating",
-                    "ratingValue": "{{ number_format($restaurant->average_rating, 1) }}",
-                    "reviewCount": "{{ $restaurant->total_reviews ?? 0 }}",
-                    "bestRating": "5",
-                    "worstRating": "1"
-                },
-                @endif
-                "priceRange": "{{ $restaurant->price_range ?? '$$' }}"
-            }
-        }@if(!$loop->last),@endif
-        @endforeach
-    ]
-}
+{!! json_encode($itemListSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) !!}
 </script>
 
 <div style="min-height:100vh; background:#0B0B0B; color:#F5F5F5;">
