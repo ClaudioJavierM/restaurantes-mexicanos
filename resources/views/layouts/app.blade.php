@@ -41,14 +41,8 @@
     <meta property="og:locale:alternate" content="{{ $ogLocale === 'en_US' ? 'es_MX' : 'en_US' }}" />
     <meta property="og:site_name" content="{{ __('app.site_name') }}" />
 
-    <!-- Dynamic Meta Tags (Open Graph, Twitter Cards) — va PRIMERO para que las páginas override los defaults -->
+    <!-- Dynamic Meta Tags (Open Graph, Twitter Cards) — cada página pushea los suyos via @push('meta') -->
     @stack('meta')
-
-    <!-- Open Graph: Fallback defaults (solo aplican si la página no pusheó sus propios OG tags) -->
-    <meta property="og:title" content="@yield('title', 'FAMER - Restaurantes Mexicanos Famosos')">
-    <meta property="og:description" content="@yield('meta_description', 'Directorio de los mejores restaurantes mexicanos auténticos en Estados Unidos.')">
-    <meta property="og:type" content="website">
-    <meta property="og:image" content="https://restaurantesmexicanosfamosos.com.mx/images/branding/famer55.png">
 
     <!-- Core Web Vitals: Preconnect & DNS Prefetch -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
