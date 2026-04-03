@@ -370,15 +370,9 @@ class RestaurantList extends Component
         }
 
         // Sorting
-        // Priority: Elite first, then Premium, then others
-        $query->orderByRaw("CASE
-            WHEN subscription_tier = 'elite' THEN 0
-            WHEN subscription_tier = 'premium' THEN 1
-            ELSE 2
-        END");
-
         switch ($this->sortBy) {
             case 'nearby':
+                // Nearby: pure distance sort — no subscription boost, location is objective
                 if ($this->userLatitude && $this->userLongitude) {
                     $query->select('restaurants.*')
                         ->selectRaw('((latitude - ?) * (latitude - ?) + (longitude - ?) * (longitude - ?)) AS distance', [$this->userLatitude, $this->userLatitude, $this->userLongitude, $this->userLongitude])
@@ -390,7 +384,12 @@ class RestaurantList extends Component
                 }
                 break;
             case 'rating':
-                $query->orderByDesc('average_rating')->orderBy('name');
+                // Rating: subscription boost applies — premium/elite get slight priority among equals
+                $query->orderByRaw("CASE
+                    WHEN subscription_tier = 'elite' THEN 0
+                    WHEN subscription_tier = 'premium' THEN 1
+                    ELSE 2
+                END")->orderByDesc('average_rating')->orderBy('name');
                 break;
             case 'newest':
                 $query->latest();
