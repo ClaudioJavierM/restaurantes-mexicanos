@@ -35,6 +35,11 @@ class RestaurantDetail extends Component
     {
         $this->slug = $slug;
 
+        // Return 410 Gone for soft-deleted restaurants — Google deindexes 4x faster than 404
+        if (Restaurant::withTrashed()->where('slug', $slug)->whereNotNull('deleted_at')->exists()) {
+            abort(410);
+        }
+
         // Load restaurant and track page view
         $this->restaurant = Restaurant::where('slug', $slug)
             ->with(['state', 'category', 'reviews', 'media'])
