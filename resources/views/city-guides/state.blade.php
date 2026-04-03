@@ -279,105 +279,93 @@ Descubre los {{ number_format($stats->total) }} mejores restaurantes mexicanos e
 </div>
 
 @push('scripts')
-{{-- BreadcrumbList Schema --}}
-<script type="application/ld+json">
-{
-    "@@context": "https://schema.org",
-    "@@type": "BreadcrumbList",
-    "itemListElement": [
-        {
-            "@@type": "ListItem",
-            "position": 1,
-            "name": "Inicio",
-            "item": "{{ url('/') }}"
-        },
-        {
-            "@@type": "ListItem",
-            "position": 2,
-            "name": "Guía por Ciudad",
-            "item": "{{ route('city-guides.states') }}"
-        },
-        {
-            "@@type": "ListItem",
-            "position": 3,
-            "name": "{{ $state->name }}",
-            "item": "{{ url()->current() }}"
-        }
-    ]
+@php
+$breadcrumbSchema = [
+    '@context' => 'https://schema.org',
+    '@type'    => 'BreadcrumbList',
+    'itemListElement' => [
+        ['@type' => 'ListItem', 'position' => 1, 'name' => 'Inicio', 'item' => url('/')],
+        ['@type' => 'ListItem', 'position' => 2, 'name' => 'Guía por Ciudad', 'item' => route('city-guides.states')],
+        ['@type' => 'ListItem', 'position' => 3, 'name' => $state->name, 'item' => url()->current()],
+    ],
+];
+
+$restaurantListSchema = null;
+if ($top10Restaurants->isNotEmpty()) {
+    $restaurantListSchema = [
+        '@context'      => 'https://schema.org',
+        '@type'         => 'ItemList',
+        'name'          => 'Top ' . $top10Restaurants->count() . ' Mejores Restaurantes Mexicanos en ' . $state->name,
+        'description'   => 'Los ' . $top10Restaurants->count() . ' mejores restaurantes mexicanos en ' . $state->name . ' ordenados por reseñas verificadas de Google.',
+        'numberOfItems' => $top10Restaurants->count(),
+        'itemListElement' => $top10Restaurants->map(function ($restaurant, $index) use ($state) {
+            $item = [
+                '@type'         => 'Restaurant',
+                'name'          => $restaurant->name,
+                'url'           => route('restaurants.show', $restaurant->slug),
+                'servesCuisine' => 'Mexican',
+            ];
+            if ($restaurant->city) {
+                $item['address'] = [
+                    '@type'           => 'PostalAddress',
+                    'addressLocality' => $restaurant->city,
+                    'addressRegion'   => $state->code,
+                    'addressCountry'  => $state->country ?? 'US',
+                ];
+            }
+            if ($restaurant->latitude && $restaurant->longitude) {
+                $item['geo'] = ['@type' => 'GeoCoordinates', 'latitude' => $restaurant->latitude, 'longitude' => $restaurant->longitude];
+            }
+            if ($restaurant->price_range) {
+                $item['priceRange'] = $restaurant->price_range;
+            }
+            $rating = $restaurant->getWeightedRating();
+            if ($rating > 0) {
+                $item['aggregateRating'] = [
+                    '@type'       => 'AggregateRating',
+                    'ratingValue' => number_format($rating, 1),
+                    'bestRating'  => '5',
+                    'ratingCount' => $restaurant->getCombinedReviewCount(),
+                ];
+            }
+            return ['@type' => 'ListItem', 'position' => $index + 1, 'item' => $item];
+        })->values()->all(),
+    ];
 }
+
+$cityListSchema = [
+    '@context'      => 'https://schema.org',
+    '@type'         => 'ItemList',
+    'name'          => 'Ciudades con Restaurantes Mexicanos en ' . $state->name,
+    'description'   => 'Lista de ' . $cities->count() . ' ciudades con restaurantes mexicanos en ' . $state->name,
+    'numberOfItems' => $cities->count(),
+    'itemListElement' => $cities->take(10)->map(function ($city, $index) use ($state) {
+        return [
+            '@type'    => 'ListItem',
+            'position' => $index + 1,
+            'item'     => [
+                '@type'            => 'City',
+                'name'             => $city->city,
+                'url'              => route('city-guides.city', [$state->code, \Illuminate\Support\Str::slug($city->city)]),
+                'containedInPlace' => ['@type' => 'State', 'name' => $state->name],
+            ],
+        ];
+    })->values()->all(),
+];
+@endphp
+
+<script type="application/ld+json">
+{!! json_encode($breadcrumbSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) !!}
 </script>
 
-{{-- ItemList Schema — Top 10 Restaurants --}}
-@if($top10Restaurants->isNotEmpty())
+@if($restaurantListSchema)
 <script type="application/ld+json">
-{
-    "@@context": "https://schema.org",
-    "@@type": "ItemList",
-    "name": "Top {{ $top10Restaurants->count() }} Mejores Restaurantes Mexicanos en {{ $state->name }}",
-    "description": "Los {{ $top10Restaurants->count() }} mejores restaurantes mexicanos en {{ $state->name }} ordenados por reseñas verificadas de Google.",
-    "numberOfItems": {{ $top10Restaurants->count() }},
-    "itemListElement": [
-        @foreach($top10Restaurants as $index => $restaurant)
-        {
-            "@@type": "ListItem",
-            "position": {{ $index + 1 }},
-            "item": {
-                "@@type": "Restaurant",
-                "name": "{{ addslashes($restaurant->name) }}",
-                "url": "{{ route('restaurants.show', $restaurant->slug) }}"@if($restaurant->city),
-                "address": {
-                    "@@type": "PostalAddress",
-                    "addressLocality": "{{ addslashes($restaurant->city) }}",
-                    "addressRegion": "{{ $state->code }}",
-                    "addressCountry": "{{ $state->country ?? 'US' }}"
-                }@endif@if($restaurant->latitude && $restaurant->longitude),
-                "geo": {
-                    "@@type": "GeoCoordinates",
-                    "latitude": {{ $restaurant->latitude }},
-                    "longitude": {{ $restaurant->longitude }}
-                }@endif,
-                "servesCuisine": "Mexican"@if($restaurant->price_range),
-                "priceRange": "{{ $restaurant->price_range }}"@endif@php $schemaRating = $restaurant->getWeightedRating(); @endphp@if($schemaRating > 0),
-                "aggregateRating": {
-                    "@@type": "AggregateRating",
-                    "ratingValue": "{{ number_format($schemaRating, 1) }}",
-                    "bestRating": "5",
-                    "ratingCount": "{{ $restaurant->getCombinedReviewCount() }}"
-                }@endif
-            }
-        }{{ $loop->last ? '' : ',' }}
-        @endforeach
-    ]
-}
+{!! json_encode($restaurantListSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) !!}
 </script>
 @endif
 
-{{-- ItemList Schema — Cities --}}
 <script type="application/ld+json">
-{
-    "@@context": "https://schema.org",
-    "@@type": "ItemList",
-    "name": "Ciudades con Restaurantes Mexicanos en {{ $state->name }}",
-    "description": "Lista de {{ $cities->count() }} ciudades con restaurantes mexicanos en {{ $state->name }}",
-    "numberOfItems": {{ $cities->count() }},
-    "itemListElement": [
-        @foreach($cities->take(10) as $index => $city)
-        {
-            "@@type": "ListItem",
-            "position": {{ $index + 1 }},
-            "item": {
-                "@@type": "City",
-                "name": "{{ addslashes($city->city) }}",
-                "url": "{{ route('city-guides.city', [$state->code, Str::slug($city->city)]) }}",
-                "containedInPlace": {
-                    "@@type": "State",
-                    "name": "{{ $state->name }}"
-                }
-            }
-        }{{ $loop->last ? '' : ',' }}
-        @endforeach
-    ]
-}
+{!! json_encode($cityListSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) !!}
 </script>
 @endpush
 
