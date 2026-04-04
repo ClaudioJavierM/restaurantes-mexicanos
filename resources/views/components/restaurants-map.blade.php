@@ -77,6 +77,7 @@ function restaurantsMap() {
         userLat: {{ $userLatitude ?? 'null' }},
         userLng: {{ $userLongitude ?? 'null' }},
         initialized: false,
+        _pendingMarkerRefresh: false,
 
         initMap() {
             if (typeof google === 'undefined' || !google.maps) {
@@ -86,6 +87,14 @@ function restaurantsMap() {
 
             if (this.initialized) return;
             this.initialized = true;
+
+            // After Livewire morphs the DOM, check if markers need refreshing
+            document.addEventListener('livewire:update', () => {
+                if (this._pendingMarkerRefresh) {
+                    this._pendingMarkerRefresh = false;
+                    this.refreshMarkersFromDom();
+                }
+            });
 
             // Calculate map center
             let center = { lat: 39.8283, lng: -98.5795 }; // USA center
@@ -204,30 +213,13 @@ function restaurantsMap() {
         refreshMapForLocation(lat, lng) {
             if (!this.map) return;
 
-            // Read fresh restaurant list from the data bridge div (Livewire just updated it)
-            const dataEl = document.getElementById('restaurants-map-data');
-            if (dataEl) {
-                try {
-                    const fresh = JSON.parse(dataEl.dataset.restaurants || '[]');
-                    if (fresh.length > 0) {
-                        this.restaurants = fresh;
-                        this.clearMarkers();
-                        const bounds = new google.maps.LatLngBounds();
-                        this.restaurants.forEach((restaurant, index) => {
-                            const marker = this.createMarker(restaurant, index);
-                            bounds.extend(marker.getPosition());
-                            this.markers.push(marker);
-                        });
-                    }
-                } catch(e) {}
-            }
-
-            // Pan to user location
             const pos = { lat: parseFloat(lat), lng: parseFloat(lng) };
+
+            // Pan to user location immediately (good UX — map moves right away)
             this.map.panTo(pos);
             this.map.setZoom(11);
 
-            // Update or add user location dot
+            // Update or add user location dot immediately
             if (this._userMarker) {
                 this._userMarker.setPosition(pos);
             } else {
@@ -246,6 +238,26 @@ function restaurantsMap() {
                     zIndex: 1000
                 });
             }
+
+            // Markers refresh AFTER Livewire re-renders with nearby restaurants.
+            // The event fires before Livewire morphs the DOM, so we wait for
+            // livewire:update (dispatched after DOM morphing is complete).
+            this._pendingMarkerRefresh = true;
+        },
+
+        refreshMarkersFromDom() {
+            const dataEl = document.getElementById('restaurants-map-data');
+            if (!dataEl) return;
+            try {
+                const fresh = JSON.parse(dataEl.dataset.restaurants || '[]');
+                if (fresh.length > 0 && JSON.stringify(fresh) !== JSON.stringify(this.restaurants)) {
+                    this.restaurants = fresh;
+                    this.clearMarkers();
+                    this.restaurants.forEach((restaurant, index) => {
+                        this.markers.push(this.createMarker(restaurant, index));
+                    });
+                }
+            } catch(e) {}
         },
 
         clearMarkers() {
