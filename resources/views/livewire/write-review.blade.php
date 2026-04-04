@@ -50,7 +50,7 @@
                     </label>
                     <input type="text" wire:model="title"
                            placeholder="{{ app()->getLocale() === 'en' ? 'Summarize your experience' : 'Resume tu experiencia' }}"
-                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-900 bg-white">
                     @error('title') <span class="text-danger-600 text-sm">{{ $message }}</span> @enderror
                 </div>
 
@@ -61,7 +61,7 @@
                     </label>
                     <textarea wire:model="comment" rows="6"
                               placeholder="{{ app()->getLocale() === 'en' ? 'Share your experience... What did you like? What could be improved?' : 'Comparte tu experiencia... ¿Qué te gustó? ¿Qué podría mejorar?' }}"
-                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"></textarea>
+                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-900 bg-white"></textarea>
                     <p class="text-sm text-gray-500 mt-1">{{ app()->getLocale() === 'en' ? 'Minimum 10 characters' : 'Mínimo 10 caracteres' }}</p>
                     @error('comment') <span class="text-danger-600 text-sm">{{ $message }}</span> @enderror
                 </div>
@@ -74,7 +74,7 @@
                             {{ app()->getLocale() === 'en' ? 'Visit Date (Optional)' : 'Fecha de Visita (Opcional)' }}
                         </label>
                         <input type="date" wire:model="visitDate" max="{{ date('Y-m-d') }}"
-                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-900 bg-white">
                         @error('visitDate') <span class="text-danger-600 text-sm">{{ $message }}</span> @enderror
                     </div>
 
@@ -83,7 +83,7 @@
                         <label class="block text-sm font-semibold text-gray-700 mb-2">
                             {{ app()->getLocale() === 'en' ? 'Visit Type (Optional)' : 'Tipo de Visita (Opcional)' }}
                         </label>
-                        <select wire:model="visitType" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                        <select wire:model="visitType" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-900 bg-white">
                             <option value="dine_in">{{ app()->getLocale() === 'en' ? 'Dine In' : 'En el Restaurante' }}</option>
                             <option value="takeout">{{ app()->getLocale() === 'en' ? 'Takeout' : 'Para Llevar' }}</option>
                             <option value="delivery">{{ app()->getLocale() === 'en' ? 'Delivery' : 'Entrega a Domicilio' }}</option>
@@ -98,7 +98,7 @@
                         {{ app()->getLocale() === 'en' ? 'Add Photos (Optional)' : 'Agregar Fotos (Opcional)' }}
                     </label>
                     <input type="file" wire:model="photos" multiple accept="image/*"
-                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-900 bg-white">
                     <p class="text-sm text-gray-500 mt-1">{{ app()->getLocale() === 'en' ? 'Max 5MB per photo' : 'Máximo 5MB por foto' }}</p>
                     @error('photos.*') <span class="text-danger-600 text-sm">{{ $message }}</span> @enderror
 
@@ -124,7 +124,7 @@
                             </label>
                             <input type="text" wire:model="guestName"
                                    placeholder="{{ app()->getLocale() === 'en' ? 'Enter your name' : 'Ingresa tu nombre' }}"
-                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-900 bg-white">
                             @error('guestName') <span class="text-danger-600 text-sm">{{ $message }}</span> @enderror
                         </div>
 
@@ -134,7 +134,7 @@
                             </label>
                             <input type="email" wire:model="guestEmail"
                                    placeholder="{{ app()->getLocale() === 'en' ? 'Enter your email' : 'Ingresa tu email' }}"
-                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent">
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent text-gray-900 bg-white">
                             @error('guestEmail') <span class="text-danger-600 text-sm">{{ $message }}</span> @enderror
                         </div>
                     </div>
