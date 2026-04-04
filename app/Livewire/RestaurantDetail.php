@@ -40,6 +40,16 @@ class RestaurantDetail extends Component
             abort(410);
         }
 
+        // Handle old slugs without numeric suffix (e.g. Google indexed "slug-city" but DB has "slug-city-1")
+        // 301 redirect to the correct slug so Google updates its index
+        if (!Restaurant::where('slug', $slug)->exists()) {
+            $redirectSlug = Restaurant::where('slug', $slug . '-1')->value('slug');
+            if ($redirectSlug) {
+                redirect()->route('restaurants.show', ['slug' => $redirectSlug], 301)->send();
+                exit;
+            }
+        }
+
         // Load restaurant and track page view
         $this->restaurant = Restaurant::where('slug', $slug)
             ->with(['state', 'category', 'reviews', 'media'])

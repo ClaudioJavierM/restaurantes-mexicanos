@@ -167,7 +167,8 @@ class CityGuideController extends Controller
         });
 
         if ($top10Restaurants->isEmpty()) {
-            abort(404);
+            // Redirect to state guide instead of hard 404 — better for GSC coverage
+            return redirect()->route('city-guides.state', ['stateSlug' => $stateSlug], 301);
         }
 
         // Full paginated list: Elite/Premium first, then by rating (for monetization)
