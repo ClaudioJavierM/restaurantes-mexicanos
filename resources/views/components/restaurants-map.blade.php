@@ -36,11 +36,14 @@
 @endphp
 
 @if($apiKey && $hasRestaurants)
+{{-- Data bridge: Livewire morphs this on every re-render with fresh restaurant JSON --}}
+<div id="restaurants-map-data" data-restaurants="{!! htmlspecialchars($restaurantsJson, ENT_QUOTES) !!}" style="display:none;"></div>
+
 <div
     x-data="restaurantsMap()"
     x-init="initMap()"
     @highlight-marker.window="highlightMarker($event.detail.index)"
-    @user-location-updated.window="moveToUserLocation($event.detail.lat, $event.detail.lng)"
+    @user-location-updated.window="refreshMapForLocation($event.detail.lat, $event.detail.lng)"
     {{ $attributes->merge(['class' => 'rounded-lg overflow-hidden shadow-lg border border-gray-200 bg-gray-100']) }}
     style="height: {{ $heightStyle }};"
 >
@@ -198,11 +201,32 @@ function restaurantsMap() {
             return marker;
         },
 
-        moveToUserLocation(lat, lng) {
+        refreshMapForLocation(lat, lng) {
             if (!this.map) return;
+
+            // Read fresh restaurant list from the data bridge div (Livewire just updated it)
+            const dataEl = document.getElementById('restaurants-map-data');
+            if (dataEl) {
+                try {
+                    const fresh = JSON.parse(dataEl.dataset.restaurants || '[]');
+                    if (fresh.length > 0) {
+                        this.restaurants = fresh;
+                        this.clearMarkers();
+                        const bounds = new google.maps.LatLngBounds();
+                        this.restaurants.forEach((restaurant, index) => {
+                            const marker = this.createMarker(restaurant, index);
+                            bounds.extend(marker.getPosition());
+                            this.markers.push(marker);
+                        });
+                    }
+                } catch(e) {}
+            }
+
+            // Pan to user location
             const pos = { lat: parseFloat(lat), lng: parseFloat(lng) };
             this.map.panTo(pos);
             this.map.setZoom(11);
+
             // Update or add user location dot
             if (this._userMarker) {
                 this._userMarker.setPosition(pos);
@@ -222,6 +246,12 @@ function restaurantsMap() {
                     zIndex: 1000
                 });
             }
+        },
+
+        clearMarkers() {
+            this.markers.forEach(m => m.setMap(null));
+            this.markers = [];
+            if (this.infoWindow) this.infoWindow.close();
         },
 
         highlightMarker(index) {
