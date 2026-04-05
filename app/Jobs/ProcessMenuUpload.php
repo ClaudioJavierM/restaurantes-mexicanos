@@ -30,21 +30,12 @@ class ProcessMenuUpload implements ShouldQueue
             // Update status to processing
             $this->upload->update(['status' => 'processing']);
 
-            // Step 1: Extract text using OCR
-            $ocrText = $extractionService->extractText($this->upload);
-            
-            if (empty($ocrText)) {
-                throw new \Exception('No se pudo extraer texto del menú');
-            }
+            // Extract menu using GPT-4o Vision (OCR + structuring in one call)
+            $menuData = $extractionService->extractMenuFromUpload($this->upload, $this->upload->restaurant);
 
-            $this->upload->update(['ocr_raw_text' => $ocrText]);
-
-            // Step 2: Use AI to structure the menu data
-            $menuData = $extractionService->structureMenuWithAI($ocrText, $this->upload->restaurant);
-            
             $this->upload->update(['ai_extracted_data' => $menuData]);
 
-            // Step 3: Create menu items from extracted data
+            // Create menu items from extracted data
             $itemsCreated = $extractionService->createMenuItems($this->upload->restaurant, $menuData);
 
             // Update status
