@@ -110,6 +110,7 @@ return [
     */
     'coupon_3_months' => env('STRIPE_COUPON_3_MONTHS'),
     'coupon_6_months' => env('STRIPE_COUPON_6_MONTHS'),
+    'intro_coupon_premium' => env('STRIPE_INTRO_COUPON_PREMIUM'),
 
     'api_version' => '2024-11-20.acacia',
 

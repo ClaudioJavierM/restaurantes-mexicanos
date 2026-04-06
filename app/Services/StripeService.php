@@ -67,7 +67,16 @@ class StripeService
                     $sessionData['discounts'] = [[
                         'promotion_code' => $promotionCode->id,
                     ]];
-                    // Remove allow_promotion_codes when pre-applying a code
+                    unset($sessionData['allow_promotion_codes']);
+                }
+            }
+            // Auto-apply introductory pricing for premium ($9.99 first month)
+            elseif ($plan === 'premium' && !isset($sessionData['discounts'])) {
+                $introCouponId = config('stripe.intro_coupon_premium');
+                if ($introCouponId) {
+                    $sessionData['discounts'] = [[
+                        'coupon' => $introCouponId,
+                    ]];
                     unset($sessionData['allow_promotion_codes']);
                 }
             }
