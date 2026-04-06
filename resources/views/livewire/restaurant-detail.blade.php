@@ -159,6 +159,20 @@
     }
 @endphp
 
+{{-- Canonical: URL permanente del restaurante sin query strings --}}
+@php
+    $isEnDomain = str_contains(request()->getHost(), 'famousmexicanrestaurants.com');
+    $canonicalSlug = $restaurant->slug;
+    $canonicalPath = $isEnDomain ? '/restaurant/' . $canonicalSlug : '/restaurante/' . $canonicalSlug;
+    $canonicalBase = $isEnDomain
+        ? 'https://famousmexicanrestaurants.com'
+        : (str_contains(request()->getHost(), '.com.mx')
+            ? 'https://restaurantesmexicanosfamosos.com.mx'
+            : 'https://restaurantesmexicanosfamosos.com');
+    $canonicalUrl = $canonicalBase . $canonicalPath;
+@endphp
+@section('canonical', $canonicalUrl)
+
 @push('meta')
     @php
         // Ranking badge for OG title

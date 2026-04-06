@@ -4,6 +4,17 @@
     @section('title', $isEn ? 'Famous Mexican Restaurants — Complete Directory | FAMER' : 'Restaurantes Mexicanos en Estados Unidos — Directorio | FAMER')
     @section('meta_description', $isEn ? 'Discover the best authentic Mexican restaurants in the United States. Verified reviews, photos and menus. Find tacos, burritos, enchiladas and more near you.' : 'Encuentra los mejores restaurantes mexicanos cerca de ti. Directorio completo con reseñas verificadas, fotos y menús. Tacos, burritos, enchiladas y más.')
 
+    {{-- Canonical: siempre apunta al listing limpio, sin ?sort=, ?state=, ?page= --}}
+    @php
+        $listCanonicalBase = $isEn
+            ? 'https://famousmexicanrestaurants.com'
+            : (str_contains(request()->getHost(), '.com.mx')
+                ? 'https://restaurantesmexicanosfamosos.com.mx'
+                : 'https://restaurantesmexicanosfamosos.com');
+        $listCanonicalPath = $isEn ? '/restaurants' : '/restaurantes';
+    @endphp
+    @section('canonical', $listCanonicalBase . $listCanonicalPath)
+
     @push('meta')
     <meta property="og:type" content="website">
     <meta property="og:title" content="{{ $isEn ? 'Famous Mexican Restaurants — Complete Directory | FAMER' : 'Restaurantes Mexicanos en Estados Unidos | FAMER' }}">

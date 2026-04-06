@@ -17,8 +17,8 @@
     <title>{{ $title ?? $__env->yieldContent('title', __('app.site_name') . ' - ' . __('app.tagline')) }}</title>
     <meta name="description" content="{{ $metaDescription ?? ($__env->yieldContent('meta_description') ?: (__('app.tagline') . ' - Descubre los mejores restaurantes mexicanos auténticos en Estados Unidos')) }}">
 
-    <!-- SEO: Canonical URL -->
-    <link rel="canonical" href="{{ url()->current() }}">
+    <!-- SEO: Canonical URL — sin query strings por defecto; páginas pueden overridearlo con @section('canonical', '...') -->
+    <link rel="canonical" href="{{ $__env->hasSection('canonical') ? $__env->yieldContent('canonical') : strtok(url()->current(), '?') }}">
 
     {{-- SEO: Hreflang — 3 domains (es-MX, es-US, en-US) --}}
     @php
