@@ -553,9 +553,9 @@
         $chatRestaurant = null;
         $isOwnerPage = request()->routeIs('for-owners', 'claim.restaurant', 'famer.grader', 'famer.grader.restaurant');
         if(!$isOwnerPage && request()->route() && request()->route()->getName() === 'restaurants.show') {
-            $chatRestaurant = request()->route()->parameter('restaurant');
-            if(is_string($chatRestaurant)) {
-                $chatRestaurant = \App\Models\Restaurant::where('slug', $chatRestaurant)->first();
+            $slug = request()->route()->parameter('slug');
+            if($slug) {
+                $chatRestaurant = \App\Models\Restaurant::where('slug', $slug)->first();
             }
         }
     @endphp
