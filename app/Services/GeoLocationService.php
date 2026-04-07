@@ -96,11 +96,11 @@ class GeoLocationService
                         return [[
                             'city' => $place['place name'] ?? null,
                             'state' => $place['state'] ?? null,
-                            'state_code' => $place['state abbreviation'] ?? null,
+                            'state_code' => $place['state code'] ?? null,
                             'zip' => $zipCode,
                             'lat' => (float) ($place['latitude'] ?? 0),
                             'lng' => (float) ($place['longitude'] ?? 0),
-                            'display' => ($place['place name'] ?? '') . ', ' . ($place['state abbreviation'] ?? '') . ' ' . $zipCode,
+                            'display' => ($place['place name'] ?? '') . ', ' . ($place['state code'] ?? '') . ' ' . $zipCode,
                         ]];
                     }
                 }

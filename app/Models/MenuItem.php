@@ -18,6 +18,7 @@ class MenuItem extends Model
         'sale_price',
         'image',
         'dietary_tags',
+        'dish_type',
         'is_available',
         'is_popular',
         'is_new',
@@ -53,6 +54,11 @@ class MenuItem extends Model
     public function scopeAvailable($query)
     {
         return $query->where('is_available', true);
+    }
+
+    public function scopeByDishType($query, string $type)
+    {
+        return $query->where('dish_type', $type);
     }
 
     public function scopePopular($query)
@@ -114,6 +120,32 @@ class MenuItem extends Model
             'gluten-free' => '🌾 Sin Gluten',
             'dairy-free' => '🥛 Sin Lácteos',
             'spicy' => '🌶️ Picante',
+        ];
+    }
+
+    public static function getDishTypeOptions(): array
+    {
+        return [
+            'birria'          => 'Birria',
+            'tacos'           => 'Tacos',
+            'tamales'         => 'Tamales',
+            'pozole'          => 'Pozole',
+            'enchiladas'      => 'Enchiladas',
+            'mole'            => 'Mole',
+            'chiles-rellenos' => 'Chiles Rellenos',
+            'tortas'          => 'Tortas',
+            'tostadas'        => 'Tostadas',
+            'quesadillas'     => 'Quesadillas',
+            'flautas'         => 'Flautas',
+            'sopes'           => 'Sopes',
+            'menudo'          => 'Menudo',
+            'carnitas'        => 'Carnitas',
+            'barbacoa'        => 'Barbacoa',
+            'ceviche'         => 'Ceviche',
+            'elotes'          => 'Elotes',
+            'churros'         => 'Churros',
+            'horchata'        => 'Horchata',
+            'margaritas'      => 'Margaritas',
         ];
     }
 }

@@ -44,7 +44,7 @@ return new class extends Migration
             $table->index('event_type');
             $table->index('user_id');
             $table->index('created_at');
-            $table->index(['restaurant_id', 'event_type', 'created_at']);
+            $table->index(['restaurant_id', 'event_type', 'created_at'], 'analytics_rest_idx');
         });
     }
 

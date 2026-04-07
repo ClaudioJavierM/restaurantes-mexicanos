@@ -31,7 +31,7 @@ return new class extends Migration
             // Indexes
             $table->index(['restaurant_id', 'status']);
             $table->index(['owner_email']);
-            $table->index(['verification_code', 'code_expires_at']);
+            $table->index(['verification_code', 'code_expires_at'], 'claim_verif_idx');
         });
     }
 

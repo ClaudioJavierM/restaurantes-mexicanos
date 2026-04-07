@@ -20,7 +20,7 @@
                                 <svg style="width: 1.25rem; height: 1.25rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                                 Actualizar Plan
                             </a>
-                            <span style="font-size: 0.875rem; color: #6b7280;">Desde $29/mes</span>
+                            <span style="font-size: 0.875rem; color: #6b7280;">Desde $39/mes</span>
                         </div>
                         <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #374151;">
                             <p style="font-size: 0.875rem; color: #9ca3af; margin-bottom: 0.75rem;">Con Premium obtendras:</p>

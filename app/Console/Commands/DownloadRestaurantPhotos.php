@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Restaurant;
+use App\Services\ApiUsageTracker;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
@@ -13,15 +14,17 @@ class DownloadRestaurantPhotos extends Command
     protected $signature = 'restaurants:download-photos
                             {--limit=100 : Number of restaurants to process}
                             {--batch=10 : Number of photos to download in each batch}
-                            {--country= : Filter by country code (US, MX)}';
+                            {--country= : Filter by country code (US, MX)}
+                            {--rephoto : Force re-download even if photos column is already populated}';
 
-    protected $description = 'Download photos for restaurants that have Google Place ID but no image';
+    protected $description = 'Download up to 5 photos per restaurant from Google Places API';
 
     protected $apiKey;
     protected $baseUrl = 'https://maps.googleapis.com/maps/api/place';
     protected $stats = [
         'processed' => 0,
         'downloaded' => 0,
+        'skipped' => 0,
         'no_photo' => 0,
         'errors' => 0,
     ];
@@ -35,23 +38,45 @@ class DownloadRestaurantPhotos extends Command
             return 1;
         }
 
-        $this->info('📸 Starting Restaurant Photo Downloader');
+        // Check budget before starting
+        $check = ApiUsageTracker::canMakeRequest('google_places_details', 1);
+        if (!$check['allowed']) {
+            $this->error('❌ API budget limit reached: ' . $check['message']);
+            return 1;
+        }
+
+        $this->info('📸 Starting Restaurant Photo Downloader (multi-photo mode)');
         $this->info('🔑 Google Places API Key: ' . substr($this->apiKey, 0, 10) . '...');
         $this->newLine();
 
-        // Get restaurants without images but with google_place_id
-        $restaurants = Restaurant::whereNotNull('google_place_id')
-            ->whereNull('image')
-            ->when($this->option('country'), fn($q) => $q->where('country', $this->option('country')))
-            ->limit($this->option('limit'))
-            ->get();
+        $rephoto = $this->option('rephoto');
+
+        // Build query
+        $query = Restaurant::whereNotNull('google_place_id')
+            ->when($this->option('country'), fn($q) => $q->where('country', $this->option('country')));
+
+        if (!$rephoto) {
+            // Skip restaurants that already have photos column populated
+            $query->where(function ($q) {
+                $q->whereNull('photos')
+                  ->orWhere('photos', '[]')
+                  ->orWhere('photos', '');
+            });
+            // Also skip those without a main image (no photos available anyway)
+            $query->whereNull('image');
+        }
+
+        $restaurants = $query->limit($this->option('limit'))->get();
 
         if ($restaurants->isEmpty()) {
-            $this->info('✅ All restaurants already have photos!');
+            $this->info('✅ All restaurants already have photos! Use --rephoto to force re-download.');
             return 0;
         }
 
-        $this->info("📊 Found {$restaurants->count()} restaurants without photos");
+        $this->info("📊 Found {$restaurants->count()} restaurants to process");
+        if ($rephoto) {
+            $this->warn('⚠️  --rephoto flag active: will overwrite existing photos');
+        }
         $this->newLine();
 
         $progressBar = $this->output->createProgressBar($restaurants->count());
@@ -64,7 +89,7 @@ class DownloadRestaurantPhotos extends Command
             $progressBar->setMessage("Processing: {$restaurant->name}");
             $progressBar->advance();
 
-            $this->processRestaurant($restaurant);
+            $this->processRestaurant($restaurant, $rephoto);
             $this->stats['processed']++;
             $processed++;
 
@@ -84,22 +109,51 @@ class DownloadRestaurantPhotos extends Command
         return 0;
     }
 
-    protected function processRestaurant(Restaurant $restaurant)
+    protected function processRestaurant(Restaurant $restaurant, bool $rephoto = false)
     {
         try {
-            // Get place details with photos
-            $details = $this->getPlaceDetails($restaurant->google_place_id);
+            // Skip if already has photos and not forcing rephoto
+            if (!$rephoto && !empty($restaurant->photos) && count($restaurant->photos) > 0) {
+                $this->stats['skipped']++;
+                return;
+            }
 
-            if (!$details || empty($details['photo_reference'])) {
+            // Get place details with up to 5 photo references
+            $photoReferences = $this->getPhotoReferences($restaurant->google_place_id);
+
+            if (empty($photoReferences)) {
                 $this->stats['no_photo']++;
                 return;
             }
 
-            // Download photo
-            $photoPath = $this->downloadPhoto($details['photo_reference'], $restaurant->name);
+            $downloadedPaths = [];
+            $photoIndex = 1;
 
-            if ($photoPath) {
-                $restaurant->update(['image' => $photoPath]);
+            foreach ($photoReferences as $photoRef) {
+                $filename = $restaurant->slug . '-' . $photoIndex . '.jpg';
+                $path = 'restaurants/' . $filename;
+
+                $downloaded = $this->downloadPhotoToPath($photoRef, $path);
+
+                if ($downloaded) {
+                    $downloadedPaths[] = $path;
+
+                    // First photo = main image (keep existing logic)
+                    if ($photoIndex === 1 && empty($restaurant->image)) {
+                        $restaurant->image = $path;
+                    }
+
+                    $photoIndex++;
+                }
+
+                if ($photoIndex > 10) {
+                    break;
+                }
+            }
+
+            if (!empty($downloadedPaths)) {
+                $restaurant->photos = $downloadedPaths;
+                $restaurant->save();
                 $this->stats['downloaded']++;
             } else {
                 $this->stats['errors']++;
@@ -107,12 +161,22 @@ class DownloadRestaurantPhotos extends Command
 
         } catch (\Exception $e) {
             $this->stats['errors']++;
+            \Log::error('DownloadRestaurantPhotos error', [
+                'restaurant_id' => $restaurant->id,
+                'error' => $e->getMessage(),
+            ]);
         }
     }
 
-    protected function getPlaceDetails(string $placeId): ?array
+    protected function getPhotoReferences(string $placeId): array
     {
         try {
+            $check = ApiUsageTracker::canMakeRequest('google_places_details', 1);
+            if (!$check['allowed']) {
+                \Log::warning('DownloadRestaurantPhotos: budget limit reached, stopping', ['reason' => $check['reason']]);
+                return [];
+            }
+
             $response = Http::timeout(30)->get("{$this->baseUrl}/details/json", [
                 'place_id' => $placeId,
                 'key' => $this->apiKey,
@@ -121,41 +185,46 @@ class DownloadRestaurantPhotos extends Command
 
             if (!$response->successful()) {
                 \Log::error('HTTP request failed', ['place_id' => $placeId, 'status' => $response->status()]);
-                return null;
+                return [];
             }
 
             $data = $response->json();
             if ($data['status'] !== 'OK' || !isset($data['result'])) {
                 \Log::error('API status not OK', ['place_id' => $placeId, 'status' => $data['status'] ?? 'UNKNOWN']);
-                return null;
+                return [];
             }
 
             $result = $data['result'];
 
-            // Get photo reference if available
-            $photoReference = null;
-            if (!empty($result['photos']) && isset($result['photos'][0]['photo_reference'])) {
-                $photoReference = $result['photos'][0]['photo_reference'];
+            if (empty($result['photos'])) {
+                return [];
             }
 
-            if (!$photoReference) {
-                \Log::info('No photo found', ['place_id' => $placeId]);
-            }
+            // Extract up to 10 photo references (Google Places API max per call)
+            $references = array_column(array_slice($result['photos'], 0, 10), 'photo_reference');
 
-            return [
-                'photo_reference' => $photoReference,
-            ];
+            ApiUsageTracker::track('google_places_details', 'place/details/photos', 1, [
+                'place_id' => $placeId,
+                'photo_count' => count($result['photos'] ?? []),
+                'source' => 'DownloadRestaurantPhotos',
+            ]);
+
+            return $references;
 
         } catch (\Exception $e) {
-            \Log::error('Exception in getPlaceDetails', ['place_id' => $placeId, 'error' => $e->getMessage()]);
-            return null;
+            \Log::error('Exception in getPhotoReferences', ['place_id' => $placeId, 'error' => $e->getMessage()]);
+            return [];
         }
     }
 
-    protected function downloadPhoto(string $photoReference, string $restaurantName): ?string
+    protected function downloadPhotoToPath(string $photoReference, string $storagePath): bool
     {
         try {
-            // Get photo from Google Places Photo API
+            $check = ApiUsageTracker::canMakeRequest('google_places_photo', 1);
+            if (!$check['allowed']) {
+                return false;
+            }
+
             $photoUrl = "{$this->baseUrl}/photo?" . http_build_query([
                 'photoreference' => $photoReference,
                 'maxwidth' => 1200,
@@ -165,21 +234,35 @@ class DownloadRestaurantPhotos extends Command
             $response = Http::timeout(30)->get($photoUrl);
 
             if (!$response->successful()) {
-                return null;
+                return false;
             }
 
-            // Generate unique filename
-            $filename = Str::slug($restaurantName) . '-' . time() . '-' . rand(1000, 9999) . '.jpg';
-            $path = 'restaurants/' . $filename;
+            Storage::disk('public')->put($storagePath, $response->body());
 
-            // Save to public storage
-            Storage::disk('public')->put($path, $response->body());
+            ApiUsageTracker::track('google_places_photo', 'place/photo', 1, [
+                'source' => 'DownloadRestaurantPhotos',
+            ]);
 
-            return $path;
+            return true;
 
         } catch (\Exception $e) {
-            return null;
+            return false;
         }
+    }
+
+    // Legacy method kept for backward compatibility
+    protected function getPlaceDetails(string $placeId): ?array
+    {
+        $refs = $this->getPhotoReferences($placeId);
+        return ['photo_reference' => $refs[0] ?? null];
+    }
+
+    // Legacy method kept for backward compatibility
+    protected function downloadPhoto(string $photoReference, string $restaurantName): ?string
+    {
+        $filename = Str::slug($restaurantName) . '-' . time() . '-' . rand(1000, 9999) . '.jpg';
+        $path = 'restaurants/' . $filename;
+        return $this->downloadPhotoToPath($photoReference, $path) ? $path : null;
     }
 
     protected function displayStats()
@@ -191,7 +274,8 @@ class DownloadRestaurantPhotos extends Command
             ['Metric', 'Count'],
             [
                 ['Processed', $this->stats['processed']],
-                ['Downloaded', $this->stats['downloaded']],
+                ['Downloaded (multi-photo)', $this->stats['downloaded']],
+                ['Skipped (already had photos)', $this->stats['skipped']],
                 ['No Photo Available', $this->stats['no_photo']],
                 ['Errors', $this->stats['errors']],
             ]
@@ -203,9 +287,15 @@ class DownloadRestaurantPhotos extends Command
             ->where('image', '!=', '')
             ->count();
 
+        $totalWithGallery = Restaurant::whereNotNull('photos')
+            ->where('photos', '!=', '[]')
+            ->where('photos', '!=', '')
+            ->count();
+
         $totalRestaurants = Restaurant::count();
 
-        $this->info("📊 Total restaurants with photos: {$totalWithPhotos} / {$totalRestaurants}");
+        $this->info("📊 Total restaurants with main image: {$totalWithPhotos} / {$totalRestaurants}");
+        $this->info("🖼️  Total restaurants with photo gallery: {$totalWithGallery} / {$totalRestaurants}");
         $this->info("📈 Coverage: " . round(($totalWithPhotos / $totalRestaurants) * 100, 2) . "%");
     }
 }

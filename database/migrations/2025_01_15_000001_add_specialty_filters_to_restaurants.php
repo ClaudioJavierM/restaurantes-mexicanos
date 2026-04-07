@@ -9,9 +9,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('restaurants', function (Blueprint $table) {
-            $table->boolean('has_cafe_de_olla')->default(false)->after('online_ordering');
-            $table->boolean('has_fresh_tortillas')->default(false)->after('has_cafe_de_olla');
-            $table->boolean('has_handmade_tortillas')->default(false)->after('has_fresh_tortillas');
+            $table->boolean('has_cafe_de_olla')->default(false);
+            $table->boolean('has_fresh_tortillas')->default(false);
+            $table->boolean('has_handmade_tortillas')->default(false);
         });
     }
 

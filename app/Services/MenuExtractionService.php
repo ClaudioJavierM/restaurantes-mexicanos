@@ -17,7 +17,7 @@ class MenuExtractionService
 
     public function __construct()
     {
-        $this->openaiApiKey = config('services.openai.api_key') ?? env('OPENAI_API_KEY', '');
+        $this->openaiApiKey = config('services.openai.api_key') ?? '';
     }
 
     /**

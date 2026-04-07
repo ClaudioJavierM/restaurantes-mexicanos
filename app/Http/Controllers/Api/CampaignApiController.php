@@ -190,8 +190,18 @@ class CampaignApiController extends Controller
             ->whereNull("welcome_email_sent_at")
             ->where("email", "!=", "")
             ->whereNotNull("email")
+            ->with('state:id,name,code')
             ->limit(50)
-            ->get(["id", "name", "email", "city", "state", "created_at"]);
+            ->get(["id", "name", "email", "city", "state_id", "created_at"])
+            ->map(fn($r) => [
+                'id'         => $r->id,
+                'name'       => $r->name,
+                'email'      => $r->email,
+                'city'       => $r->city,
+                'state'      => $r->state?->name ?? '',
+                'state_code' => $r->state?->code ?? '',
+                'created_at' => $r->created_at,
+            ]);
 
         return response()->json([
             "success" => true,

@@ -48,6 +48,36 @@ class YelpFusionService
     }
 
     /**
+     * Guard: throws RuntimeException if monthly Places API budget is reached.
+     * Called before every API request so imports auto-stop at the limit.
+     */
+    protected function checkMonthlyBudget(): void
+    {
+        $monthlyLimit = (int) config('services.yelp.monthly_limit', 5000);
+
+        $used = ApiCallLog::where('service', 'yelp')
+            ->where('called_at', '>=', now()->startOfMonth())
+            ->count();
+
+        if ($used >= $monthlyLimit) {
+            Log::warning('Yelp monthly API limit reached', [
+                'used' => $used,
+                'limit' => $monthlyLimit,
+            ]);
+            throw new \RuntimeException("Yelp monthly API limit reached ({$used}/{$monthlyLimit}). Resets on " . now()->startOfNextMonth()->toDateString() . '.');
+        }
+
+        // Warn at 80%
+        if ($used >= (int) ($monthlyLimit * 0.80)) {
+            Log::warning('Yelp API usage at ' . round(($used / $monthlyLimit) * 100) . '%', [
+                'used' => $used,
+                'limit' => $monthlyLimit,
+                'remaining' => $monthlyLimit - $used,
+            ]);
+        }
+    }
+
+    /**
      * Log API call to api_call_logs for dashboard visibility
      */
     protected function logApiCall(string $endpoint, bool $success, ?int $statusCode = null, array $params = [], ?string $error = null): void
@@ -70,6 +100,9 @@ class YelpFusionService
 
     protected function makeRequest(string $method, string $url, array $params = []): ?\Illuminate\Http\Client\Response
     {
+        // Stop if monthly budget is reached — lets RuntimeException propagate
+        $this->checkMonthlyBudget();
+
         $attempts = 0;
         $maxAttempts = count($this->apiKeys);
         $endpoint = str_replace($this->baseUrl . '/', '', $url);
@@ -97,6 +130,9 @@ class YelpFusionService
                 }
 
                 return $response;
+            } catch (\RuntimeException $e) {
+                // Budget exception — don't retry, propagate immediately
+                throw $e;
             } catch (\Exception $e) {
                 Log::error('Yelp API request exception: ' . $e->getMessage());
                 $this->logApiCall($endpoint, false, 500, $params, $e->getMessage());
@@ -198,6 +234,9 @@ class YelpFusionService
 
             return null;
 
+        } catch (\RuntimeException $e) {
+            Log::warning('Yelp budget limit in searchBusiness: ' . $e->getMessage());
+            return null;
         } catch (\Exception $e) {
             Log::error('Yelp API error: ' . $e->getMessage());
             return null;
@@ -266,6 +305,9 @@ class YelpFusionService
 
             return null;
 
+        } catch (\RuntimeException $e) {
+            Log::warning('Yelp budget limit in getBusinessDetails: ' . $e->getMessage());
+            return null;
         } catch (\Exception $e) {
             Log::error("Yelp API get business error for ID: {$businessId} - " . $e->getMessage());
             return null;
@@ -290,6 +332,9 @@ class YelpFusionService
 
             return null;
 
+        } catch (\RuntimeException $e) {
+            Log::warning('Yelp budget limit in getBusinessReviews: ' . $e->getMessage());
+            return null;
         } catch (\Exception $e) {
             Log::error('Yelp API get reviews error: ' . $e->getMessage());
             return null;
@@ -330,6 +375,9 @@ class YelpFusionService
 
             return null;
 
+        } catch (\RuntimeException $e) {
+            Log::warning('Yelp budget limit in searchBusinesses: ' . $e->getMessage());
+            return null;
         } catch (\Exception $e) {
             Log::error('Yelp API search businesses error: ' . $e->getMessage());
             return null;
@@ -339,5 +387,24 @@ class YelpFusionService
     public function getApiKeyCount(): int
     {
         return count($this->apiKeys);
+    }
+
+    /**
+     * Get current month Yelp API usage stats.
+     */
+    public function getMonthlyUsage(): array
+    {
+        $limit = (int) config('services.yelp.monthly_limit', 5000);
+        $used = ApiCallLog::where('service', 'yelp')
+            ->where('called_at', '>=', now()->startOfMonth())
+            ->count();
+
+        return [
+            'used'       => $used,
+            'limit'      => $limit,
+            'remaining'  => max(0, $limit - $used),
+            'percentage' => $limit > 0 ? round(($used / $limit) * 100, 1) : 0,
+            'resets_on'  => now()->startOfNextMonth()->toDateString(),
+        ];
     }
 }

@@ -8,16 +8,20 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (!Schema::hasTable('restaurant_customers')) {
+            return;
+        }
+
         Schema::table('restaurant_customers', function (Blueprint $table) {
-            $table->json('cart_items')->nullable()->after('metadata');
-            $table->decimal('cart_total', 10, 2)->nullable()->after('cart_items');
-            $table->timestamp('cart_updated_at')->nullable()->after('cart_total');
-            $table->timestamp('cart_abandoned_at')->nullable()->after('cart_updated_at');
-            $table->boolean('cart_reminder_sent')->default(false)->after('cart_abandoned_at');
-            $table->timestamp('last_sms_sent_at')->nullable()->after('cart_reminder_sent');
-            $table->integer('sms_sends_count')->default(0)->after('last_sms_sent_at');
-            $table->timestamp('winback_sent_at')->nullable()->after('sms_sends_count');
-            $table->timestamp('birthday_sms_sent_at')->nullable()->after('winback_sent_at');
+            $table->json('cart_items')->nullable();
+            $table->decimal('cart_total', 10, 2)->nullable();
+            $table->timestamp('cart_updated_at')->nullable();
+            $table->timestamp('cart_abandoned_at')->nullable();
+            $table->boolean('cart_reminder_sent')->default(false);
+            $table->timestamp('last_sms_sent_at')->nullable();
+            $table->integer('sms_sends_count')->default(0);
+            $table->timestamp('winback_sent_at')->nullable();
+            $table->timestamp('birthday_sms_sent_at')->nullable();
         });
     }
 

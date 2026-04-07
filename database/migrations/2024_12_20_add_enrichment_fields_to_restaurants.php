@@ -11,62 +11,62 @@ return new class extends Migration
         Schema::table('restaurants', function (Blueprint $table) {
             // Opening Hours (JSON from Google/Yelp)
             if (!Schema::hasColumn('restaurants', 'opening_hours')) {
-                $table->json('opening_hours')->nullable()->after('hours');
+                $table->json('opening_hours')->nullable();
             }
 
             // Services available
             if (!Schema::hasColumn('restaurants', 'services')) {
-                $table->json('services')->nullable()->after('opening_hours')
+                $table->json('services')->nullable()
                     ->comment('delivery, takeout, dine_in, curbside_pickup, reservations');
             }
 
             // Accessibility features
             if (!Schema::hasColumn('restaurants', 'accessibility')) {
-                $table->json('accessibility')->nullable()->after('services')
+                $table->json('accessibility')->nullable()
                     ->comment('wheelchair_accessible, parking, restroom');
             }
 
             // Payment methods
             if (!Schema::hasColumn('restaurants', 'payment_methods')) {
-                $table->json('payment_methods')->nullable()->after('accessibility')
+                $table->json('payment_methods')->nullable()
                     ->comment('credit_cards, debit_cards, cash, apple_pay, google_pay');
             }
 
             // Additional contact
             if (!Schema::hasColumn('restaurants', 'instagram_url')) {
-                $table->string('instagram_url')->nullable()->after('facebook_url');
+                $table->string('instagram_url')->nullable();
             }
             if (!Schema::hasColumn('restaurants', 'twitter_url')) {
-                $table->string('twitter_url')->nullable()->after('instagram_url');
+                $table->string('twitter_url')->nullable();
             }
             if (!Schema::hasColumn('restaurants', 'tiktok_url')) {
-                $table->string('tiktok_url')->nullable()->after('twitter_url');
+                $table->string('tiktok_url')->nullable();
             }
 
             // Google additional data
             if (!Schema::hasColumn('restaurants', 'google_photos_count')) {
-                $table->integer('google_photos_count')->nullable()->after('google_reviews_count');
+                $table->integer('google_photos_count')->nullable();
             }
             if (!Schema::hasColumn('restaurants', 'google_price_level')) {
-                $table->tinyInteger('google_price_level')->nullable()->after('google_photos_count')
+                $table->tinyInteger('google_price_level')->nullable()
                     ->comment('0=Free, 1=$, 2=$$, 3=$$$, 4=$$$$');
             }
 
             // Yelp additional data
             if (!Schema::hasColumn('restaurants', 'yelp_categories')) {
-                $table->json('yelp_categories')->nullable()->after('yelp_reviews_count');
+                $table->json('yelp_categories')->nullable();
             }
             if (!Schema::hasColumn('restaurants', 'yelp_transactions')) {
-                $table->json('yelp_transactions')->nullable()->after('yelp_categories')
+                $table->json('yelp_transactions')->nullable()
                     ->comment('delivery, pickup, restaurant_reservation');
             }
 
             // Street View
             if (!Schema::hasColumn('restaurants', 'streetview_url')) {
-                $table->string('streetview_url')->nullable()->after('google_maps_url');
+                $table->string('streetview_url')->nullable();
             }
             if (!Schema::hasColumn('restaurants', 'streetview_downloaded_at')) {
-                $table->timestamp('streetview_downloaded_at')->nullable()->after('streetview_url');
+                $table->timestamp('streetview_downloaded_at')->nullable();
             }
         });
     }

@@ -6,23 +6,19 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('states', function (Blueprint $table) {
             $table->id();
-            $table->string('name'); // California, Texas, etc.
-            $table->string('code', 2); // CA, TX, etc.
+            $table->string('name');
+            $table->string('code', 10);
+            $table->string('slug')->nullable();
+            $table->string('country', 2)->default('US')->index();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('states');

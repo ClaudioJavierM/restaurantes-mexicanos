@@ -18,125 +18,118 @@
 @endpush
 
 @section('content')
-<div class="bg-gradient-to-br from-emerald-600 via-green-600 to-red-600 text-white">
-    <div class="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
-        <h1 class="text-3xl md:text-4xl font-bold mb-4">
-            Restaurantes Mexicanos por Estado
-        </h1>
-        <p class="text-lg opacity-90 max-w-3xl">
-            Explora nuestra guia completa de restaurantes mexicanos en Estados Unidos.
-            Selecciona un estado para ver las mejores ciudades y restaurantes.
-        </p>
+<div style="background:#0B0B0B; min-height:100vh; color:#F5F5F5;">
 
-        <!-- Global Stats -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-            <div class="bg-white/10 backdrop-blur rounded-lg p-4 text-center">
-                <p class="text-3xl font-bold">{{ number_format($totalRestaurants) }}</p>
-                <p class="text-sm opacity-80">Restaurantes</p>
-            </div>
-            <div class="bg-white/10 backdrop-blur rounded-lg p-4 text-center">
-                <p class="text-3xl font-bold">{{ $totalStates }}</p>
-                <p class="text-sm opacity-80">Estados</p>
-            </div>
-            <div class="bg-white/10 backdrop-blur rounded-lg p-4 text-center">
-                <p class="text-3xl font-bold">{{ number_format($totalCities) }}</p>
-                <p class="text-sm opacity-80">Ciudades</p>
-            </div>
-            <div class="bg-white/10 backdrop-blur rounded-lg p-4 text-center">
-                <p class="text-3xl font-bold">{{ number_format($claimedCount) }}</p>
-                <p class="text-sm opacity-80">Verificados</p>
-            </div>
-        </div>
-    </div>
-</div>
+    <!-- Hero -->
+    <div style="background:#0B0B0B; border-bottom:1px solid #2A2A2A; padding:4rem 0 3rem; position:relative; overflow:hidden;">
+        <img src="https://images.unsplash.com/photo-1552332386-f8dd00dc2f85?auto=format&fit=crop&w=1600&q=80"
+             alt="" aria-hidden="true"
+             style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0.35; pointer-events:none;">
+        <div style="position:absolute; inset:0; background:rgba(0,0,0,0.55); pointer-events:none;"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center" style="position:relative; z-index:1;">
+            <nav style="margin-bottom:1.5rem;">
+                <ol style="display:flex;justify-content:center;flex-wrap:wrap;gap:0.5rem;align-items:center;font-size:0.875rem;color:#9CA3AF;list-style:none;padding:0;margin:0;">
+                    <li><a href="/" style="color:#D4AF37;text-decoration:none;">FAMER</a></li>
+                    <li style="color:#4B5563;">/</li>
+                    <li style="color:#9CA3AF;">Guía</li>
+                </ol>
+            </nav>
+            <h1 style="font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3.5rem);font-weight:700;color:#F5F5F5;margin-bottom:1rem;line-height:1.2;">
+                Guía de Restaurantes Mexicanos<br>
+                <span style="color:#D4AF37;">por Estado</span>
+            </h1>
+            <p style="color:#9CA3AF;font-size:1.125rem;max-width:600px;margin:0 auto 2.5rem;">
+                Explora {{ number_format($totalRestaurants) }} restaurantes en {{ $totalStates }} estados. Encuentra auténtica comida mexicana en tu ciudad.
+            </p>
 
-<div class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-    <!-- Top States by Restaurant Count -->
-    <section class="mb-12">
-        <h2 class="text-2xl font-bold text-gray-900 mb-6">Estados con Mas Restaurantes Mexicanos</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            @foreach($topStates as $state)
-            <a href="{{ route('city-guides.state', $state->code) }}"
-               class="bg-white rounded-lg shadow hover:shadow-lg transition p-6 group">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <h3 class="text-xl font-bold text-gray-900 group-hover:text-emerald-600 transition">
-                            {{ $state->name }}
-                        </h3>
-                        <p class="text-gray-500 text-sm">{{ $state->code }}</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-2xl font-bold text-emerald-600">{{ number_format($state->restaurants_count) }}</p>
-                        <p class="text-xs text-gray-500">restaurantes</p>
-                    </div>
+            <!-- Stats -->
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1rem;max-width:700px;margin:0 auto;">
+                @foreach([
+                    [$totalRestaurants, 'Restaurantes'],
+                    [$totalStates, 'Estados'],
+                    [$totalCities, 'Ciudades'],
+                    [$claimedCount, 'Verificados'],
+                ] as [$val, $label])
+                <div style="background:#1A1A1A;border:1px solid #2A2A2A;border-radius:12px;padding:1.25rem 1rem;text-align:center;">
+                    <div style="font-size:1.75rem;font-weight:800;color:#D4AF37;">{{ number_format($val) }}</div>
+                    <div style="font-size:0.8rem;color:#9CA3AF;margin-top:0.25rem;">{{ $label }}</div>
                 </div>
-                @if($state->top_cities)
-                <div class="mt-4 pt-4 border-t border-gray-100">
-                    <p class="text-sm text-gray-600">
-                        <span class="font-medium">Top ciudades:</span>
-                        {{ implode(', ', array_slice($state->top_cities, 0, 3)) }}
-                    </p>
-                </div>
-                @endif
-            </a>
-            @endforeach
-        </div>
-    </section>
-
-    <!-- All States A-Z -->
-    <section>
-        <h2 class="text-2xl font-bold text-gray-900 mb-6">Todos los Estados (A-Z)</h2>
-        <div class="bg-white rounded-lg shadow p-6">
-            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                @foreach($allStates as $state)
-                <a href="{{ route('city-guides.state', $state->code) }}"
-                   class="flex items-center justify-between p-3 rounded-lg hover:bg-emerald-50 transition group">
-                    <span class="text-gray-700 group-hover:text-emerald-600 transition">{{ $state->name }}</span>
-                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded group-hover:bg-emerald-100 group-hover:text-emerald-700 transition">
-                        {{ $state->restaurants_count }}
-                    </span>
-                </a>
                 @endforeach
             </div>
         </div>
-    </section>
+    </div>
 
-    <!-- CTA Section -->
-    <section class="mt-12 bg-gradient-to-r from-emerald-600 to-green-600 rounded-lg p-8 text-white text-center">
-        <h2 class="text-2xl font-bold mb-4">Eres Dueno de un Restaurante?</h2>
-        <p class="text-lg opacity-90 mb-6 max-w-2xl mx-auto">
-            Reclama tu perfil GRATIS y toma control de tu informacion.
-            Obtiene la insignia de verificado y destaca sobre la competencia.
-        </p>
-        <a href="{{ route('claim.restaurant') }}"
-           class="inline-block bg-white text-emerald-600 font-bold px-8 py-3 rounded-lg hover:bg-gray-100 transition">
-            Reclamar Mi Restaurante
-        </a>
-    </section>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
-    <!-- SEO Content -->
-    <section class="mt-12 bg-gray-50 rounded-lg p-8">
-        <h2 class="text-2xl font-bold text-gray-900 mb-4">
-            Guia de Restaurantes Mexicanos en Estados Unidos
-        </h2>
-        <div class="prose max-w-none text-gray-600">
-            <p>
-                Bienvenido a la guia mas completa de restaurantes mexicanos en Estados Unidos.
-                Nuestro directorio combina datos de Yelp y Google para ofrecerte informacion
-                actualizada sobre miles de restaurantes en todo el pais.
+        <!-- Top States -->
+        <section style="margin-bottom:3rem;">
+            <h2 style="font-family:'Playfair Display',serif;font-size:1.75rem;font-weight:700;color:#F5F5F5;margin-bottom:1.5rem;">
+                Estados con Más Restaurantes Mexicanos
+            </h2>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;">
+                @foreach($topStates as $state)
+                <a href="{{ route('city-guides.state', $state->code) }}"
+                   style="display:block;background:#1A1A1A;border:1px solid #2A2A2A;border-radius:12px;padding:1.25rem;text-decoration:none;transition:border-color 0.2s;"
+                   onmouseover="this.style.borderColor='#D4AF37'" onmouseout="this.style.borderColor='#2A2A2A'">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;">
+                        <div>
+                            <div style="font-weight:700;color:#F5F5F5;font-size:1.1rem;">{{ $state->name }}</div>
+                            <div style="color:#6B7280;font-size:0.8rem;">{{ $state->code }}</div>
+                        </div>
+                        <div style="text-align:right;">
+                            <div style="font-size:1.5rem;font-weight:800;color:#D4AF37;">{{ number_format($state->restaurants_count) }}</div>
+                            <div style="font-size:0.75rem;color:#6B7280;">restaurantes</div>
+                        </div>
+                    </div>
+                    @if($state->top_cities)
+                    <div style="border-top:1px solid #2A2A2A;padding-top:0.75rem;">
+                        <span style="font-size:0.8rem;color:#6B7280;">Top ciudades: </span>
+                        <span style="font-size:0.8rem;color:#9CA3AF;">{{ implode(', ', array_slice($state->top_cities, 0, 3)) }}</span>
+                    </div>
+                    @endif
+                </a>
+                @endforeach
+            </div>
+        </section>
+
+        <!-- All States A-Z -->
+        <section style="margin-bottom:3rem;">
+            <h2 style="font-family:'Playfair Display',serif;font-size:1.75rem;font-weight:700;color:#F5F5F5;margin-bottom:1.5rem;">
+                Todos los Estados (A-Z)
+            </h2>
+            <div style="background:#1A1A1A;border:1px solid #2A2A2A;border-radius:12px;padding:1.5rem;">
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:0.5rem;">
+                    @foreach($allStates as $state)
+                    <a href="{{ route('city-guides.state', $state->code) }}"
+                       style="display:flex;align-items:center;justify-content:space-between;padding:0.625rem 0.75rem;border-radius:8px;text-decoration:none;transition:background 0.15s;"
+                       onmouseover="this.style.background='#2A2A2A'" onmouseout="this.style.background='transparent'">
+                        <span style="color:#E5E7EB;font-size:0.875rem;">{{ $state->name }}</span>
+                        <span style="font-size:0.75rem;color:#D4AF37;font-weight:600;">{{ number_format($state->restaurants_count) }}</span>
+                    </a>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section style="background:linear-gradient(135deg,#1A1A1A 0%,#2A2A2A 100%);border:1px solid #D4AF37;border-radius:16px;padding:2.5rem;text-align:center;margin-bottom:3rem;">
+            <h2 style="font-family:'Playfair Display',serif;font-size:1.75rem;font-weight:700;color:#F5F5F5;margin-bottom:0.75rem;">¿Eres Dueño de un Restaurante?</h2>
+            <p style="color:#9CA3AF;margin-bottom:1.5rem;max-width:500px;margin-left:auto;margin-right:auto;">
+                Reclama tu perfil GRATIS y toma control de tu información. Obtén la insignia de verificado.
             </p>
-            <p class="mt-4">
-                Desde taquerias autenticas en California y Texas hasta restaurantes gourmet
-                en Nueva York, encontraras opciones para todos los gustos y presupuestos.
-                Cada perfil incluye ratings, fotos, horarios y resenas verificadas.
-            </p>
-            <p class="mt-4">
-                Los restaurantes verificados en nuestra plataforma han reclamado su perfil
-                y mantienen su informacion actualizada, garantizando datos precisos para
-                los clientes que buscan la mejor comida mexicana cerca de ellos.
-            </p>
-        </div>
-    </section>
+            <a href="{{ route('claim.restaurant') }}"
+               style="display:inline-block;background:#D4AF37;color:#0B0B0B;font-weight:700;padding:0.875rem 2rem;border-radius:9999px;text-decoration:none;font-size:1rem;"
+               onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+                Reclamar Mi Restaurante Gratis
+            </a>
+        </section>
+
+        <!-- SEO text -->
+        <section style="color:#6B7280;font-size:0.9rem;line-height:1.7;max-width:700px;">
+            <p>Bienvenido a la guía más completa de restaurantes mexicanos en Estados Unidos. Nuestro directorio combina datos de Google para ofrecerte información actualizada sobre miles de restaurantes en todo el país.</p>
+            <p style="margin-top:0.75rem;">Desde taquerías auténticas en California y Texas hasta restaurantes gourmet en Nueva York. Cada perfil incluye ratings, fotos y reseñas verificadas.</p>
+        </section>
+    </div>
 </div>
 
 @push('scripts')

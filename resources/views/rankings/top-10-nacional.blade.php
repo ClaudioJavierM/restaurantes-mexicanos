@@ -54,9 +54,12 @@
 
 <div class="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900">
     {{-- Hero Section --}}
-    <div class="relative overflow-hidden">
-        <div class="absolute inset-0 bg-[url('/images/mexican-pattern.svg')] opacity-5"></div>
-        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative">
+    <div class="relative overflow-hidden" style="background:#0B0B0B; border-bottom:1px solid rgba(212,175,55,0.15);">
+        <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=1600&q=80"
+             alt="" aria-hidden="true"
+             class="absolute inset-0 w-full h-full object-cover" style="opacity:0.35; pointer-events:none;">
+        <div style="position:absolute; inset:0; background:rgba(0,0,0,0.55); pointer-events:none;"></div>
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 relative" style="z-index:1;">
             <nav class="text-sm mb-8">
                 <ol class="flex items-center space-x-2 text-gray-400">
                     <li><a href="{{ route('home') }}" class="hover:text-white">Inicio</a></li>
@@ -122,7 +125,8 @@
                             <div class="flex-shrink-0 w-32 md:w-40 h-32 md:h-40 overflow-hidden">
                                 @php
                                     $imageUrl = $restaurant->getFirstMediaUrl('photos', 'thumb')
-                                        ?: ($restaurant->yelp_photos[0] ?? '/images/placeholder-restaurant.jpg');
+                                        ?: ($restaurant->yelp_photos[0] ?? null)
+                                        ?: ($restaurant->image ? \Illuminate\Support\Facades\Storage::url($restaurant->image) : '/images/placeholder-restaurant.jpg');
                                 @endphp
                                 <img src="{{ $imageUrl }}" alt="{{ $restaurant->name }}"
                                      class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">

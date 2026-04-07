@@ -8,10 +8,14 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (!Schema::hasTable('restaurant_votes')) {
+            return;
+        }
+
         Schema::table('restaurant_votes', function (Blueprint $table) {
             if (!Schema::hasColumn('restaurant_votes', 'voter_email')) {
-                $table->string('voter_email')->nullable()->after('voter_fingerprint');
-                $table->index(['restaurant_id', 'voter_email', 'year', 'month']);
+                $table->string('voter_email')->nullable();
+                $table->index(['restaurant_id', 'voter_email', 'year', 'month'], 'votes_rest_email_idx');
             }
         });
     }

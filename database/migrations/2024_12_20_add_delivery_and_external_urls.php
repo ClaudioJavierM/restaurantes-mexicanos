@@ -11,33 +11,33 @@ return new class extends Migration
         Schema::table('restaurants', function (Blueprint $table) {
             // Delivery platforms
             if (!Schema::hasColumn('restaurants', 'doordash_url')) {
-                $table->string('doordash_url')->nullable()->after('order_url');
+                $table->string('doordash_url')->nullable();
             }
             if (!Schema::hasColumn('restaurants', 'ubereats_url')) {
-                $table->string('ubereats_url')->nullable()->after('doordash_url');
+                $table->string('ubereats_url')->nullable();
             }
             if (!Schema::hasColumn('restaurants', 'grubhub_url')) {
-                $table->string('grubhub_url')->nullable()->after('ubereats_url');
+                $table->string('grubhub_url')->nullable();
             }
             if (!Schema::hasColumn('restaurants', 'postmates_url')) {
-                $table->string('postmates_url')->nullable()->after('grubhub_url');
+                $table->string('postmates_url')->nullable();
             }
             if (!Schema::hasColumn('restaurants', 'seamless_url')) {
-                $table->string('seamless_url')->nullable()->after('postmates_url');
+                $table->string('seamless_url')->nullable();
             }
             if (!Schema::hasColumn('restaurants', 'caviar_url')) {
-                $table->string('caviar_url')->nullable()->after('seamless_url');
+                $table->string('caviar_url')->nullable();
             }
 
             // Review platforms
             if (!Schema::hasColumn('restaurants', 'tripadvisor_url')) {
-                $table->string('tripadvisor_url')->nullable()->after('facebook_url');
+                $table->string('tripadvisor_url')->nullable();
             }
             if (!Schema::hasColumn('restaurants', 'opentable_url')) {
-                $table->string('opentable_url')->nullable()->after('tripadvisor_url');
+                $table->string('opentable_url')->nullable();
             }
             if (!Schema::hasColumn('restaurants', 'resy_url')) {
-                $table->string('resy_url')->nullable()->after('opentable_url');
+                $table->string('resy_url')->nullable();
             }
         });
     }

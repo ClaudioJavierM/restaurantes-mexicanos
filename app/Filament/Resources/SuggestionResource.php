@@ -4,9 +4,12 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\SuggestionResource\Pages;
 use App\Filament\Resources\SuggestionResource\RelationManagers;
+use App\Models\Restaurant;
+use App\Models\State;
 use App\Models\Suggestion;
 use App\Notifications\SuggestionApprovedNotification;
 use App\Services\BusinessValidationService;
+use App\Services\GooglePlacesService;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
@@ -182,19 +185,99 @@ class SuggestionResource extends Resource
                     ->visible(fn (Suggestion $record) => $record->status !== 'approved')
                     ->requiresConfirmation()
                     ->action(function (Suggestion $record) {
-                        $record->update([
-                            'status' => 'approved',
+                        $record->update(['status' => 'approved']);
+
+                        // Resolve state_id from suggestion's state string (code or name)
+                        $state = State::where('code', strtoupper($record->restaurant_state))
+                            ->orWhere('name', $record->restaurant_state)
+                            ->first();
+
+                        // Create the restaurant record
+                        $restaurant = Restaurant::create([
+                            'name'               => $record->restaurant_name,
+                            'address'            => $record->restaurant_address,
+                            'city'               => $record->restaurant_city,
+                            'state_id'           => $state?->id,
+                            'zip_code'           => $record->restaurant_zip_code,
+                            'phone'              => $record->restaurant_phone,
+                            'website'            => $record->restaurant_website,
+                            'category_id'        => $record->category_id,
+                            'description'        => $record->description,
+                            'status'             => 'approved',
+                            'is_active'          => true,
+                            'google_place_id'    => $record->google_place_id,
+                            'google_rating'      => $record->google_rating,
+                            'google_reviews_count' => $record->google_reviews_count,
+                            'yelp_id'            => $record->yelp_id,
+                            'yelp_rating'        => $record->yelp_rating,
+                            'yelp_review_count'  => $record->yelp_reviews_count,
+                            'subscription_status' => null,
                         ]);
+
+                        // Fetch Google Places data if not already present
+                        if ($restaurant && !$restaurant->google_place_id) {
+                            try {
+                                $googleService = new GooglePlacesService();
+                                $restaurant->load('state'); // ensure relationship loaded
+                                $googleService->syncRestaurantWithGoogle($restaurant);
+                                $restaurant->refresh();
+                            } catch (\Exception $e) {
+                                \Illuminate\Support\Facades\Log::warning('Google sync failed on approve: ' . $e->getMessage());
+                            }
+                        }
+
+                        // Sync Yelp data if not already present
+                        if ($restaurant && !$restaurant->yelp_id) {
+                            try {
+                                $yelpService = app(\App\Services\YelpFusionService::class);
+                                $match = $yelpService->searchBusiness(
+                                    $restaurant->name,
+                                    $restaurant->city,
+                                    $restaurant->state->code ?? $record->restaurant_state,
+                                    $restaurant->address,
+                                    false
+                                );
+
+                                if ($match && ($match['verified'] ?? false) && isset($match['yelp_id'])) {
+                                    $details = $yelpService->getBusinessDetails($match['yelp_id']);
+                                    $restaurant->update([
+                                        'yelp_id'            => $match['yelp_id'],
+                                        'yelp_rating'        => $details['rating'] ?? $match['rating'] ?? null,
+                                        'yelp_reviews_count' => $details['review_count'] ?? $match['review_count'] ?? 0,
+                                        'yelp_url'           => $details['url'] ?? $match['url'] ?? null,
+                                        'yelp_last_sync'     => now(),
+                                        'yelp_photos'        => $details['photos'] ?? null,
+                                        'yelp_hours'         => $details['hours'] ?? null,
+                                        'yelp_attributes'    => $details['attributes'] ?? null,
+                                        'yelp_categories'    => $details['categories'] ?? null,
+                                        'menu_url'           => $details['attributes']['menu_url'] ?? null,
+                                        // Set main image from Yelp if restaurant has none
+                                        'image'              => $restaurant->image ?? ($details['photos'][0] ?? $match['image_url'] ?? null),
+                                    ]);
+                                    $restaurant->refresh();
+                                }
+                            } catch (\Exception $e) {
+                                \Illuminate\Support\Facades\Log::warning('Yelp sync failed on approve: ' . $e->getMessage());
+                            }
+                        }
+
+                        // Set image from Yelp photos if still missing after syncs
+                        if ($restaurant && !$restaurant->image && !empty($restaurant->yelp_photos)) {
+                            $restaurant->update(['image' => $restaurant->yelp_photos[0]]);
+                            $restaurant->refresh();
+                        }
 
                         // Send notification to user or submitter
                         if ($record->user) {
                             $record->user->notify(new SuggestionApprovedNotification($record));
                         }
 
+                        $yelpInfo = $restaurant->yelp_rating ? " | Yelp: {$restaurant->yelp_rating}★" : '';
+                        $googleInfo = $restaurant->google_rating ? " | Google: {$restaurant->google_rating}★" : '';
                         Notification::make()
                             ->success()
                             ->title('Suggestion Approved')
-                            ->body('The suggestion has been approved and the submitter has been notified.')
+                            ->body("Restaurante \"{$restaurant->name}\" creado en FAMER.{$googleInfo}{$yelpInfo}")
                             ->send();
                     }),
                 Tables\Actions\EditAction::make(),

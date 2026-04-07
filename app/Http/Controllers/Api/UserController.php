@@ -108,7 +108,7 @@ class UserController extends Controller
     {
         $favorites = $request->user()
             ->favorites()
-            ->with(['state:id,name,abbreviation', 'category:id,name,slug'])
+            ->with(['state:id,name,code', 'category:id,name,slug'])
             ->select([
                 'restaurants.id', 'name', 'slug', 'address', 'city',
                 'average_rating', 'total_reviews', 'price_range', 'image',

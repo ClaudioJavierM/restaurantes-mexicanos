@@ -46,9 +46,9 @@ return new class extends Migration
         // Add loyalty settings to restaurants
         if (!Schema::hasColumn('restaurants', 'loyalty_enabled')) {
             Schema::table('restaurants', function (Blueprint $table) {
-                $table->boolean('loyalty_enabled')->default(false)->after('accepts_reservations');
-                $table->integer('points_per_dollar')->default(1)->after('loyalty_enabled');
-                $table->integer('points_per_visit')->default(10)->after('points_per_dollar');
+                $table->boolean('loyalty_enabled')->default(false);
+                $table->integer('points_per_dollar')->default(1);
+                $table->integer('points_per_visit')->default(10);
             });
         }
     }

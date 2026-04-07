@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\ApiCallLog;
 
 use App\Models\ApiUsage;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
@@ -22,9 +23,6 @@ class ApiUsageTracker
     {
         $cost = self::calculateCost($service, $requestCount);
 
-        ApiUsage::create([
-        ]);
-
         // Also log to api_call_logs for dashboard
         try {
             ApiCallLog::create([
@@ -38,19 +36,21 @@ class ApiUsageTracker
             ]);
         } catch (\Exception $e) {}
 
-        // Original ApiUsage tracking
-        ApiUsage::updateOrCreate([
+        // Original ApiUsage tracking (accumulate, not overwrite)
+        $record = ApiUsage::firstOrCreate([
             'usage_date' => today(),
             'service' => $service,
             'endpoint' => $endpoint,
         ], [
-            'service' => $service,
-            'endpoint' => $endpoint,
-            'requests_count' => $requestCount,
-            'estimated_cost' => $cost,
-            'usage_date' => today(),
+            'requests_count' => 0,
+            'estimated_cost' => 0.0,
             'metadata' => $metadata,
         ]);
+
+        $record->requests_count += $requestCount;
+        $record->estimated_cost = (float) $record->estimated_cost + $cost;
+        $record->metadata = $metadata;
+        $record->save();
 
         // Check if we're approaching limits
         self::checkLimits();
@@ -65,6 +65,7 @@ class ApiUsageTracker
             'google_places_text_search' => self::COST_TEXT_SEARCH,
             'google_places_details' => self::COST_PLACE_DETAILS,
             'google_street_view' => self::COST_STREET_VIEW,
+            'google_places_photo' => 7.00,   // $7 per 1,000 photo requests
             default => 0,
         };
 
@@ -120,6 +121,13 @@ class ApiUsageTracker
                 'budget' => $monthlyBudget,
                 'percentage' => ($currentCost / $monthlyBudget) * 100,
             ]);
+
+            self::sendTelegramAlert(
+                "⚠️ *Google API — Limite Proximo*\n" .
+                "Costo actual: \${$currentCost}\n" .
+                "Presupuesto: \${$monthlyBudget}\n" .
+                'Uso: ' . round(($currentCost / $monthlyBudget) * 100, 1) . '%'
+            );
         }
 
         // Critical alert if exceeded
@@ -128,6 +136,36 @@ class ApiUsageTracker
                 'current_cost' => $currentCost,
                 'budget' => $monthlyBudget,
             ]);
+
+            self::sendTelegramAlert(
+                "🚨 *Google API — Presupuesto EXCEDIDO*\n" .
+                "Costo actual: \${$currentCost}\n" .
+                "Presupuesto: \${$monthlyBudget}\n" .
+                'Las llamadas pueden estar siendo bloqueadas.'
+            );
+        }
+    }
+
+    /**
+     * Send a Telegram alert. Silently skips if token/chat_id not configured.
+     */
+    private static function sendTelegramAlert(string $message): void
+    {
+        $token  = config('services.telegram.bot_token');
+        $chatId = config('services.telegram.chat_id');
+
+        if (!$token || !$chatId) {
+            return;
+        }
+
+        try {
+            Http::post("https://api.telegram.org/bot{$token}/sendMessage", [
+                'chat_id'    => $chatId,
+                'text'       => $message,
+                'parse_mode' => 'Markdown',
+            ]);
+        } catch (\Exception $e) {
+            Log::warning('ApiUsageTracker: Telegram notification failed', ['error' => $e->getMessage()]);
         }
     }
 

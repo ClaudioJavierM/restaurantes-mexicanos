@@ -18,7 +18,7 @@ class RestaurantController extends Controller
     public function index(Request $request): JsonResponse
     {
         $query = Restaurant::query()
-            ->with(['state:id,name,abbreviation', 'category:id,name,slug'])
+            ->with(['state:id,name,code', 'category:id,name,slug'])
             ->approved()
             ->select([
                 'id', 'name', 'slug', 'description', 'address', 'city', 'zip_code',
@@ -100,7 +100,7 @@ class RestaurantController extends Controller
 
         // Get restaurants with lat/lng
         $restaurants = Restaurant::query()
-            ->with(['state:id,name,abbreviation', 'category:id,name,slug'])
+            ->with(['state:id,name,code', 'category:id,name,slug'])
             ->approved()
             ->whereNotNull('latitude')
             ->whereNotNull('longitude')
@@ -116,6 +116,16 @@ class RestaurantController extends Controller
         $nearbyRestaurants = $restaurants->map(function ($restaurant) use ($lat, $lng) {
             $distance = $this->calculateDistance($lat, $lng, $restaurant->latitude, $restaurant->longitude);
             $restaurant->distance = round($distance, 2);
+            // Normalize image to full URL for frontend consumption
+            if ($restaurant->image) {
+                $restaurant->image_url = str_starts_with($restaurant->image, 'http')
+                    ? $restaurant->image
+                    : \Illuminate\Support\Facades\Storage::url($restaurant->image);
+            } else {
+                $restaurant->image_url = null;
+            }
+            // Normalize rating field name
+            $restaurant->rating = $restaurant->average_rating;
             return $restaurant;
         })
         ->filter(function ($restaurant) use ($radius) {
@@ -142,7 +152,7 @@ class RestaurantController extends Controller
     public function show($id): JsonResponse
     {
         $restaurant = Restaurant::with([
-            'state:id,name,abbreviation',
+            'state:id,name,code',
             'category:id,name,slug',
             'approvedReviews' => function ($query) {
                 $query->with('user:id,name')
@@ -168,7 +178,7 @@ class RestaurantController extends Controller
     public function featured(Request $request): JsonResponse
     {
         $restaurants = Restaurant::query()
-            ->with(['state:id,name,abbreviation', 'category:id,name,slug'])
+            ->with(['state:id,name,code', 'category:id,name,slug'])
             ->approved()
             ->featured()
             ->select([
@@ -192,7 +202,7 @@ class RestaurantController extends Controller
     public function popular(Request $request): JsonResponse
     {
         $restaurants = Restaurant::query()
-            ->with(['state:id,name,abbreviation', 'category:id,name,slug'])
+            ->with(['state:id,name,code', 'category:id,name,slug'])
             ->approved()
             ->where('total_reviews', '>', 0)
             ->select([
@@ -223,7 +233,7 @@ class RestaurantController extends Controller
         $query = $request->q;
 
         $restaurants = Restaurant::query()
-            ->with(['state:id,name,abbreviation', 'category:id,name,slug'])
+            ->with(['state:id,name,code', 'category:id,name,slug'])
             ->approved()
             ->where(function ($q) use ($query) {
                 $q->where('name', 'like', "%{$query}%")
@@ -278,7 +288,7 @@ class RestaurantController extends Controller
                 $query->approved();
             }])
             ->orderBy('name')
-            ->get(['id', 'name', 'abbreviation', 'slug']);
+            ->get(['id', 'name', 'code', 'slug']);
 
         return response()->json([
             'success' => true,

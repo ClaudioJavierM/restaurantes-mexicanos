@@ -25,7 +25,7 @@ class RecentCampaignsWidget extends Widget
                 );
                 
                 $stmt = $pdo->query("
-                    SELECT 
+                    SELECT
                         c.id,
                         c.name,
                         c.status,
@@ -36,6 +36,10 @@ class RecentCampaignsWidget extends Widget
                         (SELECT COUNT(*) FROM link_clicks WHERE campaign_id = c.id) as clicks
                     FROM campaigns c
                     WHERE c.status IN ('running', 'finished', 'paused')
+                      AND NOT (
+                        c.tags @> ARRAY['sdv']::varchar[]
+                        OR c.tags @> ARRAY['beca-sdv']::varchar[]
+                      )
                     ORDER BY c.created_at DESC
                     LIMIT 10
                 ");

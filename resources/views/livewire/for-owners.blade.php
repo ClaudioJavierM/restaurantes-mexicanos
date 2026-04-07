@@ -1,1697 +1,536 @@
-<div class="min-h-screen bg-white">
+<div class="min-h-screen" style="background-color: #0B0B0B;">
 
+{{-- ============================================ --}}
+{{-- 1. HERO SECTION --}}
+{{-- ============================================ --}}
+<section class="relative overflow-hidden" style="background-color: #0B0B0B; min-height: 70vh;">
+    {{-- Restaurant background photo — cascade: photos[] http → yelp_photos[] → image --}}
+    @php
+        $heroRestaurant = \App\Models\Restaurant::approved()
+            ->where(function($q) {
+                $q->whereNotNull('photos')
+                  ->orWhereNotNull('yelp_photos')
+                  ->orWhere(fn($q2) => $q2->whereNotNull('image')->where('image','!=',''));
+            })
+            ->orderByDesc('google_reviews_count')
+            ->first(['photos','yelp_photos','image','name']);
 
+        $heroBg = null;
+        if ($heroRestaurant) {
+            $photos     = $heroRestaurant->photos     ?? [];
+            $yelpPhotos = $heroRestaurant->yelp_photos ?? [];
+            if (!empty($photos) && str_starts_with($photos[0], 'http')) {
+                $heroBg = $photos[0];
+            } elseif (!empty($yelpPhotos) && str_starts_with($yelpPhotos[0], 'http')) {
+                $heroBg = $yelpPhotos[0];
+            } elseif ($heroRestaurant->image) {
+                $heroBg = str_starts_with($heroRestaurant->image, 'http')
+                    ? $heroRestaurant->image
+                    : \Illuminate\Support\Facades\Storage::url($heroRestaurant->image);
+            }
+        }
+    @endphp
 
-{{-- Stats Banner --}}
-<div class="bg-gray-50 border-b border-gray-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-        <div class="flex flex-wrap items-center justify-center gap-4 md:gap-8 text-sm text-gray-600">
-            <span class="flex items-center gap-1">
-                <span class="font-bold text-gray-900">{{ number_format($stats['total_views'] ?? 150000) }}+</span> visitantes cada mes
-            </span>
-            <span class="hidden md:inline">|</span>
-            <span class="flex items-center gap-1">
-                <span class="font-bold text-gray-900">82%</span> de usuarios contactan negocios que encuentran aquí
-            </span>
-        </div>
-    </div>
-</div>
+    @if($heroBg)
+    <div class="absolute inset-0" style="background-image:url('{{ $heroBg }}'); background-size:cover; background-position:center; background-repeat:no-repeat;"></div>
+    @endif
+    {{-- Dark overlay --}}
+    <div class="absolute inset-0" style="background: linear-gradient(135deg, rgba(11,11,11,0.93) 0%, rgba(11,11,11,0.78) 50%, rgba(11,11,11,0.90) 100%);"></div>
+    {{-- Subtle gold glow --}}
+    <div class="absolute inset-0" style="background: radial-gradient(ellipse 60% 50% at 50% 60%, rgba(212,175,55,0.06) 0%, transparent 70%);"></div>
 
-{{-- Hero Section - Yelp Style --}}
-<section class="bg-white relative overflow-hidden">
-    {{-- Decorative circles (like Yelp) --}}
-    <div class="absolute left-0 top-0 w-96 h-96 opacity-20">
-        <div class="absolute top-10 left-10 w-32 h-32 bg-red-200 rounded-full"></div>
-        <div class="absolute top-40 left-20 w-24 h-24 bg-orange-200 rounded-full"></div>
-        <div class="absolute top-20 left-48 w-20 h-20 bg-red-100 rounded-full"></div>
-    </div>
-    <div class="absolute right-0 top-0 w-96 h-96 opacity-20">
-        <div class="absolute top-10 right-10 w-32 h-32 bg-red-200 rounded-full"></div>
-        <div class="absolute top-40 right-20 w-24 h-24 bg-orange-200 rounded-full"></div>
-        <div class="absolute top-20 right-48 w-20 h-20 bg-red-100 rounded-full"></div>
-    </div>
-    
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28 relative z-10">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16 md:pt-32 md:pb-24 relative z-10">
         <div class="text-center">
-            {{-- Main Headline --}}
-            <h1 class="text-4xl md:text-6xl font-bold text-gray-900 leading-tight mb-6">
-                Es <span class="text-red-600">GRATIS</span> estar en<br>
-                Restaurantes Mexicanos Famosos
+            <h1 class="text-4xl sm:text-5xl md:text-7xl font-bold leading-tight mb-6" style="font-family: 'Playfair Display', Georgia, serif; color: #F5F5F5;">
+                {{ app()->getLocale() === 'en' ? 'Your Customers Are Already Searching for You' : 'Tus Clientes Ya Te Estan Buscando' }}
             </h1>
-            
-            <p class="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
-                Busca tu restaurante y verifica tu perfil para empezar a atraer más clientes hoy mismo.
+
+            <p class="text-lg md:text-xl max-w-2xl mx-auto mb-10" style="color: #CCCCCC;">
+                {{ app()->getLocale() === 'en'
+                    ? 'Make sure they find your restaurant first on the leading platform for Mexican dining in the U.S.'
+                    : 'Asegurate de que encuentren tu restaurante primero en la plataforma lider de comida mexicana en EE.UU.' }}
             </p>
 
-            {{-- Search Box --}}
-            <div class="max-w-xl mx-auto bg-white rounded-2xl shadow-xl border border-gray-200 p-2">
-                <form action="{{ route('claim.restaurant') }}" method="GET" class="flex flex-col sm:flex-row gap-2">
-                    <div class="flex-1 relative">
-                        <input type="text" name="search" placeholder="{{ app()->getLocale() === 'en' ? 'Your restaurant name' : 'Nombre de tu restaurante' }}"
-                               class="w-full px-5 py-4 text-lg border-0 bg-gray-50 rounded-xl focus:ring-2 focus:ring-red-500 transition">
-                        <svg class="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                        </svg>
+            {{-- CTAs --}}
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+                <a href="{{ route('claim.restaurant') }}" class="inline-flex items-center px-8 py-4 text-lg font-bold rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg" style="background-color: #D4AF37; color: #0B0B0B; box-shadow: 0 4px 24px rgba(212,175,55,0.25);">
+                    {{ app()->getLocale() === 'en' ? 'Claim Your Restaurant' : 'Reclama Tu Restaurante' }}
+                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                </a>
+                <a href="{{ app()->getLocale() === 'en' ? '/how-famer-works' : '/como-funciona-famer' }}" class="inline-flex items-center px-8 py-4 text-lg font-semibold rounded-xl transition-all duration-300 hover:bg-white/5" style="border: 1px solid #D4AF37; color: #D4AF37;">
+                    {{ app()->getLocale() === 'en' ? 'See How It Works' : 'Cómo Funciona' }}
+                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                </a>
+            </div>
+
+            {{-- Stats Bar --}}
+            <div class="grid grid-cols-3 gap-6 md:gap-12 max-w-3xl mx-auto">
+                <div class="text-center">
+                    <div class="text-3xl md:text-4xl font-black" style="color: #D4AF37;">{{ number_format($stats['total_restaurants'] ?? 26000) }}+</div>
+                    <div class="text-sm mt-1" style="color: #CCCCCC;">{{ app()->getLocale() === 'en' ? 'Restaurants' : 'Restaurantes' }}</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl md:text-4xl font-black" style="color: #D4AF37;">{{ number_format($stats['total_views'] ?? 1155826) }}+</div>
+                    <div class="text-sm mt-1" style="color: #CCCCCC;">{{ app()->getLocale() === 'en' ? 'Monthly Views' : 'Visitas/Mes' }}</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-3xl md:text-4xl font-black" style="color: #D4AF37;">82</div>
+                    <div class="text-sm mt-1" style="color: #CCCCCC;">{{ app()->getLocale() === 'en' ? 'States/Regions' : 'Estados/Regiones' }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Bottom fade --}}
+    <div class="absolute bottom-0 left-0 right-0 h-24" style="background: linear-gradient(to top, #0B0B0B, transparent);"></div>
+</section>
+
+{{-- ============================================ --}}
+{{-- 2. FAMER SCORE LEAD MAGNET --}}
+{{-- ============================================ --}}
+<section class="py-12 md:py-16" style="background-color: #0B0B0B;">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="relative rounded-3xl overflow-hidden" style="background: linear-gradient(135deg, #1A1A1A 0%, #1F3D2B 50%, #1A1A1A 100%); border: 1px solid rgba(212,175,55,0.3);">
+            <div class="absolute inset-0" style="background: radial-gradient(ellipse 60% 80% at 80% 50%, rgba(212,175,55,0.07) 0%, transparent 70%);"></div>
+
+            <div class="relative z-10 flex flex-col md:flex-row items-center gap-8 p-10 md:p-14">
+                {{-- Score badge visual --}}
+                <div class="flex-shrink-0 flex items-center justify-center w-28 h-28 rounded-full" style="background: rgba(212,175,55,0.12); border: 2px solid rgba(212,175,55,0.4);">
+                    <div class="text-center">
+                        <div class="text-3xl font-black leading-none" style="color: #D4AF37;">87</div>
+                        <div class="text-xs font-bold mt-1" style="color: #D4AF37;">SCORE</div>
                     </div>
-                    <button type="submit" class="px-8 py-4 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition flex items-center justify-center gap-2 whitespace-nowrap">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                        </svg>
-                        {{ app()->getLocale() === 'en' ? 'Search' : 'Buscar' }}
-                    </button>
-                </form>
-            </div>
-            
-            <p class="mt-6 text-sm text-gray-500">
-                {{ app()->getLocale() === 'en' ? "Can't find it?" : '¿No lo encuentras?' }} 
-                <a href="/sugerir" class="text-red-600 hover:underline font-medium">
-                    {{ app()->getLocale() === 'en' ? 'Add your restaurant' : 'Agrega tu restaurante' }}
-                </a> 
-                {{ app()->getLocale() === 'en' ? 'and we\'ll help you claim it.' : 'y te ayudamos a reclamarlo.' }}
-            </p>
-        </div>
-    </div>
-</section>
+                </div>
 
-{{-- Join Banner --}}
-<section class="bg-gray-50 py-12 border-y border-gray-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 class="text-2xl md:text-3xl font-bold text-center text-gray-900 mb-8">
-            {{ app()->getLocale() === 'en' ? 'Join thousands of Mexican restaurants' : 'Únete a miles de restaurantes mexicanos' }}
-        </h2>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-            <div>
-                <div class="text-3xl md:text-4xl font-black text-red-600">{{ number_format($stats['total_restaurants'] ?? 13000) }}+</div>
-                <div class="text-sm text-gray-600 mt-1">{{ app()->getLocale() === 'en' ? 'Restaurants' : 'Restaurantes' }}</div>
-            </div>
-            <div>
-                <div class="text-3xl md:text-4xl font-black text-red-600">50</div>
-                <div class="text-sm text-gray-600 mt-1">{{ app()->getLocale() === 'en' ? 'States' : 'Estados' }}</div>
-            </div>
-            <div>
-                <div class="text-3xl md:text-4xl font-black text-red-600">{{ number_format($stats['total_views'] ?? 150000) }}+</div>
-                <div class="text-sm text-gray-600 mt-1">{{ app()->getLocale() === 'en' ? 'Monthly visitors' : 'Visitantes/mes' }}</div>
-            </div>
-            <div>
-                <div class="text-3xl md:text-4xl font-black text-red-600">4.8⭐</div>
-                <div class="text-sm text-gray-600 mt-1">{{ app()->getLocale() === 'en' ? 'Avg. rating' : 'Rating promedio' }}</div>
+                {{-- Text --}}
+                <div class="flex-1 text-center md:text-left">
+                    <div class="text-xs font-bold tracking-widest uppercase mb-2" style="color: #D4AF37;">
+                        {{ app()->getLocale() === 'en' ? 'Free Tool — Takes 30 seconds' : 'Herramienta Gratuita — Solo 30 segundos' }}
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-bold mb-3" style="color: #F5F5F5; font-family: 'Playfair Display', Georgia, serif;">
+                        {{ app()->getLocale() === 'en' ? 'How visible is your restaurant online?' : '¿Qué tan visible es tu restaurante en línea?' }}
+                    </h2>
+                    <p style="color: #CCCCCC; max-width: 520px;">
+                        {{ app()->getLocale() === 'en'
+                            ? 'Get your free FAMER Score — an analysis of your ratings, photos, completeness and online visibility. See exactly what to improve to get more customers.'
+                            : 'Obtén tu FAMER Score gratis — análisis de calificaciones, fotos, completitud y visibilidad. Ve exactamente qué mejorar para conseguir más clientes.' }}
+                    </p>
+                </div>
+
+                {{-- CTA --}}
+                <div class="flex-shrink-0">
+                    <a href="{{ route('famer.grader') }}"
+                       class="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 hover:scale-105"
+                       style="background-color: #D4AF37; color: #0B0B0B; box-shadow: 0 4px 20px rgba(212,175,55,0.3);">
+                        {{ app()->getLocale() === 'en' ? 'Get My Score' : 'Ver Mi Score' }}
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                    </a>
+                </div>
             </div>
         </div>
     </div>
 </section>
 
-
 {{-- ============================================ --}}
-{{-- TUS CLIENTES TE ESTÁN BUSCANDO - Live Stats --}}
+{{-- 3. PROBLEM → SOLUTION --}}
 {{-- ============================================ --}}
-<section class="py-20 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 relative overflow-hidden">
-    {{-- Background Pattern --}}
-    <div class="absolute inset-0 opacity-10">
-        <div class="absolute inset-0" style="background-image: url('data:image/svg+xml,<svg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"><g fill=\"none\" fill-rule=\"evenodd\"><g fill=\"%23ffffff\" fill-opacity=\"0.4\"><path d=\"M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\"/></g></g></svg>');"></div>
-    </div>
-
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div class="text-center mb-16">
-            <span class="inline-block bg-red-500/20 text-red-400 text-sm font-bold px-4 py-2 rounded-full mb-4 border border-red-500/30">
-                📊 ESTADÍSTICAS EN VIVO
-            </span>
-            <h2 class="text-4xl md:text-5xl font-bold text-white mb-4">
-                Tus Clientes Te Están Buscando
-            </h2>
-            <p class="text-xl text-gray-300 max-w-2xl mx-auto">
-                Cada día miles de personas buscan restaurantes mexicanos en nuestra plataforma. ¿Estás perdiendo clientes?
-            </p>
-        </div>
-
-        {{-- Main Stats Grid - Redesigned --}}
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-12">
-            {{-- Total Views --}}
-            <div class="bg-gradient-to-br from-orange-500 to-red-600 rounded-2xl p-6 text-center group hover:scale-105 transition-transform duration-300 shadow-xl shadow-orange-500/20">
-                <div class="text-5xl mb-3">👁️</div>
-                <div class="text-3xl md:text-4xl font-black text-white mb-1">{{ number_format($stats['total_views'] ?? 447283) }}</div>
-                <p class="text-white/90 font-medium text-sm">Visitas Totales</p>
-            </div>
-
-            {{-- Daily Average --}}
-            <div class="bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl p-6 text-center group hover:scale-105 transition-transform duration-300 shadow-xl shadow-green-500/20">
-                <div class="text-5xl mb-3">📈</div>
-                <div class="text-3xl md:text-4xl font-black text-white mb-1">{{ number_format($stats['daily_average'] ?? 6997) }}</div>
-                <p class="text-white/90 font-medium text-sm">Promedio Diario</p>
-            </div>
-
-            {{-- Monthly Views --}}
-            <div class="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-6 text-center group hover:scale-105 transition-transform duration-300 shadow-xl shadow-blue-500/20">
-                <div class="text-5xl mb-3">📅</div>
-                <div class="text-3xl md:text-4xl font-black text-white mb-1">{{ number_format($stats['monthly_views'] ?? 209910) }}</div>
-                <p class="text-white/90 font-medium text-sm">Visitas Este Mes</p>
-            </div>
-
-            {{-- Total Restaurants --}}
-            <div class="bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl p-6 text-center group hover:scale-105 transition-transform duration-300 shadow-xl shadow-amber-500/20">
-                <div class="text-5xl mb-3">🏪</div>
-                <div class="text-3xl md:text-4xl font-black text-white mb-1">{{ number_format($stats['total_restaurants'] ?? 13247) }}</div>
-                <p class="text-white/90 font-medium text-sm">Restaurantes Listados</p>
-            </div>
-        </div>
-
-        {{-- Secondary Stats - Better visibility --}}
-        <div class="grid grid-cols-3 md:grid-cols-6 gap-3 md:gap-4 mb-12">
-            <div class="bg-white/10 backdrop-blur rounded-xl p-4 text-center border border-white/20 hover:bg-white/20 transition">
-                <div class="text-2xl mb-1">✅</div>
-                <div class="text-xl md:text-2xl font-bold text-white">{{ number_format($stats['claimed'] ?? 847) }}</div>
-                <p class="text-xs text-white/70 mt-1">Reclamados</p>
-            </div>
-            <div class="bg-white/10 backdrop-blur rounded-xl p-4 text-center border border-white/20 hover:bg-white/20 transition">
-                <div class="text-2xl mb-1">🔓</div>
-                <div class="text-xl md:text-2xl font-bold text-white">{{ number_format($stats['available'] ?? 12400) }}</div>
-                <p class="text-xs text-white/70 mt-1">Disponibles</p>
-            </div>
-            <div class="bg-white/10 backdrop-blur rounded-xl p-4 text-center border border-white/20 hover:bg-white/20 transition">
-                <div class="text-2xl mb-1">🇺🇸</div>
-                <div class="text-xl md:text-2xl font-bold text-white">50</div>
-                <p class="text-xs text-white/70 mt-1">Estados</p>
-            </div>
-            <div class="bg-white/10 backdrop-blur rounded-xl p-4 text-center border border-white/20 hover:bg-white/20 transition">
-                <div class="text-2xl mb-1">🏙️</div>
-                <div class="text-xl md:text-2xl font-bold text-white">{{ number_format($stats['cities'] ?? 2847) }}</div>
-                <p class="text-xs text-white/70 mt-1">Ciudades</p>
-            </div>
-            <div class="bg-white/10 backdrop-blur rounded-xl p-4 text-center border border-white/20 hover:bg-white/20 transition">
-                <div class="text-2xl mb-1">⭐</div>
-                <div class="text-xl md:text-2xl font-bold text-white">{{ number_format($stats['total_reviews'] ?? 892456) }}</div>
-                <p class="text-xs text-white/70 mt-1">Reseñas</p>
-            </div>
-            <div class="bg-white/10 backdrop-blur rounded-xl p-4 text-center border border-white/20 hover:bg-white/20 transition">
-                <div class="text-2xl mb-1">📸</div>
-                <div class="text-xl md:text-2xl font-bold text-white">{{ number_format($stats['photos'] ?? 45892) }}</div>
-                <p class="text-xs text-white/70 mt-1">Fotos</p>
-            </div>
-        </div>
-
-        {{-- ============================================ --}}
-        {{-- TOP ESTADOS POR TRÁFICO --}}
-        {{-- ============================================ --}}
-        @if(isset($stateStats) && count($stateStats) > 0)
-        <div class="max-w-3xl mx-auto mb-12">
-            <div class="bg-white/10 backdrop-blur rounded-2xl p-8 border border-white/20">
-                <h3 class="text-xl font-bold text-white mb-6 text-center flex items-center justify-center">
-                    <svg class="w-6 h-6 mr-2 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path></svg>
-                    Top Estados por Tráfico
+<section class="py-20 md:py-28" style="background-color: #1A1A1A;">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20">
+            {{-- Pain Points --}}
+            <div>
+                <h3 class="text-sm font-bold tracking-widest uppercase mb-8" style="color: #8B1E1E;">
+                    {{ app()->getLocale() === 'en' ? 'The Problem' : 'El Problema' }}
                 </h3>
-                <div class="space-y-4">
-                    @foreach($stateStats as $index => $state)
-                        @php
-                            $maxViews = $stateStats[0]['views'] ?? 1;
-                            $percentage = ($state['views'] / $maxViews) * 100;
-                            $colors = [
-                                'background: linear-gradient(to right, #eab308, #f59e0b);',
-                                'background: linear-gradient(to right, #9ca3af, #6b7280);',
-                                'background: linear-gradient(to right, #d97706, #ea580c);',
-                                'background: linear-gradient(to right, #3b82f6, #6366f1);',
-                                'background: linear-gradient(to right, #22c55e, #10b981);'
-                            ];
-                        @endphp
-                        <div class="flex items-center gap-4">
-                            <span class="text-2xl font-black text-gray-500 w-8">#{{ $index + 1 }}</span>
-                            <div class="flex-1">
-                                <div class="flex justify-between mb-2">
-                                    <span class="font-semibold text-white">{{ $state['state_name'] }}</span>
-                                    <span class="text-gray-300 font-medium">{{ number_format($state['views']) }}</span>
-                                </div>
-                                <div class="h-3 bg-gray-700 rounded-full overflow-hidden">
-                                    <div class="h-full rounded-full transition-all duration-500" style="{{ $colors[$index] ?? 'background: linear-gradient(to right, #6b7280, #4b5563);' }} width: {{ $percentage }}%;"></div>
-                                </div>
-                            </div>
+                <div class="space-y-6">
+                    @php
+                        $problems = app()->getLocale() === 'en'
+                            ? ['Low visibility online', 'Too much competition', 'Dependence on third-party apps that charge 15–30%', 'No automated tool to collect reviews']
+                            : ['Baja visibilidad en internet', 'Demasiada competencia', 'Dependencia de apps que cobran 15–30% de comisión', 'Sin herramienta para conseguir reseñas automáticamente'];
+                    @endphp
+                    @foreach($problems as $problem)
+                    <div class="flex items-start gap-4">
+                        <div class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center mt-0.5" style="background-color: rgba(139,30,30,0.15);">
+                            <svg class="w-4 h-4" style="color: #8B1E1E;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                         </div>
+                        <p class="text-lg" style="color: #CCCCCC;">{{ $problem }}</p>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+
+            {{-- Solutions --}}
+            <div>
+                <h3 class="text-sm font-bold tracking-widest uppercase mb-8" style="color: #D4AF37;">
+                    {{ app()->getLocale() === 'en' ? 'The Solution' : 'La Solucion' }}
+                </h3>
+                <div class="space-y-6">
+                    @php
+                        $solutions = app()->getLocale() === 'en'
+                            ? ['Get discovered by local customers searching right now', 'Rank in Top 10 city and state lists', 'Showcase your brand with photos, menu and QR code', 'Automatic SMS review requests — fully hands-free']
+                            : ['Sé encontrado por clientes buscando ahora mismo', 'Aparece en el Top 10 de tu ciudad y estado', 'Muestra tu marca con fotos, menú y código QR', 'SMS automáticos para conseguir reseñas — sin intervención'];
+                    @endphp
+                    @foreach($solutions as $solution)
+                    <div class="flex items-start gap-4">
+                        <div class="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center mt-0.5" style="background-color: rgba(212,175,55,0.15);">
+                            <svg class="w-4 h-4" style="color: #D4AF37;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        </div>
+                        <p class="text-lg" style="color: #F5F5F5;">{{ $solution }}</p>
+                    </div>
                     @endforeach
                 </div>
             </div>
         </div>
-        @endif
+    </div>
+</section>
 
-        {{-- ============================================ --}}
-        {{-- VALUE PROPOSITION CARDS - Mismo estilo que stats de arriba --}}
-        {{-- ============================================ --}}
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-12">
-            {{-- Valor en Google Ads --}}
-            <div class="rounded-2xl p-6 text-center group hover:scale-105 transition-transform duration-300" style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); box-shadow: 0 10px 40px -10px rgba(59, 130, 246, 0.5);">
-                <div class="text-5xl mb-3">💰</div>
-                <div class="text-3xl md:text-4xl font-black text-white mb-1">${{ number_format($stats['google_ads_value'] ?? 894566) }}</div>
-                <p class="text-white/90 font-medium text-sm">Valor equivalente en Google Ads</p>
-            </div>
-
-            {{-- Promedio por restaurante --}}
-            <div class="rounded-2xl p-6 text-center group hover:scale-105 transition-transform duration-300" style="background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%); box-shadow: 0 10px 40px -10px rgba(168, 85, 247, 0.5);">
-                <div class="text-5xl mb-3">🏪</div>
-                <div class="text-3xl md:text-4xl font-black text-white mb-1">${{ number_format($stats['google_ads_per_restaurant'] ?? 67) }}</div>
-                <p class="text-white/90 font-medium text-sm">Promedio por restaurante</p>
-            </div>
-
-            {{-- Costo Premium --}}
-            <div class="rounded-2xl p-6 text-center group hover:scale-105 transition-transform duration-300" style="background: linear-gradient(135deg, #22c55e 0%, #15803d 100%); box-shadow: 0 10px 40px -10px rgba(34, 197, 94, 0.5);">
-                <div class="text-5xl mb-3">✅</div>
-                <div class="text-3xl md:text-4xl font-black text-white mb-1">$39/mes</div>
-                <p class="text-white/90 font-medium text-sm">Costo del plan Premium</p>
-            </div>
-
-            {{-- ROI --}}
-            <div class="rounded-2xl p-6 text-center group hover:scale-105 transition-transform duration-300" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); box-shadow: 0 10px 40px -10px rgba(245, 158, 11, 0.5);">
-                <div class="text-5xl mb-3">❤️</div>
-                <div class="text-3xl md:text-4xl font-black text-white mb-1">1 cliente</div>
-                <p class="text-white/90 font-medium text-sm">Para ROI positivo al mes</p>
-            </div>
+{{-- ============================================ --}}
+{{-- 4. BENEFITS GRID --}}
+{{-- ============================================ --}}
+<section class="py-20 md:py-28" style="background-color: #0B0B0B;">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl md:text-5xl font-bold mb-4" style="color: #F5F5F5; font-family: 'Playfair Display', Georgia, serif;">
+                {{ app()->getLocale() === 'en' ? 'Everything in one platform.' : 'Todo en una sola plataforma.' }}
+            </h2>
+            <p class="text-lg max-w-xl mx-auto" style="color: #CCCCCC;">
+                {{ app()->getLocale() === 'en' ? 'Built exclusively for Mexican restaurants.' : 'Construido exclusivamente para restaurantes mexicanos.' }}
+            </p>
         </div>
 
-        {{-- Live Activity Ticker --}}
-        <div class="bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-xl p-4 border border-green-500/30 mb-8">
-            <div class="flex items-center justify-center gap-3">
-                <span class="relative flex h-3 w-3">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
-                </span>
-                <p class="text-green-400 font-medium">
-                    <span class="font-bold">{{ rand(15, 45) }} personas</span> están buscando restaurantes mexicanos ahora mismo
-                </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            @php $cards = [
+                ['icon' => '🔍', 'title_es' => 'Sé Encontrado', 'title_en' => 'Get Discovered', 'desc_es' => 'Rankings de ciudad y estado. Tu restaurante frente a clientes que buscan comida mexicana ahora.', 'desc_en' => 'City and state rankings. Your restaurant in front of customers searching for Mexican food right now.', 'image' => 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=400&q=80'],
+                ['icon' => '⭐', 'title_es' => 'Más Reseñas', 'title_en' => 'More Reviews', 'desc_es' => 'SMS automáticos post-visita. Más reseñas sin que tengas que hacer nada.', 'desc_en' => 'Automatic post-visit SMS. More reviews without you doing anything.', 'image' => 'https://images.unsplash.com/photo-1553729459-efe14ef6055d?auto=format&fit=crop&w=400&q=80'],
+                ['icon' => '📋', 'title_es' => 'Menú Digital', 'title_en' => 'Digital Menu', 'desc_es' => 'Menú con fotos y precios. Código QR descargable para tus mesas y redes sociales.', 'desc_en' => 'Menu with photos and prices. Downloadable QR code for your tables and social media.', 'image' => 'https://images.unsplash.com/photo-1526367790999-0150786686a2?auto=format&fit=crop&w=400&q=80'],
+                ['icon' => '📊', 'title_es' => 'Analytics', 'title_en' => 'Analytics', 'desc_es' => 'Ve cuántos clientes vieron tu perfil, llamaron o pidieron direcciones. Datos reales.', 'desc_en' => 'See how many customers viewed your profile, called, or asked for directions. Real data.', 'image' => 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=400&q=80'],
+            ]; @endphp
+
+            @foreach($cards as $card)
+            <div class="rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1" style="background-color: #1A1A1A; border: 1px solid rgba(212,175,55,0.12);">
+                <div style="height:130px; overflow:hidden;">
+                    <img src="{{ $card['image'] }}" alt="{{ $card['title_es'] }}" loading="lazy"
+                         style="width:100%; height:100%; object-fit:cover; transition:transform 0.4s;"
+                         onmouseover="this.style.transform='scale(1.06)'" onmouseout="this.style.transform='scale(1)'">
+                </div>
+                <div class="p-6">
+                    <div class="text-2xl mb-3">{{ $card['icon'] }}</div>
+                    <h3 class="text-lg font-bold mb-2" style="color: #F5F5F5;">{{ app()->getLocale() === 'en' ? $card['title_en'] : $card['title_es'] }}</h3>
+                    <p class="text-sm leading-relaxed" style="color: #9CA3AF;">{{ app()->getLocale() === 'en' ? $card['desc_en'] : $card['desc_es'] }}</p>
+                </div>
             </div>
+            @endforeach
         </div>
 
-        {{-- CTA --}}
+        {{-- Link to full details --}}
+        <div class="text-center mt-10">
+            <a href="{{ app()->getLocale() === 'en' ? '/how-famer-works' : '/como-funciona-famer' }}"
+               class="inline-flex items-center gap-2 text-sm font-semibold transition-colors duration-200"
+               style="color: #D4AF37;">
+                {{ app()->getLocale() === 'en' ? 'See all 12 features — full comparison vs Yelp, DoorDash, OpenTable →' : 'Ver las 12 funciones — comparación completa vs Yelp, DoorDash, OpenTable →' }}
+            </a>
+        </div>
+    </div>
+</section>
+
+{{-- ============================================ --}}
+{{-- 5. HOW IT WORKS — simplified 3 steps --}}
+{{-- ============================================ --}}
+<section class="py-20 md:py-28" style="background-color: #1A1A1A;">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-14">
+            <h2 class="text-3xl md:text-5xl font-bold mb-4" style="color: #F5F5F5; font-family: 'Playfair Display', Georgia, serif;">
+                {{ app()->getLocale() === 'en' ? 'How It Works' : 'Cómo Funciona' }}
+            </h2>
+            <p class="text-lg max-w-xl mx-auto" style="color: #CCCCCC;">
+                {{ app()->getLocale() === 'en' ? 'Three steps to start growing.' : 'Tres pasos para empezar a crecer.' }}
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mb-12">
+            @php $steps = [
+                ['num' => '01', 'icon' => '🔍', 'title_es' => 'Reclama Tu Restaurante', 'title_en' => 'Claim Your Restaurant', 'desc_es' => 'Tu restaurante ya está en FAMER. Búscalo, haz clic en "Reclamar" y verifica en menos de 24 horas.', 'desc_en' => 'Your restaurant is already on FAMER. Search, click "Claim" and verify in under 24 hours.', 'image' => 'https://images.unsplash.com/photo-1552332386-f8dd00dc2f85?auto=format&fit=crop&w=600&q=80'],
+                ['num' => '02', 'icon' => '✏️', 'title_es' => 'Completa Tu Perfil', 'title_en' => 'Complete Your Profile', 'desc_es' => 'Agrega fotos, menú, horarios. FAMER Score mide tu progreso y te dice exactamente qué mejorar.', 'desc_en' => 'Add photos, menu, hours. FAMER Score measures progress and tells you exactly what to improve.', 'image' => 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=600&q=80'],
+                ['num' => '03', 'icon' => '📈', 'title_es' => 'Crece y Aparece en Rankings', 'title_en' => 'Grow & Rank', 'desc_es' => 'Rankings semanales de ciudad y estado. SMS automáticos consiguen reseñas. Tú solo atiende el negocio.', 'desc_en' => 'Weekly city and state rankings. Automatic SMS collects reviews. You just run the restaurant.', 'image' => 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80'],
+            ]; @endphp
+
+            @foreach($steps as $step)
+            <div class="rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1" style="background-color: #0B0B0B; border: 1px solid rgba(212,175,55,0.15);">
+                <div style="height:160px; overflow:hidden; position:relative;">
+                    <img src="{{ $step['image'] }}" alt="{{ app()->getLocale() === 'en' ? $step['title_en'] : $step['title_es'] }}" loading="lazy"
+                         style="width:100%; height:100%; object-fit:cover; transition:transform 0.4s;"
+                         onmouseover="this.style.transform='scale(1.06)'" onmouseout="this.style.transform='scale(1)'">
+                    <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(11,11,11,0.5) 0%, transparent 60%);"></div>
+                    <div style="position:absolute; top:1rem; left:50%; transform:translateX(-50%);">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background-color: #D4AF37;">
+                            <span class="text-sm font-bold" style="color: #0B0B0B;">{{ $step['num'] }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6 text-center">
+                    <div class="text-2xl mb-3">{{ $step['icon'] }}</div>
+                    <h3 class="text-lg font-bold mb-3" style="color: #F5F5F5;">{{ app()->getLocale() === 'en' ? $step['title_en'] : $step['title_es'] }}</h3>
+                    <p class="text-sm leading-relaxed" style="color: #9CA3AF;">{{ app()->getLocale() === 'en' ? $step['desc_en'] : $step['desc_es'] }}</p>
+                </div>
+            </div>
+            @endforeach
+        </div>
+
+        {{-- CTA to full process page --}}
         <div class="text-center">
-            <p class="text-gray-400 mb-6">¿Tu restaurante está siendo encontrado? Reclámalo ahora y empieza a atraer más clientes.</p>
-            <a href="{{ route('claim.restaurant') }}" class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-red-600 to-orange-600 text-white font-bold rounded-xl hover:from-red-700 hover:to-orange-700 transition shadow-lg shadow-red-500/25">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                </svg>
-                Buscar Mi Restaurante
+            <a href="{{ app()->getLocale() === 'en' ? '/how-famer-works' : '/como-funciona-famer' }}"
+               class="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-200"
+               style="border: 1px solid rgba(212,175,55,0.3); color: #D4AF37;"
+               onmouseover="this.style.borderColor='#D4AF37'" onmouseout="this.style.borderColor='rgba(212,175,55,0.3)'">
+                {{ app()->getLocale() === 'en' ? 'See the complete process — 4 steps + all features →' : 'Ver el proceso completo — 4 pasos + todas las funciones →' }}
             </a>
         </div>
     </div>
 </section>
 
-{{-- Success Stories Section --}}
-<section class="py-20 bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-16">
-            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                Restaurantes que brillan en nuestra plataforma
+{{-- ============================================ --}}
+{{-- 6. SOCIAL PROOF — Dueños con resultados    --}}
+{{-- ============================================ --}}
+<section class="py-20 md:py-28" style="background-color: #0B0B0B;">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        {{-- Section header --}}
+        <div class="text-center mb-14">
+            <p class="text-xs font-bold tracking-widest uppercase mb-3" style="color: #D4AF37;">
+                {{ app()->getLocale() === 'en' ? 'Real Results' : 'Resultados Reales' }}
+            </p>
+            <h2 class="text-3xl md:text-4xl font-bold" style="color: #F5F5F5; font-family: 'Playfair Display', Georgia, serif;">
+                {{ app()->getLocale() === 'en' ? 'Owners who are already growing.' : 'Dueños que ya están creciendo.' }}
             </h2>
-            <p class="text-xl text-gray-600">
-                Conoce algunos de los restaurantes mexicanos más exitosos
+        </div>
+
+        {{-- Impact stats bar --}}
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-14">
+            @foreach([
+                ['num' => '3.2×', 'label_es' => 'Más reseñas en 90 días',       'label_en' => 'More reviews in 90 days'],
+                ['num' => '68%',  'label_es' => 'Aumento promedio en visitas',   'label_en' => 'Average increase in profile views'],
+                ['num' => '94%',  'label_es' => 'Dueños satisfechos',            'label_en' => 'Satisfied owners'],
+                ['num' => '26K+', 'label_es' => 'Restaurantes en la plataforma', 'label_en' => 'Restaurants on the platform'],
+            ] as $stat)
+            <div class="rounded-2xl p-5 text-center" style="background:#1A1A1A; border:1px solid rgba(212,175,55,0.15);">
+                <div class="text-3xl font-black mb-1" style="color:#D4AF37; font-family:'Playfair Display',serif;">{{ $stat['num'] }}</div>
+                <div class="text-xs" style="color:#9CA3AF;">{{ app()->getLocale() === 'en' ? $stat['label_en'] : $stat['label_es'] }}</div>
+            </div>
+            @endforeach
+        </div>
+
+        {{-- Testimonials grid --}}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-14">
+            @php $testimonials = [
+                [
+                    'name_es'     => 'Carlos M.',
+                    'name_en'     => 'Carlos M.',
+                    'restaurant_es' => 'Taquería El Güero',
+                    'restaurant_en' => 'Taquería El Güero',
+                    'location'    => 'Dallas, TX',
+                    'quote_es'    => 'En 3 meses pasé de 12 reseñas a 47. Ahora aparezco en el Top 5 de Dallas. Los clientes me dicen que me encontraron en FAMER.',
+                    'quote_en'    => 'In 3 months I went from 12 reviews to 47. Now I appear in the Top 5 of Dallas. Customers tell me they found me on FAMER.',
+                    'metric_es'   => '+35 reseñas en 90 días',
+                    'metric_en'   => '+35 reviews in 90 days',
+                    'photo'       => 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=80&q=80',
+                ],
+                [
+                    'name_es'     => 'Ana L.',
+                    'name_en'     => 'Ana L.',
+                    'restaurant_es' => 'La Cocina de Ana',
+                    'restaurant_en' => 'La Cocina de Ana',
+                    'location'    => 'Houston, TX',
+                    'quote_es'    => 'El menú digital con QR fue un cambio total. Los clientes escanean y piden directo. Mis ingresos del fin de semana subieron 22% en el primer mes.',
+                    'quote_en'    => 'The digital menu with QR was a total game changer. Customers scan and order directly. My weekend revenue went up 22% in the first month.',
+                    'metric_es'   => '+22% ingresos fin de semana',
+                    'metric_en'   => '+22% weekend revenue',
+                    'photo'       => 'https://images.unsplash.com/photo-1494790108755-2616b612b786?auto=format&fit=crop&w=80&q=80',
+                ],
+                [
+                    'name_es'     => 'Roberto V.',
+                    'name_en'     => 'Roberto V.',
+                    'restaurant_es' => 'Pozolería Don Roberto',
+                    'restaurant_en' => 'Pozolería Don Roberto',
+                    'location'    => 'Chicago, IL',
+                    'quote_es'    => 'Antes dependía 100% de Yelp. Ahora tengo mi propio perfil en FAMER y no pago comisiones. El FAMER Score me ayudó a saber exactamente qué mejorar.',
+                    'quote_en'    => 'Before I relied 100% on Yelp. Now I have my own profile on FAMER and I pay no commissions. The FAMER Score helped me know exactly what to improve.',
+                    'metric_es'   => 'Sin comisiones a terceros',
+                    'metric_en'   => 'Zero third-party commissions',
+                    'photo'       => 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=80&q=80',
+                ],
+            ]; @endphp
+
+            @foreach($testimonials as $t)
+            <div class="rounded-2xl p-7 flex flex-col" style="background:#1A1A1A; border:1px solid rgba(212,175,55,0.12);">
+                {{-- Stars --}}
+                <div class="flex gap-0.5 mb-4">
+                    @for($i = 0; $i < 5; $i++)
+                    <svg class="w-4 h-4" style="color:#D4AF37;" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                    </svg>
+                    @endfor
+                </div>
+                {{-- Quote --}}
+                <p class="text-sm leading-relaxed flex-1 mb-5" style="color:#CCCCCC;">
+                    "{{ app()->getLocale() === 'en' ? $t['quote_en'] : $t['quote_es'] }}"
+                </p>
+                {{-- Metric badge --}}
+                <div class="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 mb-5 w-fit" style="background:rgba(212,175,55,0.08); border:1px solid rgba(212,175,55,0.2);">
+                    <span class="text-xs font-bold" style="color:#D4AF37;">📈 {{ app()->getLocale() === 'en' ? $t['metric_en'] : $t['metric_es'] }}</span>
+                </div>
+                {{-- Owner info --}}
+                <div class="flex items-center gap-3">
+                    <img src="{{ $t['photo'] }}"
+                         alt="{{ $t['name_es'] }}"
+                         loading="lazy"
+                         class="w-12 h-12 rounded-full object-cover flex-shrink-0"
+                         style="border:2px solid rgba(212,175,55,0.4);">
+                    <div>
+                        <div class="text-sm font-bold" style="color:#F5F5F5;">{{ app()->getLocale() === 'en' ? $t['name_en'] : $t['name_es'] }}</div>
+                        <div class="text-xs" style="color:#9CA3AF;">{{ app()->getLocale() === 'en' ? $t['restaurant_en'] : $t['restaurant_es'] }} · {{ $t['location'] }}</div>
+                    </div>
+                </div>
+            </div>
+            @endforeach
+        </div>
+
+        {{-- Logos / trust badges of restaurant types --}}
+        <div class="text-center">
+            <p class="text-xs font-medium mb-4" style="color:#6B7280;">
+                {{ app()->getLocale() === 'en' ? 'Restaurants of all types trust FAMER' : 'Restaurantes de todos los tipos confían en FAMER' }}
+            </p>
+            <div class="flex flex-wrap justify-center gap-3">
+                @foreach(['Taquerías','Pozelerías','Restaurantes Familiares','Bares Mexicanos','Cocinas Regionales','Food Trucks'] as $type)
+                <span class="px-3 py-1.5 rounded-full text-xs font-medium" style="background:#1A1A1A; border:1px solid #2A2A2A; color:#9CA3AF;">{{ $type }}</span>
+                @endforeach
+            </div>
+        </div>
+    </div>
+</section>
+
+{{-- ============================================ --}}
+{{-- 7. PRICING SECTION --}}
+{{-- ============================================ --}}
+<section id="pricing" class="py-20 md:py-28" style="background-color: #0B0B0B;">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl md:text-5xl font-bold mb-4" style="color: #F5F5F5; font-family: 'Playfair Display', Georgia, serif;">
+                {{ app()->getLocale() === 'en' ? 'Simple, Transparent Pricing' : 'Precios Simples y Transparentes' }}
+            </h2>
+            <p class="text-lg max-w-xl mx-auto" style="color: #CCCCCC;">
+                {{ app()->getLocale() === 'en' ? 'Start free. Upgrade when you are ready.' : 'Empieza gratis. Mejora cuando estes listo.' }}
             </p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            {{-- Success Card 1 --}}
-            <div class="group relative overflow-hidden rounded-2xl aspect-[3/4] cursor-pointer">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-10"></div>
-                <img src="https://images.unsplash.com/photo-1504544750208-dc0358e63f7f?w=400&h=500&fit=crop"
-                     alt="Mi Tierra Cafe" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                <div class="absolute bottom-0 left-0 right-0 p-5 z-20">
-                    <p class="text-white/80 text-xs font-medium">San Antonio, TX</p>
-                    <h3 class="text-white font-bold text-lg">Mi Tierra Cafe & Bakery</h3>
-                    <div class="mt-3 flex items-center gap-2">
-                        <span class="bg-amber-500 text-white text-xs font-bold px-2 py-1 rounded">+24,152</span>
-                        <span class="text-white/80 text-xs">reseñas</span>
-                    </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 items-start">
+            {{-- FREE Plan --}}
+            <div class="rounded-2xl p-8" style="background-color: #1A1A1A; border: 1px solid rgba(255,255,255,0.05);">
+                <h3 class="text-lg font-bold mb-2" style="color: #F5F5F5;">{{ app()->getLocale() === 'en' ? 'Basic' : 'Listado Gratis' }}</h3>
+                <div class="mb-6">
+                    <span class="text-4xl font-black" style="color: #F5F5F5;">$0</span>
+                    <span class="text-sm" style="color: #CCCCCC;">/{{ app()->getLocale() === 'en' ? 'forever' : 'siempre' }}</span>
                 </div>
-            </div>
-
-            {{-- Success Card 2 --}}
-            <div class="group relative overflow-hidden rounded-2xl aspect-[3/4] cursor-pointer">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-10"></div>
-                <img src="https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400&h=500&fit=crop"
-                     alt="Gracias Madre" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                <div class="absolute bottom-0 left-0 right-0 p-5 z-20">
-                    <p class="text-white/80 text-xs font-medium">West Hollywood, CA</p>
-                    <h3 class="text-white font-bold text-lg">Gracias Madre</h3>
-                    <div class="mt-3 flex items-center gap-2">
-                        <span class="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded">4.6 ⭐</span>
-                        <span class="text-white/80 text-xs">5,296 reseñas</span>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Success Card 3 --}}
-            <div class="group relative overflow-hidden rounded-2xl aspect-[3/4] cursor-pointer">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-10"></div>
-                <img src="https://images.unsplash.com/photo-1613514785940-daed07799d9b?w=400&h=500&fit=crop"
-                     alt="Columbia Restaurant" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                <div class="absolute bottom-0 left-0 right-0 p-5 z-20">
-                    <p class="text-white/80 text-xs font-medium">Tampa, FL</p>
-                    <h3 class="text-white font-bold text-lg">Columbia Restaurant</h3>
-                    <div class="mt-3 flex items-center gap-2">
-                        <span class="bg-amber-500 text-white text-xs font-bold px-2 py-1 rounded">+20,732</span>
-                        <span class="text-white/80 text-xs">reseñas</span>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Success Card 4 --}}
-            <div class="group relative overflow-hidden rounded-2xl aspect-[3/4] cursor-pointer">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-10"></div>
-                <img src="https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=400&h=500&fit=crop"
-                     alt="The Taco Stand" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                <div class="absolute bottom-0 left-0 right-0 p-5 z-20">
-                    <p class="text-white/80 text-xs font-medium">La Jolla, CA</p>
-                    <h3 class="text-white font-bold text-lg">The Taco Stand</h3>
-                    <div class="mt-3 flex items-center gap-2">
-                        <span class="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded">4.5 ⭐</span>
-                        <span class="text-white/80 text-xs">5,845 reseñas</span>
-                    </div>
-                </div>
-            </div>
-
-            {{-- Success Card 5 --}}
-            <div class="group relative overflow-hidden rounded-2xl aspect-[3/4] cursor-pointer">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-10"></div>
-                <img src="https://images.unsplash.com/photo-1599974579688-8dbdd335c77f?w=400&h=500&fit=crop"
-                     alt="Café Tu Tu Tango" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                <div class="absolute bottom-0 left-0 right-0 p-5 z-20">
-                    <p class="text-white/80 text-xs font-medium">Orlando, FL</p>
-                    <h3 class="text-white font-bold text-lg">Café Tu Tu Tango</h3>
-                    <div class="mt-3 flex items-center gap-2">
-                        <span class="bg-green-500 text-white text-xs font-bold px-2 py-1 rounded">4.6 ⭐</span>
-                        <span class="text-white/80 text-xs">10,210 reseñas</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-{{-- ============================================ --}}
-{{-- POR QUÉ ELEGIRNOS - Comparison Section --}}
-{{-- ============================================ --}}
-<section class="py-20 bg-gradient-to-br from-red-50 to-orange-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-16">
-            <span class="inline-block bg-red-100 text-red-700 text-sm font-bold px-4 py-2 rounded-full mb-4">COMPARACIÓN</span>
-            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                ¿Por Qué Elegirnos Sobre Otras Plataformas?
-            </h2>
-            <p class="text-xl text-gray-600">Somos el directorio #1 especializado en restaurantes mexicanos</p>
-        </div>
-
-        {{-- Comparison Table --}}
-        <div class="overflow-x-auto mb-12">
-            <table class="w-full bg-white rounded-2xl shadow-xl overflow-hidden">
-                <thead>
-                    <tr class="bg-gray-900 text-white">
-                        <th class="py-3 px-3 md:py-4 md:px-6 text-left text-sm md:text-base">Característica</th>
-                        <th class="py-3 px-3 md:py-4 md:px-6 text-center">
-                            <div class="flex flex-col items-center">
-                                <span class="text-red-400 font-bold text-lg">RestaurantesMexicanos</span>
-                                <span class="text-xs text-gray-400">Famosos</span>
-                            </div>
-                        </th>
-                        <th class="py-3 px-3 md:py-4 md:px-6 text-center">
-                            <div class="flex flex-col items-center">
-                                <span class="text-gray-300">Yelp</span>
-                            </div>
-                        </th>
-                        <th class="py-3 px-3 md:py-4 md:px-6 text-center">
-                            <div class="flex flex-col items-center">
-                                <span class="text-gray-300">Google</span>
-                            </div>
-                        </th>
-                        <th class="py-3 px-3 md:py-4 md:px-6 text-center">
-                            <div class="flex flex-col items-center">
-                                <span class="text-gray-300">TripAdvisor</span>
-                            </div>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100">
-                    <tr class="hover:bg-gray-50">
-                        <td class="py-3 px-3 md:py-4 md:px-6 font-medium text-gray-900 text-sm md:text-base">Enfoque en comida mexicana</td>
-                        <td class="py-3 px-3 md:py-4 md:px-6 text-center"><div class="flex flex-col items-center"><span class="text-xl">✅</span><span class="text-green-600 font-bold text-xs mt-0.5">100%</span></div></td>
-                        <td class="py-3 px-3 md:py-4 md:px-6 text-center"><span class="text-xl">❌</span></td>
-                        <td class="py-3 px-3 md:py-4 md:px-6 text-center"><span class="text-xl">❌</span></td>
-                        <td class="py-3 px-3 md:py-4 md:px-6 text-center"><span class="text-xl">❌</span></td>
-                    </tr>
-                    <tr class="hover:bg-gray-50 bg-gray-50/50">
-                        <td class="py-3 px-3 md:py-4 md:px-6 font-medium text-gray-900 text-sm md:text-base">Perfil básico gratis</td>
-                        <td class="py-3 px-3 md:py-4 md:px-6 text-center"><span class="text-xl">✅</span></td>
-                        <td class="py-3 px-3 md:py-4 md:px-6 text-center"><span class="text-xl">✅</span></td>
-                        <td class="py-3 px-3 md:py-4 md:px-6 text-center"><span class="text-xl">✅</span></td>
-                        <td class="py-3 px-3 md:py-4 md:px-6 text-center"><span class="text-xl">✅</span></td>
-                    </tr>
-                    <tr class="hover:bg-gray-50">
-                        <td class="py-3 px-3 md:py-4 md:px-6 font-medium text-gray-900 text-sm md:text-base">Sin anuncios de competidores</td>
-                        <td class="py-3 px-3 md:py-4 md:px-6 text-center"><span class="text-xl">✅</span></td>
-                        <td class="py-3 px-3 md:py-4 md:px-6 text-center"><div class="flex flex-col items-center"><span class="text-xl">❌</span><span class="text-red-500 text-xs mt-0.5">$$$</span></div></td>
-                        <td class="py-3 px-3 md:py-4 md:px-6 text-center"><span class="text-xl">❌</span></td>
-                        <td class="py-3 px-3 md:py-4 md:px-6 text-center"><span class="text-xl">❌</span></td>
-                    </tr>
-                    <tr class="hover:bg-gray-50 bg-gray-50/50">
-                        <td class="py-3 px-3 md:py-4 md:px-6 font-medium text-gray-900 text-sm md:text-base">Cupones y descuentos incluidos</td>
-                        <td class="py-3 px-3 md:py-4 md:px-6 text-center"><div class="flex flex-col items-center"><span class="text-xl">✅</span><span class="text-green-600 text-xs mt-0.5">Premium</span></div></td>
-                        <td class="py-3 px-3 md:py-4 md:px-6 text-center"><span class="text-xl">❌</span></td>
-                        <td class="py-3 px-3 md:py-4 md:px-6 text-center"><span class="text-xl">❌</span></td>
-                        <td class="py-3 px-3 md:py-4 md:px-6 text-center"><span class="text-xl">❌</span></td>
-                    </tr>
-                    <tr class="hover:bg-gray-50">
-                        <td class="py-3 px-3 md:py-4 md:px-6 font-medium text-gray-900 text-sm md:text-base">Audiencia enfocada</td>
-                        <td class="py-3 px-3 md:py-4 md:px-6 text-center"><div class="flex flex-col items-center"><span class="text-xl">✅</span><span class="text-green-600 font-bold text-xs mt-0.5">13K+</span></div></td>
-                        <td class="py-3 px-3 md:py-4 md:px-6 text-center"><div class="flex flex-col items-center"><span class="text-xl">❌</span><span class="text-gray-500 text-xs mt-0.5">Mixto</span></div></td>
-                        <td class="py-3 px-3 md:py-4 md:px-6 text-center"><div class="flex flex-col items-center"><span class="text-xl">❌</span><span class="text-gray-500 text-xs mt-0.5">Mixto</span></div></td>
-                        <td class="py-3 px-3 md:py-4 md:px-6 text-center"><div class="flex flex-col items-center"><span class="text-xl">❌</span><span class="text-gray-500 text-xs mt-0.5">Turistas</span></div></td>
-                    </tr>
-                    <tr class="hover:bg-gray-50 bg-gray-50/50">
-                        <td class="py-3 px-3 md:py-4 md:px-6 font-medium text-gray-900 text-sm md:text-base">Soporte en español</td>
-                        <td class="py-3 px-3 md:py-4 md:px-6 text-center"><span class="text-xl">✅</span></td>
-                        <td class="py-3 px-3 md:py-4 md:px-6 text-center"><div class="flex flex-col items-center"><span class="text-xl">⚠️</span><span class="text-gray-500 text-xs mt-0.5">Limitado</span></div></td>
-                        <td class="py-3 px-3 md:py-4 md:px-6 text-center"><div class="flex flex-col items-center"><span class="text-xl">⚠️</span><span class="text-gray-500 text-xs mt-0.5">Auto</span></div></td>
-                        <td class="py-3 px-3 md:py-4 md:px-6 text-center"><div class="flex flex-col items-center"><span class="text-xl">⚠️</span><span class="text-gray-500 text-xs mt-0.5">Limitado</span></div></td>
-                    </tr>
-                    <tr class="hover:bg-gray-50">
-                        <td class="py-3 px-3 md:py-4 md:px-6 font-medium text-gray-900 text-sm md:text-base">Premium mensual desde</td>
-                        <td class="py-3 px-3 md:py-4 md:px-6 text-center"><span class="text-green-600 font-bold text-lg md:text-xl"></span></td>
-                        <td class="py-3 px-3 md:py-4 md:px-6 text-center"><span class="text-red-600 font-bold text-sm md:text-base">0+</span></td>
-                        <td class="py-3 px-3 md:py-4 md:px-6 text-center"><span class="text-gray-500 text-sm">N/A</span></td>
-                        <td class="py-3 px-3 md:py-4 md:px-6 text-center"><span class="text-red-600 font-bold text-sm md:text-base">+</span></td>
-                    </tr>
-                    <tr class="hover:bg-gray-50 bg-green-50">
-                        <td class="py-3 px-3 md:py-4 md:px-6 font-medium text-gray-900 text-sm md:text-base">Reseñas transparentes</td>
-                        <td class="py-3 px-3 md:py-4 md:px-6 text-center"><div class="flex flex-col items-center"><span class="text-xl">✅</span><span class="text-green-600 text-xs mt-0.5">Transparentes</span></div></td>
-                        <td class="py-3 px-3 md:py-4 md:px-6 text-center"><div class="flex flex-col items-center"><span class="text-xl">⚠️</span><span class="text-red-500 text-xs mt-0.5">Controversia</span></div></td>
-                        <td class="py-3 px-3 md:py-4 md:px-6 text-center"><span class="text-xl">⚠️</span></td>
-                        <td class="py-3 px-3 md:py-4 md:px-6 text-center"><span class="text-xl">⚠️</span></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        {{-- Platform Cards --}}
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {{-- vs Yelp --}}
-            <div class="bg-white rounded-xl p-6 shadow-lg border-2 border-red-100">
-                <div class="flex items-center gap-3 mb-4">
-                    <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                        <span class="text-2xl">🆚</span>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-gray-900">vs Yelp</h3>
-                        <p class="text-sm text-gray-500">La diferencia</p>
-                    </div>
-                </div>
-                <ul class="space-y-2 text-sm text-gray-600">
-                    <li class="flex items-start gap-2">
-                        <span class="text-red-500">✗</span>
-                        Yelp: Cobra $300-$1000/mes por anuncios destacados
+                <ul class="space-y-3 mb-8">
+                    @foreach($isEn ?? false
+                        ? ['Directory listing','Basic info','Google Maps integration','Claim & verify ownership','Edit basic info','Customer reviews','Hours & contact','Up to 5 photos']
+                        : ['Aparece en el directorio', 'Info básica (nombre, dirección, teléfono)', 'Integración con Google Maps', 'Verificar propiedad del restaurante', 'Editar información básica', 'Reseñas de clientes', 'Horarios y contacto', 'Hasta 5 fotos']
+                    as $feature)
+                    <li class="flex items-center gap-3">
+                        <svg class="w-4 h-4 flex-shrink-0" style="color: #4ade80;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        <span class="text-sm" style="color: #CCCCCC;">{{ $feature }}</span>
                     </li>
-                    <li class="flex items-start gap-2">
-                        <span class="text-red-500">✗</span>
-                        Yelp: Muestra competidores en tu perfil
-                    </li>
-                    <li class="flex items-start gap-2">
-                        <span class="text-red-500">✗</span>
-                        Yelp: Acusaciones de filtrar reseñas
-                    </li>
-                    <li class="flex items-start gap-2">
-                        <span class="text-green-500">✓</span>
-                        <strong>Nosotros:</strong> Premium desde $39/mes, sin trucos
-                    </li>
+                    @endforeach
                 </ul>
+                <a href="{{ route('claim.restaurant') }}" class="block w-full text-center py-3 px-6 rounded-xl font-semibold transition-all duration-300 hover:bg-white/10" style="border: 1px solid rgba(255,255,255,0.1); color: #F5F5F5;">
+                    {{ app()->getLocale() === 'en' ? 'Start Free' : 'Reclamar Gratis' }}
+                </a>
             </div>
 
-            {{-- vs Google --}}
-            <div class="bg-white rounded-xl p-6 shadow-lg border-2 border-blue-100">
-                <div class="flex items-center gap-3 mb-4">
-                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                        <span class="text-2xl">🆚</span>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-gray-900">vs Google</h3>
-                        <p class="text-sm text-gray-500">La diferencia</p>
-                    </div>
+            {{-- PREMIUM Plan (Highlighted) --}}
+            <div class="rounded-2xl p-8 relative md:-mt-4 md:mb-0" style="background-color: #1A1A1A; border: 2px solid #D4AF37; box-shadow: 0 0 40px rgba(212,175,55,0.1);">
+                <div class="absolute -top-4 left-1/2 -translate-x-1/2 flex gap-2">
+                    <span class="px-4 py-1.5 rounded-full text-xs font-bold" style="background-color: #D4AF37; color: #0B0B0B;">{{ app()->getLocale() === 'en' ? 'MOST POPULAR' : 'MAS POPULAR' }}</span>
                 </div>
-                <ul class="space-y-2 text-sm text-gray-600">
-                    <li class="flex items-start gap-2">
-                        <span class="text-amber-500">⚠️</span>
-                        Google: Te mezcla con miles de negocios
-                    </li>
-                    <li class="flex items-start gap-2">
-                        <span class="text-amber-500">⚠️</span>
-                        Google: No especializado en comida mexicana
-                    </li>
-                    <li class="flex items-start gap-2">
-                        <span class="text-amber-500">⚠️</span>
-                        Google: Difícil destacar sin pagar ads
-                    </li>
-                    <li class="flex items-start gap-2">
-                        <span class="text-green-500">✓</span>
-                        <strong>Nosotros:</strong> 100% enfocados en comida mexicana
-                    </li>
-                </ul>
-            </div>
-
-            {{-- vs TripAdvisor --}}
-            <div class="bg-white rounded-xl p-6 shadow-lg border-2 border-green-100">
-                <div class="flex items-center gap-3 mb-4">
-                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                        <span class="text-2xl">🆚</span>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-gray-900">vs TripAdvisor</h3>
-                        <p class="text-sm text-gray-500">La diferencia</p>
-                    </div>
+                <h3 class="text-lg font-bold mb-2" style="color: #D4AF37;">Premium</h3>
+                <div class="mb-2">
+                    <span class="text-2xl line-through" style="color: #666;">$39</span>
+                    <span class="text-4xl font-black ml-2" style="color: #F5F5F5;">$9.99</span>
+                    <span class="text-sm" style="color: #CCCCCC;">/{{ app()->getLocale() === 'en' ? 'first month' : 'primer mes' }}</span>
                 </div>
-                <ul class="space-y-2 text-sm text-gray-600">
-                    <li class="flex items-start gap-2">
-                        <span class="text-amber-500">⚠️</span>
-                        TripAdvisor: Enfocado principalmente en turistas
+                <p class="text-sm mb-6" style="color: #D4AF37;">{{ app()->getLocale() === 'en' ? 'Then $39/mo. Cancel anytime.' : 'Después $39/mes. Cancela cuando quieras.' }}</p>
+                <ul class="space-y-3 mb-8">
+                    @foreach($isEn ?? false
+                        ? ['Everything in Basic, plus:','Verified "Premium" badge','Digital menu + QR code','Automatic review SMS requests','FAMER Score & recommendations','Unlimited photos','Profile analytics','Highlighted in rankings']
+                        : ['Todo lo de Básico PLUS:', 'Badge Verificado "Premium"', 'Menú Digital + QR Code', 'SMS automáticos de solicitud de reseña', 'FAMER Score y recomendaciones', 'Fotos ilimitadas', 'Analytics del perfil', 'Destacado en rankings']
+                    as $i => $feature)
+                    <li class="flex items-center gap-3">
+                        <svg class="w-4 h-4 flex-shrink-0" style="color: #D4AF37;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        <span class="text-sm {{ $i === 0 ? 'font-bold' : '' }}" style="color: #F5F5F5;">{{ $feature }}</span>
                     </li>
-                    <li class="flex items-start gap-2">
-                        <span class="text-amber-500">⚠️</span>
-                        TripAdvisor: Premium desde $99/mes
-                    </li>
-                    <li class="flex items-start gap-2">
-                        <span class="text-amber-500">⚠️</span>
-                        TripAdvisor: Interfaz compleja para dueños
-                    </li>
-                    <li class="flex items-start gap-2">
-                        <span class="text-green-500">✓</span>
-                        <strong>Nosotros:</strong> Clientes locales que buscan comida mexicana
-                    </li>
+                    @endforeach
                 </ul>
+                <a href="{{ route('claim.restaurant') }}?plan=premium" class="block w-full text-center py-3 px-6 rounded-xl font-bold transition-all duration-300 hover:scale-105" style="background-color: #D4AF37; color: #0B0B0B; box-shadow: 0 4px 20px rgba(212,175,55,0.25);">
+                    {{ app()->getLocale() === 'en' ? 'Start for $9.99' : 'Suscribirse por $9.99' }}
+                </a>
+                <p class="text-center text-xs mt-3" style="color: #999;">{{ app()->getLocale() === 'en' ? '4 Quarterly coupons (10% off) at MF Group' : '4 Cupones Trimestrales (10% off) en MF Group' }}</p>
             </div>
-        </div>
 
-        {{-- Bottom CTA --}}
-        <div class="mt-12 text-center">
-            <div class="inline-flex items-center gap-4 bg-white rounded-full py-2 pl-6 pr-2 shadow-lg border border-gray-200">
-                <p class="text-gray-700">
-                    <strong class="text-[#AF0606]">Ahorra hasta $3,000/año</strong> comparado con Yelp Premium
-                </p>
-                <a href="{{ route('claim.restaurant') }}" class="bg-red-600 text-white px-6 py-2 rounded-full font-bold hover:bg-red-700 transition">
-                    Empezar Gratis
+            {{-- ELITE Plan --}}
+            <div class="rounded-2xl p-8" style="background-color: #1A1A1A; border: 1px solid rgba(255,255,255,0.05);">
+                <h3 class="text-lg font-bold mb-2" style="color: #F5F5F5;">Elite</h3>
+                <div class="mb-6">
+                    <span class="text-4xl font-black" style="color: #F5F5F5;">$79</span>
+                    <span class="text-sm" style="color: #CCCCCC;">/{{ app()->getLocale() === 'en' ? 'mo' : 'mes' }}</span>
+                </div>
+                <ul class="space-y-3 mb-8">
+                    @foreach($isEn ?? false
+                        ? ['Everything in Premium, plus:','#1 position in city rankings','Advanced analytics + reports','Email marketing campaigns','Your own restaurant website','FAMER Awards eligibility','Priority account manager']
+                        : ['Todo lo de Premium PLUS:', 'Posición #1 en Rankings', 'Analytics Avanzados + Reportes', 'Campañas de Email Marketing', 'Website Propio del Restaurante', 'Elegible para FAMER Awards', 'Gerente de Cuenta Dedicado']
+                    as $i => $feature)
+                    <li class="flex items-center gap-3">
+                        <svg class="w-4 h-4 flex-shrink-0" style="color: #a78bfa;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        <span class="text-sm {{ $i === 0 ? 'font-bold' : '' }}" style="color: #CCCCCC;">{{ $feature }}</span>
+                    </li>
+                    @endforeach
+                </ul>
+                <a href="{{ route('claim.restaurant') }}?plan=elite" class="block w-full text-center py-3 px-6 rounded-xl font-semibold transition-all duration-300 hover:bg-white/10" style="border: 1px solid rgba(255,255,255,0.1); color: #F5F5F5;">
+                    {{ app()->getLocale() === 'en' ? 'Go Elite' : 'Ir a Elite' }}
                 </a>
             </div>
         </div>
-    </div>
-</section>
 
-{{-- Benefits Section - Clean Grid --}}
-<section id="benefits" class="py-20 bg-gray-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-16">
-            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                ¿Por Qué Reclamar Tu Restaurante?
-            </h2>
-            <p class="text-xl text-gray-600">Todo lo que necesitas para crecer tu negocio online</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {{-- Benefit 1 --}}
-            <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition">
-                <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-6">
-                    <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                    </svg>
-                </div>
-                <h3 class="text-2xl font-bold text-gray-900 mb-3">Análisis en Tiempo Real</h3>
-                <p class="text-gray-600 mb-4">Ve cuántas personas visitan tu perfil, hacen clic en tu teléfono, abren tu menú y más.</p>
-                <ul class="text-gray-600 space-y-2">
-                    <li>✓ Visitas a tu página</li>
-                    <li>✓ Clics en teléfono</li>
-                    <li>✓ Clics en dirección</li>
-                    <li>✓ Visitas a tu sitio web</li>
-                </ul>
-            </div>
-
-            {{-- Benefit 2 --}}
-            <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition">
-                <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mb-6">
-                    <svg class="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                    </svg>
-                </div>
-                <h3 class="text-2xl font-bold text-gray-900 mb-3">Galería de Fotos</h3>
-                <p class="text-gray-600 mb-4">Muestra lo mejor de tu restaurante con fotos profesionales de tus platillos y ambiente.</p>
-                <ul class="text-gray-600 space-y-2">
-                    <li>✓ Hasta 10 fotos gratis</li>
-                    <li>✓ Fotos ilimitadas (Premium)</li>
-                    <li>✓ Actualiza cuando quieras</li>
-                    <li>✓ Optimización automática</li>
-                </ul>
-            </div>
-
-            {{-- Benefit 3 --}}
-            <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition">
-                <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mb-6">
-                    <svg class="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
-                    </svg>
-                </div>
-                <h3 class="text-2xl font-bold text-gray-900 mb-3">Gestión de Reseñas</h3>
-                <p class="text-gray-600 mb-4">Responde a reseñas de clientes y construye tu reputación online.</p>
-                <ul class="text-gray-600 space-y-2">
-                    <li>✓ Responde a reseñas</li>
-                    <li>✓ Notificaciones instantáneas</li>
-                    <li>✓ Mejora tu rating</li>
-                    <li>✓ Construye confianza</li>
-                </ul>
-            </div>
-
-            {{-- Benefit 4 --}}
-            <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition">
-                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6">
-                    <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                </div>
-                <h3 class="text-2xl font-bold text-gray-900 mb-3">Perfil Verificado</h3>
-                <p class="text-gray-600 mb-4">Obtén una insignia de verificación que genera confianza en tus clientes.</p>
-                <ul class="text-gray-600 space-y-2">
-                    <li>✓ Insignia verificada</li>
-                    <li>✓ Mayor credibilidad</li>
-                    <li>✓ Destaca sobre competencia</li>
-                    <li>✓ Información actualizada</li>
-                </ul>
-            </div>
-
-            {{-- Benefit 5 --}}
-            <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition">
-                <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-6">
-                    <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"></path>
-                    </svg>
-                </div>
-                <h3 class="text-2xl font-bold text-gray-900 mb-3">Cupones y Promociones</h3>
-                <p class="text-gray-600 mb-4">Crea ofertas especiales para atraer nuevos clientes y aumentar ventas.</p>
-                <ul class="text-gray-600 space-y-2">
-                    <li>✓ Cupones digitales</li>
-                    <li>✓ Ofertas por tiempo limitado</li>
-                    <li>✓ Tracking de conversiones</li>
-                    <li>✓ Atrae nuevos clientes</li>
-                </ul>
-            </div>
-
-            {{-- Benefit 6 --}}
-            <div class="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition">
-                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6">
-                    <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                    </svg>
-                </div>
-                <h3 class="text-2xl font-bold text-gray-900 mb-3">Email Marketing</h3>
-                <p class="text-gray-600 mb-4">Mantén contacto con tus clientes mediante campañas de email profesionales.</p>
-                <ul class="text-gray-600 space-y-2">
-                    <li>✓ Campañas automatizadas</li>
-                    <li>✓ Plantillas profesionales</li>
-                    <li>✓ Segmentación de audiencia</li>
-                    <li>✓ Análisis de resultados</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</section>
-
-{{-- ============================================ --}}
-{{-- PROCESO - How It Works Section --}}
-{{-- ============================================ --}}
-<section class="py-20 bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-16">
-            <span class="inline-block bg-green-100 text-green-700 text-sm font-bold px-4 py-2 rounded-full mb-4">SIMPLE Y RÁPIDO</span>
-            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                Reclama Tu Restaurante en 3 Pasos
-            </h2>
-            <p class="text-xl text-gray-600">Completa el proceso en menos de 5 minutos</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-            {{-- Connection Line (desktop) - usando style para compatibilidad --}}
-            <div class="hidden md:block absolute top-24 h-1 bg-gradient-to-r from-red-500 via-amber-500 to-green-500" style="left: 20%; right: 20%;"></div>
-
-            {{-- Step 1 --}}
-            <div class="relative text-center">
-                <div class="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl relative z-10" style="background: linear-gradient(135deg, #ef4444, #dc2626);">
-                    <span class="text-3xl font-bold text-white">1</span>
-                </div>
-                <div class="bg-gray-50 rounded-2xl p-6">
-                    <div class="w-16 h-16 bg-red-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                        <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-2">Busca Tu Restaurante</h3>
-                    <p class="text-gray-600">Ingresa el nombre de tu restaurante en nuestro buscador. Si ya está en nuestra base de datos, lo encontrarás al instante.</p>
-                </div>
-            </div>
-
-            {{-- Step 2 --}}
-            <div class="relative text-center">
-                <div class="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl relative z-10" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
-                    <span class="text-3xl font-bold text-white">2</span>
-                </div>
-                <div class="bg-gray-50 rounded-2xl p-6">
-                    <div class="w-16 h-16 bg-amber-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                        <svg class="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-2">Verifica Tu Identidad</h3>
-                    <p class="text-gray-600">Confirma que eres el dueño o representante autorizado mediante un código enviado a tu teléfono o email del negocio.</p>
-                </div>
-            </div>
-
-            {{-- Step 3 --}}
-            <div class="relative text-center">
-                <div class="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl relative z-10" style="background: linear-gradient(135deg, #22c55e, #16a34a);">
-                    <span class="text-3xl font-bold text-white">3</span>
-                </div>
-                <div class="bg-gray-50 rounded-2xl p-6">
-                    <div class="w-16 h-16 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-2">¡Listo! Empieza a Crecer</h3>
-                    <p class="text-gray-600">Completa tu perfil, sube fotos, actualiza tu menú y empieza a recibir más clientes inmediatamente.</p>
-                </div>
-            </div>
-        </div>
-
-        {{-- Time indicator --}}
-        <div class="mt-12 text-center">
-            <div class="inline-flex items-center gap-3 bg-green-50 border border-green-200 rounded-full px-6 py-3">
-                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                <span class="text-green-800 font-medium">Tiempo promedio: <strong>5 minutos</strong></span>
-            </div>
-        </div>
-    </div>
-</section>
-
-
-{{-- CASOS DE ÉXITO - Testimonials Section (owner.com style) --}}
-<section class="py-20 bg-gray-100" style="overflow: hidden;">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-16">
-            <span style="display: inline-block; background: #fef2f2; color: #dc2626; font-size: 0.8rem; font-weight: 700; padding: 0.5rem 1.25rem; border-radius: 9999px; margin-bottom: 1rem; letter-spacing: 0.05em;">CASOS DE ÉXITO</span>
-            <h2 style="font-size: 2.25rem; font-weight: 800; color: #111827; margin-bottom: 1rem;">Miles de Dueños Confían en Nosotros</h2>
-            <p style="font-size: 1.15rem; color: #6b7280; max-width: 600px; margin: 0 auto;">Historias reales de dueños que han crecido su negocio con nuestra plataforma</p>
-        </div>
-
-        <!-- Testimonials Carousel -->
-        <div style="position: relative;">
-            <div id="testimonials-track" style="display: flex; gap: 1.5rem; transition: transform 0.5s ease; cursor: grab;">
-
-                <!-- Card 1 -->
-                <div style="min-width: 350px; max-width: 350px; background: #fff; border-radius: 1.25rem; overflow: hidden; flex-shrink: 0; box-shadow: 0 4px 20px rgba(0,0,0,0.08); transition: transform 0.3s, box-shadow 0.3s;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 30px rgba(0,0,0,0.12)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 20px rgba(0,0,0,0.08)'">
-                    <div style="position: relative; height: 220px; overflow: hidden;">
-                        <img src="/images/testimonials/juan-lg.jpg" alt="Juan Rodriguez" style="width: 100%; height: 100%; object-fit: cover;">
-                        <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 80px; background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);"></div>
-                        <div style="position: absolute; bottom: 12px; left: 16px; color: #fff;">
-                            <p style="font-weight: 700; font-size: 1.05rem; margin: 0;">Juan Rodriguez</p>
-                            <p style="font-size: 0.8rem; opacity: 0.9; margin: 0;">La Taqueria de Javier, Houston TX</p>
-                        </div>
-                    </div>
-                    <div style="padding: 1.5rem;">
-                        <div style="color: #f59e0b; font-size: 0.95rem; margin-bottom: 0.75rem;">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-                        <p style="color: #374151; font-size: 0.9rem; line-height: 1.65; margin-bottom: 1.25rem; font-style: italic;">"Desde que reclamé mi restaurante, mis pedidos en línea aumentaron un 40%. La plataforma es muy fácil de usar y el soporte es excelente."</p>
-                        <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #f3f4f6; padding-top: 1rem;">
-                            <div>
-                                <span style="color: #dc2626; font-weight: 800; font-size: 1.5rem;">+40%</span>
-                                <p style="color: #6b7280; font-size: 0.75rem; margin: 0;">Pedidos en línea</p>
-                            </div>
-                            <a href="{{ route('claim.restaurant') }}" style="color: #dc2626; font-size: 0.8rem; font-weight: 600; text-decoration: none;">Ver más →</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card 2 -->
-                <div style="min-width: 350px; max-width: 350px; background: #fff; border-radius: 1.25rem; overflow: hidden; flex-shrink: 0; box-shadow: 0 4px 20px rgba(0,0,0,0.08); transition: transform 0.3s, box-shadow 0.3s;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 30px rgba(0,0,0,0.12)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 20px rgba(0,0,0,0.08)'">
-                    <div style="position: relative; height: 220px; overflow: hidden;">
-                        <img src="/images/testimonials/maria_g-lg.jpg" alt="Maria Garcia" style="width: 100%; height: 100%; object-fit: cover;">
-                        <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 80px; background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);"></div>
-                        <div style="position: absolute; bottom: 12px; left: 16px; color: #fff;">
-                            <p style="font-weight: 700; font-size: 1.05rem; margin: 0;">María García</p>
-                            <p style="font-size: 0.8rem; opacity: 0.9; margin: 0;">El Fogón Oaxaqueño, Los Angeles CA</p>
-                        </div>
-                    </div>
-                    <div style="padding: 1.5rem;">
-                        <div style="color: #f59e0b; font-size: 0.95rem; margin-bottom: 0.75rem;">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-                        <p style="color: #374151; font-size: 0.9rem; line-height: 1.65; margin-bottom: 1.25rem; font-style: italic;">"El menú digital con IA es increíble. Mis clientes pueden ver los platillos con fotos y precios actualizados. Ha sido un cambio total para mi negocio."</p>
-                        <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #f3f4f6; padding-top: 1rem;">
-                            <div>
-                                <span style="color: #dc2626; font-weight: 800; font-size: 1.5rem;">+$8,500</span>
-                                <p style="color: #6b7280; font-size: 0.75rem; margin: 0;">/mes en ventas</p>
-                            </div>
-                            <a href="{{ route('claim.restaurant') }}" style="color: #dc2626; font-size: 0.8rem; font-weight: 600; text-decoration: none;">Ver más →</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card 3 -->
-                <div style="min-width: 350px; max-width: 350px; background: #fff; border-radius: 1.25rem; overflow: hidden; flex-shrink: 0; box-shadow: 0 4px 20px rgba(0,0,0,0.08); transition: transform 0.3s, box-shadow 0.3s;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 30px rgba(0,0,0,0.12)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 20px rgba(0,0,0,0.08)'">
-                    <div style="position: relative; height: 220px; overflow: hidden;">
-                        <img src="/images/testimonials/carlos-lg.jpg" alt="Carlos Lopez" style="width: 100%; height: 100%; object-fit: cover;">
-                        <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 80px; background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);"></div>
-                        <div style="position: absolute; bottom: 12px; left: 16px; color: #fff;">
-                            <p style="font-weight: 700; font-size: 1.05rem; margin: 0;">Carlos López</p>
-                            <p style="font-size: 0.8rem; opacity: 0.9; margin: 0;">Casa Mezcal, Chicago IL</p>
-                        </div>
-                    </div>
-                    <div style="padding: 1.5rem;">
-                        <div style="color: #f59e0b; font-size: 0.95rem; margin-bottom: 0.75rem;">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-                        <p style="color: #374151; font-size: 0.9rem; line-height: 1.65; margin-bottom: 1.25rem; font-style: italic;">"El chatbot bilingüe atiende a mis clientes 24/7. Ya no pierdo reservaciones por no contestar el teléfono a tiempo. Excelente inversión."</p>
-                        <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #f3f4f6; padding-top: 1rem;">
-                            <div>
-                                <span style="color: #dc2626; font-weight: 800; font-size: 1.5rem;">+65%</span>
-                                <p style="color: #6b7280; font-size: 0.75rem; margin: 0;">Reservaciones</p>
-                            </div>
-                            <a href="{{ route('claim.restaurant') }}" style="color: #dc2626; font-size: 0.8rem; font-weight: 600; text-decoration: none;">Ver más →</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card 4 -->
-                <div style="min-width: 350px; max-width: 350px; background: #fff; border-radius: 1.25rem; overflow: hidden; flex-shrink: 0; box-shadow: 0 4px 20px rgba(0,0,0,0.08); transition: transform 0.3s, box-shadow 0.3s;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 30px rgba(0,0,0,0.12)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 20px rgba(0,0,0,0.08)'">
-                    <div style="position: relative; height: 220px; overflow: hidden;">
-                        <img src="/images/testimonials/ana-lg.jpg" alt="Ana Sanchez" style="width: 100%; height: 100%; object-fit: cover;">
-                        <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 80px; background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);"></div>
-                        <div style="position: absolute; bottom: 12px; left: 16px; color: #fff;">
-                            <p style="font-weight: 700; font-size: 1.05rem; margin: 0;">Ana Sánchez</p>
-                            <p style="font-size: 0.8rem; opacity: 0.9; margin: 0;">Sabor Michoacano, Dallas TX</p>
-                        </div>
-                    </div>
-                    <div style="padding: 1.5rem;">
-                        <div style="color: #f59e0b; font-size: 0.95rem; margin-bottom: 0.75rem;">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-                        <p style="color: #374151; font-size: 0.9rem; line-height: 1.65; margin-bottom: 1.25rem; font-style: italic;">"Los analytics me ayudaron a entender qué platillos son más populares. Ajusté mi menú y mis ganancias subieron. La mejor decisión que he tomado."</p>
-                        <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #f3f4f6; padding-top: 1rem;">
-                            <div>
-                                <span style="color: #dc2626; font-weight: 800; font-size: 1.5rem;">+$12,000</span>
-                                <p style="color: #6b7280; font-size: 0.75rem; margin: 0;">/mes ganancias</p>
-                            </div>
-                            <a href="{{ route('claim.restaurant') }}" style="color: #dc2626; font-size: 0.8rem; font-weight: 600; text-decoration: none;">Ver más →</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card 5 -->
-                <div style="min-width: 350px; max-width: 350px; background: #fff; border-radius: 1.25rem; overflow: hidden; flex-shrink: 0; box-shadow: 0 4px 20px rgba(0,0,0,0.08); transition: transform 0.3s, box-shadow 0.3s;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 30px rgba(0,0,0,0.12)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 20px rgba(0,0,0,0.08)'">
-                    <div style="position: relative; height: 220px; overflow: hidden;">
-                        <img src="/images/testimonials/roberto-lg.jpg" alt="Roberto Hernandez" style="width: 100%; height: 100%; object-fit: cover;">
-                        <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 80px; background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);"></div>
-                        <div style="position: absolute; bottom: 12px; left: 16px; color: #fff;">
-                            <p style="font-weight: 700; font-size: 1.05rem; margin: 0;">Roberto Hernández</p>
-                            <p style="font-size: 0.8rem; opacity: 0.9; margin: 0;">El Rancho Grande, Phoenix AZ</p>
-                        </div>
-                    </div>
-                    <div style="padding: 1.5rem;">
-                        <div style="color: #f59e0b; font-size: 0.95rem; margin-bottom: 0.75rem;">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-                        <p style="color: #374151; font-size: 0.9rem; line-height: 1.65; margin-bottom: 1.25rem; font-style: italic;">"Reclamé mi restaurante gratis y en una semana ya tenía nuevos clientes llegando. El plan premium se pagó solo en el primer mes."</p>
-                        <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #f3f4f6; padding-top: 1rem;">
-                            <div>
-                                <span style="color: #dc2626; font-weight: 800; font-size: 1.5rem;">+120</span>
-                                <p style="color: #6b7280; font-size: 0.75rem; margin: 0;">Nuevos clientes/mes</p>
-                            </div>
-                            <a href="{{ route('claim.restaurant') }}" style="color: #dc2626; font-size: 0.8rem; font-weight: 600; text-decoration: none;">Ver más →</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card 6 -->
-                <div style="min-width: 350px; max-width: 350px; background: #fff; border-radius: 1.25rem; overflow: hidden; flex-shrink: 0; box-shadow: 0 4px 20px rgba(0,0,0,0.08); transition: transform 0.3s, box-shadow 0.3s;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 30px rgba(0,0,0,0.12)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 20px rgba(0,0,0,0.08)'">
-                    <div style="position: relative; height: 220px; overflow: hidden;">
-                        <img src="/images/testimonials/lupita-lg.jpg" alt="Lupita Martinez" style="width: 100%; height: 100%; object-fit: cover;">
-                        <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 80px; background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);"></div>
-                        <div style="position: absolute; bottom: 12px; left: 16px; color: #fff;">
-                            <p style="font-weight: 700; font-size: 1.05rem; margin: 0;">Lupita Martínez</p>
-                            <p style="font-size: 0.8rem; opacity: 0.9; margin: 0;">Tamales Doña Lupita, San Antonio TX</p>
-                        </div>
-                    </div>
-                    <div style="padding: 1.5rem;">
-                        <div style="color: #f59e0b; font-size: 0.95rem; margin-bottom: 0.75rem;">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-                        <p style="color: #374151; font-size: 0.9rem; line-height: 1.65; margin-bottom: 1.25rem; font-style: italic;">"Como mujer empresaria, esta plataforma me dio las herramientas que necesitaba. El email marketing me ayudó a mantener a mis clientes regresando."</p>
-                        <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #f3f4f6; padding-top: 1rem;">
-                            <div>
-                                <span style="color: #dc2626; font-weight: 800; font-size: 1.5rem;">+85%</span>
-                                <p style="color: #6b7280; font-size: 0.75rem; margin: 0;">Clientes recurrentes</p>
-                            </div>
-                            <a href="{{ route('claim.restaurant') }}" style="color: #dc2626; font-size: 0.8rem; font-weight: 600; text-decoration: none;">Ver más →</a>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- Navigation Arrows -->
-            <button onclick="scrollTestimonials(-1)" style="position: absolute; left: -20px; top: 50%; transform: translateY(-50%); width: 48px; height: 48px; background: #fff; border: 1px solid #e5e7eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 10;" onmouseover="this.style.boxShadow='0 6px 20px rgba(0,0,0,0.15)'" onmouseout="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)'">
-                <svg width="20" height="20" fill="none" stroke="#374151" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-            </button>
-            <button onclick="scrollTestimonials(1)" style="position: absolute; right: -20px; top: 50%; transform: translateY(-50%); width: 48px; height: 48px; background: #fff; border: 1px solid #e5e7eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.1); z-index: 10;" onmouseover="this.style.boxShadow='0 6px 20px rgba(0,0,0,0.15)'" onmouseout="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)'">
-                <svg width="20" height="20" fill="none" stroke="#374151" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-            </button>
-        </div>
-
-        <!-- Dots -->
-        <div style="display: flex; justify-content: center; gap: 0.5rem; margin-top: 2rem;" id="testimonials-dots">
-            <button onclick="goToTestimonial(0)" class="t-dot" style="width: 10px; height: 10px; border-radius: 50%; background: #dc2626; border: none; cursor: pointer; transition: all 0.3s;"></button>
-            <button onclick="goToTestimonial(1)" class="t-dot" style="width: 10px; height: 10px; border-radius: 50%; background: #d1d5db; border: none; cursor: pointer; transition: all 0.3s;"></button>
-            <button onclick="goToTestimonial(2)" class="t-dot" style="width: 10px; height: 10px; border-radius: 50%; background: #d1d5db; border: none; cursor: pointer; transition: all 0.3s;"></button>
-            <button onclick="goToTestimonial(3)" class="t-dot" style="width: 10px; height: 10px; border-radius: 50%; background: #d1d5db; border: none; cursor: pointer; transition: all 0.3s;"></button>
-            <button onclick="goToTestimonial(4)" class="t-dot" style="width: 10px; height: 10px; border-radius: 50%; background: #d1d5db; border: none; cursor: pointer; transition: all 0.3s;"></button>
-            <button onclick="goToTestimonial(5)" class="t-dot" style="width: 10px; height: 10px; border-radius: 50%; background: #d1d5db; border: none; cursor: pointer; transition: all 0.3s;"></button>
-        </div>
-
-        <!-- CTA -->
-        <div style="text-align: center; margin-top: 2.5rem;">
-            <a href="{{ route('claim.restaurant') }}" style="display: inline-flex; align-items: center; gap: 0.5rem; background: #dc2626; color: #fff; padding: 1rem 2.5rem; border-radius: 0.75rem; font-weight: 700; font-size: 1rem; text-decoration: none; box-shadow: 0 4px 15px rgba(220,38,38,0.3); transition: all 0.3s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 25px rgba(220,38,38,0.4)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 4px 15px rgba(220,38,38,0.3)'">
-                <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-                Únete a Estos Casos de Éxito
+        <p class="text-center mt-8 text-sm" style="color: #6B7280;">
+            {{ app()->getLocale() === 'en' ? '¿Want to see a detailed comparison with all features?' : '¿Quieres ver la comparación detallada con todas las funciones?' }}
+            <a href="{{ app()->getLocale() === 'en' ? '/how-famer-works' : '/como-funciona-famer' }}#precios" style="color: #D4AF37; text-decoration: none; margin-left: 4px;">
+                {{ app()->getLocale() === 'en' ? 'See full comparison →' : 'Ver comparación completa →' }}
             </a>
-        </div>
-    </div>
-
-    <script>
-        (function() {
-            const track = document.getElementById('testimonials-track');
-            const dots = document.querySelectorAll('.t-dot');
-            let current = 0;
-            const cardWidth = 350 + 24;
-            const totalCards = 6;
-
-            function getVisibleCards() {
-                return window.innerWidth < 768 ? 1 : 3;
-            }
-
-            window.scrollTestimonials = function(dir) {
-                const maxIndex = totalCards - getVisibleCards();
-                current = Math.max(0, Math.min(current + dir, maxIndex));
-                updatePosition();
-            };
-
-            window.goToTestimonial = function(index) {
-                const maxIndex = totalCards - getVisibleCards();
-                current = Math.min(index, maxIndex);
-                updatePosition();
-            };
-
-            function updatePosition() {
-                track.style.transform = 'translateX(-' + (current * cardWidth) + 'px)';
-                dots.forEach(function(dot, i) {
-                    dot.style.background = i === current ? '#dc2626' : '#d1d5db';
-                });
-            }
-
-            let autoPlay = setInterval(function() {
-                const maxIndex = totalCards - getVisibleCards();
-                current = current >= maxIndex ? 0 : current + 1;
-                updatePosition();
-            }, 4000);
-
-            track.addEventListener('mouseenter', function() { clearInterval(autoPlay); });
-            track.addEventListener('mouseleave', function() {
-                autoPlay = setInterval(function() {
-                    const maxIndex = totalCards - getVisibleCards();
-                    current = current >= maxIndex ? 0 : current + 1;
-                    updatePosition();
-                }, 4000);
-            });
-
-            let startX, isDragging = false;
-            track.addEventListener('mousedown', function(e) { startX = e.pageX; isDragging = true; track.style.cursor = 'grabbing'; });
-            track.addEventListener('mousemove', function(e) { if (!isDragging) return; e.preventDefault(); });
-            track.addEventListener('mouseup', function(e) {
-                if (!isDragging) return;
-                isDragging = false;
-                track.style.cursor = 'grab';
-                const diff = e.pageX - startX;
-                if (Math.abs(diff) > 50) scrollTestimonials(diff > 0 ? -1 : 1);
-            });
-            track.addEventListener('touchstart', function(e) { startX = e.touches[0].pageX; });
-            track.addEventListener('touchend', function(e) {
-                const diff = e.changedTouches[0].pageX - startX;
-                if (Math.abs(diff) > 50) scrollTestimonials(diff > 0 ? -1 : 1);
-            });
-        })();
-    </script>
-</section>
-
-{{-- ============================================ --}}
-{{-- PRICING Section --}}
-{{-- ============================================ --}}
-<section id="pricing" class="py-20 bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-16">
-            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                Elige tu Plan
-            </h2>
-            <p class="text-xl text-gray-600">Planes simples y transparentes. Cancela cuando quieras.</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {{-- Free Listing --}}
-            <div class="bg-white rounded-2xl shadow-lg p-8 border-2 border-gray-200">
-                <div class="text-center mb-8">
-                    <h3 class="text-2xl font-bold text-gray-900 mb-2">Listado Gratis</h3>
-                    <div class="text-5xl font-bold text-gray-900 mb-2">$0</div>
-                    <p class="text-gray-600">Listado básico</p>
-                </div>
-
-                <ul class="space-y-4 mb-8">
-                    <li class="flex items-start gap-3">
-                        <svg class="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                        <span class="text-gray-700">Aparece en el directorio</span>
-                    </li>
-                    <li class="flex items-start gap-3">
-                        <svg class="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                        <span class="text-gray-700">Info básica (nombre, dirección, teléfono)</span>
-                    </li>
-                    <li class="flex items-start gap-3">
-                        <svg class="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                        <span class="text-gray-700">Integración con Google Maps</span>
-                    </li>
-                    <li class="flex items-start gap-3">
-                        <svg class="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                        <span class="text-gray-700">Verificar propiedad del restaurante</span>
-                    </li>
-                    <li class="flex items-start gap-3">
-                        <svg class="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                        <span class="text-gray-700">Editar información básica</span>
-                    </li>
-                    <li class="flex items-start gap-3 opacity-50">
-                        <svg class="w-6 h-6 text-gray-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                        <span class="text-gray-500">Sin prioridad en búsquedas</span>
-                    </li>
-                    <li class="flex items-start gap-3 opacity-50">
-                        <svg class="w-6 h-6 text-gray-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                        <span class="text-gray-500">Sin analíticas avanzadas</span>
-                    </li>
-                </ul>
-
-                <a href="{{ route('claim.restaurant') }}" class="block w-full text-center py-3 px-6 bg-gray-100 hover:bg-gray-200 text-gray-900 font-semibold rounded-lg transition">
-                    Reclamar Gratis
-                </a>
-            </div>
-
-            {{-- Premium --}}
-            <div class="bg-gradient-to-br from-yellow-400 via-yellow-500 to-orange-500 rounded-2xl shadow-xl p-8 border-2 border-yellow-600 relative transform scale-105">
-                <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-red-600 text-white px-4 py-1 rounded-full text-xs font-bold shadow-lg">
-                    MAS POPULAR
-                </div>
-
-                <div class="text-center mb-6">
-                    <div class="inline-block px-3 py-1 bg-red-600 text-white text-xs font-bold rounded-full mb-2 animate-pulse">OFERTA PRIMER MES</div>
-                    <h3 class="text-2xl font-bold text-gray-900 mb-2">Premium</h3>
-                    <div class="flex items-center justify-center gap-2 mb-1">
-                        <span class="text-2xl text-gray-600 line-through">$39</span>
-                        <span class="text-5xl font-bold text-gray-900">$9.99</span>
-                    </div>
-                    <p class="text-gray-900 font-semibold">primer mes</p>
-                    <p class="text-sm text-gray-700">Después $39/mes</p>
-                </div>
-
-                <ul class="space-y-3 mb-8 text-gray-900">
-                    <li class="flex items-start gap-3">
-                        <svg class="w-5 h-5 text-green-700 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                        <span><strong>Todo lo de Free PLUS:</strong></span>
-                    </li>
-                    <li class="flex items-start gap-3">
-                        <svg class="w-5 h-5 text-green-700 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                        <span>Badge Destacado</span>
-                    </li>
-                    <li class="flex items-start gap-3">
-                        <svg class="w-5 h-5 text-green-700 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                        <span><strong>Top 3 en búsquedas</strong> locales</span>
-                    </li>
-                    <li class="flex items-start gap-3">
-                        <svg class="w-5 h-5 text-green-700 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                        <span><strong>Menú Digital + QR Code</strong></span>
-                    </li>
-                    <li class="flex items-start gap-3">
-                        <svg class="w-5 h-5 text-green-700 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                        <span><strong>Widget de Pedidos Online</strong></span>
-                    </li>
-                    <li class="flex items-start gap-3">
-                        <svg class="w-5 h-5 text-green-700 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                        <span><strong>Sistema de Reservaciones</strong></span>
-                    </li>
-                    <li class="flex items-start gap-3">
-                        <svg class="w-5 h-5 text-green-700 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                        <span><strong>Dashboard de Analíticas</strong></span>
-                    </li>
-                    <li class="flex items-start gap-3">
-                        <svg class="w-5 h-5 text-green-700 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                        <span><strong>Fotos y Videos Ilimitados</strong></span>
-                    </li>
-                    <li class="flex items-start gap-3">
-                        <svg class="w-5 h-5 text-green-700 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                        <span><strong>Chatbot AI (ES/EN)</strong> 24/7</span>
-                    </li>
-                    <li class="flex items-start gap-3">
-                        <svg class="w-5 h-5 text-green-700 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                        <span><strong>Programa de Lealtad</strong></span>
-                    </li>
-
-                    {{-- Cupon Premium --}}
-                    <li class="flex items-start gap-2 bg-white/50 p-3 rounded-lg border-2 border-gray-900 mt-4">
-                        <svg class="w-5 h-5 text-green-800 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        <div>
-                            <strong class="text-gray-900">4 Cupones Trimestrales (10% off)</strong>
-                            <p class="text-xs text-gray-900 mt-0.5">Ahorra hasta $500 por cupón ($2,000/año) en muebles, decoración, loza, artesanías, equipos de tortillería y más...</p>
-                        </div>
-                    </li>
-                </ul>
-
-                <a href="{{ route('claim.restaurant') }}?plan=premium" class="block w-full text-center py-3 px-6 bg-gray-900 hover:bg-gray-800 text-white font-bold rounded-lg transition shadow-lg">
-                    Suscribirse por $9.99
-                </a>
-                <p class="text-center text-sm text-gray-900 mt-2 font-medium">Cancela cuando quieras</p>
-            </div>
-
-            {{-- Elite Plan --}}
-            <div class="bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 rounded-2xl shadow-2xl p-8 border-2 border-purple-500 relative">
-                <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 px-4 py-1 rounded-full text-xs font-bold shadow-lg">
-                    ELITE
-                </div>
-
-                <div class="text-center mb-6">
-                    <h3 class="text-2xl font-bold text-white mb-2">Elite</h3>
-                    <div class="text-5xl font-bold text-white mb-1">$79</div>
-                    <p class="text-purple-200 font-semibold">por mes</p>
-                </div>
-
-                <ul class="space-y-3 mb-8 text-white">
-                    <li class="flex items-start gap-3">
-                        <svg class="w-5 h-5 text-yellow-300 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                        <span><strong>Todo lo de Premium PLUS:</strong></span>
-                    </li>
-                    <li class="flex items-start gap-3">
-                        <svg class="w-5 h-5 text-yellow-300 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                        <span><strong>App Móvil White Label</strong></span>
-                    </li>
-                    <li class="flex items-start gap-3">
-                        <svg class="w-5 h-5 text-yellow-300 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                        <span><strong>Website Builder Completo</strong></span>
-                    </li>
-                    <li class="flex items-start gap-3">
-                        <svg class="w-5 h-5 text-yellow-300 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                        <span><strong>Asistente AI Avanzado</strong></span>
-                    </li>
-                    <li class="flex items-start gap-3">
-                        <svg class="w-5 h-5 text-yellow-300 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                        <span><strong>Marketing Automatizado</strong></span>
-                    </li>
-                    <li class="flex items-start gap-3">
-                        <svg class="w-5 h-5 text-yellow-300 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                        <span><strong>Fotografía Profesional</strong> trimestral</span>
-                    </li>
-                    <li class="flex items-start gap-3">
-                        <svg class="w-5 h-5 text-yellow-300 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                        <span><strong>Account Manager Dedicado</strong></span>
-                    </li>
-                    <li class="flex items-start gap-3">
-                        <svg class="w-5 h-5 text-yellow-300 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                        <span><strong>Integración POS</strong></span>
-                    </li>
-                    <li class="flex items-start gap-3">
-                        <svg class="w-5 h-5 text-yellow-300 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                        <span><strong>Posición #1 Garantizada</strong></span>
-                    </li>
-                    <li class="flex items-start gap-3">
-                        <svg class="w-5 h-5 text-yellow-300 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                        <span><strong>Cobertura de Medios y PR</strong></span>
-                    </li>
-
-                    {{-- Cupon Elite --}}
-                    <li class="flex items-start gap-2 bg-gradient-to-r from-yellow-100 to-orange-100 p-3 rounded-lg border-2 border-yellow-400 mt-4">
-                        <svg class="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        <div>
-                            <strong class="text-gray-900">6 Cupones (15% off)</strong>
-                            <p class="text-xs text-gray-900 mt-0.5">Ahorra hasta $750 por cupón ($4,500/año) en muebles, decoración, equipos y más...</p>
-                        </div>
-                    </li>
-                </ul>
-
-                <a href="{{ route('claim.restaurant') }}?plan=elite" class="block w-full text-center py-3 px-6 bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-gray-900 font-bold rounded-lg transition shadow-lg">
-                    Comenzar Elite
-                </a>
-                <p class="text-center text-sm text-purple-200 mt-2 font-medium">Soporte premium incluido</p>
-            </div>
-        </div>
-
-        {{-- Garantía --}}
-        <div class="mt-12 text-center">
-            <div class="inline-flex items-center gap-2 bg-green-100 text-green-800 px-6 py-3 rounded-full">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
-                </svg>
-                <span class="font-semibold">Garantía de satisfacción - Cancela en cualquier momento</span>
-            </div>
-        </div>
-    </div>
-</section>
-
-{{-- ============================================ --}}
-{{-- FAQ Section --}}
-{{-- ============================================ --}}
-<section class="py-20 bg-gray-50">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-16">
-            <span class="inline-block bg-blue-100 text-blue-700 text-sm font-bold px-4 py-2 rounded-full mb-4">PREGUNTAS FRECUENTES</span>
-            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                ¿Tienes Preguntas?
-            </h2>
-            <p class="text-xl text-gray-600">Aquí están las respuestas a las preguntas más comunes</p>
-        </div>
-
-        <div class="space-y-4">
-            {{-- FAQ 1 --}}
-            <div x-data="{ open: false }" class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <button @click="open = !open" class="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50 transition">
-                    <span class="font-semibold text-gray-900">¿Cuánto cuesta reclamar mi restaurante?</span>
-                    <svg class="w-5 h-5 text-gray-500 transition-transform" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                    </svg>
-                </button>
-                <div x-show="open" x-transition class="px-6 pb-4">
-                    <p class="text-gray-600">
-                        <strong>¡Es completamente gratis!</strong> Reclamar tu restaurante no tiene costo. El plan gratuito incluye perfil verificado, hasta 10 fotos, análisis básicos y la capacidad de responder a reseñas. Si deseas funciones avanzadas como fotos ilimitadas, cupones y posición destacada, puedes actualizar al plan Premium por $39/mes.
-                    </p>
-                </div>
-            </div>
-
-            {{-- FAQ 2 --}}
-            <div x-data="{ open: false }" class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <button @click="open = !open" class="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50 transition">
-                    <span class="font-semibold text-gray-900">¿Cuánto tiempo toma el proceso de verificación?</span>
-                    <svg class="w-5 h-5 text-gray-500 transition-transform" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                    </svg>
-                </button>
-                <div x-show="open" x-transition class="px-6 pb-4">
-                    <p class="text-gray-600">
-                        El proceso típicamente toma <strong>menos de 5 minutos</strong>. Solo necesitas buscar tu restaurante, verificar que eres el dueño mediante un código enviado a tu teléfono o email del negocio, y listo. En algunos casos especiales la verificación puede tomar hasta 24 horas si requiere revisión manual.
-                    </p>
-                </div>
-            </div>
-
-            {{-- FAQ 3 --}}
-            <div x-data="{ open: false }" class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <button @click="open = !open" class="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50 transition">
-                    <span class="font-semibold text-gray-900">¿Qué pasa si mi restaurante no está en la lista?</span>
-                    <svg class="w-5 h-5 text-gray-500 transition-transform" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                    </svg>
-                </button>
-                <div x-show="open" x-transition class="px-6 pb-4">
-                    <p class="text-gray-600">
-                        Si tu restaurante no aparece en nuestra búsqueda, puedes agregarlo fácilmente. Durante el proceso de reclamación, tendrás la opción de "Agregar nuevo restaurante" donde podrás ingresar toda la información de tu negocio. Tu perfil será creado y verificado en cuestión de minutos.
-                    </p>
-                </div>
-            </div>
-
-            {{-- FAQ 4 --}}
-            <div x-data="{ open: false }" class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <button @click="open = !open" class="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50 transition">
-                    <span class="font-semibold text-gray-900">¿Puedo cancelar mi suscripción Premium en cualquier momento?</span>
-                    <svg class="w-5 h-5 text-gray-500 transition-transform" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                    </svg>
-                </button>
-                <div x-show="open" x-transition class="px-6 pb-4">
-                    <p class="text-gray-600">
-                        <strong>Sí, absolutamente.</strong> Puedes cancelar tu suscripción Premium en cualquier momento desde tu panel de control. Tu perfil seguirá activo con las funciones del plan gratuito. Además, ofrecemos una garantía de devolución de 30 días sin preguntas si no estás satisfecho.
-                    </p>
-                </div>
-            </div>
-
-            {{-- FAQ 5 --}}
-            <div x-data="{ open: false }" class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <button @click="open = !open" class="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50 transition">
-                    <span class="font-semibold text-gray-900">¿Cómo funcionan los cupones de proveedores?</span>
-                    <svg class="w-5 h-5 text-gray-500 transition-transform" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                    </svg>
-                </button>
-                <div x-show="open" x-transition class="px-6 pb-4">
-                    <p class="text-gray-600">
-                        Los usuarios Premium reciben <strong>4 cupones trimestrales</strong> de nuestros proveedores asociados. Estos cupones ofrecen descuentos en equipos de cocina, ingredientes, empaques, y servicios para restaurantes. En promedio, nuestros usuarios ahorran $1,200 al año con estos cupones, lo que más que compensa el costo del plan Premium.
-                    </p>
-                </div>
-            </div>
-
-            {{-- FAQ 6 --}}
-            <div x-data="{ open: false }" class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <button @click="open = !open" class="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50 transition">
-                    <span class="font-semibold text-gray-900">¿Pueden ayudarme si solo hablo español?</span>
-                    <svg class="w-5 h-5 text-gray-500 transition-transform" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                    </svg>
-                </button>
-                <div x-show="open" x-transition class="px-6 pb-4">
-                    <p class="text-gray-600">
-                        <strong>¡Por supuesto!</strong> Todo nuestro equipo de soporte es bilingüe. Puedes contactarnos en español o inglés por email, chat o teléfono. Además, toda nuestra plataforma está disponible completamente en español para tu comodidad.
-                    </p>
-                </div>
-            </div>
-
-            {{-- FAQ 7 --}}
-            <div x-data="{ open: false }" class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <button @click="open = !open" class="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50 transition">
-                    <span class="font-semibold text-gray-900">¿Cómo se comparan con Yelp o Google?</span>
-                    <svg class="w-5 h-5 text-gray-500 transition-transform" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                    </svg>
-                </button>
-                <div x-show="open" x-transition class="px-6 pb-4">
-                    <p class="text-gray-600">
-                        A diferencia de Yelp (que cobra $300-$1000/mes por publicidad y muestra competidores en tu perfil) o Google (donde compites con millones de negocios), nosotros somos el directorio <strong>100% especializado en restaurantes mexicanos</strong>. Esto significa que tu audiencia ya está buscando específicamente comida mexicana, no tienes que competir con otros tipos de negocios, y nuestro Premium cuesta solo $39/mes sin trucos ocultos.
-                    </p>
-                </div>
-            </div>
-
-            {{-- FAQ 8 --}}
-            <div x-data="{ open: false }" class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <button @click="open = !open" class="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-gray-50 transition">
-                    <span class="font-semibold text-gray-900">¿Puedo actualizar o degradar mi plan después?</span>
-                    <svg class="w-5 h-5 text-gray-500 transition-transform" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                    </svg>
-                </button>
-                <div x-show="open" x-transition class="px-6 pb-4">
-                    <p class="text-gray-600">
-                        Sí, puedes cambiar tu plan en cualquier momento. Si actualizas de Gratis a Premium, el cambio es inmediato. Si decides volver al plan gratuito, mantendrás los beneficios Premium hasta el final de tu período de facturación actual. No hay penalizaciones ni cargos adicionales por cambiar de plan.
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        {{-- Still have questions? --}}
-        <div class="mt-12 text-center">
-            <p class="text-gray-600 mb-4">¿Todavía tienes preguntas?</p>
-            <a href="mailto:soporte@restaurantesmexicanosfamosos.com" class="inline-flex items-center text-red-600 font-semibold hover:text-red-700">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                </svg>
-                Contáctanos - Respondemos en menos de 24 horas
-            </a>
-        </div>
-    </div>
-</section>
-
-{{-- ============================================ --}}
-{{-- CITY STATS SEARCH Section --}}
-{{-- ============================================ --}}
-<section class="py-20 bg-white" x-data="cityStats()">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-12">
-            <span class="inline-block bg-amber-100 text-amber-700 text-sm font-bold px-4 py-2 rounded-full mb-4">DESCUBRE TU MERCADO</span>
-            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                ¿Cuántas Personas Buscan en Tu Ciudad?
-            </h2>
-            <p class="text-xl text-gray-600">Ingresa tu ciudad para ver estadísticas de búsquedas de comida mexicana</p>
-        </div>
-
-        {{-- Search Input --}}
-        <div class="max-w-xl mx-auto mb-8">
-            <div class="relative">
-                <input type="text"
-                       x-model="citySearch"
-                       @input.debounce.300ms="searchCity()"
-                       placeholder="Ej: Houston TX, Los Angeles CA..."
-                       class="w-full px-6 py-4 text-lg border-2 border-gray-200 rounded-xl focus:border-amber-500 focus:ring-0 transition pl-14">
-                <svg class="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                </svg>
-                {{-- Loading indicator --}}
-                <div x-show="isLoading" class="absolute right-4 top-1/2 -translate-y-1/2">
-                    <svg class="animate-spin h-5 w-5 text-amber-600" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                </div>
-                {{-- Suggestions dropdown --}}
-                <div x-show="showSuggestions && suggestions.length > 0" x-transition class="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-50 max-h-60 overflow-y-auto">
-                    <template x-for="suggestion in suggestions" :key="suggestion.city + suggestion.state_code">
-                        <button @click="selectCity(suggestion.city, suggestion.state_code)" class="w-full px-4 py-3 text-left hover:bg-amber-50 flex justify-between items-center border-b border-gray-100 last:border-0">
-                            <span class="font-medium" x-text="suggestion.city + ", " + suggestion.state_code"></span>
-                            <span class="text-sm text-gray-500" x-text="suggestion.restaurant_count + " restaurantes""></span>
-                        </button>
-                    </template>
-                </div>
-            </div>
-        </div>
-        
-        {{-- No data found message --}}
-        <div x-show="noDataFound && !isLoading" x-transition class="max-w-xl mx-auto mb-8 bg-blue-50 border border-blue-200 rounded-xl p-4 text-center">
-            <p class="text-blue-800">
-                <span class="font-bold">No encontramos datos para esta ciudad.</span><br>
-                <span class="text-sm">Prueba buscando ciudades más grandes o verifica la ortografía.</span>
-            </p>
-        </div>
-
-        {{-- Results --}}
-        <div x-show="showResults" x-transition class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-8 border border-amber-200">
-            <div class="text-center mb-6">
-                <h3 class="text-2xl font-bold text-gray-900" x-text="'Estadísticas para ' + selectedCity"></h3>
-            </div>
-
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <div class="bg-white rounded-xl p-4 text-center shadow-sm">
-                    <div class="text-3xl font-bold text-amber-600" x-text="monthlySearches.toLocaleString()"></div>
-                    <p class="text-sm text-gray-600 mt-1">Búsquedas/mes</p>
-                </div>
-                <div class="bg-white rounded-xl p-4 text-center shadow-sm">
-                    <div class="text-3xl font-bold text-green-600" x-text="restaurantCount.toLocaleString()"></div>
-                    <p class="text-sm text-gray-600 mt-1">Restaurantes</p>
-                </div>
-                <div class="bg-white rounded-xl p-4 text-center shadow-sm">
-                    <div class="text-3xl font-bold text-blue-600" x-text="availableToClaim.toLocaleString()"></div>
-                    <p class="text-sm text-gray-600 mt-1">Sin reclamar</p>
-                </div>
-                <div class="bg-white rounded-xl p-4 text-center shadow-sm">
-                    <div class="text-3xl font-bold text-red-600" x-text="competitionLevel"></div>
-                    <p class="text-sm text-gray-600 mt-1">Competencia</p>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-xl p-4 mb-6">
-                <p class="text-gray-700">
-                    <span class="font-bold text-green-600">¡Buenas noticias!</span>
-                    En <span x-text="selectedCity" class="font-semibold"></span> hay
-                    <span x-text="availableToClaim.toLocaleString()" class="font-bold text-red-600"></span>
-                    restaurantes mexicanos que aún no han sido reclamados.
-                    Si tu restaurante está entre ellos, ¡este es el momento perfecto para destacar!
-                </p>
-            </div>
-
-            <div class="text-center">
-                <a href="{{ route('claim.restaurant') }}" class="inline-flex items-center px-8 py-4 bg-amber-600 text-white font-bold rounded-xl hover:bg-amber-700 transition shadow-lg">
-                    Buscar Mi Restaurante en <span x-text="selectedCity" class="ml-1"></span>
-                </a>
-            </div>
-        </div>
-
-        {{-- Popular Cities --}}
-        <div x-show="!showResults" class="mt-8">
-            <p class="text-center text-gray-500 mb-4">Ciudades populares:</p>
-            <div class="flex flex-wrap justify-center gap-2">
-                <button @click="selectCity('Los Angeles', 'CA')" class="px-4 py-2 bg-gray-100 rounded-full text-gray-700 hover:bg-amber-100 hover:text-amber-800 transition">Los Angeles</button>
-                <button @click="selectCity('Houston', 'TX')" class="px-4 py-2 bg-gray-100 rounded-full text-gray-700 hover:bg-amber-100 hover:text-amber-800 transition">Houston</button>
-                <button @click="selectCity('Chicago', 'IL')" class="px-4 py-2 bg-gray-100 rounded-full text-gray-700 hover:bg-amber-100 hover:text-amber-800 transition">Chicago</button>
-                <button @click="selectCity('Phoenix', 'AZ')" class="px-4 py-2 bg-gray-100 rounded-full text-gray-700 hover:bg-amber-100 hover:text-amber-800 transition">Phoenix</button>
-                <button @click="selectCity('San Antonio', 'TX')" class="px-4 py-2 bg-gray-100 rounded-full text-gray-700 hover:bg-amber-100 hover:text-amber-800 transition">San Antonio</button>
-                <button @click="selectCity('Dallas')" class="px-4 py-2 bg-gray-100 rounded-full text-gray-700 hover:bg-amber-100 hover:text-amber-800 transition">Dallas</button>
-                <button @click="selectCity('Miami')" class="px-4 py-2 bg-gray-100 rounded-full text-gray-700 hover:bg-amber-100 hover:text-amber-800 transition">Miami</button>
-                <button @click="selectCity('New York')" class="px-4 py-2 bg-gray-100 rounded-full text-gray-700 hover:bg-amber-100 hover:text-amber-800 transition">New York</button>
-            </div>
-        </div>
-    </div>
-</section>
-
-{{-- Final CTA Section --}}
-<section class="py-20 bg-gradient-to-br from-red-600 via-red-700 to-orange-600 relative overflow-hidden">
-    {{-- Decorative Elements --}}
-    <div class="absolute top-0 left-0 w-64 h-64 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
-    <div class="absolute bottom-0 right-0 w-96 h-96 bg-white/10 rounded-full translate-x-1/3 translate-y-1/3"></div>
-
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-        <h2 class="text-4xl md:text-5xl font-bold text-white mb-6">
-            ¿Listo Para Atraer Más Clientes?
-        </h2>
-        <p class="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-            Únete a los {{ number_format($stats['claimed'] ?? 847) }} restaurantes que ya están creciendo con nosotros. Reclama tu perfil gratis hoy.
         </p>
-
-        <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
-            <a href="{{ route('claim.restaurant') }}" class="px-10 py-4 bg-white text-red-600 font-bold rounded-xl hover:bg-gray-100 transition shadow-xl flex items-center">
-                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                </svg>
-                Reclamar Mi Restaurante Gratis
-            </a>
-            <a href="#pricing" class="px-10 py-4 border-2 border-white text-white font-bold rounded-xl hover:bg-white/10 transition flex items-center">
-                Ver Planes Premium
-                <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-                </svg>
-            </a>
-        </div>
-
-        <div class="flex flex-wrap justify-center gap-6 text-white/80 text-sm">
-            <span class="flex items-center">
-                <svg class="w-5 h-5 mr-1 text-green-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-                100% Gratis
-            </span>
-            <span class="flex items-center">
-                <svg class="w-5 h-5 mr-1 text-green-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-                5 minutos
-            </span>
-            <span class="flex items-center">
-                <svg class="w-5 h-5 mr-1 text-green-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-                Sin tarjeta de crédito
-            </span>
-            <span class="flex items-center">
-                <svg class="w-5 h-5 mr-1 text-green-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-                Soporte en español
-            </span>
-        </div>
     </div>
 </section>
 
-{{-- Alpine.js City Stats Component --}}
-<script>
-function cityStats() {
-    return {
-        citySearch: '',
-        showResults: false,
-        selectedCity: '',
-        monthlySearches: 0,
-        restaurantCount: 0,
-        availableToClaim: 0,
-        competitionLevel: '',
-        isLoading: false,
-        suggestions: [],
-        showSuggestions: false,
-        noDataFound: false,
+{{-- ============================================ --}}
+{{-- 8. FINAL CTA --}}
+{{-- ============================================ --}}
+<section class="py-20 md:py-28 relative" style="background: linear-gradient(to bottom, #1A1A1A, #0B0B0B);">
+    <div class="absolute inset-0" style="background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(212,175,55,0.05) 0%, transparent 70%);"></div>
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+        <div class="text-4xl mb-4">🌮</div>
+        <h2 class="text-3xl md:text-5xl font-bold mb-6" style="color: #F5F5F5; font-family: 'Playfair Display', Georgia, serif;">
+            {{ app()->getLocale() === 'en' ? 'Start Getting More Customers Today' : 'Empieza a Recibir Más Clientes Hoy' }}
+        </h2>
+        <p class="text-lg mb-10" style="color: #CCCCCC;">
+            {{ app()->getLocale() === 'en'
+                ? 'Join 26,000+ Mexican restaurant owners already on FAMER. Free to start — no credit card required.'
+                : 'Únete a 26,000+ dueños de restaurantes mexicanos que ya están en FAMER. Gratis para empezar — sin tarjeta de crédito.' }}
+        </p>
+        <a href="{{ route('claim.restaurant') }}" class="inline-flex items-center px-10 py-5 text-lg font-bold rounded-xl transition-all duration-300 hover:scale-105" style="background-color: #D4AF37; color: #0B0B0B; box-shadow: 0 4px 30px rgba(212,175,55,0.3);">
+            {{ app()->getLocale() === 'en' ? 'Claim Your Restaurant' : 'Reclama Tu Restaurante' }}
+            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+        </a>
+        <p class="mt-6 text-sm" style="color: #CCCCCC;">
+            {{ app()->getLocale() === 'en' ? 'Free to get started. Upgrade anytime.' : 'Gratis para empezar. Mejora cuando quieras.' }}
+        </p>
+    </div>
+</section>
 
-        async searchCity() {
-            if (this.citySearch.length < 3) {
-                this.showResults = false;
-                this.showSuggestions = false;
-                return;
-            }
-
-            this.isLoading = true;
-            this.noDataFound = false;
-
-            try {
-                const suggestResponse = await fetch('/api/city-search?q=' + encodeURIComponent(this.citySearch));
-                this.suggestions = await suggestResponse.json();
-                this.showSuggestions = this.suggestions.length > 0;
-
-                const statsResponse = await fetch('/api/city-stats?city=' + encodeURIComponent(this.citySearch));
-                const data = await statsResponse.json();
-
-                if (data.restaurant_count > 0) {
-                    this.displayRealData(data);
-                } else if (this.suggestions.length > 0) {
-                    this.selectCity(this.suggestions[0].city, this.suggestions[0].state_code);
-                } else {
-                    this.noDataFound = true;
-                    this.showResults = false;
-                }
-            } catch (error) {
-                console.error('Error fetching city stats:', error);
-                this.noDataFound = true;
-            }
-
-            this.isLoading = false;
-        },
-
-        async selectCity(city, stateCode) {
-            stateCode = stateCode || '';
-            this.citySearch = stateCode ? city + ', ' + stateCode : city;
-            this.showSuggestions = false;
-            this.isLoading = true;
-
-            try {
-                const response = await fetch('/api/city-stats?city=' + encodeURIComponent(city) + '&state=' + encodeURIComponent(stateCode));
-                const data = await response.json();
-                this.displayRealData(data);
-            } catch (error) {
-                console.error('Error:', error);
-            }
-
-            this.isLoading = false;
-        },
-
-        displayRealData(data) {
-            this.selectedCity = data.state ? data.city + ', ' + data.state : data.city;
-            this.monthlySearches = data.monthly_searches || 0;
-            this.restaurantCount = data.restaurant_count || 0;
-            this.availableToClaim = data.available_to_claim || 0;
-            this.competitionLevel = data.competition_level || 'Baja';
-            this.showResults = this.restaurantCount > 0;
-            this.noDataFound = this.restaurantCount === 0;
-        }
-    }
-}
-</script>
 </div>

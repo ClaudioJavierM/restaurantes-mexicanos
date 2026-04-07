@@ -36,10 +36,14 @@
 @endphp
 
 @if($apiKey && $hasRestaurants)
+{{-- Data bridge: Livewire morphs this on every re-render with fresh restaurant JSON --}}
+<div id="restaurants-map-data" data-restaurants="{!! htmlspecialchars($restaurantsJson, ENT_QUOTES) !!}" style="display:none;"></div>
+
 <div
     x-data="restaurantsMap()"
     x-init="initMap()"
     @highlight-marker.window="highlightMarker($event.detail.index)"
+    @user-location-updated.window="refreshMapForLocation($event.detail.lat, $event.detail.lng)"
     {{ $attributes->merge(['class' => 'rounded-lg overflow-hidden shadow-lg border border-gray-200 bg-gray-100']) }}
     style="height: {{ $heightStyle }};"
 >
@@ -73,6 +77,7 @@ function restaurantsMap() {
         userLat: {{ $userLatitude ?? 'null' }},
         userLng: {{ $userLongitude ?? 'null' }},
         initialized: false,
+        _pendingMarkerRefresh: false,
 
         initMap() {
             if (typeof google === 'undefined' || !google.maps) {
@@ -82,6 +87,14 @@ function restaurantsMap() {
 
             if (this.initialized) return;
             this.initialized = true;
+
+            // After Livewire morphs the DOM, check if markers need refreshing
+            document.addEventListener('livewire:update', () => {
+                if (this._pendingMarkerRefresh) {
+                    this._pendingMarkerRefresh = false;
+                    this.refreshMarkersFromDom();
+                }
+            });
 
             // Calculate map center
             let center = { lat: 39.8283, lng: -98.5795 }; // USA center
@@ -178,31 +191,79 @@ function restaurantsMap() {
 
             // Click handler
             marker.addListener('click', () => {
-                const content = `
-                    <div style="max-width: 250px; padding: 8px;">
-                        <div style="font-weight: bold; font-size: 14px; margin-bottom: 4px; color: #111827;">
-                            ${index + 1}. ${restaurant.name}
-                        </div>
-                        <div style="font-size: 12px; color: #6B7280; margin-bottom: 4px;">
-                            ${restaurant.address}${restaurant.city ? ', ' + restaurant.city : ''}${restaurant.state ? ', ' + restaurant.state : ''}
-                        </div>
-                        ${restaurant.rating > 0 ? `
-                        <div style="font-size: 12px; color: #F59E0B; margin-bottom: 8px;">
-                            ${'★'.repeat(Math.round(restaurant.rating))}${'☆'.repeat(5 - Math.round(restaurant.rating))}
-                            <span style="color: #6B7280;">(${restaurant.rating})</span>
-                        </div>
-                        ` : ''}
-                        <a href="/restaurante/${restaurant.slug}"
-                           style="display: inline-block; background: #DC2626; color: white; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; text-decoration: none;">
-                            Ver restaurante
-                        </a>
-                    </div>
-                `;
+                const restaurantUrl = '/restaurante/' + restaurant.slug;
+                const starsHtml = restaurant.rating > 0
+                    ? '<div style="font-size:12px;color:#F59E0B;margin-bottom:8px;">' +
+                      '★'.repeat(Math.round(restaurant.rating)) + '☆'.repeat(5 - Math.round(restaurant.rating)) +
+                      ' <span style="color:#6B7280;">(' + restaurant.rating + ')</span></div>'
+                    : '';
+                const content = '<div style="max-width:250px;padding:8px;">' +
+                    '<div style="font-weight:bold;font-size:14px;margin-bottom:4px;color:#111827;">' + (index + 1) + '. ' + restaurant.name + '</div>' +
+                    '<div style="font-size:12px;color:#6B7280;margin-bottom:4px;">' + restaurant.address + (restaurant.city ? ', ' + restaurant.city : '') + (restaurant.state ? ', ' + restaurant.state : '') + '</div>' +
+                    starsHtml +
+                    '<a href="' + restaurantUrl + '" style="display:inline-block;background:#DC2626;color:white;padding:6px 12px;border-radius:6px;font-size:12px;font-weight:600;text-decoration:none;">Ver restaurante</a>' +
+                    '</div>';
                 this.infoWindow.setContent(content);
                 this.infoWindow.open(this.map, marker);
             });
 
             return marker;
+        },
+
+        refreshMapForLocation(lat, lng) {
+            if (!this.map) return;
+
+            const pos = { lat: parseFloat(lat), lng: parseFloat(lng) };
+
+            // Pan to user location immediately (good UX — map moves right away)
+            this.map.panTo(pos);
+            this.map.setZoom(11);
+
+            // Update or add user location dot immediately
+            if (this._userMarker) {
+                this._userMarker.setPosition(pos);
+            } else {
+                this._userMarker = new google.maps.Marker({
+                    position: pos,
+                    map: this.map,
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        scale: 8,
+                        fillColor: '#3B82F6',
+                        fillOpacity: 1,
+                        strokeColor: '#1E40AF',
+                        strokeWeight: 2,
+                    },
+                    title: 'Tu ubicacion',
+                    zIndex: 1000
+                });
+            }
+
+            // Markers refresh AFTER Livewire re-renders with nearby restaurants.
+            // The event fires before Livewire morphs the DOM, so we wait for
+            // livewire:update (dispatched after DOM morphing is complete).
+            this._pendingMarkerRefresh = true;
+        },
+
+        refreshMarkersFromDom() {
+            const dataEl = document.getElementById('restaurants-map-data');
+            if (!dataEl) return;
+            try {
+                const fresh = JSON.parse(dataEl.dataset.restaurants || '[]');
+                if (fresh.length > 0 && JSON.stringify(fresh) !== JSON.stringify(this.restaurants)) {
+                    this.restaurants = fresh;
+                    this.clearMarkers();
+                    this.restaurants.forEach((restaurant, index) => {
+                        this.markers.push(this.createMarker(restaurant, index));
+                    });
+                }
+            } catch(e) {}
+        },
+
+        clearMarkers() {
+            this.markers.forEach(m => m.setMap(null));
+            this.markers = [];
+            if (this.infoWindow) this.infoWindow.close();
         },
 
         highlightMarker(index) {

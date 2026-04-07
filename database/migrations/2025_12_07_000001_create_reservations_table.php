@@ -44,7 +44,7 @@ return new class extends Migration
             $table->softDeletes();
 
             // Indexes
-            $table->index(['restaurant_id', 'reservation_date']);
+            $table->index(['restaurant_id', 'reservation_date'], 'reservations_rest_date_idx');
             $table->index(['restaurant_id', 'status']);
             $table->index('confirmation_code');
             $table->index('user_id');

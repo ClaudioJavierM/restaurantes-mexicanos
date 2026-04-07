@@ -1,35 +1,86 @@
-<div>
-    @section('title', 'Restaurantes Mexicanos en Estados Unidos - Directorio Completo')
-    @section('meta_description', 'Encuentra los mejores restaurantes mexicanos cerca de ti. Directorio completo con reseñas de Google, Yelp y nuestra comunidad. Tacos, burritos, enchiladas y más.')
+<div style="background:#0B0B0B; min-height:100vh;">
+    @php $isEn = str_contains(request()->getHost(), 'famousmexicanrestaurants.com'); @endphp
+
+    @section('title', $isEn ? 'Famous Mexican Restaurants — Complete Directory | FAMER' : 'Restaurantes Mexicanos en Estados Unidos — Directorio | FAMER')
+    @section('meta_description', $isEn ? 'Discover the best authentic Mexican restaurants in the United States. Verified reviews, photos and menus. Find tacos, burritos, enchiladas and more near you.' : 'Encuentra los mejores restaurantes mexicanos cerca de ti. Directorio completo con reseñas verificadas, fotos y menús. Tacos, burritos, enchiladas y más.')
+
+    {{-- Canonical: siempre apunta al listing limpio, sin ?sort=, ?state=, ?page= --}}
+    @php
+        $listCanonicalBase = $isEn
+            ? 'https://famousmexicanrestaurants.com'
+            : (str_contains(request()->getHost(), '.com.mx')
+                ? 'https://restaurantesmexicanosfamosos.com.mx'
+                : 'https://restaurantesmexicanosfamosos.com');
+        $listCanonicalPath = $isEn ? '/restaurants' : '/restaurantes';
+    @endphp
+    @section('canonical', $listCanonicalBase . $listCanonicalPath)
 
     @push('meta')
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Restaurantes Mexicanos en Estados Unidos | FAMER">
-    <meta property="og:description" content="Directorio completo de restaurantes mexicanos auténticos. Encuentra tacos, burritos, enchiladas y más cerca de ti.">
+    <meta property="og:title" content="{{ $isEn ? 'Famous Mexican Restaurants — Complete Directory | FAMER' : 'Restaurantes Mexicanos en Estados Unidos | FAMER' }}">
+    <meta property="og:description" content="{{ $isEn ? 'Discover the best authentic Mexican restaurants in the United States. Verified reviews, photos and menus.' : 'Directorio completo de restaurantes mexicanos auténticos. Encuentra tacos, burritos, enchiladas y más cerca de ti.' }}">
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Restaurantes Mexicanos en USA">
+    <meta name="twitter:title" content="{{ $isEn ? 'Famous Mexican Restaurants | FAMER' : 'Restaurantes Mexicanos en USA | FAMER' }}">
     @endpush
 
-    <!-- Header -->
-    <div class="bg-gradient-to-r from-gray-900 to-gray-800 border-b-4 border-[#D4A54A] text-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <h1 class="text-4xl font-bold mb-2">Restaurantes Mexicanos</h1>
-            <p class="text-gray-300">Descubre los mejores restaurantes mexicanos en Estados Unidos</p>
+    <!-- Hero / Header -->
+    <div style="position:relative; border-bottom:1px solid #2A2A2A; padding:3rem 0 2.5rem; overflow:hidden;">
+        <div style="position:absolute; inset:0; background-image:url('https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=1600&q=80'); background-size:cover; background-position:center; z-index:0;"></div>
+        <div style="position:absolute; inset:0; background:linear-gradient(135deg,rgba(11,11,11,0.88) 0%,rgba(26,26,26,0.82) 50%,rgba(11,11,11,0.88) 100%); z-index:1;"></div>
+        <div style="position:relative; z-index:2;">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Breadcrumb -->
+            <nav style="margin-bottom:1rem;">
+                <ol style="display:flex; gap:0.5rem; align-items:center; font-size:0.875rem; color:#9CA3AF; list-style:none; padding:0; margin:0;">
+                    <li><a href="/" style="color:#D4AF37; text-decoration:none;">FAMER</a></li>
+                    <li style="color:#4B5563;">/</li>
+                    <li style="color:#9CA3AF;">{{ $isEn ? 'Restaurants' : 'Restaurantes' }}</li>
+                </ol>
+            </nav>
+            <!-- Title -->
+            <h1 style="font-family:'Playfair Display',serif; font-size:clamp(1.75rem,4vw,3rem); font-weight:700; color:#F5F5F5; margin-bottom:0.75rem; line-height:1.2;">
+                @if($isEn)
+                    Famous <span style="color:#D4AF37;">Mexican Restaurants</span>
+                @else
+                    Restaurantes <span style="color:#D4AF37;">Mexicanos</span>
+                @endif
+            </h1>
+            <p style="color:#9CA3AF; font-size:1rem; max-width:550px;">
+                {{ $isEn
+                    ? 'Discover the best authentic Mexican restaurants in the United States. Verified reviews, photos and menus.'
+                    : 'Descubre los mejores restaurantes mexicanos auténticos. Reseñas verificadas, fotos y menús.' }}
+            </p>
+            <!-- Quick stats -->
+            <div style="margin-top:1.25rem; display:flex; gap:1.5rem; flex-wrap:wrap;">
+                <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.875rem; color:#9CA3AF;">
+                    <span style="color:#D4AF37; font-weight:700; font-size:1rem;">25,000+</span>
+                    {{ $isEn ? 'Verified restaurants' : 'Restaurantes verificados' }}
+                </div>
+                <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.875rem; color:#9CA3AF;">
+                    <span style="color:#D4AF37; font-weight:700; font-size:1rem;">50</span>
+                    {{ $isEn ? 'States covered' : 'Estados cubiertos' }}
+                </div>
+                <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.875rem; color:#9CA3AF;">
+                    <span style="color:#D4AF37; font-weight:700; font-size:1rem;">🇲🇽</span>
+                    {{ $isEn ? '100% Authentic Mexican' : '100% Mexicano Auténtico' }}
+                </div>
+            </div>
+        </div>
         </div>
     </div>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- Location Permission Banner -->
         @if($showLocationBanner && $locationSource !== 'browser')
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 flex items-center justify-between" x-data="{ requesting: false }">
+        <div style="background:#1A1A1A; border:1px solid #2A2A2A; border-radius:0.5rem; padding:1rem; margin-bottom:1.5rem; display:flex; align-items:center; justify-content:space-between;" x-data="{ requesting: false }">
             <div class="flex items-center">
-                <svg class="w-6 h-6 text-blue-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-6 h-6 mr-3" style="color:#D4AF37;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                 </svg>
                 <div>
-                    <p class="text-sm font-medium text-blue-800">Activa tu ubicacion para ver restaurantes cercanos</p>
-                    <p class="text-xs text-blue-600">Ordenaremos los resultados por distancia</p>
+                    <p class="text-sm font-medium" style="color:#F5F5F5;">{{ $isEn ? 'Enable location to see nearby restaurants' : 'Activa tu ubicacion para ver restaurantes cercanos' }}</p>
+                    <p class="text-xs" style="color:#9CA3AF;">{{ $isEn ? 'We\'ll sort results by distance' : 'Ordenaremos los resultados por distancia' }}</p>
                 </div>
             </div>
             <div class="flex items-center space-x-2">
@@ -40,25 +91,25 @@
                         (err) => { requesting = false; $wire.dismissLocationBanner(); },
                         { enableHighAccuracy: true, timeout: 10000 }
                     )"
-                    class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                    style="padding:0.5rem 1rem; background:#D4AF37; color:#0B0B0B; font-size:0.875rem; font-weight:700; border-radius:0.5rem; border:none; cursor:pointer;"
                 >
-                    Permitir ubicacion
+                    {{ $isEn ? 'Allow location' : 'Permitir ubicacion' }}
                 </button>
                 <button
                     x-show="requesting"
                     disabled
-                    class="px-4 py-2 bg-blue-400 text-white text-sm font-medium rounded-lg cursor-wait"
+                    style="padding:0.5rem 1rem; background:#8A7020; color:#0B0B0B; font-size:0.875rem; font-weight:700; border-radius:0.5rem; border:none; cursor:wait;"
                 >
                     <svg class="animate-spin h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    Obteniendo...
+                    {{ $isEn ? 'Getting...' : 'Obteniendo...' }}
                 </button>
                 <button
                     wire:click="dismissLocationBanner"
-                    class="text-blue-600 hover:text-blue-800 p-1"
-                    title="Cerrar"
+                    style="color:#9CA3AF; padding:0.25rem; background:none; border:none; cursor:pointer;"
+                    title="{{ $isEn ? 'Close' : 'Cerrar' }}"
                 >
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -70,21 +121,21 @@
 
         <!-- Location Status Indicator -->
         @if($locationSource === 'browser')
-        <div class="bg-green-50 border border-green-200 rounded-lg p-3 mb-6 flex items-center justify-between">
-            <div class="flex items-center text-sm text-green-800">
-                <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div style="background:#1F3D2B; border:1px solid #2A5A3A; border-radius:0.5rem; padding:0.75rem 1rem; margin-bottom:1.5rem; display:flex; align-items:center; justify-content:space-between;">
+            <div class="flex items-center text-sm" style="color:#D4AF37;">
+                <svg class="w-5 h-5 mr-2" style="color:#D4AF37;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                 </svg>
-                Mostrando restaurantes ordenados por distancia desde tu ubicacion
+                {{ $isEn ? 'Showing restaurants sorted by distance from your location' : 'Mostrando restaurantes ordenados por distancia desde tu ubicacion' }}
             </div>
         </div>
         @endif
         <!-- Filters Section -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+        <div style="background:#1A1A1A; border:1px solid #2A2A2A; border-radius:0.5rem; padding:1.5rem; margin-bottom:2rem;">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <!-- Search -->
                 <div class="md:col-span-2">
-                    <label for="search" class="block text-sm font-medium text-gray-700 mb-1">
+                    <label for="search" class="block text-sm font-medium mb-1" style="color:#9CA3AF;">
                         Buscar
                     </label>
                     <input
@@ -92,19 +143,19 @@
                         id="search"
                         wire:model.live.debounce.300ms="search"
                         placeholder="Nombre, ciudad, descripción..."
-                        class="w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500"
+                        style="width:100%; border-radius:0.375rem; border:1px solid #2A2A2A; background:#111; color:#F5F5F5; padding:0.5rem 0.75rem;"
                     >
                 </div>
 
                 <!-- State Filter -->
                 <div>
-                    <label for="state" class="block text-sm font-medium text-gray-700 mb-1">
+                    <label for="state" class="block text-sm font-medium mb-1" style="color:#9CA3AF;">
                         Estado
                     </label>
                     <select
                         id="state"
                         wire:model.live="selectedState"
-                        class="w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500"
+                        style="width:100%; border-radius:0.375rem; border:1px solid #2A2A2A; background:#111; color:#F5F5F5; padding:0.5rem 0.75rem;"
                     >
                         <option value="">Todos los estados</option>
                         @foreach($states as $state)
@@ -115,13 +166,13 @@
 
                 <!-- Category Filter -->
                 <div>
-                    <label for="category" class="block text-sm font-medium text-gray-700 mb-1">
+                    <label for="category" class="block text-sm font-medium mb-1" style="color:#9CA3AF;">
                         Categoría
                     </label>
                     <select
                         id="category"
                         wire:model.live="selectedCategory"
-                        class="w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500"
+                        style="width:100%; border-radius:0.375rem; border:1px solid #2A2A2A; background:#111; color:#F5F5F5; padding:0.5rem 0.75rem;"
                     >
                         <option value="">Todas las categorías</option>
                         @foreach($categories as $category)
@@ -132,11 +183,12 @@
             </div>
 
             <!-- Advanced Filters Toggle -->
-            <div class="mt-4 pt-4 border-t border-gray-200">
+            <div class="mt-4 pt-4" style="border-top:1px solid #2A2A2A;">
                 <button
                     wire:click="toggleAdvancedFilters"
                     type="button"
-                    class="flex items-center space-x-2 text-sm font-medium text-gray-700 hover:text-red-600 transition-colors"
+                    class="flex items-center space-x-2 text-sm font-medium transition-colors"
+                    style="color:#9CA3AF;"
                 >
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
@@ -153,55 +205,53 @@
 
 
             <!-- Sort and Clear -->
-            <div class="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
+            <div class="flex items-center justify-between mt-4 pt-4" style="border-top:1px solid #2A2A2A;">
                 <div class="flex items-center space-x-4">
-                    <label class="text-sm font-medium text-gray-700">Ordenar por:</label>
+                    <label class="text-sm font-medium" style="color:#9CA3AF;">Ordenar por:</label>
                     <div class="flex flex-wrap gap-2">
-                        @if($userLatitude && $userLongitude)
-                        <button
-                            wire:click="$set('sortBy', 'nearby')"
-                            class="px-3 py-1 text-sm rounded-md flex items-center {{ $sortBy === 'nearby' ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}"
-                        >
-                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                            </svg>
-                            Cerca de mi
-                        </button>
-                        @else
+                        {{-- Always request GPS — IP fallback is unreliable for near-me sort --}}
                         <button
                             type="button"
-                            x-data
-                            @click="navigator.geolocation.getCurrentPosition(
-                                (pos) => { $wire.setUserLocation(pos.coords.latitude, pos.coords.longitude); },
-                                (err) => { alert('No pudimos obtener tu ubicacion. Por favor activa los permisos de ubicacion en tu navegador.'); },
-                                { enableHighAccuracy: true, timeout: 10000 }
-                            )"
-                            class="px-3 py-1 text-sm rounded-md flex items-center bg-blue-100 text-blue-700 hover:bg-blue-200 border border-blue-300"
-                            title="Activa tu ubicacion para ordenar por cercania"
+                            x-data="{ loading: false }"
+                            @click="
+                                loading = true;
+                                navigator.geolocation.getCurrentPosition(
+                                    (pos) => { $wire.setUserLocation(pos.coords.latitude, pos.coords.longitude); loading = false; },
+                                    (err) => { $wire.$set('sortBy', 'nearby'); loading = false; },
+                                    { enableHighAccuracy: true, timeout: 10000 }
+                                )
+                            "
+                            style="{{ $sortBy === 'nearby' ? 'background:#D4AF37; color:#0B0B0B;' : 'background:#2A2A2A; color:#9CA3AF;' }}"
+                            class="px-3 py-1 text-sm rounded-md flex items-center"
                         >
-                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg x-show="!loading" class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                             </svg>
+                            <svg x-show="loading" class="animate-spin w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                            </svg>
                             Cerca de mi
                         </button>
-                        @endif
                         <button
                             wire:click="$set('sortBy', 'name')"
-                            class="px-3 py-1 text-sm rounded-md {{ $sortBy === 'name' ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}"
+                            style="{{ $sortBy === 'name' ? 'background:#D4AF37; color:#0B0B0B;' : 'background:#2A2A2A; color:#9CA3AF;' }}"
+                            class="px-3 py-1 text-sm rounded-md"
                         >
                             Nombre
                         </button>
                         <button
                             wire:click="$set('sortBy', 'rating')"
-                            class="px-3 py-1 text-sm rounded-md {{ $sortBy === 'rating' ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}"
+                            style="{{ $sortBy === 'rating' ? 'background:#D4AF37; color:#0B0B0B;' : 'background:#2A2A2A; color:#9CA3AF;' }}"
+                            class="px-3 py-1 text-sm rounded-md"
                         >
                             Calificacion
                         </button>
                         <button
                             wire:click="$set('sortBy', 'newest')"
-                            class="px-3 py-1 text-sm rounded-md {{ $sortBy === 'newest' ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}"
+                            style="{{ $sortBy === 'newest' ? 'background:#D4AF37; color:#0B0B0B;' : 'background:#2A2A2A; color:#9CA3AF;' }}"
+                            class="px-3 py-1 text-sm rounded-md"
                         >
                             Mas recientes
                         </button>
@@ -214,7 +264,8 @@
                 @if($search || $selectedState || $selectedCategory || $sortBy !== $defaultSort)
                     <button
                         wire:click="clearFilters"
-                        class="text-sm text-red-600 hover:text-red-700 font-medium"
+                        class="text-sm font-medium"
+                        style="color:#D4AF37;"
                     >
                         Limpiar filtros
                     </button>
@@ -228,7 +279,7 @@
                 <!-- Left Column: Restaurant List -->
                 <div class="md:w-3/5 lg:w-2/3">
                     <!-- Results Count -->
-                    <div class="mb-4 text-sm text-gray-600">
+                    <div class="mb-4" style="font-size:0.875rem; color:#9CA3AF;">
                         Mostrando {{ $restaurants->count() }} de {{ $restaurants->total() }} restaurantes
                     </div>
 
@@ -245,20 +296,24 @@
                                     </span>
 
                                     <!-- Restaurant Image -->
-                                    <div class="aspect-video bg-gray-200 overflow-hidden">
-                                        @if($restaurant->hasMedia('images'))
+                                    @php
+                                        $imgUrl = $restaurant->getDisplayImageUrl();
+                                    @endphp
+                                    <div class="aspect-video bg-gray-900 overflow-hidden" style="position:relative;">
+                                        @if($imgUrl)
                                             <img
-                                                src="{{ $restaurant->getFirstMediaUrl('images') }}"
+                                                src="{{ $imgUrl }}"
                                                 alt="{{ $restaurant->name }}"
                                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                                                loading="lazy"
+                                                decoding="async"
+                                                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
                                             >
-                                        @else
-                                            <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-red-100 to-red-200">
-                                                <svg class="w-16 h-16 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-                                                </svg>
-                                            </div>
                                         @endif
+                                        <div style="display:{{ $imgUrl ? 'none' : 'flex' }}; width:100%; height:100%; align-items:center; justify-content:center; background:#111; flex-direction:column; gap:0.5rem;">
+                                            <span style="font-size:2.5rem;">🍽️</span>
+                                            <span style="font-size:0.65rem; color:#4B5563; text-align:center; padding:0 0.5rem; line-height:1.3;">{{ Str::limit($restaurant->name, 22) }}</span>
+                                        </div>
                                     </div>
 
                                     <!-- Restaurant Info -->
@@ -269,7 +324,7 @@
                                                     {{ $restaurant->name }}
                                                 </h3>
                                                 <p class="text-sm text-gray-600">
-                                                    {{ $restaurant->category->name }}
+                                                    {{ $restaurant->category?->name }}
                                                 </p>
                                             </div>
                                             @if($restaurant->is_featured)
@@ -307,7 +362,7 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                                             </svg>
-                                            <span>{{ $restaurant->city }}, {{ $restaurant->state->code }}</span>
+                                            <span>{{ $restaurant->city }}, {{ $restaurant->state?->code }}</span>
                                             @if($userLatitude && $userLongitude && $restaurant->latitude && $restaurant->longitude)
                                                 @php
                                                     $distance = $this->getDistanceToRestaurant($restaurant);
@@ -388,9 +443,13 @@
                                             {{-- Badge: Datos Fusionados (cuando tiene ambas fuentes) --}}
                                             @include('livewire.partials.data-completeness-badge', ['restaurant' => $restaurant])
 
-                                            @if($restaurant->business_status === 'operational')
+                                            @if($restaurant->open_status === 'open')
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-800">
                                                     Abierto
+                                                </span>
+                                            @elseif($restaurant->open_status === 'closed')
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+                                                    Cerrado
                                                 </span>
                                             @elseif($restaurant->business_status === 'coming_soon')
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">

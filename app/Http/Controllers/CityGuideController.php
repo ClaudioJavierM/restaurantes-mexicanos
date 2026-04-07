@@ -123,11 +123,23 @@ class CityGuideController extends Controller
             ];
         });
 
+        // Top 10 restaurants in state ordered by reviews then rating
+        $top10Restaurants = Cache::remember("city_guide_top10_state_{$state->id}", 3600, function () use ($state) {
+            return Restaurant::where('state_id', $state->id)
+                ->where('status', 'approved')
+                ->with(['state', 'category', 'media'])
+                ->orderByDesc('google_reviews_count')
+                ->orderByDesc('google_rating')
+                ->limit(10)
+                ->get();
+        });
+
         return view('city-guides.state', [
             'state' => $state,
             'cities' => $data['cities'],
             'stats' => $data['stats'],
             'topRestaurants' => $data['topRestaurants'],
+            'top10Restaurants' => $top10Restaurants,
         ]);
     }
 
@@ -142,7 +154,24 @@ class CityGuideController extends Controller
 
         $cityName = Str::title(str_replace('-', ' ', $citySlug));
 
-        // Order by: Elite first, then Premium, then by rating
+        // Top 10 list ordered by google reviews count then rating (pure quality signal, no subscription bias)
+        $top10Restaurants = Cache::remember("city_guide_top10_{$state->id}_{$citySlug}", 3600, function () use ($state, $cityName) {
+            return Restaurant::where('state_id', $state->id)
+                ->where('city', 'like', $cityName)
+                ->where('status', 'approved')
+                ->with(['state', 'category', 'media'])
+                ->orderByDesc('google_reviews_count')
+                ->orderByDesc('google_rating')
+                ->limit(10)
+                ->get();
+        });
+
+        if ($top10Restaurants->isEmpty()) {
+            // Redirect to state guide instead of hard 404 — better for GSC coverage
+            return redirect()->route('city-guides.state', ['stateSlug' => $stateSlug], 301);
+        }
+
+        // Full paginated list: Elite/Premium first, then by rating (for monetization)
         $restaurants = Restaurant::where('state_id', $state->id)
             ->where('city', 'like', $cityName)
             ->where('status', 'approved')
@@ -156,10 +185,6 @@ class CityGuideController extends Controller
             ->orderByDesc('total_reviews')
             ->paginate(20);
 
-        if ($restaurants->isEmpty()) {
-            abort(404);
-        }
-
         // Get stats for the city
         $stats = Cache::remember("city_guide_{$state->id}_{$citySlug}", 3600, function () use ($state, $cityName) {
             return Restaurant::where('state_id', $state->id)
@@ -167,9 +192,10 @@ class CityGuideController extends Controller
                 ->where('status', 'approved')
                 ->selectRaw('
                     COUNT(*) as total,
-                    AVG(average_rating) as avg_rating,
-                    SUM(total_reviews) as total_reviews,
-                    COUNT(CASE WHEN is_claimed = 1 THEN 1 END) as claimed_count
+                    AVG(google_rating) as avg_rating,
+                    SUM(google_reviews_count) as total_reviews,
+                    COUNT(CASE WHEN is_claimed = 1 THEN 1 END) as claimed_count,
+                    COUNT(DISTINCT category_id) as category_count
                 ')
                 ->first();
         });
@@ -190,6 +216,7 @@ class CityGuideController extends Controller
             'state' => $state,
             'cityName' => $cityName,
             'citySlug' => $citySlug,
+            'top10Restaurants' => $top10Restaurants,
             'restaurants' => $restaurants,
             'stats' => $stats,
             'topCategories' => $topCategories,

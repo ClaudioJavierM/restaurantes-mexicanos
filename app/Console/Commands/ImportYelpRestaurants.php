@@ -14,7 +14,7 @@ class ImportYelpRestaurants extends Command
      */
     protected $signature = 'yelp:import
                             {city : City name}
-                            {state : State name or abbreviation}
+                            {state : State name or code}
                             {--limit=50 : Maximum number of restaurants to import per request}
                             {--offset=0 : Offset for pagination}
                             {--min-rating=3.0 : Minimum Yelp rating to import}

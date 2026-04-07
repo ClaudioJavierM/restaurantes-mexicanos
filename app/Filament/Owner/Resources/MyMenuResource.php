@@ -191,6 +191,14 @@ class MyMenuResource extends Resource
                             ->numeric()
                             ->suffix('min'),
 
+                        Forms\Components\Select::make('dish_type')
+                            ->label('Tipo de Platillo')
+                            ->options(MenuItem::getDishTypeOptions())
+                            ->nullable()
+                            ->searchable()
+                            ->placeholder('Seleccionar tipo...')
+                            ->columnSpanFull(),
+
                         Forms\Components\CheckboxList::make('dietary_tags')
                             ->label('Etiquetas Dietéticas')
                             ->options([
@@ -258,6 +266,13 @@ class MyMenuResource extends Resource
                     ->label('Tags')
                     ->badge()
                     ->separator(','),
+
+                Tables\Columns\TextColumn::make('dish_type')
+                    ->label('Tipo')
+                    ->badge()
+                    ->color('warning')
+                    ->formatStateUsing(fn ($state) => MenuItem::getDishTypeOptions()[$state] ?? $state)
+                    ->placeholder('-'),
 
                 Tables\Columns\IconColumn::make('is_popular')
                     ->label('⭐')

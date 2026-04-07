@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Category;
 use App\Models\Restaurant;
+use App\Models\Review;
 use App\Models\State;
 use App\Services\CountryContext;
 use App\Services\GeoLocationService;
@@ -205,32 +206,46 @@ class Home extends Component
                 ->get();
         }
 
-        // For USA, try to get featured/subscribed restaurants first
-        $featured = Restaurant::approved()
-            ->forCurrentCountry()
-            ->with(['state', 'category', 'media'])
-            ->featured()
-            ->limit(6)
-            ->get();
-
-        // If we have featured restaurants, return them
-        if ($featured->count() >= 3) {
-            return $featured;
-        }
-
-        // If user has a detected state from IP, show from that state
+        // If user has a detected state from IP/browser, prioritize local restaurants
         if ($this->detectedLocation && isset($this->detectedLocation['state_code'])) {
-            $stateCode = $this->detectedLocation['state_code'];
+            $stateCode = strtoupper(trim($this->detectedLocation['state_code']));
+
+            // 1. First try featured restaurants in the user's state
+            $stateFeatured = Restaurant::approved()
+                ->forCurrentCountry()
+                ->with(['state', 'category', 'media'])
+                ->featured()
+                ->whereHas('state', fn($q) => $q->whereRaw('UPPER(code) = ?', [$stateCode]))
+                ->limit(6)
+                ->get();
+
+            if ($stateFeatured->count() >= 3) {
+                // Sort featured by distance if lat/lng available
+                if ($this->userLat && $this->userLng) {
+                    $stateFeatured = $stateFeatured->map(function($restaurant) {
+                        $restaurant->distance = $this->calculateDistance(
+                            $this->userLat,
+                            $this->userLng,
+                            $restaurant->latitude,
+                            $restaurant->longitude
+                        );
+                        return $restaurant;
+                    })->sortBy('distance')->values();
+                }
+                return $stateFeatured;
+            }
+
+            // 2. Get all restaurants from the user's state, sorted by rating
             $stateRestaurants = Restaurant::approved()
                 ->forCurrentCountry()
                 ->with(['state', 'category', 'media'])
-                ->whereHas('state', fn($q) => $q->where('code', $stateCode))
+                ->whereHas('state', fn($q) => $q->whereRaw('UPPER(code) = ?', [$stateCode]))
                 ->orderByDesc('google_rating')
                 ->orderByDesc('google_reviews_count')
                 ->limit(12)
                 ->get();
 
-            // If we have location, calculate distances in PHP and sort
+            // If we have lat/lng, sort by distance from user
             if ($stateRestaurants->count() > 0 && $this->userLat && $this->userLng) {
                 $stateRestaurants = $stateRestaurants->map(function($restaurant) {
                     $restaurant->distance = $this->calculateDistance(
@@ -245,12 +260,25 @@ class Home extends Component
                 return $stateRestaurants;
             }
 
+            // 3. If we have state restaurants but no lat/lng, return by rating
             if ($stateRestaurants->count() >= 3) {
                 return $stateRestaurants->take(6);
             }
         }
 
-        // Fallback: Get highest rated restaurants nationwide
+        // 4. No location detected or not enough local results — try national featured
+        $featured = Restaurant::approved()
+            ->forCurrentCountry()
+            ->with(['state', 'category', 'media'])
+            ->featured()
+            ->limit(6)
+            ->get();
+
+        if ($featured->count() >= 3) {
+            return $featured;
+        }
+
+        // 5. Final fallback: highest rated restaurants nationwide
         return Restaurant::approved()
             ->forCurrentCountry()
             ->with(['state', 'category', 'media'])
@@ -258,6 +286,103 @@ class Home extends Component
             ->orderByDesc('google_reviews_count')
             ->limit(6)
             ->get();
+    }
+
+    /**
+     * Get recent platform activity (reviews + new restaurants), optionally filtered by state.
+     */
+    protected function getRecentActivity()
+    {
+        $stateId = null;
+
+        // If user has a detected state, resolve its ID for filtering
+        if ($this->detectedLocation && isset($this->detectedLocation['state_code'])) {
+            $stateCode = strtoupper(trim($this->detectedLocation['state_code']));
+            $state = State::where('is_active', true)
+                ->forCurrentCountry()
+                ->whereRaw('UPPER(code) = ?', [$stateCode])
+                ->first();
+            if ($state) {
+                $stateId = $state->id;
+            }
+        }
+
+        // Recent approved reviews
+        $reviewQuery = Review::with(['restaurant.state', 'restaurant.media'])
+            ->where('status', 'approved')
+            ->whereHas('restaurant', fn($q) => $q->where('status', 'approved')->where('is_active', true));
+
+        if ($stateId) {
+            $reviewQuery->whereHas('restaurant', fn($q) => $q->where('state_id', $stateId));
+        }
+
+        $recentReviews = $reviewQuery->latest()->limit(6)->get()->map(function ($review) {
+            $r = $review->restaurant;
+            $imgSrc = null;
+            if ($r) {
+                if ($r->image) {
+                    $imgSrc = str_starts_with($r->image, 'http') ? $r->image : asset('storage/' . $r->image);
+                } elseif ($r->getFirstMediaUrl('images')) {
+                    $imgSrc = $r->getFirstMediaUrl('images');
+                } elseif (is_array($r->yelp_photos) && count($r->yelp_photos) > 0) {
+                    $imgSrc = $r->yelp_photos[0];
+                }
+            }
+            return (object) [
+                'type' => 'review',
+                'restaurant_name' => $r->name ?? 'Unknown',
+                'restaurant_slug' => $r->slug ?? '#',
+                'city' => $r->city ?? '',
+                'state_name' => $r->state->name ?? '',
+                'state_code' => $r->state->code ?? '',
+                'rating' => $review->rating,
+                'snippet' => $review->comment ? \Illuminate\Support\Str::limit($review->comment, 80) : null,
+                'reviewer' => $review->reviewer_name,
+                'time_ago' => $review->created_at->diffForHumans(),
+                'created_at' => $review->created_at,
+                'image' => $imgSrc,
+            ];
+        });
+
+        // Recently added restaurants
+        $restaurantQuery = Restaurant::approved()
+            ->forCurrentCountry()
+            ->with('state');
+
+        if ($stateId) {
+            $restaurantQuery->where('state_id', $stateId);
+        }
+
+        $recentRestaurants = $restaurantQuery->with('media')->latest()->limit(6)->get()->map(function ($restaurant) {
+            $imgSrc = null;
+            if ($restaurant->image) {
+                $imgSrc = str_starts_with($restaurant->image, 'http') ? $restaurant->image : asset('storage/' . $restaurant->image);
+            } elseif ($restaurant->getFirstMediaUrl('images')) {
+                $imgSrc = $restaurant->getFirstMediaUrl('images');
+            } elseif (is_array($restaurant->yelp_photos) && count($restaurant->yelp_photos) > 0) {
+                $imgSrc = $restaurant->yelp_photos[0];
+            }
+            return (object) [
+                'type' => 'new_restaurant',
+                'restaurant_name' => $restaurant->name,
+                'restaurant_slug' => $restaurant->slug ?? '#',
+                'city' => $restaurant->city ?? '',
+                'state_name' => $restaurant->state->name ?? '',
+                'state_code' => $restaurant->state->code ?? '',
+                'rating' => $restaurant->google_rating,
+                'snippet' => null,
+                'reviewer' => null,
+                'time_ago' => $restaurant->created_at->diffForHumans(),
+                'created_at' => $restaurant->created_at,
+                'image' => $imgSrc,
+            ];
+        });
+
+        // Merge and sort by most recent, take 6
+        return $recentReviews->concat($recentRestaurants)
+            ->sortByDesc('created_at')
+            ->take(6)
+            ->values();
     }
 
     public function render()
@@ -302,6 +427,17 @@ class Home extends Component
             ];
         });
 
+        // Get recent activity for USA homepage
+        $recentActivity = $isMexico ? collect() : $this->getRecentActivity();
+
+        $isEn = app()->getLocale() === 'en';
+        $seoTitle = $isEn
+            ? 'Best Mexican Restaurants in the USA | FAMER — Famous Mexican Restaurants'
+            : 'Los Mejores Restaurantes Mexicanos | FAMER — Restaurantes Mexicanos Famosos';
+        $seoDesc = $isEn
+            ? 'Discover the best authentic Mexican restaurants near you. Browse 25,000+ restaurants across the USA — verified ratings, menus, hours, and reviews. Find birria, tacos, tamales & more.'
+            : 'Descubre los mejores restaurantes mexicanos auténticos cerca de ti. Más de 25,000 restaurantes en EE.UU. — calificaciones verificadas, menús, horarios y reseñas. Encuentra birria, tacos, tamales y más.';
+
         return view('livewire.home', [
             'categories' => $categories,
             'states' => $states,
@@ -309,7 +445,11 @@ class Home extends Component
             'stats' => $stats,
             'isMexico' => $isMexico,
             'userLocation' => $this->detectedLocation,
-        ])->layout('layouts.app', ['title' => 'Inicio']);
+            'recentActivity' => $recentActivity,
+        ])->layout('layouts.app', [
+            'title'           => $seoTitle,
+            'metaDescription' => $seoDesc,
+        ]);
     }
 
     public function searchRestaurants()

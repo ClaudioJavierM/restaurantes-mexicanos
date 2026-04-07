@@ -89,6 +89,27 @@ class StripeWebhookController extends Controller
 
         // Get subscription ID from session
         $subscriptionId = $session->subscription;
+        if (!$subscriptionId) {
+            \Log::warning('Webhook: subscription ID is null for session ' . $session->id);
+            // Try to get it from the customer
+            if ($session->customer) {
+                try {
+                    $subs = \Stripe\Subscription::all([
+                        'customer' => $session->customer,
+                        'status' => 'active',
+                        'limit' => 1,
+                    ]);
+                    $subscriptionId = $subs->data[0]->id ?? null;
+                } catch (\Exception $e) {
+                    \Log::error('Webhook: could not fetch subscription for customer ' . $session->customer . ': ' . $e->getMessage());
+                }
+            }
+        }
+
+        if (!$subscriptionId) {
+            \Log::error('Webhook: unable to resolve subscription ID for restaurant ' . $restaurantId);
+            return;
+        }
 
         // Update restaurant with subscription info
         $this->stripeService->handleSuccessfulSubscription($subscriptionId, $restaurant, $plan);
@@ -200,6 +221,24 @@ class StripeWebhookController extends Controller
             $restaurant = Restaurant::find($restaurantId);
 
             if ($restaurant) {
+                // Ensure stripe_subscription_id is set
+                $subscriptionId = $session->subscription;
+                if (!$subscriptionId && $restaurant->stripe_customer_id) {
+                    try {
+                        $stripe = new \Stripe\StripeClient(config('stripe.secret'));
+                        $subs = $stripe->subscriptions->all([
+                            'customer' => $restaurant->stripe_customer_id,
+                            'status' => 'active',
+                            'limit' => 1,
+                        ]);
+                        $subscriptionId = $subs->data[0]->id ?? null;
+                    } catch (\Exception $e) {
+                        \Log::warning('Could not fetch subscription for customer: ' . $restaurant->stripe_customer_id);
+                    }
+                }
+                $restaurant->stripe_subscription_id = $subscriptionId;
+                $restaurant->save();
+
                 // Create or find the user account for the owner
                 $password = Str::random(12);
                 $isNewUser = false;
@@ -272,7 +311,7 @@ class StripeWebhookController extends Controller
             $restaurant = Restaurant::find($restaurantId);
 
             if ($restaurant) {
-                $this->stripeService->handleSuccessfulSubscription($restaurant, $plan, $session);
+                $this->stripeService->handleSuccessfulSubscription($session->subscription ?? '', $restaurant, $plan);
 
                 if ($coupon = $restaurant->subscriberCoupon) {
                     $coupon->update(["tier" => $plan]);

@@ -132,10 +132,10 @@
                                 <tr>
                                     <td style="padding: 25px; text-align: center;">
                                         <p style="color: rgba(255,255,255,0.9); margin: 0 0 5px 0; font-size: 14px;">
-                                            Precio normal: <span style="text-decoration: line-through;">$29/mes</span>
+                                            Precio normal: <span style="text-decoration: line-through;">$39/mes</span>
                                         </p>
                                         <p style="color: #ffffff; margin: 0; font-size: 28px; font-weight: bold;">
-                                            Con tu cupon: <span style="color: #fcd34d;">${{ number_format(29 * (100 - $discountPercent) / 100, 2) }}/mes</span>
+                                            Con tu cupon: <span style="color: #fcd34d;">${{ number_format(39 * (100 - $discountPercent) / 100, 2) }}/mes</span>
                                         </p>
                                         <p style="color: rgba(255,255,255,0.8); margin: 10px 0 0 0; font-size: 13px;">
                                             *Descuento aplicable al primer mes

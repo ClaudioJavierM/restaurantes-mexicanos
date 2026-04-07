@@ -6,7 +6,9 @@ use App\Models\Restaurant;
 use App\Models\State;
 use App\Models\Category;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class YelpImportService
@@ -344,6 +346,11 @@ class YelpImportService
             }
         }
 
+        // Download up to 5 Google Places photos if available
+        if (!empty($googleData['photos'])) {
+            $this->downloadGooglePhotos($restaurant, $googleData['photos']);
+        }
+
         Log::info("Imported restaurant from Yelp: {$restaurant->name} in {$restaurant->city}, {$state->name}");
 
         return $restaurant;
@@ -522,6 +529,55 @@ class YelpImportService
         }
 
         return $phone;
+    }
+
+    /**
+     * Download up to 5 Google Places photos and store in the photos JSON column.
+     * Uses photo_reference objects already fetched during getPlaceDetails().
+     */
+    protected function downloadGooglePhotos(Restaurant $restaurant, array $googlePhotos): void
+    {
+        $apiKey = config('services.google.places_api_key');
+        if (empty($apiKey)) return;
+
+        $baseUrl = 'https://maps.googleapis.com/maps/api/place';
+        $downloaded = [];
+        $index = 1;
+
+        foreach ($googlePhotos as $photo) {
+            $ref = $photo['photo_reference'] ?? null;
+            if (!$ref) continue;
+
+            try {
+                $url = "{$baseUrl}/photo?" . http_build_query([
+                    'photoreference' => $ref,
+                    'maxwidth'       => 1200,
+                    'key'            => $apiKey,
+                ]);
+
+                $response = Http::timeout(20)->get($url);
+                if (!$response->successful()) continue;
+
+                $path = 'restaurants/' . $restaurant->slug . '-' . $index . '.jpg';
+                Storage::disk('public')->put($path, $response->body());
+                $downloaded[] = $path;
+
+                // Use first Google photo as main image if no image yet
+                if ($index === 1 && empty($restaurant->image)) {
+                    $restaurant->image = $path;
+                }
+
+                $index++;
+                if ($index > 10) break; // Google Places API max is 10 per call
+            } catch (\Exception $e) {
+                Log::warning("Failed to download Google photo for {$restaurant->name}", ['error' => $e->getMessage()]);
+            }
+        }
+
+        if (!empty($downloaded)) {
+            $restaurant->photos = $downloaded;
+            $restaurant->save();
+        }
     }
 
     protected function attachImageFromUrl(Restaurant $restaurant, string $imageUrl): void

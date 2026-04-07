@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\OwnerController;
 use App\Http\Controllers\Api\OwnerAppController;
 use App\Http\Controllers\Api\CouponController;
 use App\Http\Controllers\Api\CheckInController;
+use App\Http\Controllers\Api\FanController;
 use App\Http\Controllers\Api\SubscriberCouponApiController;
 use App\Http\Controllers\Api\CarmenApiController;
 
@@ -112,6 +113,9 @@ Route::prefix('v1')->group(function () {
             // User's coupons & check-ins
             Route::get('/coupons', [CouponController::class, 'userCoupons']);
             Route::get('/check-ins', [CheckInController::class, 'userCheckIns']);
+
+            // Fan badges
+            Route::get('/fan-badges', [FanController::class, 'myFanBadges']);
         });
 
         // Claim a coupon
@@ -190,7 +194,8 @@ Route::prefix('v1')->group(function () {
             Route::get('/orders', [OwnerAppController::class, 'orders']);
             Route::put('/orders/{orderId}', [OwnerAppController::class, 'updateOrder']);
 
-            // Subscription info & feature gates
+            // Subscription & Tier
+            Route::get('/tier-features', [OwnerAppController::class, 'getTierFeatures']);
             Route::get('/subscription', [OwnerAppController::class, 'subscription']);
 
             // SMS Marketing (Elite only)

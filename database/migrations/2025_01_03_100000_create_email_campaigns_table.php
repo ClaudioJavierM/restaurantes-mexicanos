@@ -42,10 +42,10 @@ return new class extends Migration
         // Add campaign_id to email_logs if not exists
         if (!Schema::hasColumn('email_logs', 'campaign_id')) {
             Schema::table('email_logs', function (Blueprint $table) {
-                $table->foreignId('campaign_id')->nullable()->after('id')->constrained('email_campaigns')->nullOnDelete();
-                $table->string('tracking_token', 64)->nullable()->after('message_id')->unique();
-                $table->integer('open_count')->default(0)->after('opened_at');
-                $table->integer('click_count')->default(0)->after('clicked_at');
+                $table->foreignId('campaign_id')->nullable()->constrained('email_campaigns')->nullOnDelete();
+                $table->string('tracking_token', 64)->nullable()->unique();
+                $table->integer('open_count')->default(0);
+                $table->integer('click_count')->default(0);
             });
         }
     }

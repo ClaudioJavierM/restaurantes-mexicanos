@@ -4,8 +4,10 @@ namespace App\Filament\Owner\Resources;
 
 use App\Filament\Owner\Resources\MyReviewsResource\Pages;
 use App\Models\Review;
+use App\Services\AiReviewResponseService;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -156,6 +158,46 @@ class MyReviewsResource extends Resource
                     ),
             ])
             ->actions([
+                Tables\Actions\Action::make('ai_suggest')
+                    ->label('✨ Sugerir con IA')
+                    ->icon('heroicon-o-sparkles')
+                    ->color('warning')
+                    ->visible(fn (Review $record): bool => empty($record->owner_response))
+                    ->mountUsing(function (Forms\ComponentContainer $form, Review $record): void {
+                        $suggestion = '';
+
+                        try {
+                            $service = new AiReviewResponseService();
+                            $suggestion = $service->suggestResponse($record);
+                        } catch (\Throwable $e) {
+                            Notification::make()
+                                ->title('No se pudo generar sugerencia')
+                                ->body('Revisa tu conexión o la clave de Anthropic e intenta de nuevo.')
+                                ->warning()
+                                ->send();
+                        }
+
+                        $form->fill(['suggestion' => $suggestion]);
+                    })
+                    ->form([
+                        Forms\Components\Textarea::make('suggestion')
+                            ->label('Respuesta sugerida por IA')
+                            ->helperText('Puedes editar el texto antes de guardar.')
+                            ->rows(5)
+                            ->maxLength(1000)
+                            ->required(),
+                    ])
+                    ->action(function (Review $record, array $data): void {
+                        $record->update([
+                            'owner_response'    => $data['suggestion'],
+                            'owner_response_by' => auth()->id(),
+                            'owner_response_at' => now(),
+                        ]);
+                    })
+                    ->modalHeading('Sugerencia de respuesta con IA')
+                    ->modalSubmitActionLabel('Guardar Respuesta')
+                    ->successNotificationTitle('Respuesta guardada correctamente'),
+
                 Tables\Actions\Action::make('respond')
                     ->label('Responder')
                     ->icon('heroicon-o-chat-bubble-left-right')

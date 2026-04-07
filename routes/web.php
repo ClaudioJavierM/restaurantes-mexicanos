@@ -4,15 +4,69 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\TeamInvitationController;
+use App\Http\Controllers\StateRestaurantsController;
+use App\Http\Controllers\CityRestaurantsController;
 
 // Public Routes
 Route::get('/', \App\Livewire\Home::class)->name('home');
 Route::get('/restaurantes', \App\Livewire\RestaurantList::class)->name('restaurants.index');
+Route::get('/restaurantes/categoria/{slug}', [\App\Http\Controllers\CategoryController::class, 'show'])->name('categories.show');
 Route::get('/restaurante/{slug}', \App\Livewire\RestaurantDetail::class)->name('restaurants.show');
+// English URL alias for famousmexicanrestaurants.com domain
+Route::get('/restaurant/{slug}', fn($slug) => redirect('/restaurante/' . $slug, 301));
 Route::get('/sugerir', \App\Livewire\SmartSuggestionForm::class)->name('suggestions.create');
+Route::get('/restaurantes-mexicanos-cerca-de-mi', [\App\Http\Controllers\NearMeController::class, 'index'])->name('near-me');
+
+// City landing pages — MUST be before state routes (more specific slug pattern)
+// Format: /restaurantes-mexicanos-en-dallas-tx  /best-mexican-restaurants-in-dallas-tx
+Route::get('/restaurantes-mexicanos-en-{citySlug}', [CityRestaurantsController::class, 'show'])
+    ->where('citySlug', '[a-z\-]+-[a-z]{2}')
+    ->name('cities.show');
+Route::get('/best-mexican-restaurants-in-{citySlug}', [CityRestaurantsController::class, 'show'])
+    ->where('citySlug', '[a-z\-]+-[a-z]{2}')
+    ->name('cities.show.en');
+
+// State landing pages (SEO: "restaurantes mexicanos en texas")
+Route::get('/estados', [StateRestaurantsController::class, 'index'])->name('states.index');
+Route::get('/restaurantes-mexicanos-en-{stateSlug}', [StateRestaurantsController::class, 'show'])->name('states.show');
+Route::get('/best-mexican-restaurants-in-{stateSlug}', [StateRestaurantsController::class, 'show'])->name('states.show.en');
+
+// Dish-specific landing pages (SEO) — unified show() route covering 22 dishes
+Route::get('/{dish}', [\App\Http\Controllers\DishController::class, 'show'])
+    ->where('dish', 'birria|tacos|tamales|pozole|enchiladas|mole|chiles-rellenos|tortas|tostadas|quesadillas|flautas|sopes|menudo|carnitas|barbacoa|ceviche|elotes|churros|horchata|margaritas|tacos-al-pastor|carne-asada')
+    ->name('dishes.show');
+
+// Dish near-me landing pages (SEO)
+Route::get('/birria-cerca-de-mi', [\App\Http\Controllers\DishNearMeController::class, 'birria'])->name('dish-near-me.birria');
+Route::get('/tamales-cerca-de-mi', [\App\Http\Controllers\DishNearMeController::class, 'tamales'])->name('dish-near-me.tamales');
+Route::get('/pozole-cerca-de-mi', [\App\Http\Controllers\DishNearMeController::class, 'pozole'])->name('dish-near-me.pozole');
+Route::get('/carnitas-cerca-de-mi', [\App\Http\Controllers\DishNearMeController::class, 'carnitas'])->name('dish-near-me.carnitas');
+Route::get('/barbacoa-cerca-de-mi', [\App\Http\Controllers\DishNearMeController::class, 'barbacoa'])->name('dish-near-me.barbacoa');
+Route::get('/mole-cerca-de-mi', [\App\Http\Controllers\DishNearMeController::class, 'mole'])->name('dish-near-me.mole');
+Route::get('/carne-asada-cerca-de-mi', [\App\Http\Controllers\DishNearMeController::class, 'carneAsada'])->name('dish-near-me.carne-asada');
+
+// State-level dish pages (SEO: "birria en texas", "tamales en california")
+Route::get('/{dish}-en-{state}', [\App\Http\Controllers\DishStateController::class, 'show'])
+    ->where('dish', 'birria|tamales|pozole|carnitas|barbacoa|mole')
+    ->where('state', 'tx|ca|il|az|fl|co|nv|nm|ny|ga|wa|nc|or|ut|tn')
+    ->name('dish-state');
+
+// City-level dish pages (SEO: "birria en dallas-tx", "tacos en chicago-il")
+// MUST be before the /{dish} wildcard — more specific pattern
+Route::get('/{dish}-en-{citySlug}-{stateCode}', [\App\Http\Controllers\DishCityController::class, 'show'])
+    ->where('dish', 'birria|tacos|tamales|pozole|enchiladas|mole|chiles-rellenos|menudo|carnitas|barbacoa|ceviche|carne-asada')
+    ->where('stateCode', 'tx|ca|il|az|fl|co|nv|nm|ny|ga|wa|nc|or|ut|tn|mi|oh|pa|nj|md')
+    ->name('dish.city');
+
+// Blog — Mexican food content & SEO authority
+Route::get('/blog', [\App\Http\Controllers\BlogController::class, 'index'])->name('blog.index');
+Route::get('/blog/categoria/{category}', [\App\Http\Controllers\BlogController::class, 'category'])->name('blog.category');
+Route::get('/blog/{post}', [\App\Http\Controllers\BlogController::class, 'show'])->name('blog.show');
 
 // For Business Owners
 Route::get("/for-owners", \App\Livewire\ForOwners::class)->name("for-owners");
+Route::get('/como-funciona-famer', \App\Http\Controllers\HowItWorksController::class)->name('how-it-works');
+Route::get('/how-famer-works', \App\Http\Controllers\HowItWorksController::class)->name('how-it-works.en');
 Route::get("/preguntas-frecuentes", \App\Livewire\Faq::class)->name("faq");
 Route::get('/grader', \App\Livewire\FamerGrader::class)->name('famer.grader');
 Route::get('/grader/{slug}', \App\Livewire\FamerGrader::class)->name('famer.grader.restaurant');
@@ -36,6 +90,9 @@ Route::get('/sitemap-main.xml', [SitemapController::class, 'main'])->name('sitem
 Route::get('/sitemap-restaurants-{page}.xml', [SitemapController::class, 'restaurants'])->where('page', '[0-9]+')->name('sitemap.restaurants');
 Route::get('/sitemap-guides.xml', [SitemapController::class, 'guides'])->name('sitemap.guides');
 Route::get('/sitemap-rankings.xml', [SitemapController::class, 'rankings'])->name('sitemap.rankings');
+Route::get('/sitemap-blog.xml', [SitemapController::class, 'blog'])->name('sitemap.blog');
+Route::get('/sitemap-states.xml', [SitemapController::class, 'states'])->name('sitemap.states');
+Route::get('/sitemap-dishes.xml', [SitemapController::class, 'dishes'])->name('sitemap.dishes');
 
 // City Guides (SEO)
 Route::prefix('guia')->group(function () {
@@ -146,14 +203,6 @@ Route::post('/webhooks/twilio/status', [\App\Http\Controllers\TwilioWebhookContr
     ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
 require __DIR__.'/chat-widget.php';
 
-// TEMPORARY: Staging auto-login route - REMOVE AFTER TESTING
-Route::get('/staging-login', function () {
-    $user = \App\Models\User::find(16);
-    if (!$user) abort(404);
-    auth()->login($user);
-    return redirect('/owner');
-})->name('staging.login');
-
 // QR Print page for restaurant owners
 Route::get('/owner/qr-print/{restaurant}', function (App\Models\Restaurant $restaurant) {
     $voteUrl = url("/restaurante/{$restaurant->slug}#votar");
@@ -203,26 +252,6 @@ Route::get('/owner/{slug}', function ($slug) {
 
     return redirect('/owner');
 })->middleware(['auth'])->name('owner-legacy-redirect');
-
-
-// Temporary diagnostic route - REMOVE AFTER DEBUGGING
-Route::get('/who-am-i', function () {
-    if (!auth()->check()) {
-        return response()->json(['status' => 'NOT LOGGED IN']);
-    }
-    $user = auth()->user();
-    return response()->json([
-        'id' => $user->id,
-        'name' => $user->name,
-        'email' => $user->email,
-        'role' => $user->role,
-        'email_verified' => $user->email_verified_at ? 'YES' : 'NO',
-        'restaurants_count' => $user->restaurants()->count(),
-        'restaurants' => $user->restaurants->map(fn($r) => ['id' => $r->id, 'name' => $r->name, 'slug' => $r->slug]),
-        'can_access_owner_panel' => in_array($user->role, ['owner', 'admin']) && $user->email_verified_at && $user->restaurants()->exists(),
-        'nav_link_would_go_to' => (in_array($user->role, ['owner', 'admin']) && $user->restaurants->first()) ? '/owner' : '/for-owners',
-    ]);
-})->name('who-am-i');
 
 
 // Certificate preview

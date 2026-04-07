@@ -182,7 +182,7 @@ class OwnerAppController extends Controller
             ], 404);
         }
 
-        $restaurant->load(['state:id,name,abbreviation', 'category:id,name']);
+        $restaurant->load(['state:id,name,code', 'category:id,name']);
 
         return response()->json([
             'success' => true,
@@ -716,8 +716,10 @@ class OwnerAppController extends Controller
             return response()->json(['success' => false, 'message' => 'Restaurante no encontrado'], 404);
         }
 
-        $tierError = $this->requireTier($restaurant, ['premium', 'elite']);
-        if ($tierError) return $tierError;
+        $tierError = $this->requireTier($restaurant, ['claimed', 'premium', 'elite']);
+        if ($tierError) {
+            return $tierError;
+        }
 
         $request->validate(['period' => 'nullable|in:7d,30d,90d,1y']);
         $period = $request->get('period', '30d');
@@ -886,6 +888,105 @@ class OwnerAppController extends Controller
             'success' => true,
             'message' => 'Horarios actualizados exitosamente',
             'data'    => ['hours' => $restaurant->fresh()->hours],
+        ]);
+    }
+
+    /**
+     * Check if restaurant meets the required tier. Returns error response or null.
+     */
+    private function requireTier(Restaurant $restaurant, array $allowedTiers): ?JsonResponse
+    {
+        $tier = $restaurant->subscription_tier ?? 'free';
+
+        if (!in_array($tier, $allowedTiers)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Esta función requiere un plan superior. Actualiza a Premium ($39/mes) o Elite ($79/mes).',
+                'required_tiers' => $allowedTiers,
+                'current_tier' => $tier,
+            ], 403);
+        }
+
+        return null;
+    }
+
+    /**
+     * GET /v1/owner/tier-features
+     * Returns the feature map for the restaurant's current subscription tier.
+     */
+    public function getTierFeatures(Request $request): JsonResponse
+    {
+        $restaurant = $this->getRestaurant($request);
+
+        if (!$restaurant) {
+            return response()->json(['success' => false, 'message' => 'Restaurante no encontrado'], 404);
+        }
+
+        $tier = $restaurant->subscription_tier ?? 'free';
+
+        $isClaimed = in_array($tier, ['claimed', 'premium', 'elite']);
+        $isPremium = in_array($tier, ['premium', 'elite']);
+        $isElite = $tier === 'elite';
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'tier' => $tier,
+                'features' => [
+                    'analytics' => $isClaimed,
+                    'reservations' => $isClaimed,
+                    'menu_edit' => $isClaimed,
+                    'team_management' => $isPremium,
+                    'coupons' => $isPremium,
+                    'featured_listing' => $isPremium,
+                    'advanced_analytics' => $isElite,
+                    'online_ordering' => $isElite,
+                    'priority_support' => $isElite,
+                    'photo_limit' => $isElite ? null : ($isPremium ? 25 : ($isClaimed ? 10 : 5)),
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * GET /v1/owner/subscription
+     * Returns available subscription plans and pricing.
+     */
+    public function subscription(Request $request): JsonResponse
+    {
+        $restaurant = $this->getRestaurant($request);
+        $currentTier = $restaurant?->subscription_tier ?? 'free';
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'current_tier' => $currentTier,
+                'plans' => [
+                    'free' => [
+                        'name' => 'Gratuito',
+                        'price_monthly' => 0,
+                        'features' => ['Perfil básico', 'Aparecer en búsquedas', '5 fotos'],
+                    ],
+                    'claimed' => [
+                        'name' => 'Reclamado',
+                        'price_monthly' => 0,
+                        'features' => ['Perfil verificado', 'Analytics básicos', 'Reservaciones', 'Editar menú', '10 fotos'],
+                    ],
+                    'premium' => [
+                        'name' => 'Premium',
+                        'price_monthly' => 39,
+                        'price_display' => '$39/mes',
+                        'promo_first_month' => '$9.99',
+                        'features' => ['Todo de Reclamado', 'Cupones y promociones', 'Listado destacado', 'Gestión de equipo', '25 fotos'],
+                    ],
+                    'elite' => [
+                        'name' => 'Elite',
+                        'price_monthly' => 79,
+                        'price_display' => '$79/mes',
+                        'features' => ['Todo de Premium', 'Analytics avanzados', 'Pedidos online', 'Fotos ilimitadas', 'Soporte prioritario', 'Badge Elite dorado'],
+                    ],
+                ],
+            ],
         ]);
     }
 

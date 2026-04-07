@@ -26,6 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Add locale detection middleware to web group
         $middleware->web(append: [
+            \App\Http\Middleware\DomainLocale::class,
             \App\Http\Middleware\SetLocaleFromDomain::class,
         ]);
 

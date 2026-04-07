@@ -127,6 +127,8 @@ class RestaurantList extends Component
             'lng' => $longitude,
         ]]);
 
+        $this->dispatch('user-location-updated', lat: $latitude, lng: $longitude);
+
         $this->resetPage();
     }
 
@@ -370,15 +372,9 @@ class RestaurantList extends Component
         }
 
         // Sorting
-        // Priority: Elite first, then Premium, then others
-        $query->orderByRaw("CASE
-            WHEN subscription_tier = 'elite' THEN 0
-            WHEN subscription_tier = 'premium' THEN 1
-            ELSE 2
-        END");
-
         switch ($this->sortBy) {
             case 'nearby':
+                // Nearby: pure distance sort — no subscription boost, location is objective
                 if ($this->userLatitude && $this->userLongitude) {
                     $query->select('restaurants.*')
                         ->selectRaw('((latitude - ?) * (latitude - ?) + (longitude - ?) * (longitude - ?)) AS distance', [$this->userLatitude, $this->userLatitude, $this->userLongitude, $this->userLongitude])
@@ -390,7 +386,12 @@ class RestaurantList extends Component
                 }
                 break;
             case 'rating':
-                $query->orderByDesc('average_rating')->orderBy('name');
+                // Rating: subscription boost applies — premium/elite get slight priority among equals
+                $query->orderByRaw("CASE
+                    WHEN subscription_tier = 'elite' THEN 0
+                    WHEN subscription_tier = 'premium' THEN 1
+                    ELSE 2
+                END")->orderByDesc('average_rating')->orderBy('name');
                 break;
             case 'newest':
                 $query->latest();
@@ -420,6 +421,14 @@ class RestaurantList extends Component
             'food_stand' => 'Puesto de Comida',
         ];
 
+        $isEn = app()->getLocale() === 'en';
+        $listTitle = $isEn
+            ? 'Find Mexican Restaurants Near You | Browse 25,000+ Locations | FAMER'
+            : 'Buscar Restaurantes Mexicanos | Más de 25,000 Ubicaciones | FAMER';
+        $listDesc = $isEn
+            ? 'Search and filter authentic Mexican restaurants by city, state, cuisine type, and ratings. Discover top-rated birria spots, taco trucks, family restaurants, and more across the USA.'
+            : 'Busca y filtra restaurantes mexicanos auténticos por ciudad, estado, tipo de cocina y calificación. Descubre los mejores lugares de birria, taquerías, fondas familiares y más en todo EE.UU.';
+
         return view('livewire.restaurant-list', [
             'restaurants' => $restaurants,
             'states' => $states,
@@ -430,7 +439,10 @@ class RestaurantList extends Component
             'userLatitude' => $this->userLatitude,
             'userLongitude' => $this->userLongitude,
             'locationSource' => $this->locationSource,
-        ])->layout('layouts.app', ['title' => 'Restaurantes Mexicanos']);
+        ])->layout('layouts.app', [
+            'title'           => $listTitle,
+            'metaDescription' => $listDesc,
+        ]);
     }
 
     public function getDistanceToRestaurant($restaurant): ?float

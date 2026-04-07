@@ -90,7 +90,7 @@
                                             Quieres destacar sobre la competencia?
                                         </h3>
                                         <p style="color: rgba(255,255,255,0.9); margin: 0 0 15px 0; font-size: 14px;">
-                                            Actualiza a <strong>Premium</strong> por solo $29/mes y obtiene:
+                                            Actualiza a <strong>Premium</strong> por solo $39/mes y obtiene:
                                         </p>
                                         <p style="color: #fcd34d; margin: 0; font-size: 13px;">
                                             Insignia Premium | Analytics | Menu Digital + QR | Chatbot IA | Reservas Online

@@ -26,7 +26,7 @@
                             <svg style="width: 1.25rem; height: 1.25rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                             Ver Planes Disponibles
                         </a>
-                        <p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.75rem;">Desde $29/mes - Primer mes $9.99</p>
+                        <p style="font-size: 0.75rem; color: #6b7280; margin-top: 0.75rem;">Desde $39/mes - Primer mes $9.99</p>
                     </div>
                 </div>
                 <div style="filter: blur(4px); pointer-events: none; opacity: 0.4;">

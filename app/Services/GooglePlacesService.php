@@ -78,7 +78,16 @@ class GooglePlacesService
     }
 
     /**
-     * Obtener detalles completos de un lugar por Place ID
+     * Obtener detalles completos de un lugar por Place ID.
+     *
+     * Billing breakdown (Places API Legacy):
+     *   Basic    ($17/1000): name, formatted_address, geometry, business_status, photos, url
+     *   Contact  (+$3/1000): formatted_phone_number, website, opening_hours
+     *   Atmosphere (+$5/1000): rating, user_ratings_total
+     *
+     * "reviews" (Atmosphere) is intentionally excluded — FAMER has its own review
+     * system and Google reviews are never displayed. Removing it saves $5/1000 calls.
+     * Total: $20/1000 instead of $25/1000 = 20% cheaper per import.
      */
     public function getPlaceDetails($placeId)
     {
@@ -88,7 +97,7 @@ class GooglePlacesService
 
             $response = Http::get("{$this->baseUrl}/place/details/json", [
                 'place_id' => $placeId,
-                'fields' => 'name,formatted_address,geometry,formatted_phone_number,website,opening_hours,business_status,rating,user_ratings_total,photos,url,reviews',
+                'fields' => 'name,formatted_address,geometry,formatted_phone_number,website,opening_hours,business_status,rating,user_ratings_total,photos,url',
                 'key' => $this->apiKey,
             ]);
 
@@ -224,6 +233,40 @@ class GooglePlacesService
     }
 
     /**
+     * Buscar múltiples restaurantes por nombre y ciudad (Text Search)
+     * Usado por SmartSuggestionForm cuando Yelp falla o se necesitan más resultados
+     */
+    public function searchPlaces(string $name, string $city, string $state, int $limit = 5): array
+    {
+        $query = "{$name} restaurant {$city}, {$state}";
+
+        try {
+            $this->checkAndTrackUsage('google_places_text_search', 1);
+
+            $response = Http::get("{$this->baseUrl}/place/textsearch/json", [
+                'query' => $query,
+                'type' => 'restaurant',
+                'key' => $this->apiKey,
+            ]);
+
+            $this->trackUsage('google_places_text_search', 'textsearch', 1, [
+                'query' => $query,
+                'status' => $response->json('status'),
+            ]);
+
+            if ($response->successful() && in_array($response->json('status'), ['OK', 'ZERO_RESULTS'])) {
+                $results = $response->json('results') ?? [];
+                return array_slice($results, 0, $limit);
+            }
+
+            return [];
+        } catch (\Exception $e) {
+            Log::error('Google Places Text Search Error: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
      * Actualizar un restaurante con información de Google Places
      * OPTIMIZADO: Solo hace 2 llamadas máximo (findPlace + getPlaceDetails)
      */
@@ -269,5 +312,101 @@ class GooglePlacesService
         ]);
 
         return true;
+    }
+
+    /**
+     * Convert Google Places weekday_text to schema.org openingHours format.
+     * Input: ["Monday: 11:00 AM – 10:00 PM", "Tuesday: Closed", ...]
+     * Output: ["Mo 11:00-22:00", "Tu 11:00-22:00", ...] or [] if unparseable
+     */
+    public function parseOpeningHoursSchema(array $weekdayText): array
+    {
+        $dayMap = [
+            'Monday' => 'Mo', 'Tuesday' => 'Tu', 'Wednesday' => 'We',
+            'Thursday' => 'Th', 'Friday' => 'Fr', 'Saturday' => 'Sa', 'Sunday' => 'Su',
+        ];
+
+        $result = [];
+
+        foreach ($weekdayText as $line) {
+            // Format: "Monday: 11:00 AM – 10:00 PM" or "Monday: Closed" or "Monday: Open 24 hours"
+            if (!preg_match('/^(\w+):\s+(.+)$/', $line, $m)) continue;
+
+            $dayName = $m[1];
+            $hours = trim($m[2]);
+            $dayCode = $dayMap[$dayName] ?? null;
+            if (!$dayCode) continue;
+
+            if (strtolower($hours) === 'closed') continue; // Skip closed days
+            if (strtolower($hours) === 'open 24 hours') {
+                $result[] = "{$dayCode} 00:00-23:59";
+                continue;
+            }
+
+            // Handle "11:00 AM – 10:00 PM" or "11:00 AM – 2:00 AM" (next-day close)
+            // The dash is an en-dash (–), not a hyphen
+            $hours = str_replace('–', '-', $hours); // normalize dash
+            if (!preg_match('/^(\d{1,2}:\d{2}\s*[AP]M)\s*-\s*(\d{1,2}:\d{2}\s*[AP]M)$/i', $hours, $hm)) continue;
+
+            $open = $this->convertTo24h($hm[1]);
+            $close = $this->convertTo24h($hm[2]);
+            if (!$open || !$close) continue;
+
+            $result[] = "{$dayCode} {$open}-{$close}";
+        }
+
+        // Merge consecutive days with same hours into ranges (Mo-Fr 11:00-22:00)
+        return $this->mergeConsecutiveDays($result);
+    }
+
+    private function convertTo24h(string $time12): ?string
+    {
+        $time12 = trim($time12);
+        if (!preg_match('/^(\d{1,2}):(\d{2})\s*([AP]M)$/i', $time12, $m)) return null;
+        $h = (int)$m[1];
+        $min = $m[2];
+        $ampm = strtoupper($m[3]);
+        if ($ampm === 'AM') {
+            if ($h === 12) $h = 0;
+        } else {
+            if ($h !== 12) $h += 12;
+            if ($h >= 24) $h = 0; // midnight expressed as 12:00 AM next day
+        }
+        return sprintf('%02d:%s', $h, $min);
+    }
+
+    private function mergeConsecutiveDays(array $entries): array
+    {
+        $dayOrder = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+        // Build map: dayCode => hours string
+        $map = [];
+        foreach ($entries as $e) {
+            if (preg_match('/^(\w{2}) (.+)$/', $e, $m)) {
+                $map[$m[1]] = $m[2];
+            }
+        }
+
+        $merged = [];
+        $i = 0;
+        while ($i < count($dayOrder)) {
+            $day = $dayOrder[$i];
+            if (!isset($map[$day])) { $i++; continue; }
+            $hours = $map[$day];
+            $rangeStart = $day;
+            $rangeEnd = $day;
+            // Extend range while next days have same hours
+            while (($i + 1) < count($dayOrder)) {
+                $nextDay = $dayOrder[$i + 1];
+                if (($map[$nextDay] ?? null) === $hours) {
+                    $rangeEnd = $nextDay;
+                    $i++;
+                } else break;
+            }
+            $merged[] = ($rangeStart === $rangeEnd)
+                ? "{$rangeStart} {$hours}"
+                : "{$rangeStart}-{$rangeEnd} {$hours}";
+            $i++;
+        }
+        return $merged;
     }
 }

@@ -85,8 +85,8 @@ return new class extends Migration
                 $table->timestamp('published_at')->nullable();
                 $table->timestamps();
                 
-                $table->unique(['restaurant_id', 'year', 'ranking_type', 'ranking_scope']);
-                $table->index(['year', 'ranking_type', 'ranking_scope', 'position']);
+                $table->unique(['restaurant_id', 'year', 'ranking_type', 'ranking_scope'], 'rest_rankings_unique');
+                $table->index(['year', 'ranking_type', 'ranking_scope', 'position'], 'rest_rankings_idx');
             });
         }
 

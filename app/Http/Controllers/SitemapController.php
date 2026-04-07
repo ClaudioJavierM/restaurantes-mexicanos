@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BlogPost;
 use App\Models\Restaurant;
 use App\Models\State;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 
@@ -50,6 +52,21 @@ class SitemapController extends Controller
             $xml .= '<lastmod>' . now()->format('Y-m-d') . '</lastmod>';
             $xml .= '</sitemap>';
 
+            $xml .= '<sitemap>';
+            $xml .= '<loc>' . $baseUrl . '/sitemap-blog.xml</loc>';
+            $xml .= '<lastmod>' . now()->format('Y-m-d') . '</lastmod>';
+            $xml .= '</sitemap>';
+
+            $xml .= '<sitemap>';
+            $xml .= '<loc>' . $baseUrl . '/sitemap-states.xml</loc>';
+            $xml .= '<lastmod>' . now()->format('Y-m-d') . '</lastmod>';
+            $xml .= '</sitemap>';
+
+            $xml .= '<sitemap>';
+            $xml .= '<loc>' . $baseUrl . '/sitemap-dishes.xml</loc>';
+            $xml .= '<lastmod>' . now()->format('Y-m-d') . '</lastmod>';
+            $xml .= '</sitemap>';
+
             $xml .= '</sitemapindex>';
 
             return $xml;
@@ -71,9 +88,52 @@ class SitemapController extends Controller
 
             $xml .= $this->addUrl($baseUrl . '/', now(), 'daily', '1.0');
             $xml .= $this->addUrl($baseUrl . '/restaurantes', now(), 'daily', '0.9');
+
+            // High-value owner/tool pages
+            $xml .= $this->addUrl($baseUrl . '/for-owners', now()->subMonth(), 'monthly', '0.8');
+            $xml .= $this->addUrl($baseUrl . '/grader', now()->subMonth(), 'monthly', '0.8');
+            $xml .= $this->addUrl($baseUrl . '/famer-awards', now()->subMonth(), 'monthly', '0.7');
+
+            // Suggest page
             $xml .= $this->addUrl($baseUrl . '/sugerir', now()->subMonth(), 'monthly', '0.5');
-            $xml .= $this->addUrl($baseUrl . '/mejores-restaurantes-mexicanos', now(), 'weekly', '0.9');
-            $xml .= $this->addUrl($baseUrl . '/top-10-restaurantes-mexicanos', now(), 'weekly', '0.9');
+
+
+            // Rankings
+            \ .= \->addUrl(\ . '/mejores-restaurantes-mexicanos', now(), 'weekly', '0.9');
+            \ .= \->addUrl(\ . '/top-10-restaurantes-mexicanos', now(), 'weekly', '0.9');
+
+            // Dish-specific landing pages
+            foreach (['birria','tamales','pozole','enchiladas','tacos-al-pastor','mole','menudo','chiles-rellenos','carne-asada','carnitas','barbacoa'] as $dish) {
+                $xml .= $this->addUrl($baseUrl . '/' . $dish, now()->subWeek(), 'weekly', '0.8');
+            }
+
+            // Dish near-me pages
+            foreach (['birria','tamales','pozole','carnitas','barbacoa','mole','carne-asada'] as $dish) {
+                $xml .= $this->addUrl($baseUrl . '/' . $dish . '-cerca-de-mi', now()->subWeek(), 'weekly', '0.8');
+            }
+
+            // Near-me page
+            $xml .= $this->addUrl($baseUrl . '/restaurantes-mexicanos-cerca-de-mi', now()->subWeek(), 'weekly', '0.8');
+
+            // State-level dish pages (90 URLs: 6 dishes x 15 states)
+            $dishStates = ['birria','tamales','pozole','carnitas','barbacoa','mole'];
+            $statesForDish = ['tx','ca','il','az','fl','co','nv','nm','ny','ga','wa','nc','or','ut','tn'];
+            foreach ($dishStates as $dish) {
+                foreach ($statesForDish as $state) {
+                    $xml .= $this->addUrl($baseUrl . '/' . $dish . '-en-' . $state, now()->subMonth(), 'monthly', '0.7');
+                }
+            }
+
+            // Category pages (clean URLs, not query strings)
+            $categories = Category::has('restaurants')->select('slug', 'updated_at')->get();
+            foreach ($categories as $category) {
+                $xml .= $this->addUrl(
+                    $baseUrl . '/restaurantes/categoria/' . $category->slug,
+                    $category->updated_at ?? now()->subWeek(),
+                    'daily',
+                    '0.7'
+                );
+            }
 
             $xml .= '</urlset>';
             return $xml;
@@ -102,7 +162,7 @@ class SitemapController extends Controller
 
             foreach ($restaurants as $restaurant) {
                 $xml .= $this->addUrl(
-                    $baseUrl . '/restaurante/' . $restaurant->slug,
+                    $baseUrl . $this->getRestaurantPath() . $restaurant->slug,
                     $restaurant->updated_at,
                     'weekly',
                     '0.8'
@@ -127,7 +187,8 @@ class SitemapController extends Controller
         $xml = Cache::remember($cacheKey, 3600, function () use ($baseUrl) {
             $xml = $this->openUrlset();
 
-            $xml .= $this->addUrl($baseUrl . '/guia', now(), 'weekly', '0.8');
+            // Guides index
+            $xml .= $this->addUrl($baseUrl . '/guia', now(), 'weekly', '0.9');
 
             $states = State::has('restaurants')
                 ->select('id', 'name', 'code', 'slug', 'updated_at')
@@ -210,6 +271,120 @@ class SitemapController extends Controller
         return $this->xmlResponse($xml);
     }
 
+    /**
+     * Blog posts sitemap (published posts only).
+     */
+    public function blog(): Response
+    {
+        $baseUrl = $this->getBaseUrl();
+        $cacheKey = 'sitemap_blog_' . md5($baseUrl);
+
+        $xml = Cache::remember($cacheKey, 3600, function () use ($baseUrl) {
+            $xml = $this->openUrlset();
+
+            $blogPosts = BlogPost::where('is_published', true)
+                ->select('slug', 'updated_at')
+                ->orderBy('updated_at', 'desc')
+                ->get();
+
+            foreach ($blogPosts as $post) {
+                $xml .= $this->addUrl(
+                    $baseUrl . '/blog/' . $post->slug,
+                    $post->updated_at,
+                    'monthly',
+                    '0.6'
+                );
+            }
+
+            $xml .= '</urlset>';
+            return $xml;
+        });
+
+        return $this->xmlResponse($xml);
+    }
+
+    /**
+     * State landing pages sitemap (/restaurantes-mexicanos-en-{stateSlug}).
+     */
+    public function states(): Response
+    {
+        $baseUrl = $this->getBaseUrl();
+        $cacheKey = 'sitemap_states_' . md5($baseUrl);
+
+        $xml = Cache::remember($cacheKey, 3600, function () use ($baseUrl) {
+            $xml = $this->openUrlset();
+
+            $states = State::whereHas('restaurants')
+                ->select('id', 'name', 'updated_at')
+                ->get();
+
+            foreach ($states as $state) {
+                $stateSlug = Str::slug($state->name);
+                $xml .= $this->addUrl(
+                    $baseUrl . '/restaurantes-mexicanos-en-' . $stateSlug,
+                    $state->updated_at ?? now()->subWeek(),
+                    'weekly',
+                    '0.7'
+                );
+            }
+
+            $xml .= '</urlset>';
+            return $xml;
+        });
+
+        return $this->xmlResponse($xml);
+    }
+
+    /**
+     * City+dish combination pages sitemap (/{dish}-en-{citySlug}-{stateCode}).
+     */
+    public function dishes(): Response
+    {
+        $baseUrl = $this->getBaseUrl();
+        $cacheKey = 'sitemap_dishes_' . md5($baseUrl);
+
+        $xml = Cache::remember($cacheKey, 3600, function () use ($baseUrl) {
+            $xml = $this->openUrlset();
+
+            $dishes = [
+                'birria','tacos','tamales','enchiladas','pozole','carnitas',
+                'chile-relleno','mole','chiles-en-nogada','tortas','burritos',
+                'quesadillas','sopes','tostadas','gorditas','tlayudas','menudo',
+                'barbacoa','huaraches','flautas','chilaquiles','chalupas',
+            ];
+
+            // Top 50 cities × 22 dishes = up to 1,100 URLs
+            $cityStates = Restaurant::query()
+                ->join('states', 'restaurants.state_id', '=', 'states.id')
+                ->whereNotNull('restaurants.city')
+                ->where('restaurants.city', '!=', '')
+                ->select('restaurants.city', DB::raw('states.code as state_code'), DB::raw('COUNT(*) as cnt'))
+                ->groupBy('restaurants.city', 'states.code')
+                ->orderByDesc('cnt')
+                ->limit(50)
+                ->get();
+
+            foreach ($cityStates as $location) {
+                $citySlug   = Str::slug($location->city);
+                $stateCode  = strtolower($location->state_code);
+
+                foreach ($dishes as $dish) {
+                    $xml .= $this->addUrl(
+                        $baseUrl . '/' . $dish . '-en-' . $citySlug . '-' . $stateCode,
+                        now()->subMonth(),
+                        'monthly',
+                        '0.5'
+                    );
+                }
+            }
+
+            $xml .= '</urlset>';
+            return $xml;
+        });
+
+        return $this->xmlResponse($xml);
+    }
+
     // ─── Helpers ──────────────────────────────────────────
 
     protected function getBaseUrl(): string
@@ -222,6 +397,12 @@ class SitemapController extends Controller
             str_contains($currentDomain, 'restaurantesmexicanosfamosos') => 'https://restaurantesmexicanosfamosos.com',
             default => url('/'),
         };
+    }
+
+    protected function getRestaurantPath(): string
+    {
+        $host = request()->getHost();
+        return str_contains($host, 'famousmexicanrestaurants') ? '/restaurant/' : '/restaurante/';
     }
 
     protected function getTopCities(int $limit): \Illuminate\Support\Collection

@@ -78,7 +78,7 @@ return new class extends Migration
                 $table->timestamps();
                 
                 $table->unique(['restaurant_id', 'year', 'month', 'ranking_type', 'ranking_scope'], 'unique_monthly_ranking');
-                $table->index(['year', 'month', 'ranking_type', 'ranking_scope', 'position']);
+                $table->index(['year', 'month', 'ranking_type', 'ranking_scope', 'position'], 'monthly_rankings_idx');
             });
         }
 

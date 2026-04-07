@@ -13,21 +13,24 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans text-gray-900 antialiased">
-        <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
-            <div>
-                <a href="/">
-                    <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
-                </a>
+        <div class="min-h-screen flex flex-col items-center bg-gray-100">
+            <!-- Gradient Header Bar -->
+            <div class="w-full py-6" style="background: linear-gradient(135deg, #059669 0%, #C9A84C 100%);">
+                <div class="flex justify-center">
+                    <a href="/">
+                        <img src="{{ asset('images/branding/logo-famer-full.png') }}" alt="FAMER" class="h-12">
+                    </a>
+                </div>
             </div>
 
-            <div class="w-full sm:max-w-lg mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
+            <div class="w-full sm:max-w-lg mt-8 px-6 py-6 bg-white shadow-md overflow-hidden sm:rounded-lg">
                 <div class="text-center mb-6">
                     <h2 class="text-2xl font-bold text-gray-900">Invitacion de Equipo</h2>
                     <p class="mt-2 text-gray-600">Has sido invitado a unirte al equipo</p>
                 </div>
 
                 <!-- Restaurant Info -->
-                <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                <div class="bg-gray-50 rounded-lg p-4 mb-4">
                     <div class="flex items-center space-x-4">
                         @php
                             $photo = $member->restaurant->getMedia('photos')->first();
@@ -48,6 +51,12 @@
                             <p class="text-gray-600 text-sm">{{ $member->restaurant->city }}{{ $member->restaurant->state ? ', ' . $member->restaurant->state->name : '' }}</p>
                         </div>
                     </div>
+                </div>
+
+                <!-- Invitee Email -->
+                <div class="bg-emerald-50 rounded-lg p-4 mb-6 text-center">
+                    <p class="text-sm text-gray-500">Invitacion para:</p>
+                    <p class="font-medium text-gray-900">{{ $member->user->email }}</p>
                 </div>
 
                 <!-- Role Info -->
@@ -149,6 +158,13 @@
                 <p class="mt-4 text-center text-xs text-gray-500">
                     Al aceptar, tendras acceso al panel de administracion del restaurante con los permisos de tu rol.
                 </p>
+            </div>
+
+            <!-- Footer -->
+            <div class="w-full mt-8 py-6 text-center">
+                <img src="{{ asset('images/branding/logo-famer-full.png') }}" alt="FAMER" class="h-8 mx-auto mb-2 opacity-60">
+                <p class="text-xs text-gray-400">FAMER - Restaurantes Mexicanos Famosos</p>
+                <p class="text-xs text-gray-400 mt-1">&copy; {{ date('Y') }} Todos los derechos reservados.</p>
             </div>
         </div>
     </body>

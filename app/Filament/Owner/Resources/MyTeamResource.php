@@ -194,7 +194,7 @@ class MyTeamResource extends Resource
                             try {
                                 Mail::to($record->user->email)->send(new TeamInvitation($record));
                             } catch (\Exception $e) {
-                                // Log error silently
+                                \Log::error('Team invitation email failed: ' . $e->getMessage());
                             }
                         }
 

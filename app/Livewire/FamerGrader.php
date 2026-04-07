@@ -10,6 +10,7 @@ use App\Services\FamerScoreService;
 use App\Services\YelpFusionService;
 use App\Services\GooglePlacesService;
 use App\Mail\FamerScoreReport;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -17,7 +18,7 @@ use Livewire\Attributes\Url;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 
-#[Layout('layouts.app')]
+#[Layout('layouts.owners-public')]
 #[Title('FAMER Score - Califica tu Restaurante Mexicano')]
 class FamerGrader extends Component
 {
@@ -52,6 +53,12 @@ class FamerGrader extends Component
     public bool $emailSubmitted = false;
     public bool $isSendingEmail = false;
 
+    // Scan step data for frontend animation
+    public array $scanStepData = [];
+
+    // Platform stats (dynamic, rounded to nearest 1000)
+    public int $totalRestaurantsRounded = 0;
+
     // Messages
     public string $errorMessage = '';
     public string $successMessage = '';
@@ -72,6 +79,12 @@ class FamerGrader extends Component
 
     public function mount(?string $slug = null)
     {
+        // Dynamic restaurant count rounded to nearest 1000
+        $total = Cache::remember('grader_total_restaurants', 3600, function () {
+            return Restaurant::approved()->forCurrentCountry()->count();
+        });
+        $this->totalRestaurantsRounded = (int) (floor($total / 1000) * 1000);
+
         // If a restaurant slug is provided, load it directly
         if ($slug) {
             $restaurant = Restaurant::where('slug', $slug)
@@ -390,6 +403,78 @@ class FamerGrader extends Component
         ];
         $this->isExternalRestaurant = false;
 
+        // Build primary image URL
+        $imgUrl = $restaurant->getFirstMediaUrl('images') ?: $restaurant->getFirstMediaUrl('logo');
+
+        // Populate scan step data for frontend animation
+        $this->scanStepData = [
+            'restaurant' => [
+                'name' => $restaurant->name,
+                'address' => $restaurant->address,
+                'city' => $restaurant->city,
+                'state' => $restaurant->state->code ?? '',
+                'lat' => $restaurant->latitude,
+                'lng' => $restaurant->longitude,
+                'phone' => $restaurant->phone,
+                'website' => $restaurant->website,
+                'image' => $imgUrl,
+            ],
+            'competitors' => [],
+            'reviews' => [],
+            'photos' => [],
+            'google_rating' => $restaurant->google_rating,
+            'google_reviews_count' => $restaurant->google_reviews_count,
+            'yelp_rating' => $restaurant->yelp_rating,
+            'yelp_reviews_count' => $restaurant->yelp_reviews_count,
+        ];
+
+        // Competitors: up to 5 other restaurants in the same city
+        $competitors = Restaurant::where('status', 'approved')
+            ->where('is_active', true)
+            ->where('city', $restaurant->city)
+            ->where('state_id', $restaurant->state_id)
+            ->where('id', '!=', $restaurant->id)
+            ->orderByDesc('google_rating')
+            ->limit(5)
+            ->get(['name', 'google_rating', 'google_reviews_count', 'address']);
+
+        $this->scanStepData['competitors'] = $competitors->map(fn($c) => [
+            'name' => $c->name,
+            'rating' => $c->google_rating,
+            'reviews' => $c->google_reviews_count,
+        ])->toArray();
+
+        // Reviews: recent approved reviews
+        $reviews = $restaurant->reviews()
+            ->where('status', 'approved')
+            ->latest()
+            ->limit(5)
+            ->get();
+
+        $this->scanStepData['reviews'] = $reviews->map(fn($r) => [
+            'name' => $r->reviewer_name ?? 'Anonymous',
+            'rating' => $r->rating,
+            'comment' => $r->comment,
+            'date' => $r->created_at->diffForHumans(),
+        ])->toArray();
+
+        // Photos: collect from multiple sources
+        $photos = [];
+        if ($restaurant->image) {
+            $photos[] = str_starts_with($restaurant->image, 'http') ? $restaurant->image : asset('storage/' . $restaurant->image);
+        }
+        foreach ($restaurant->getMedia('images') as $media) {
+            $photos[] = $media->getUrl();
+            if (count($photos) >= 8) break;
+        }
+        if (is_array($restaurant->yelp_photos)) {
+            foreach ($restaurant->yelp_photos as $photo) {
+                $photos[] = $photo;
+                if (count($photos) >= 8) break;
+            }
+        }
+        $this->scanStepData['photos'] = array_slice($photos, 0, 8);
+
         // Calculate score
         $famerScore = $this->scoreService->getScore($restaurant);
 
@@ -424,6 +509,26 @@ class FamerGrader extends Component
             'google_place_id' => $result['google_place_id'] ?? null,
             'google_rating' => $result['rating'] ?? null,
             'google_reviews' => $result['review_count'] ?? 0,
+        ];
+
+        // Populate scan step data for external restaurant
+        $this->scanStepData = [
+            'restaurant' => [
+                'name' => $result['name'] ?? '',
+                'address' => $result['address'] ?? '',
+                'city' => $result['city'] ?? '',
+                'state' => $result['state_code'] ?? $result['state'] ?? '',
+                'lat' => $result['lat'] ?? null,
+                'lng' => $result['lng'] ?? null,
+                'phone' => $result['phone'] ?? null,
+                'website' => $result['website'] ?? null,
+                'image' => $result['image_url'] ?? $result['image'] ?? null,
+            ],
+            'competitors' => [],
+            'reviews' => [],
+            'photos' => $result['photos'] ?? [],
+            'google_rating' => $result['rating'] ?? null,
+            'google_reviews_count' => $result['review_count'] ?? null,
         ];
 
         $partialScore = $this->scoreService->calculateExternalScore($externalData);
@@ -554,6 +659,7 @@ class FamerGrader extends Component
             'hasSearched',
             'errorMessage',
             'successMessage',
+            'scanStepData',
         ]);
         $this->resetScore();
     }
@@ -566,6 +672,7 @@ class FamerGrader extends Component
         $this->selectedRestaurantId = null;
         $this->selectedRestaurant = null;
         $this->scoreData = null;
+        $this->scanStepData = [];
         $this->isExternalRestaurant = false;
         $this->showAnalysis = false;
         $this->analysisComplete = false;

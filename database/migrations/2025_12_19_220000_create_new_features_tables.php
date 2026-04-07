@@ -20,7 +20,7 @@ return new class extends Migration
                 $table->integer('points_earned')->default(10);
                 $table->timestamps();
                 
-                $table->index(['user_id', 'restaurant_id', 'created_at']);
+                $table->index(['user_id', 'restaurant_id', 'created_at'], 'features_user_rest_idx');
             });
         }
 
@@ -73,7 +73,7 @@ return new class extends Migration
                 $table->string('applicable_for')->default('all'); // all, dine_in, takeout, delivery
                 $table->timestamps();
                 
-                $table->index(['restaurant_id', 'is_active', 'starts_at', 'ends_at']);
+                $table->index(['restaurant_id', 'is_active', 'starts_at', 'ends_at'], 'features_restaurant_idx');
             });
         }
 
@@ -114,7 +114,7 @@ return new class extends Migration
                 $table->boolean('is_active')->default(true);
                 $table->timestamps();
                 
-                $table->index(['restaurant_id', 'event_date', 'is_active']);
+                $table->index(['restaurant_id', 'event_date', 'is_active'], 'features_rest_date_idx');
             });
         }
 
@@ -169,7 +169,7 @@ return new class extends Migration
                 $table->string('payment_method')->nullable();
                 $table->timestamps();
                 
-                $table->index(['restaurant_id', 'status', 'pickup_time']);
+                $table->index(['restaurant_id', 'status', 'pickup_time'], 'features_rest_status_idx');
             });
         }
 

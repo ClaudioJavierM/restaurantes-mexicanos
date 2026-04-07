@@ -32,6 +32,10 @@ class Restaurant extends Model implements HasMedia
         'name',
         'slug',
         'description',
+        'ai_description',
+        'ai_description_generated_at',
+        'ai_description_en',
+        'ai_description_en_generated_at',
         'email',
         'phone',
         'website',
@@ -53,10 +57,12 @@ class Restaurant extends Model implements HasMedia
         'dietary_options',
         'atmosphere',
         'special_features',
-        // Authenticity badges
+        // Authenticity badges (boolean flags — legacy)
         'chef_certified',
         'traditional_recipes',
         'imported_ingredients',
+        // Authenticity badges system (JSON array of verified badges)
+        'authenticity_badges',
         // Business features
         'accepts_reservations',
         'reservation_type',
@@ -168,6 +174,7 @@ class Restaurant extends Model implements HasMedia
         'owner_phone',
         // Images
         'image',
+        'photos',
         'logo',
         // FAMER Email Sequence
         'famer_email_1_sent_at',
@@ -176,6 +183,8 @@ class Restaurant extends Model implements HasMedia
     ];
 
     protected $casts = [
+        'ai_description_generated_at' => 'datetime',
+        'ai_description_en_generated_at' => 'datetime',
         'hours' => 'array',
         'is_featured' => 'boolean',
         'is_active' => 'boolean',
@@ -248,13 +257,66 @@ class Restaurant extends Model implements HasMedia
         'reservation_notify_email' => 'boolean',
         'reservation_send_confirmation' => 'boolean',
         'reservation_send_reminder' => 'boolean',
+        // Photo gallery
+        'photos' => 'array',
     ];
+
+    // ──────────────────────────────────────────────────────────────
+    // Authenticity Badges
+    // ──────────────────────────────────────────────────────────────
+
+    /**
+     * Return authenticity_badges as an array, always (never null).
+     * Each element: {id, icon, name, name_en, color, verified_at, verified_by}
+     */
+    public function getAuthenticityBadgesAttribute($value): array
+    {
+        return $value ? json_decode($value, true) ?? [] : [];
+    }
+
+    public function authenticityBadgeRequests(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(\App\Models\AuthenticityBadgeRequest::class);
+    }
+
+    // ──────────────────────────────────────────────────────────────
 
     public function getSlugOptions(): SlugOptions
     {
         return SlugOptions::create()
             ->generateSlugsFrom('name')
             ->saveSlugsTo('slug');
+    }
+
+    /**
+     * Returns the best available display image URL for listing pages.
+     * Priority: CDN URLs (image col if http, yelp_photos) → Spatie local files.
+     * Avoids 0-byte Spatie files that render as broken images.
+     */
+    public function getDisplayImageUrl(): ?string
+    {
+        // 1. image column — if it's already an absolute CDN URL, use it directly
+        if ($this->image && str_starts_with($this->image, 'http')) {
+            return $this->image;
+        }
+
+        // 2. yelp_photos — also CDN URLs, always valid
+        if (!empty($this->yelp_photos) && is_array($this->yelp_photos) && isset($this->yelp_photos[0])) {
+            return $this->yelp_photos[0];
+        }
+
+        // 3. Spatie 'images' collection — local file (may be 0 bytes)
+        $spatieUrl = $this->getFirstMediaUrl('images');
+        if ($spatieUrl) {
+            return $spatieUrl;
+        }
+
+        // 4. image column — local path fallback
+        if ($this->image) {
+            return \Illuminate\Support\Facades\Storage::url($this->image);
+        }
+
+        return null;
     }
 
     public function registerMediaCollections(): void
@@ -554,20 +616,7 @@ class Restaurant extends Model implements HasMedia
         return str_repeat('🌶️', $this->spice_level);
     }
 
-    public function getAuthenticityBadgesAttribute(): array
-    {
-        $badges = [];
-        if ($this->chef_certified) {
-            $badges[] = ['name' => 'Chef Certificado', 'icon' => '👨‍🍳', 'color' => 'blue'];
-        }
-        if ($this->traditional_recipes) {
-            $badges[] = ['name' => 'Recetas Tradicionales', 'icon' => '📖', 'color' => 'green'];
-        }
-        if ($this->imported_ingredients) {
-            $badges[] = ['name' => 'Ingredientes de México', 'icon' => '🇲🇽', 'color' => 'red'];
-        }
-        return $badges;
-    }
+    // Legacy accessor removed — merged into getAuthenticityBadgesAttribute() at line 269
 
     public function getPriceRangeSymbolAttribute(): string
     {
@@ -680,6 +729,91 @@ class Restaurant extends Model implements HasMedia
     public function getReservationHoursForDay(string $day): ?array
     {
         return data_get($this->reservation_hours, strtolower($day));
+    }
+
+    /**
+     * Check if restaurant is currently open based on opening_hours + timezone.
+     * Returns: 'open', 'closed', or null (no hours data)
+     */
+    public function getOpenStatusAttribute(): ?string
+    {
+        $hours = $this->opening_hours;
+        if (empty($hours) || empty($hours['periods'])) {
+            return null;
+        }
+
+        try {
+            // Use timezone from hours JSON, fallback to state-based guess
+            $tz = $hours['timezone'] ?? $this->guessTimezone();
+            $now = now()->setTimezone($tz);
+            $currentDay = (int) $now->format('w'); // 0=Sun, 6=Sat
+            $currentTime = (int) $now->format('Hi'); // e.g. 1430 for 2:30pm
+
+            foreach ($hours['periods'] as $period) {
+                $openDay  = $period['open']['day']  ?? null;
+                $closeDay = $period['close']['day'] ?? null;
+                $openTime  = (int) ($period['open']['time']  ?? 0);
+                $closeTime = (int) ($period['close']['time'] ?? 0);
+
+                if ($openDay === null) continue;
+
+                // Same-day period
+                if ($openDay === $currentDay) {
+                    // Closes after midnight (next day)
+                    if ($closeDay !== $openDay) {
+                        if ($currentTime >= $openTime) return 'open';
+                    } else {
+                        if ($currentTime >= $openTime && $currentTime < $closeTime) return 'open';
+                    }
+                }
+
+                // Period that started yesterday and closes today after midnight
+                $yesterday = ($currentDay + 6) % 7;
+                if ($openDay === $yesterday && $closeDay === $currentDay) {
+                    if ($currentTime < $closeTime) return 'open';
+                }
+            }
+
+            return 'closed';
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    protected function guessTimezone(): string
+    {
+        $code = $this->state?->code ?? '';
+        $tzMap = [
+            'HI' => 'Pacific/Honolulu',
+            'AK' => 'America/Anchorage',
+            'WA' => 'America/Los_Angeles', 'OR' => 'America/Los_Angeles',
+            'CA' => 'America/Los_Angeles', 'NV' => 'America/Los_Angeles',
+            'MT' => 'America/Denver', 'ID' => 'America/Denver',
+            'WY' => 'America/Denver', 'UT' => 'America/Denver',
+            'CO' => 'America/Denver', 'AZ' => 'America/Phoenix',
+            'NM' => 'America/Denver',
+            'ND' => 'America/Chicago', 'SD' => 'America/Chicago',
+            'NE' => 'America/Chicago', 'KS' => 'America/Chicago',
+            'MN' => 'America/Chicago', 'IA' => 'America/Chicago',
+            'MO' => 'America/Chicago', 'WI' => 'America/Chicago',
+            'IL' => 'America/Chicago', 'MI' => 'America/Detroit',
+            'IN' => 'America/Indiana/Indianapolis',
+            'OH' => 'America/New_York', 'KY' => 'America/New_York',
+            'TN' => 'America/Chicago', 'AL' => 'America/Chicago',
+            'MS' => 'America/Chicago', 'AR' => 'America/Chicago',
+            'LA' => 'America/Chicago', 'TX' => 'America/Chicago',
+            'OK' => 'America/Chicago',
+            'FL' => 'America/New_York', 'GA' => 'America/New_York',
+            'SC' => 'America/New_York', 'NC' => 'America/New_York',
+            'VA' => 'America/New_York', 'WV' => 'America/New_York',
+            'MD' => 'America/New_York', 'DE' => 'America/New_York',
+            'PA' => 'America/New_York', 'NJ' => 'America/New_York',
+            'NY' => 'America/New_York', 'CT' => 'America/New_York',
+            'RI' => 'America/New_York', 'MA' => 'America/New_York',
+            'VT' => 'America/New_York', 'NH' => 'America/New_York',
+            'ME' => 'America/New_York',
+        ];
+        return $tzMap[$code] ?? 'America/Chicago';
     }
 
     public function isOpenForReservations(string $day): bool

@@ -29,7 +29,7 @@ return new class extends Migration
             $table->timestamps();
             
             $table->unique(['restaurant_id', 'email']);
-            $table->index(['restaurant_id', 'email_subscribed']);
+            $table->index(['restaurant_id', 'email_subscribed'], 'cust_rest_email_idx');
             $table->index(['restaurant_id', 'source']);
             $table->index('birthday');
         });

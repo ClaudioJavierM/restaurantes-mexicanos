@@ -21,7 +21,7 @@ class OwnerController extends Controller
     {
         $restaurants = $request->user()
             ->restaurants()
-            ->with(['state:id,name,abbreviation', 'category:id,name'])
+            ->with(['state:id,name,code', 'category:id,name'])
             ->select([
                 'id', 'name', 'slug', 'address', 'city', 'phone', 'image',
                 'average_rating', 'total_reviews', 'is_claimed', 'status',

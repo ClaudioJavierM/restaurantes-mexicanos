@@ -80,7 +80,7 @@
                                     @if(!empty($item['modifiers']))
                                     <p class="text-xs text-gray-500 mt-1">
                                         @foreach($item['modifiers'] as $mod)
-                                            {{ $mod['name'] }}@if(!$loop->last), @endif
+                                            {{ is_array($mod) ? ($mod['name'] ?? '') : '' }}@if(!$loop->last), @endif
                                         @endforeach
                                     </p>
                                     @endif
