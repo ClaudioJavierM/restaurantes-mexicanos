@@ -855,5 +855,13 @@
     document.addEventListener("livewire:updated", () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
     });
+    document.addEventListener("livewire:morph", () => {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+    Livewire.hook('commit', ({ succeed }) => {
+        succeed(() => {
+            setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 100);
+        });
+    });
 </script>
 </div>
