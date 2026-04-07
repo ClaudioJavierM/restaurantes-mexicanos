@@ -551,14 +551,13 @@
     {{-- Carmen AI Chat: Premium/Elite restaurant detail pages only --}}
     @php
         $chatRestaurant = null;
-        $routeName = request()->route() ? request()->route()->getName() : 'no-route';
-        $routeSlug = request()->route() ? request()->route()->parameter('slug') : null;
-        $isRestaurantPage = $routeName === 'restaurants.show';
-        if($isRestaurantPage && $routeSlug) {
-            $chatRestaurant = \App\Models\Restaurant::where('slug', $routeSlug)->first();
+        if(request()->route() && request()->route()->getName() === 'restaurants.show') {
+            $slug = request()->route()->parameter('slug');
+            if($slug) {
+                $chatRestaurant = \App\Models\Restaurant::where('slug', $slug)->first();
+            }
         }
     @endphp
-    <!-- DEBUG-CHAT: route={{ $routeName }} slug={{ $routeSlug ?? 'null' }} isRestPage={{ $isRestaurantPage ? 'yes' : 'no' }} tier={{ $chatRestaurant->subscription_tier ?? 'none' }} -->
     @if($chatRestaurant && in_array($chatRestaurant->subscription_tier, ['premium', 'elite']))
         @include("partials.chat-widget")
     @endif
