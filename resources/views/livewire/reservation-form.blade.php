@@ -100,20 +100,20 @@
                     <!-- Date and Time -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-[#CCCCCC] mb-1">Fecha</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Fecha</label>
                             <input
                                 type="date"
                                 wire:model="reservationDate"
                                 min="{{ now()->format('Y-m-d') }}"
-                                class="w-full rounded-lg bg-[#1A1A1A] border-[#D4AF37]/30 text-[#F5F5F5] placeholder-[#6B7280] shadow-sm focus:border-[#D4AF37] focus:ring-[#D4AF37]"
+                                class="w-full rounded-lg bg-white border-gray-300 text-gray-900 placeholder-gray-400 shadow-sm focus:border-[#D4AF37] focus:ring-[#D4AF37]"
                             >
                             @error('reservationDate') <span class="text-danger-500 text-sm">{{ $message }}</span> @enderror
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-[#CCCCCC] mb-1">Hora</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Hora</label>
                             <select
                                 wire:model="reservationTime"
-                                class="w-full rounded-lg bg-[#1A1A1A] border-[#D4AF37]/30 text-[#F5F5F5] placeholder-[#6B7280] shadow-sm focus:border-[#D4AF37] focus:ring-[#D4AF37]"
+                                class="w-full rounded-lg bg-white border-gray-300 text-gray-900 placeholder-gray-400 shadow-sm focus:border-[#D4AF37] focus:ring-[#D4AF37]"
                             >
                                 <option value="">Seleccionar hora</option>
                                 @foreach($availableTimes as $value => $label)
@@ -127,10 +127,10 @@
                     <!-- Party Size and Occasion -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-[#CCCCCC] mb-1">Número de Personas</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Número de Personas</label>
                             <select
                                 wire:model="partySize"
-                                class="w-full rounded-lg bg-[#1A1A1A] border-[#D4AF37]/30 text-[#F5F5F5] placeholder-[#6B7280] shadow-sm focus:border-[#D4AF37] focus:ring-[#D4AF37]"
+                                class="w-full rounded-lg bg-white border-gray-300 text-gray-900 placeholder-gray-400 shadow-sm focus:border-[#D4AF37] focus:ring-[#D4AF37]"
                             >
                                 @foreach($partySizes as $value => $label)
                                     <option value="{{ $value }}">{{ $label }}</option>
@@ -139,10 +139,10 @@
                             @error('partySize') <span class="text-danger-500 text-sm">{{ $message }}</span> @enderror
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-[#CCCCCC] mb-1">Ocasión (opcional)</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Ocasión (opcional)</label>
                             <select
                                 wire:model="occasion"
-                                class="w-full rounded-lg bg-[#1A1A1A] border-[#D4AF37]/30 text-[#F5F5F5] placeholder-[#6B7280] shadow-sm focus:border-[#D4AF37] focus:ring-[#D4AF37]"
+                                class="w-full rounded-lg bg-white border-gray-300 text-gray-900 placeholder-gray-400 shadow-sm focus:border-[#D4AF37] focus:ring-[#D4AF37]"
                             >
                                 @foreach($occasions as $value => $label)
                                     <option value="{{ $value }}">{{ $label }}</option>
@@ -157,22 +157,22 @@
                             <p class="text-sm text-gray-600 mb-3">Información de contacto</p>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
-                                    <label class="block text-sm font-medium text-[#CCCCCC] mb-1">Nombre</label>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
                                     <input
                                         type="text"
                                         wire:model="guestName"
                                         placeholder="Tu nombre"
-                                        class="w-full rounded-lg bg-[#1A1A1A] border-[#D4AF37]/30 text-[#F5F5F5] placeholder-[#6B7280] shadow-sm focus:border-[#D4AF37] focus:ring-[#D4AF37]"
+                                        class="w-full rounded-lg bg-white border-gray-300 text-gray-900 placeholder-gray-400 shadow-sm focus:border-[#D4AF37] focus:ring-[#D4AF37]"
                                     >
                                     @error('guestName') <span class="text-danger-500 text-sm">{{ $message }}</span> @enderror
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-[#CCCCCC] mb-1">Email</label>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
                                     <input
                                         type="email"
                                         wire:model="guestEmail"
                                         placeholder="tu@email.com"
-                                        class="w-full rounded-lg bg-[#1A1A1A] border-[#D4AF37]/30 text-[#F5F5F5] placeholder-[#6B7280] shadow-sm focus:border-[#D4AF37] focus:ring-[#D4AF37]"
+                                        class="w-full rounded-lg bg-white border-gray-300 text-gray-900 placeholder-gray-400 shadow-sm focus:border-[#D4AF37] focus:ring-[#D4AF37]"
                                     >
                                     @error('guestEmail') <span class="text-danger-500 text-sm">{{ $message }}</span> @enderror
                                 </div>
@@ -182,24 +182,24 @@
 
                     <!-- Phone (always required) -->
                     <div>
-                        <label class="block text-sm font-medium text-[#CCCCCC] mb-1">Teléfono</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
                         <input
                             type="tel"
                             wire:model="guestPhone"
                             placeholder="(555) 123-4567"
-                            class="w-full rounded-lg bg-[#1A1A1A] border-[#D4AF37]/30 text-[#F5F5F5] placeholder-[#6B7280] shadow-sm focus:border-[#D4AF37] focus:ring-[#D4AF37]"
+                            class="w-full rounded-lg bg-white border-gray-300 text-gray-900 placeholder-gray-400 shadow-sm focus:border-[#D4AF37] focus:ring-[#D4AF37]"
                         >
                         @error('guestPhone') <span class="text-danger-500 text-sm">{{ $message }}</span> @enderror
                     </div>
 
                     <!-- Special Requests -->
                     <div>
-                        <label class="block text-sm font-medium text-[#CCCCCC] mb-1">Peticiones Especiales (opcional)</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Peticiones Especiales (opcional)</label>
                         <textarea
                             wire:model="specialRequests"
                             rows="2"
                             placeholder="Alergias, silla de bebé, etc."
-                            class="w-full rounded-lg bg-[#1A1A1A] border-[#D4AF37]/30 text-[#F5F5F5] placeholder-[#6B7280] shadow-sm focus:border-[#D4AF37] focus:ring-[#D4AF37]"
+                            class="w-full rounded-lg bg-white border-gray-300 text-gray-900 placeholder-gray-400 shadow-sm focus:border-[#D4AF37] focus:ring-[#D4AF37]"
                         ></textarea>
                     </div>
 

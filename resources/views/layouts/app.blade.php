@@ -548,7 +548,7 @@
     <!-- Dynamic Scripts -->
     @stack('scripts')
 
-    {{-- Carmen AI Chat: Premium/Elite restaurant detail pages only --}}
+    {{-- AI Chatbot (ChatGPT): Premium/Elite restaurant detail pages only --}}
     @php
         $chatRestaurant = null;
         if(request()->route() && request()->route()->getName() === 'restaurants.show') {
@@ -559,7 +559,7 @@
         }
     @endphp
     @if($chatRestaurant && in_array($chatRestaurant->subscription_tier, ['premium', 'elite']))
-        @include("partials.chat-widget")
+        @livewire('restaurant-chatbot', ['restaurant' => $chatRestaurant])
     @endif
 
     <!-- Google Tag Manager (body) -->
