@@ -25,7 +25,7 @@ class GenerateAiDescriptions extends Command
         $force   = $this->option('force');
         $lang    = $this->option('lang');
         $dryRun  = $this->option('dry-run');
-        $apiKey  = env('OPENAI_API_KEY');
+        $apiKey  = config('services.openai.api_key');
 
         if (! $apiKey) {
             $this->error('OPENAI_API_KEY not set in .env');
