@@ -63,9 +63,11 @@ class ClaimRestaurant extends Component
 
                 if ($restaurant->is_claimed) {
                     $this->step = "claimed_options";
+        $this->dispatch('scroll-top');
                 } else {
                     $this->detectAvailableMethods();
                     $this->step = "verify";
+        $this->dispatch('scroll-top');
                 }
             }
         }
@@ -137,11 +139,13 @@ class ClaimRestaurant extends Component
 
         $this->detectAvailableMethods();
         $this->step = 'verify';
+        $this->dispatch('scroll-top');
     }
 
     public function backToSearch()
     {
         $this->step = 'search';
+        $this->dispatch('scroll-top');
         $this->selectedRestaurant = null;
         $this->reset(['ownerName', 'ownerEmail', 'ownerPhone', 'verificationCode', 'codeError', 'availableMethods']);
     }
@@ -149,17 +153,20 @@ class ClaimRestaurant extends Component
     public function backToVerify()
     {
         $this->step = 'verify';
+        $this->dispatch('scroll-top');
         $this->reset(['verificationCode', 'codeError']);
     }
 
     public function backToVerifyCode()
     {
         $this->step = 'verify_code';
+        $this->dispatch('scroll-top');
     }
 
     public function backToSelectPlan()
     {
         $this->step = 'select_plan';
+        $this->dispatch('scroll-top');
     }
 
     public function submitVerification()
@@ -227,6 +234,7 @@ class ClaimRestaurant extends Component
         }
 
         $this->step = 'verify_code';
+        $this->dispatch('scroll-top');
     }
 
     /**
@@ -344,6 +352,7 @@ class ClaimRestaurant extends Component
         ]);
 
         $this->step = 'select_plan';
+        $this->dispatch('scroll-top');
     }
 
     public function resendCode()
@@ -392,6 +401,7 @@ class ClaimRestaurant extends Component
         }
 
         $this->step = 'payment';
+        $this->dispatch('scroll-top');
     }
 
     public function completeFreeClai()

@@ -175,7 +175,7 @@
         </div>
     </footer>
 
-    @include('partials.chat-widget')
+    {{-- @include('partials.chat-widget') --}}
 
     <script data-cfasync="false">/* Disable Rocket Loader for Livewire */</script>
     @livewireScripts

@@ -1,4 +1,4 @@
-<div class="min-h-screen py-12" style="background:#0B0B0B;">
+<div class="min-h-screen py-12" style="background:#0B0B0B;" x-data x-init="$watch('$wire.step', () => setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 50))">
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {{-- Progress Steps --}}
@@ -858,17 +858,5 @@
         </a>
     </div>
 
-<script>
-    document.addEventListener("livewire:updated", () => {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-    });
-    document.addEventListener("livewire:morph", () => {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-    });
-    Livewire.hook('commit', ({ succeed }) => {
-        succeed(() => {
-            setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 100);
-        });
-    });
-</script>
+
 </div>

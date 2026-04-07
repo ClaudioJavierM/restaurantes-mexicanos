@@ -61,7 +61,7 @@ class Home extends Component
 
     public function updatedLocationQuery()
     {
-        if (strlen($this->locationQuery) >= 2) {
+        if (is_string($this->locationQuery) && strlen($this->locationQuery) >= 2) {
             $geoService = app(GeoLocationService::class);
             $this->locationSuggestions = $geoService->searchLocations($this->locationQuery);
             $this->showLocationSuggestions = count($this->locationSuggestions) > 0;

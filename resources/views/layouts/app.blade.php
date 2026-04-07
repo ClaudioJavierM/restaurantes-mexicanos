@@ -559,7 +559,7 @@
             }
         }
     @endphp
-    @if($isOwnerPage || ($chatRestaurant && in_array($chatRestaurant->subscription_tier, ['premium', 'elite'])))
+    @if(!$isOwnerPage && $chatRestaurant && in_array($chatRestaurant->subscription_tier, ['premium', 'elite']))
         @include("partials.chat-widget")
     @endif
 
