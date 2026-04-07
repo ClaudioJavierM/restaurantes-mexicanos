@@ -548,18 +548,18 @@
     <!-- Dynamic Scripts -->
     @stack('scripts')
 
-    {{-- Carmen AI Chat: owner incentive pages + Premium/Elite restaurant detail pages --}}
+    {{-- Carmen AI Chat: Premium/Elite restaurant detail pages only --}}
     @php
         $chatRestaurant = null;
-        $isOwnerPage = request()->routeIs('for-owners', 'claim.restaurant', 'famer.grader', 'famer.grader.restaurant');
-        if(!$isOwnerPage && request()->route() && request()->route()->getName() === 'restaurants.show') {
-            $slug = request()->route()->parameter('slug');
-            if($slug) {
-                $chatRestaurant = \App\Models\Restaurant::where('slug', $slug)->first();
-            }
+        $routeName = request()->route() ? request()->route()->getName() : 'no-route';
+        $routeSlug = request()->route() ? request()->route()->parameter('slug') : null;
+        $isRestaurantPage = $routeName === 'restaurants.show';
+        if($isRestaurantPage && $routeSlug) {
+            $chatRestaurant = \App\Models\Restaurant::where('slug', $routeSlug)->first();
         }
     @endphp
-    @if(!$isOwnerPage && $chatRestaurant && in_array($chatRestaurant->subscription_tier, ['premium', 'elite']))
+    <!-- DEBUG-CHAT: route={{ $routeName }} slug={{ $routeSlug ?? 'null' }} isRestPage={{ $isRestaurantPage ? 'yes' : 'no' }} tier={{ $chatRestaurant->subscription_tier ?? 'none' }} -->
+    @if($chatRestaurant && in_array($chatRestaurant->subscription_tier, ['premium', 'elite']))
         @include("partials.chat-widget")
     @endif
 
