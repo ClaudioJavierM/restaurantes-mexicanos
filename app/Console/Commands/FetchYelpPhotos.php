@@ -42,7 +42,11 @@ class FetchYelpPhotos extends Command
 
         // Skip restaurants with photos unless --force
         if (!$this->option('force')) {
-            $query->doesntHave('media');
+            $query->doesntHave('media')
+                  ->where(function($q) {
+                      $q->whereNull('yelp_enriched_at')
+                        ->orWhere('yelp_enriched_at', '<', now()->subDays(30));
+                  });
         }
 
         $total = $query->count();
@@ -118,6 +122,7 @@ class FetchYelpPhotos extends Command
 
             if ($photoCount > 0) {
                 $this->fetched++;
+                $restaurant->update(['yelp_enriched_at' => now()]);
                 Log::info("Fetched {$photoCount} photos for {$restaurant->name}");
             } else {
                 $this->skipped++;

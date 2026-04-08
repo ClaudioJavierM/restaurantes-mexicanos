@@ -37,6 +37,10 @@ class BackfillYelpData extends Command
         // Only get restaurants missing data unless force is specified
         if (!$this->option('force')) {
             $query->where(function($q) {
+                // Skip restaurants already enriched in the last 30 days
+                $q->whereNull('yelp_enriched_at')
+                  ->orWhere('yelp_enriched_at', '<', now()->subDays(30));
+            })->where(function($q) {
                 $q->whereNull('yelp_photos')
                   ->orWhereNull('yelp_attributes')
                   ->orWhereNull('yelp_transactions')
@@ -128,6 +132,7 @@ class BackfillYelpData extends Command
                     }
                 } else {
                     if (!empty($updateData)) {
+                        $updateData['yelp_enriched_at'] = now();
                         $restaurant->update($updateData);
                         $updated++;
                     }

@@ -35,6 +35,10 @@ class FetchYelpCoordinates extends Command
             ->where(function ($q) {
                 $q->whereNull('latitude')
                   ->orWhereNull('longitude');
+            })
+            ->where(function($q) {
+                $q->whereNull('yelp_enriched_at')
+                  ->orWhere('yelp_enriched_at', '<', now()->subDays(30));
             });
 
         if ($source = $this->option('source')) {
@@ -122,6 +126,7 @@ class FetchYelpCoordinates extends Command
                 $updateData['phone'] = $details['display_phone'];
             }
 
+            $updateData['yelp_enriched_at'] = now();
             DB::table('restaurants')
                 ->where('id', $restaurant->id)
                 ->update($updateData);
