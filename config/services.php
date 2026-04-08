@@ -65,13 +65,14 @@ return [
         'client_id'     => env('YELP_CLIENT_ID'),
         'api_key'       => env('YELP_API_KEY'),
         'monthly_limit' => env('YELP_MONTHLY_LIMIT', 5000),
-        'api_keys' => array_values(array_filter([
-            env('YELP_API_KEY'),
-            env('YELP_API_KEY_MEXICO'),
-            env('YELP_API_KEY_US_2'),
-            env('YELP_API_KEY_US_3'),
-            env('YELP_API_KEY_US_4'),
-        ])),
+        'api_keys' => array_values(array_filter(array_merge(
+            [
+                env('YELP_API_KEY'),
+                env('YELP_API_KEY_MEXICO'),
+            ],
+            // Auto-discover YELP_API_KEY_US_2 through YELP_API_KEY_US_99
+            array_map(fn($i) => env("YELP_API_KEY_US_{$i}"), range(2, 99))
+        ))),
     ],
 
     'twilio' => [
