@@ -56,7 +56,7 @@ class OwnerAppController extends Controller
     /**
      * Returns a map of feature availability based on subscription tier.
      */
-    private function getTierFeatures(string $tier): array
+    private function getTierFeaturesMap(string $tier): array
     {
         $isPremium = in_array($tier, ['premium', 'elite']);
         $isElite   = $tier === 'elite';
@@ -153,7 +153,7 @@ class OwnerAppController extends Controller
                     'total_reviews', 'subscription_tier', 'subscription_status',
                     'city', 'phone', 'is_claimed',
                 ]),
-                'tier_features' => $this->getTierFeatures($restaurant->subscription_tier ?? 'free'),
+                'tier_features' => $this->getTierFeaturesMap($restaurant->subscription_tier ?? 'free'),
                 'total_reviews' => $restaurant->total_reviews ?? 0,
                 'average_rating' => (float) ($restaurant->average_rating ?? 0),
                 'pending_reservations' => $pendingReservations,
@@ -930,48 +930,6 @@ class OwnerAppController extends Controller
     }
 
     /**
-     * GET /v1/owner/subscription
-     * Returns available subscription plans and pricing.
-     */
-    public function subscription(Request $request): JsonResponse
-    {
-        $restaurant = $this->getRestaurant($request);
-        $currentTier = $restaurant?->subscription_tier ?? 'free';
-
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'current_tier' => $currentTier,
-                'plans' => [
-                    'free' => [
-                        'name' => 'Gratuito',
-                        'price_monthly' => 0,
-                        'features' => ['Perfil básico', 'Aparecer en búsquedas', '5 fotos'],
-                    ],
-                    'claimed' => [
-                        'name' => 'Reclamado',
-                        'price_monthly' => 0,
-                        'features' => ['Perfil verificado', 'Analytics básicos', 'Reservaciones', 'Editar menú', '10 fotos'],
-                    ],
-                    'premium' => [
-                        'name' => 'Premium',
-                        'price_monthly' => 39,
-                        'price_display' => '$39/mes',
-                        'promo_first_month' => '$9.99',
-                        'features' => ['Todo de Reclamado', 'Cupones y promociones', 'Listado destacado', 'Gestión de equipo', '25 fotos'],
-                    ],
-                    'elite' => [
-                        'name' => 'Elite',
-                        'price_monthly' => 79,
-                        'price_display' => '$79/mes',
-                        'features' => ['Todo de Premium', 'Analytics avanzados', 'Pedidos online', 'Fotos ilimitadas', 'Soporte prioritario', 'Badge Elite dorado'],
-                    ],
-                ],
-            ],
-        ]);
-    }
-
-    /**
      * DELETE /v1/owner/account
      * Deletes the authenticated owner's account.
      */
@@ -1092,7 +1050,7 @@ class OwnerAppController extends Controller
                 'started_at'         => $restaurant->subscription_started_at,
                 'expires_at'         => $restaurant->subscription_expires_at,
                 'has_stripe'         => !empty($restaurant->stripe_customer_id),
-                'features'           => $this->getTierFeatures($tier),
+                'features'           => $this->getTierFeaturesMap($tier),
                 'upgrade_url'        => url('/owner/upgrade-subscription'),
             ],
         ]);
