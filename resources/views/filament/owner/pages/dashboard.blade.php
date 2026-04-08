@@ -1,7 +1,7 @@
 <x-filament-panels::page>
     @php
         $restaurant = auth()->user()->allAccessibleRestaurants()->first();
-        $plan = $restaurant->subscription_plan ?? 'free';
+        $plan = $restaurant->subscription_tier ?? 'free';
         $isPremium = in_array($plan, ['premium', 'elite']);
         
         // Calculate profile completion
