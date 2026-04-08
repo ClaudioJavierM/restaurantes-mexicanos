@@ -892,25 +892,6 @@ class OwnerAppController extends Controller
     }
 
     /**
-     * Check if restaurant meets the required tier. Returns error response or null.
-     */
-    private function requireTier(Restaurant $restaurant, array $allowedTiers): ?JsonResponse
-    {
-        $tier = $restaurant->subscription_tier ?? 'free';
-
-        if (!in_array($tier, $allowedTiers)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Esta función requiere un plan superior. Actualiza a Premium ($39/mes) o Elite ($79/mes).',
-                'required_tiers' => $allowedTiers,
-                'current_tier' => $tier,
-            ], 403);
-        }
-
-        return null;
-    }
-
-    /**
      * GET /v1/owner/tier-features
      * Returns the feature map for the restaurant's current subscription tier.
      */
