@@ -109,9 +109,24 @@ class UpgradeSubscription extends Page
             return;
         }
 
-        // For paid plans — Stripe integration pending
-        session()->flash('error', 'El sistema de pagos con tarjeta está en proceso de configuración. Para actualizar tu plan, contáctanos a admin@restaurantesmexicanosfamosos.com.mx');
-        $this->dispatch('$refresh');
+        // For paid plans, redirect to Stripe Checkout
+        try {
+            $stripeService = new StripeService();
+
+            $successUrl = url('/owner') . '?upgrade=success&plan=' . $plan;
+            $cancelUrl = url('/owner/upgrade-subscription') . '?upgrade=cancelled';
+
+            $session = $stripeService->createCheckoutSession(
+                $this->restaurant,
+                $plan,
+                $successUrl . '&session_id={CHECKOUT_SESSION_ID}',
+                $cancelUrl
+            );
+
+            $this->redirect($session->url);
+        } catch (\Exception $e) {
+            session()->flash('error', 'Error al procesar el pago: ' . $e->getMessage());
+        }
     }
 
     public static function shouldRegisterNavigation(): bool
