@@ -99,8 +99,8 @@ class SitemapController extends Controller
 
 
             // Rankings
-            \ .= \->addUrl(\ . '/mejores-restaurantes-mexicanos', now(), 'weekly', '0.9');
-            \ .= \->addUrl(\ . '/top-10-restaurantes-mexicanos', now(), 'weekly', '0.9');
+            $xml .= $this->addUrl($baseUrl . '/mejores-restaurantes-mexicanos', now(), 'weekly', '0.9');
+            $xml .= $this->addUrl($baseUrl . '/top-10-restaurantes-mexicanos', now(), 'weekly', '0.9');
 
             // Dish-specific landing pages
             foreach (['birria','tamales','pozole','enchiladas','tacos-al-pastor','mole','menudo','chiles-rellenos','carne-asada','carnitas','barbacoa'] as $dish) {
