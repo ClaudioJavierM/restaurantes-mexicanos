@@ -27,7 +27,7 @@ class UpgradeSubscription extends Page
         $this->restaurant = $user->allAccessibleRestaurants()->first();
 
         if ($this->restaurant) {
-            $this->currentPlan = $this->restaurant->subscription_plan ?? 'free';
+            $this->currentPlan = $this->restaurant->subscription_tier ?? 'free';
         }
 
         $this->plans = [
@@ -88,7 +88,7 @@ class UpgradeSubscription extends Page
         // If downgrading to free
         if ($plan === 'free') {
             $this->restaurant->update([
-                'subscription_plan' => 'free',
+                'subscription_tier' => 'free',
                 'subscription_status' => 'active',
                 'premium_badge' => false,
                 'premium_analytics' => false,
@@ -109,21 +109,9 @@ class UpgradeSubscription extends Page
             return;
         }
 
-        // For paid plans, redirect to Stripe Checkout
-        try {
-            $stripeService = new StripeService();
-            
-            $session = $stripeService->createUpgradeCheckoutSession(
-                $this->restaurant,
-                $plan,
-                route('owner.upgrade.success') . '?session_id={CHECKOUT_SESSION_ID}',
-                route('owner.upgrade.cancel')
-            );
-
-            redirect($session->url);
-        } catch (\Exception $e) {
-            session()->flash('error', 'Error al procesar: ' . $e->getMessage());
-        }
+        // For paid plans — Stripe integration pending
+        session()->flash('error', 'El sistema de pagos con tarjeta está en proceso de configuración. Para actualizar tu plan, contáctanos a admin@restaurantesmexicanosfamosos.com.mx');
+        $this->dispatch('$refresh');
     }
 
     public static function shouldRegisterNavigation(): bool
