@@ -25,7 +25,7 @@ class EmailStatsOverview extends BaseWidget
         // This month stats
         $monthTotal = EmailLog::where('sent_at', '>=', $thisMonth)->count();
         $monthOpened = EmailLog::where('sent_at', '>=', $thisMonth)->whereNotNull('opened_at')->count();
-        $monthClicked = EmailLog::where('sent_at', '>=', $thisMonth)->whereNotNull('first_clicked_at')->count();
+        $monthClicked = EmailLog::where('sent_at', '>=', $thisMonth)->whereNotNull('clicked_at')->count();
 
         // Calculate open rate
         $totalSent = EmailLog::whereIn('status', ['sent', 'delivered', 'opened', 'clicked'])->count();
