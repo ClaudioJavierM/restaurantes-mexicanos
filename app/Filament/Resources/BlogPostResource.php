@@ -19,9 +19,9 @@ class BlogPostResource extends Resource
 
     protected static ?string $navigationLabel = 'Blog Posts';
 
-    protected static ?string $navigationGroup = 'Contenido';
+    protected static ?string $navigationGroup = 'Marketing & SEO';
 
-    protected static ?int $navigationSort = 10;
+    protected static ?int $navigationSort = 4;
 
     protected static bool $isLazy = true;
 

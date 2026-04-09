@@ -48,7 +48,11 @@ class BackfillYelpImages extends Command
                 $q->whereNull('image')
                   ->orWhere('image', '');
             })
-            ->doesntHave('media');
+            ->doesntHave('media')
+            ->where(function($q) {
+                $q->whereNull('yelp_enriched_at')
+                  ->orWhere('yelp_enriched_at', '<', now()->subDays(30));
+            });
 
         $total = $query->count();
 
@@ -116,6 +120,7 @@ class BackfillYelpImages extends Command
                 if (!$isDryRun) {
                     try {
                         $this->downloadAndAttachImage($restaurant, $imageUrl);
+                        $restaurant->update(['yelp_enriched_at' => now()]);
                         $stats['downloaded']++;
                     } catch (\Exception $e) {
                         $stats['failed']++;

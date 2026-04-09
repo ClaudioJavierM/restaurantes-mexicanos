@@ -123,7 +123,12 @@ class EnrichReviewCounts extends Command
 
     protected function enrichYelp(int $limit, bool $missingRatings): int
     {
-        $query = Restaurant::query()->whereNotNull('yelp_id');
+        $query = Restaurant::query()->whereNotNull('yelp_id')
+            ->where(function($q) {
+                // Only re-fetch if not enriched in the last 30 days
+                $q->whereNull('yelp_enriched_at')
+                  ->orWhere('yelp_enriched_at', '<', now()->subDays(30));
+            });
 
         if ($missingRatings) {
             $query->where(function($q) {
@@ -158,8 +163,9 @@ class EnrichReviewCounts extends Command
                     if (isset($yelpData['review_count'])) {
                         $updateData['yelp_reviews_count'] = $yelpData['review_count'];
                     }
-                    
+
                     if (!empty($updateData)) {
+                        $updateData['yelp_enriched_at'] = now();
                         $restaurant->update($updateData);
                         $updated++;
                     }

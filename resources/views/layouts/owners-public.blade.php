@@ -6,6 +6,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', $title ?? 'For Owners') - FAMER | Famous Mexican Restaurants</title>
     <meta name="description" content="@yield('meta_description', '')">
+    <link rel="canonical" href="{{ $__env->hasSection('canonical') ? $__env->yieldContent('canonical') : strtok(url()->current(), '?') }}">
+    <meta name="robots" content="noindex, nofollow">
     @stack('meta')
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles

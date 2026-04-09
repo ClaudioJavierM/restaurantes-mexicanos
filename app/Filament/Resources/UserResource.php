@@ -19,7 +19,9 @@ class UserResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
 
-    protected static ?string $navigationGroup = 'User Management';
+    protected static ?string $navigationGroup = 'Plataforma';
+
+    protected static ?int $navigationSort = 4;
 
     public static function canViewAny(): bool
     {

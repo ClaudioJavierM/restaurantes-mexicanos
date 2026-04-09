@@ -29,63 +29,68 @@ function notifyN8nFailure(string $jobName, string $description): void
 // ============================================================================
 
 /**
- * SMART IMPORT - 4 runs/day to exhaust 15,000 trial calls in ~12 days
- * - 3× Enhanced plan keys = 15,000 calls/month (trial, expires ~Apr 28)
- * - 48 cities/day × ~26 avg calls = ~1,250 calls/day → done in ~12 days
- * - Budget guard auto-stops if monthly limit reached
+ * SMART IMPORT - 4 runs/day × 10 cities = ~600 calls/day
+ * Goal: exhaust 7 trial keys (35,000 calls) before they expire ~Apr 28
+ * Keys are consumed sequentially (key 1 → 2 → 3...) via findActiveKeyIndex()
  */
-// RUN 1 — 2:00 AM
-Schedule::command('yelp:import-smart --cities=12 --limit=50 --min-rating=3.5 --delay=1')
-    ->dailyAt('02:00')
+// IMPORT RUN 1 — 1:00 AM
+Schedule::command('yelp:import-smart --cities=10 --limit=50 --min-rating=3.5 --delay=1')
+    ->dailyAt('01:00')
     ->timezone('America/New_York')
-    ->description('Import run 1/4: 12 cities')
+    ->description('Import run 1/4: 10 cities')
     ->onSuccess(function () { \Log::info('Yelp import run 1 completed'); })
     ->onFailure(function () {
         \Log::error('Yelp import run 1 failed');
-        notifyN8nFailure('yelp:import-smart', 'Import run 1 (12 cities)');
+        notifyN8nFailure('yelp:import-smart', 'Import run 1 (10 cities)');
     });
 
-// RUN 2 — 8:00 AM
-Schedule::command('yelp:import-smart --cities=12 --limit=50 --min-rating=3.5 --delay=1')
-    ->dailyAt('08:00')
+// IMPORT RUN 2 — 7:00 AM
+Schedule::command('yelp:import-smart --cities=10 --limit=50 --min-rating=3.5 --delay=1')
+    ->dailyAt('07:00')
     ->timezone('America/New_York')
-    ->description('Import run 2/4: 12 cities')
+    ->description('Import run 2/4: 10 cities')
     ->onSuccess(function () { \Log::info('Yelp import run 2 completed'); })
     ->onFailure(function () {
         \Log::error('Yelp import run 2 failed');
-        notifyN8nFailure('yelp:import-smart', 'Import run 2 (12 cities)');
+        notifyN8nFailure('yelp:import-smart', 'Import run 2 (10 cities)');
     });
 
-// RUN 3 — 2:00 PM
-Schedule::command('yelp:import-smart --cities=12 --limit=50 --min-rating=3.5 --delay=1')
-    ->dailyAt('14:00')
+// IMPORT RUN 3 — 1:00 PM
+Schedule::command('yelp:import-smart --cities=10 --limit=50 --min-rating=3.5 --delay=1')
+    ->dailyAt('13:00')
     ->timezone('America/New_York')
-    ->description('Import run 3/4: 12 cities')
+    ->description('Import run 3/4: 10 cities')
     ->onSuccess(function () { \Log::info('Yelp import run 3 completed'); })
     ->onFailure(function () {
         \Log::error('Yelp import run 3 failed');
-        notifyN8nFailure('yelp:import-smart', 'Import run 3 (12 cities)');
+        notifyN8nFailure('yelp:import-smart', 'Import run 3 (10 cities)');
     });
 
-// RUN 4 — 8:00 PM
-Schedule::command('yelp:import-smart --cities=12 --limit=50 --min-rating=3.5 --delay=1')
-    ->dailyAt('20:00')
+// IMPORT RUN 4 — 7:00 PM
+Schedule::command('yelp:import-smart --cities=10 --limit=50 --min-rating=3.5 --delay=1')
+    ->dailyAt('19:00')
     ->timezone('America/New_York')
-    ->description('Import run 4/4: 12 cities')
+    ->description('Import run 4/4: 10 cities')
     ->onSuccess(function () { \Log::info('Yelp import run 4 completed'); })
     ->onFailure(function () {
         \Log::error('Yelp import run 4 failed');
-        notifyN8nFailure('yelp:import-smart', 'Import run 4 (12 cities)');
+        notifyN8nFailure('yelp:import-smart', 'Import run 4 (10 cities)');
     });
 
-// BACKFILL — 6:00 AM & 6:00 PM (enrich existing restaurants with photos/hours)
-Schedule::command('yelp:backfill --limit=300')
-    ->twiceDaily(6, 18)
+/**
+ * BACKFILL — every 2 hours (12 runs/day × 100 restaurants = 1,200 calls/day)
+ * - Enriches existing 26K restaurants with photos, hours, attributes, coords
+ * - Combined with imports: ~1,800 calls/day total
+ * - 35,000 calls ÷ 1,800/day = ~19 days → exhausted before Apr 28 expiry
+ * - yelp_enriched_at semaphore prevents duplicate calls across commands
+ */
+Schedule::command('yelp:backfill --limit=100')
+    ->cron('0 */2 * * *')
     ->timezone('America/New_York')
-    ->description('Backfill photos/hours/attributes for existing restaurants')
-    ->onSuccess(function () { \Log::info('Yelp backfill completed'); })
+    ->description('ENRICHMENT: Backfill photos/hours/attributes (every 2h, 12x/day)')
+    ->onSuccess(function () { \Log::info('Yelp backfill run completed'); })
     ->onFailure(function () {
-        notifyN8nFailure('yelp:backfill', 'Backfill photos/hours');
+        notifyN8nFailure('yelp:backfill', 'Enrichment backfill run');
     });
 
 // ============================================================================

@@ -21,7 +21,7 @@ class AuthenticityBadgeRequestResource extends Resource
     protected static ?string $navigationIcon  = 'heroicon-o-shield-check';
     protected static ?string $navigationLabel = 'Insignias Autenticidad';
     protected static ?string $navigationGroup = 'Restaurantes';
-    protected static ?int    $navigationSort  = 15;
+    protected static ?int    $navigationSort  = 2;
 
     // ── Form ────────────────────────────────────────────────────────
 

@@ -231,6 +231,7 @@ class YelpImportService
             'yelp_reviews_count' => $yelpBusiness['review_count'] ?? 0,
             'yelp_url' => $yelpBusiness['url'] ?? null,
             'yelp_last_sync' => now(),
+            'yelp_enriched_at' => now(), // Full detail fetched (photos, hours, attributes)
 
             // NEW: Yelp categories and transactions
             'yelp_categories' => !empty($yelpCategories) ? $yelpCategories : null,

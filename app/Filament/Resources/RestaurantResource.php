@@ -22,6 +22,8 @@ class RestaurantResource extends Resource
 
     protected static ?string $navigationLabel = 'Restaurantes';
 
+    protected static ?string $navigationGroup = 'Plataforma';
+
     protected static ?string $modelLabel = 'Restaurante';
 
     protected static ?string $pluralModelLabel = 'Restaurantes';

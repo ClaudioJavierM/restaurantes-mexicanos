@@ -26,12 +26,34 @@ class YelpFusionService
 
         $this->apiKey = $this->apiKeys[0] ?? null;
 
+        // Always start on the key with most usage (exhaust sequentially, not randomly)
+        // This ensures each key looks like a single independent user to Yelp
         if (count($this->apiKeys) > 1) {
-            $this->currentKeyIndex = rand(0, count($this->apiKeys) - 1);
+            $this->currentKeyIndex = $this->findActiveKeyIndex();
             $this->apiKey = $this->apiKeys[$this->currentKeyIndex];
         }
 
-        Log::debug('YelpFusionService initialized with ' . count($this->apiKeys) . ' API keys');
+        Log::debug('YelpFusionService initialized with ' . count($this->apiKeys) . ' API keys, starting at index ' . $this->currentKeyIndex);
+    }
+
+    /**
+     * Find the first key that still has remaining budget this month.
+     * Keys are exhausted sequentially (0 → 1 → 2 ...) so each looks
+     * like an independent user making normal calls to Yelp.
+     */
+    protected function findActiveKeyIndex(): int
+    {
+        $perKeyLimit = (int) config('services.yelp.monthly_limit', 5000);
+
+        for ($i = 0; $i < count($this->apiKeys); $i++) {
+            $used = $this->getKeyUsage($i);
+            if ($used < $perKeyLimit) {
+                return $i;
+            }
+        }
+
+        // All exhausted — return last index (budget guard will throw on next call)
+        return count($this->apiKeys) - 1;
     }
 
     protected function rotateApiKey(): bool
@@ -48,37 +70,84 @@ class YelpFusionService
     }
 
     /**
-     * Guard: throws RuntimeException if monthly Places API budget is reached.
+     * Guard: checks per-key monthly budget (5,000 per trial key).
+     * Auto-rotates to a key with remaining budget before throwing.
      * Called before every API request so imports auto-stop at the limit.
      */
     protected function checkMonthlyBudget(): void
     {
-        $monthlyLimit = (int) config('services.yelp.monthly_limit', 5000);
+        $perKeyLimit = (int) config('services.yelp.monthly_limit', 5000);
 
-        $used = ApiCallLog::where('service', 'yelp')
-            ->where('called_at', '>=', now()->startOfMonth())
-            ->count();
+        // Check current key's usage
+        $used = $this->getKeyUsage($this->currentKeyIndex);
 
-        if ($used >= $monthlyLimit) {
-            Log::warning('Yelp monthly API limit reached', [
-                'used' => $used,
-                'limit' => $monthlyLimit,
-            ]);
-            throw new \RuntimeException("Yelp monthly API limit reached ({$used}/{$monthlyLimit}). Resets on " . now()->startOfNextMonth()->toDateString() . '.');
+        if ($used >= $perKeyLimit) {
+            Log::warning("Yelp key [{$this->currentKeyIndex}] monthly limit reached ({$used}/{$perKeyLimit}), rotating...");
+
+            // Try to rotate to a key with remaining budget
+            if (!$this->rotateToAvailableKey($perKeyLimit)) {
+                $total = count($this->apiKeys) * $perKeyLimit;
+                throw new \RuntimeException(
+                    "All {$this->getApiKeyCount()} Yelp API keys exhausted for this month. " .
+                    "Total budget: {$total} calls. Resets on " . now()->startOfNextMonth()->toDateString() . '.'
+                );
+            }
+
+            // Re-check the new key
+            $used = $this->getKeyUsage($this->currentKeyIndex);
         }
 
         // Warn at 80%
-        if ($used >= (int) ($monthlyLimit * 0.80)) {
-            Log::warning('Yelp API usage at ' . round(($used / $monthlyLimit) * 100) . '%', [
+        if ($used >= (int) ($perKeyLimit * 0.80)) {
+            Log::warning("Yelp key [{$this->currentKeyIndex}] at " . round(($used / $perKeyLimit) * 100) . '%', [
                 'used' => $used,
-                'limit' => $monthlyLimit,
-                'remaining' => $monthlyLimit - $used,
+                'limit' => $perKeyLimit,
+                'remaining' => $perKeyLimit - $used,
             ]);
         }
     }
 
     /**
-     * Log API call to api_call_logs for dashboard visibility
+     * Count this month's API calls for a specific key index.
+     */
+    protected function getKeyUsage(int $keyIndex): int
+    {
+        return ApiCallLog::where('service', 'yelp')
+            ->where('called_at', '>=', now()->startOfMonth())
+            ->whereRaw("JSON_EXTRACT(params, '$._key_index') = ?", [$keyIndex])
+            ->count();
+    }
+
+    /**
+     * Rotate to the first key that still has remaining monthly budget.
+     * Returns true if a key with budget was found, false if all exhausted.
+     */
+    protected function rotateToAvailableKey(int $perKeyLimit): bool
+    {
+        $startIndex = $this->currentKeyIndex;
+
+        for ($i = 1; $i <= count($this->apiKeys); $i++) {
+            $nextIndex = ($startIndex + $i) % count($this->apiKeys);
+
+            if ($nextIndex === $startIndex) {
+                break; // Checked all keys
+            }
+
+            $used = $this->getKeyUsage($nextIndex);
+            if ($used < $perKeyLimit) {
+                $this->currentKeyIndex = $nextIndex;
+                $this->apiKey = $this->apiKeys[$nextIndex];
+                Log::info("Rotated to Yelp key [{$nextIndex}] — {$used}/{$perKeyLimit} used this month");
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Log API call to api_call_logs for dashboard visibility.
+     * Stores _key_index in params JSON for per-key budget tracking.
      */
     protected function logApiCall(string $endpoint, bool $success, ?int $statusCode = null, array $params = [], ?string $error = null): void
     {
@@ -89,7 +158,7 @@ class YelpFusionService
                 'status_code' => $statusCode ?? ($success ? 200 : 500),
                 'success' => $success,
                 'cost' => 0,
-                'params' => $params,
+                'params' => array_merge($params, ['_key_index' => $this->currentKeyIndex]),
                 'error_message' => $error,
                 'called_at' => now(),
             ]);
@@ -390,21 +459,42 @@ class YelpFusionService
     }
 
     /**
-     * Get current month Yelp API usage stats.
+     * Get current month Yelp API usage stats, broken down per key.
      */
     public function getMonthlyUsage(): array
     {
-        $limit = (int) config('services.yelp.monthly_limit', 5000);
-        $used = ApiCallLog::where('service', 'yelp')
+        $perKeyLimit = (int) config('services.yelp.monthly_limit', 5000);
+        $keyCount = count($this->apiKeys);
+        $totalLimit = $perKeyLimit * $keyCount;
+
+        // Total calls (including legacy entries without _key_index)
+        $totalUsed = ApiCallLog::where('service', 'yelp')
             ->where('called_at', '>=', now()->startOfMonth())
             ->count();
 
+        // Per-key breakdown (only counts entries with _key_index logged)
+        $perKey = [];
+        for ($i = 0; $i < $keyCount; $i++) {
+            $used = $this->getKeyUsage($i);
+            $perKey[] = [
+                'key_index' => $i,
+                'used'      => $used,
+                'limit'     => $perKeyLimit,
+                'remaining' => max(0, $perKeyLimit - $used),
+            ];
+        }
+
+        // Effective remaining = sum of per-key remaining
+        $effectiveRemaining = array_sum(array_column($perKey, 'remaining'));
+
         return [
-            'used'       => $used,
-            'limit'      => $limit,
-            'remaining'  => max(0, $limit - $used),
-            'percentage' => $limit > 0 ? round(($used / $limit) * 100, 1) : 0,
-            'resets_on'  => now()->startOfNextMonth()->toDateString(),
+            'used'               => $totalUsed,
+            'limit'              => $totalLimit,
+            'remaining'          => $effectiveRemaining,
+            'percentage'         => $totalLimit > 0 ? round(($totalUsed / $totalLimit) * 100, 1) : 0,
+            'resets_on'          => now()->startOfNextMonth()->toDateString(),
+            'per_key'            => $perKey,
+            'key_count'          => $keyCount,
         ];
     }
 }

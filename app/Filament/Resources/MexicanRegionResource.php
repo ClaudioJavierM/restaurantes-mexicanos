@@ -16,7 +16,7 @@ class MexicanRegionResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-map';
     protected static ?string $navigationGroup = 'Clasificación';
     protected static ?string $navigationLabel = 'Regiones Mexicanas';
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 4;
 
     public static function form(Form $form): Form
     {
