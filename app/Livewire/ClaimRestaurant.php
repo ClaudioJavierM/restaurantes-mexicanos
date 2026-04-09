@@ -213,8 +213,18 @@ class ClaimRestaurant extends Component
                 $maskedPhone = $this->maskPhone($restaurantPhone);
                 session()->flash('success', 'Llamada de verificación en progreso al teléfono del restaurante: ' . $maskedPhone);
             } else {
-                session()->flash('error', 'No se pudo realizar la llamada de verificación. Por favor intenta de nuevo.');
-                return;
+                // Twilio not configured — fallback to email verification
+                Log::warning('Phone verification failed, falling back to email for restaurant ' . $this->selectedRestaurant->id);
+
+                $fallbackEmail = $hasEmail ? $restaurantEmail : $this->ownerEmail;
+                $emailCacheKey = 'claim_code_' . $this->selectedRestaurant->id . '_' . md5($fallbackEmail);
+                Cache::put($emailCacheKey, $code, now()->addMinutes(15));
+
+                $this->sendVerificationEmail($code, $fallbackEmail);
+                $this->verificationMethod = 'email';
+
+                $maskedEmail = $this->maskEmail($fallbackEmail);
+                session()->flash('success', 'La verificación por teléfono no está disponible. Se envió el código al correo: ' . $maskedEmail);
             }
         } else {
             // Email verification (default)

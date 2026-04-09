@@ -308,7 +308,7 @@
                     {{-- Verification Method Selection --}}
                     <div>
                         <label class="block text-sm font-medium mb-3" style="color:#CCCCCC;">
-                            Metodo de verificacion
+                            Método de verificación
                         </label>
 
                         @if(count($availableMethods) === 0)
@@ -318,7 +318,7 @@
                                     <svg class="w-5 h-5 inline mr-2" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
                                     </svg>
-                                    Este restaurante no tiene correo electronico ni telefono registrado. Por favor contacta a soporte.
+                                    Este restaurante no tiene correo electrónico ni teléfono registrado. Por favor contacta a soporte.
                                 </p>
                             </div>
                         @elseif(count($availableMethods) === 1)
@@ -329,22 +329,20 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                                     </svg>
                                     <div>
-                                        <p class="text-sm font-medium" style="color:#F5F5F5;">Verificacion por correo electronico</p>
-                                        <p class="text-xs mt-1" style="color:#9CA3AF;">Se enviara un codigo de 6 digitos al correo registrado del restaurante.</p>
+                                        <p class="text-sm font-medium" style="color:#F5F5F5;">Verificación por correo electrónico</p>
+                                        <p class="text-xs mt-1" style="color:#9CA3AF;">Se enviará un código de 6 dígitos al correo registrado del restaurante.</p>
                                     </div>
                                 </div>
-                                <input type="hidden" wire:model="verificationMethod" value="email">
                             @else
                                 <div class="rounded-lg p-4 flex items-start" style="background:rgba(212,175,55,0.08); border:1px solid rgba(212,175,55,0.2);">
                                     <svg class="w-6 h-6 mr-3 mt-0.5 flex-shrink-0" style="color:#D4AF37;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
                                     </svg>
                                     <div>
-                                        <p class="text-sm font-medium" style="color:#F5F5F5;">Verificacion por llamada telefonica</p>
-                                        <p class="text-xs mt-1" style="color:#9CA3AF;">Recibirás una llamada al telefono del restaurante con un codigo de 6 digitos.</p>
+                                        <p class="text-sm font-medium" style="color:#F5F5F5;">Verificación por llamada telefónica</p>
+                                        <p class="text-xs mt-1" style="color:#9CA3AF;">Recibirás una llamada al teléfono del restaurante con un código de 6 dígitos.</p>
                                     </div>
                                 </div>
-                                <input type="hidden" wire:model="verificationMethod" value="phone">
                             @endif
                         @else
                             {{-- Both methods available - clickable card selector --}}
@@ -362,8 +360,8 @@
                                             </svg>
                                         </div>
                                         <div>
-                                            <p class="text-sm font-semibold" style="color:#F5F5F5;">Correo electronico</p>
-                                            <p class="text-xs mt-1" style="color:#9CA3AF;">Codigo enviado al email del restaurante</p>
+                                            <p class="text-sm font-semibold" style="color:#F5F5F5;">Correo electrónico</p>
+                                            <p class="text-xs mt-1" style="color:#9CA3AF;">Código enviado al email del restaurante</p>
                                         </div>
                                         @if($verificationMethod === 'email')
                                             <svg class="w-5 h-5 ml-auto flex-shrink-0" style="color:#D4AF37;" fill="currentColor" viewBox="0 0 20 20">
@@ -386,8 +384,8 @@
                                             </svg>
                                         </div>
                                         <div>
-                                            <p class="text-sm font-semibold" style="color:#F5F5F5;">Llamada telefonica</p>
-                                            <p class="text-xs mt-1" style="color:#9CA3AF;">Llamada con codigo al telefono del restaurante</p>
+                                            <p class="text-sm font-semibold" style="color:#F5F5F5;">Llamada telefónica</p>
+                                            <p class="text-xs mt-1" style="color:#9CA3AF;">Llamada con código al teléfono del restaurante</p>
                                         </div>
                                         @if($verificationMethod === 'phone')
                                             <svg class="w-5 h-5 ml-auto flex-shrink-0" style="color:#D4AF37;" fill="currentColor" viewBox="0 0 20 20">
@@ -405,7 +403,7 @@
                             <svg class="w-5 h-5 inline mr-2" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
                             </svg>
-                            El codigo de verificacion se enviara a los datos de contacto registrados del restaurante para confirmar que eres el propietario.
+                            El código de verificación se enviará a los datos de contacto registrados del restaurante para confirmar que eres el propietario.
                         </p>
                     </div>
 
@@ -442,7 +440,7 @@
                             </svg>
                         </div>
                         <h1 class="text-3xl font-bold mb-2" style="color:#F5F5F5; font-family:'Playfair Display',serif;">Verifica tu identidad</h1>
-                        <p style="color:#9CA3AF;">Estamos llamando al telefono del restaurante con tu codigo de verificacion:</p>
+                        <p style="color:#9CA3AF;">Estamos llamando al teléfono del restaurante con tu código de verificación:</p>
                         @php
                             $rPhone = $selectedRestaurant->phone ?? '';
                             $rPhoneCleaned = preg_replace('/[^0-9]/', '', $rPhone);
