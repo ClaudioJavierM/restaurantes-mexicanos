@@ -32,12 +32,14 @@ class CityRestaurants extends Component
             ->when($this->stateModel, fn($q) => $q->where('state_id', $this->stateModel->id))
             ->with('state');
 
-        return match($this->sortBy) {
+        $sorted = match($this->sortBy) {
             'rating'  => $query->orderByDesc('average_rating'),
             'reviews' => $query->orderByDesc('total_reviews'),
             'name'    => $query->orderBy('name'),
             default   => $query->orderByDesc('average_rating'),
-        }->paginate(24);
+        };
+
+        return $sorted->paginate(24);
     }
 
     public function render()
