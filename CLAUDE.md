@@ -108,9 +108,27 @@ sudo nginx -t && sudo systemctl reload nginx
 - **Tailwind:** Colores en namespace `famer.*` (famer-black, famer-gold, etc.)
 - **Estilo:** Dark premium, Apple/Airbnb/Stripe feel, gold accents sparingly
 
+## Base de Datos — Notas Críticas
+
+### email_logs — Tabla compartida con SDV (Resend webhooks)
+- La tabla `email_logs` recibe webhooks de Resend para TODOS los dominios (FAMER + SDV)
+- Los emails SDV llegan con `from_email = NULL` — NO tienen `from_email` ni `restaurant_id`
+- **SIEMPRE filtrar** `whereNotNull('from_email')` en cualquier query de email_logs dentro de FAMER
+- El `EmailLogResource` ya tiene `getEloquentQuery()` con este filtro — NO removerlo
+- El `EmailStatsOverview` widget también aplica el mismo filtro vía closure `$famer = fn() => EmailLog::whereNotNull('from_email')`
+
+### Columnas agregadas manualmente (no en migraciones)
+
+- `reviews.is_approved` — columna VIRTUAL GENERATED: `IF(status='approved',1,0)`
+- `email_logs.delivered_at` — agregada vía ALTER TABLE
+- `famer_email_1_sent_at`, `famer_email_2_sent_at`, `famer_email_3_sent_at` en `restaurants`
+
 ## Reglas
+
 - NUNCA editar archivos directamente en el VPS — todo por git o rsync desde local
 - NUNCA usar `rsync --delete` (borra storage/ y vendor/)
 - El tailwind.config.js usa `famer.*` colors — NO usar el override de `red` como gold (fue removido)
 - Archivos blade que usan `red-600` de Tailwind ahora es el rojo real de Tailwind (ya no gold)
 - npm run build necesario después de cambiar blade templates (Tailwind JIT)
+- Filament 4: los NavigationGroup NO pueden tener íconos si sus items también los tienen (500 error)
+- Todos los widgets Filament deben tener `protected static bool $isLazy = true;`

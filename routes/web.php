@@ -108,9 +108,11 @@ Route::get('/mejores/{state}', [\App\Http\Controllers\RankingController::class, 
 Route::get('/mejores/{state}/{city}', [\App\Http\Controllers\RankingController::class, 'mejoresCiudad'])->name('rankings.mejores-ciudad');
 
 // Auth Routes (Breeze)
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
+Route::view('/mi-cuenta', 'mi-cuenta')
+    ->middleware(['auth'])
     ->name('dashboard');
+
+Route::redirect('/dashboard', '/mi-cuenta');
 
 Route::view('profile', 'profile')
     ->middleware(['auth'])

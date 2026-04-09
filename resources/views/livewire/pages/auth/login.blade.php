@@ -20,7 +20,14 @@ new #[Layout('layouts.guest')] class extends Component
 
         Session::regenerate();
 
-        $this->redirectIntended(default: route('dashboard', absolute: false), navigate: false);
+        $user = auth()->user();
+        $isOwner = $user->role === 'owner' || $user->restaurants()->exists();
+
+        if ($isOwner) {
+            $this->redirect('/owner', navigate: false);
+        } else {
+            $this->redirect('/mi-cuenta', navigate: false);
+        }
     }
 }; ?>
 
