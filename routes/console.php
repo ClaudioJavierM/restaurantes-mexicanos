@@ -233,6 +233,39 @@ Schedule::command('rankings:calculate')
         notifyN8nFailure('rankings:calculate', 'Weekly Top 10 city/state rankings');
     });
 
+/**
+ * Recalculate FAMER Scores for all restaurants
+ * Runs every Sunday at 4:00 AM (after rankings:calculate finishes)
+ * Combines Google/Yelp/TripAdvisor ratings + vote bonus into a single score
+ */
+Schedule::command('famer:recalculate-scores')
+    ->cron('0 4 * * 0')
+    ->timezone('America/New_York')
+    ->description('WEEKLY: Recalculate FAMER composite scores for all restaurants')
+    ->onSuccess(function () {
+        \Log::info('Weekly FAMER score recalculation completed');
+    })
+    ->onFailure(function () {
+        \Log::error('Weekly FAMER score recalculation failed');
+        notifyN8nFailure('famer:recalculate-scores', 'Weekly FAMER score recalculation');
+    });
+
+/**
+ * Assign monthly badges and populate monthly_rankings from votes
+ * Runs on the 1st of each month at 2:00 AM (processes previous month's votes)
+ */
+Schedule::command('famer:assign-badges')
+    ->cron('0 2 1 * *')
+    ->timezone('America/New_York')
+    ->description('MONTHLY: Assign city/state/national badges from previous month votes')
+    ->onSuccess(function () {
+        \Log::info('Monthly badge assignment completed');
+    })
+    ->onFailure(function () {
+        \Log::error('Monthly badge assignment failed');
+        notifyN8nFailure('famer:assign-badges', 'Monthly badge assignment');
+    });
+
 // ============================================================================
 // Yelp Photo Merge — weekly Sunday 1:00 AM
 // ============================================================================
