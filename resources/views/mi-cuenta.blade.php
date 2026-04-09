@@ -216,7 +216,7 @@
                                         {{ $vote->restaurant->name }}
                                     </a>
                                     <div style="font-family:'Poppins',sans-serif; font-size:0.75rem; color:#6B7280; margin-top:0.1rem;">
-                                        {{ $vote->restaurant->city }}@if($vote->restaurant->state), {{ $vote->restaurant->state }}@endif
+                                        {{ $vote->restaurant->city }}@if($vote->restaurant->state), {{ $vote->restaurant->state->code ?? $vote->restaurant->state->name }}@endif
                                     </div>
                                 @else
                                     <span style="font-family:'Poppins',sans-serif; font-size:0.9rem; color:#6B7280;">Restaurante eliminado</span>
@@ -318,7 +318,7 @@
                                 {{ $restaurant->name }}
                             </div>
                             <div style="font-family:'Poppins',sans-serif; font-size:0.8rem; color:#6B7280;">
-                                {{ $restaurant->city }}@if($restaurant->state), {{ $restaurant->state }}@endif
+                                {{ $restaurant->city }}@if($restaurant->state), {{ $restaurant->state->code ?? $restaurant->state->name }}@endif
                             </div>
                             @if(!empty($restaurant->rating) && $restaurant->rating > 0)
                                 <div style="margin-top:0.5rem; font-size:0.8rem; color:#D4AF37;">
