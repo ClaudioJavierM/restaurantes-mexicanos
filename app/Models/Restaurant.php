@@ -152,6 +152,7 @@ class Restaurant extends Model implements HasMedia
         'verification_method',
         // Subscription
         'subscription_tier',
+        'chatbot_settings',
         'stripe_customer_id',
         'stripe_subscription_id',
         'subscription_started_at',
@@ -244,6 +245,7 @@ class Restaurant extends Model implements HasMedia
         'famer_email_3_sent_at' => 'datetime',
         'subscription_started_at' => 'datetime',
         'subscription_expires_at' => 'datetime',
+        'chatbot_settings' => 'array',
         'premium_analytics' => 'boolean',
         'premium_seo' => 'boolean',
         'premium_featured' => 'boolean',

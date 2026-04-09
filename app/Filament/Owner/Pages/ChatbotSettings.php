@@ -48,15 +48,18 @@ class ChatbotSettings extends Page implements HasForms
                 'satisfaction' => 0,
             ];
 
+            // Load saved settings or use defaults
+            $saved = $restaurant->chatbot_settings ?? [];
+
             $this->form->fill([
-                'chatbot_enabled' => false,
-                'chatbot_welcome_es' => '¡Hola! Soy el asistente virtual de ' . $restaurant->name . '. ¿En qué puedo ayudarte?',
-                'chatbot_welcome_en' => 'Hello! I am the virtual assistant of ' . $restaurant->name . '. How can I help you?',
-                'chatbot_hours_response' => true,
-                'chatbot_menu_response' => true,
-                'chatbot_reservations_response' => true,
-                'chatbot_directions_response' => true,
-                'chatbot_custom_faqs' => [],
+                'chatbot_enabled' => $saved['chatbot_enabled'] ?? true,
+                'chatbot_welcome_es' => $saved['chatbot_welcome_es'] ?? '¡Hola! Soy el asistente virtual de ' . $restaurant->name . '. ¿En qué puedo ayudarte?',
+                'chatbot_welcome_en' => $saved['chatbot_welcome_en'] ?? 'Hello! I am the virtual assistant of ' . $restaurant->name . '. How can I help you?',
+                'chatbot_hours_response' => $saved['chatbot_hours_response'] ?? true,
+                'chatbot_menu_response' => $saved['chatbot_menu_response'] ?? true,
+                'chatbot_reservations_response' => $saved['chatbot_reservations_response'] ?? true,
+                'chatbot_directions_response' => $saved['chatbot_directions_response'] ?? true,
+                'chatbot_custom_faqs' => $saved['chatbot_custom_faqs'] ?? [],
             ]);
         }
     }
@@ -144,7 +147,10 @@ class ChatbotSettings extends Page implements HasForms
         $restaurant = $this->getRestaurant();
 
         if ($restaurant) {
-            // TODO: Save to DB once chatbot columns are added to restaurants table
+            $restaurant->update([
+                'chatbot_settings' => $data,
+            ]);
+
             Notification::make()
                 ->title('Configuración guardada')
                 ->body('La configuración del chatbot ha sido actualizada.')

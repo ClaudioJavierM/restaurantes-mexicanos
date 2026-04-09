@@ -558,7 +558,7 @@
             }
         }
     @endphp
-    @if($chatRestaurant && in_array($chatRestaurant->subscription_tier, ['premium', 'elite']))
+    @if($chatRestaurant && in_array($chatRestaurant->subscription_tier, ['premium', 'elite']) && ($chatRestaurant->chatbot_settings['chatbot_enabled'] ?? true))
         @livewire('restaurant-chatbot', ['restaurant' => $chatRestaurant])
     @endif
 

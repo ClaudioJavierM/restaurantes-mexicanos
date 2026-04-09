@@ -22,9 +22,18 @@ class RestaurantChatbot extends Component
         $this->restaurant = $restaurant;
         $this->locale = app()->getLocale() === 'en' ? 'en' : 'es';
 
-        $welcome = $this->locale === 'en'
-            ? "Hi! I'm the virtual assistant for {$restaurant->name}. How can I help you? You can ask me about our menu, hours, location, or reservations."
-            : "¡Hola! Soy el asistente virtual de {$restaurant->name}. ¿En qué puedo ayudarte? Puedes preguntarme sobre nuestro menú, horarios, ubicación o reservaciones.";
+        $settings = $restaurant->chatbot_settings ?? [];
+
+        // Use custom welcome message if configured
+        if ($this->locale === 'en' && !empty($settings['chatbot_welcome_en'])) {
+            $welcome = $settings['chatbot_welcome_en'];
+        } elseif ($this->locale === 'es' && !empty($settings['chatbot_welcome_es'])) {
+            $welcome = $settings['chatbot_welcome_es'];
+        } else {
+            $welcome = $this->locale === 'en'
+                ? "Hi! I'm the virtual assistant for {$restaurant->name}. How can I help you? You can ask me about our menu, hours, location, or reservations."
+                : "¡Hola! Soy el asistente virtual de {$restaurant->name}. ¿En qué puedo ayudarte? Puedes preguntarme sobre nuestro menú, horarios, ubicación o reservaciones.";
+        }
 
         $this->messages = [
             ['role' => 'assistant', 'content' => $welcome],
@@ -172,6 +181,43 @@ class RestaurantChatbot extends Component
     {
         $lang = $this->locale === 'en' ? 'English' : 'Spanish';
         $contextJson = json_encode($context, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        $settings = $this->restaurant->chatbot_settings ?? [];
+
+        // Build capability rules based on settings
+        $capabilities = [];
+        if ($settings['chatbot_hours_response'] ?? true) {
+            $capabilities[] = '- Answer questions about opening hours using the data provided.';
+        } else {
+            $capabilities[] = '- Do NOT answer questions about hours. Say to call the restaurant instead.';
+        }
+        if ($settings['chatbot_menu_response'] ?? true) {
+            $capabilities[] = '- Answer questions about menu items and prices using the data provided.';
+        } else {
+            $capabilities[] = '- Do NOT answer questions about the menu. Say to check the Menu tab on the page.';
+        }
+        if ($settings['chatbot_reservations_response'] ?? true) {
+            $capabilities[] = '- Help with reservations — encourage using the reservation form on the page.';
+        } else {
+            $capabilities[] = '- Do NOT help with reservations. Say to call the restaurant.';
+        }
+        if ($settings['chatbot_directions_response'] ?? true) {
+            $capabilities[] = '- Provide the address and suggest Google Maps for directions.';
+        } else {
+            $capabilities[] = '- Do NOT provide directions. Say to check the map on the page.';
+        }
+        $capabilitiesText = implode("\n", $capabilities);
+
+        // Add custom FAQs
+        $faqText = '';
+        $faqs = $settings['chatbot_custom_faqs'] ?? [];
+        if (!empty($faqs)) {
+            $faqText = "\n\nCUSTOM FAQ (use these answers when the question matches):\n";
+            foreach ($faqs as $faq) {
+                if (!empty($faq['question']) && !empty($faq['answer'])) {
+                    $faqText .= "Q: {$faq['question']}\nA: {$faq['answer']}\n\n";
+                }
+            }
+        }
 
         return <<<PROMPT
 You are a friendly virtual assistant for the restaurant "{$context['name']}".
@@ -181,12 +227,13 @@ IMPORTANT RULES:
 - Only answer questions about THIS restaurant using the data below.
 - If asked something you don't know, politely say you don't have that information and suggest calling the restaurant.
 - Never make up information not in the data.
-- If asked about reservations and the restaurant accepts them, encourage them to use the reservation form on the page.
-- For directions, provide the address and suggest using Google Maps.
 - Keep responses short and conversational.
 
+CAPABILITY RULES:
+{$capabilitiesText}
+
 RESTAURANT DATA:
-{$contextJson}
+{$contextJson}{$faqText}
 PROMPT;
     }
 
