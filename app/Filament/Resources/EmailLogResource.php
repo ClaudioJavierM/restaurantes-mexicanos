@@ -32,6 +32,12 @@ class EmailLogResource extends Resource
     protected static ?string $navigationGroup = 'Comunicaciones';
     protected static ?int $navigationSort = 1;
 
+    // Only show FAMER emails — exclude SDV/external emails that come in via Resend webhooks with no from_email
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        return parent::getEloquentQuery()->whereNotNull('from_email');
+    }
+
     public static function getWidgets(): array
     {
         return [

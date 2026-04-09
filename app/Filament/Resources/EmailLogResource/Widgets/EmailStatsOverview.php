@@ -15,25 +15,28 @@ class EmailStatsOverview extends BaseWidget
         $thisWeek = Carbon::now()->startOfWeek();
         $thisMonth = Carbon::now()->startOfMonth();
 
+        // Only count FAMER emails (exclude SDV/external via Resend webhooks)
+        $famer = fn() => EmailLog::whereNotNull('from_email');
+
         // Today's stats
-        $todayTotal = EmailLog::whereDate('sent_at', $today)->count();
-        $todayFailed = EmailLog::whereDate('sent_at', $today)->whereIn('status', ['failed', 'bounced'])->count();
+        $todayTotal = $famer()->whereDate('sent_at', $today)->count();
+        $todayFailed = $famer()->whereDate('sent_at', $today)->whereIn('status', ['failed', 'bounced'])->count();
 
         // This week stats
-        $weekTotal = EmailLog::where('sent_at', '>=', $thisWeek)->count();
+        $weekTotal = $famer()->where('sent_at', '>=', $thisWeek)->count();
 
         // This month stats
-        $monthTotal = EmailLog::where('sent_at', '>=', $thisMonth)->count();
-        $monthOpened = EmailLog::where('sent_at', '>=', $thisMonth)->whereNotNull('opened_at')->count();
-        $monthClicked = EmailLog::where('sent_at', '>=', $thisMonth)->whereNotNull('first_clicked_at')->count();
+        $monthTotal = $famer()->where('sent_at', '>=', $thisMonth)->count();
+        $monthOpened = $famer()->where('sent_at', '>=', $thisMonth)->whereNotNull('opened_at')->count();
+        $monthClicked = $famer()->where('sent_at', '>=', $thisMonth)->whereNotNull('clicked_at')->count();
 
         // Calculate open rate
-        $totalSent = EmailLog::whereIn('status', ['sent', 'delivered', 'opened', 'clicked'])->count();
-        $totalOpened = EmailLog::whereNotNull('opened_at')->count();
+        $totalSent = $famer()->whereIn('status', ['sent', 'delivered', 'opened', 'clicked'])->count();
+        $totalOpened = $famer()->whereNotNull('opened_at')->count();
         $openRate = $totalSent > 0 ? round(($totalOpened / $totalSent) * 100, 1) : 0;
 
         // Calculate click rate
-        $totalClicked = EmailLog::whereNotNull('clicked_at')->count();
+        $totalClicked = $famer()->whereNotNull('clicked_at')->count();
         $clickRate = $totalOpened > 0 ? round(($totalClicked / $totalOpened) * 100, 1) : 0;
 
         return [

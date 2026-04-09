@@ -73,6 +73,57 @@ class RestaurantResource extends Resource
                             ->maxLength(255),
                     ])->columns(3),
 
+                Forms\Components\Section::make('Redes Sociales & Plataformas')
+                    ->schema([
+                        Forms\Components\TextInput::make('facebook_url')
+                            ->label('Facebook')
+                            ->url()
+                            ->maxLength(255)
+                            ->placeholder('https://facebook.com/restaurante'),
+                        Forms\Components\TextInput::make('instagram_url')
+                            ->label('Instagram')
+                            ->url()
+                            ->maxLength(255)
+                            ->placeholder('https://instagram.com/restaurante'),
+                        Forms\Components\TextInput::make('tiktok_url')
+                            ->label('TikTok')
+                            ->url()
+                            ->maxLength(255)
+                            ->placeholder('https://tiktok.com/@restaurante'),
+                        Forms\Components\TextInput::make('twitter_url')
+                            ->label('X / Twitter')
+                            ->url()
+                            ->maxLength(255)
+                            ->placeholder('https://x.com/restaurante'),
+                        Forms\Components\Placeholder::make('google_claim_link')
+                            ->label('Link Reclamar Google Business')
+                            ->content(function ($record) {
+                                if (!$record) return '—';
+                                if ($record->google_place_id) {
+                                    $url = 'https://business.google.com/add?placeid=' . $record->google_place_id;
+                                    return new \Illuminate\Support\HtmlString(
+                                        '<a href="' . $url . '" target="_blank" class="text-primary-600 hover:underline text-sm">
+                                            🔗 Reclamar en Google Business
+                                        </a>' .
+                                        ($record->is_claimed ? ' <span class="text-green-600 text-xs ml-2">✓ Ya reclamado</span>' : ' <span class="text-amber-600 text-xs ml-2">Sin reclamar</span>')
+                                    );
+                                }
+                                $url = 'https://business.google.com/add?' . http_build_query(['name' => $record->name, 'address' => $record->address . ', ' . $record->city]);
+                                return new \Illuminate\Support\HtmlString('<a href="' . $url . '" target="_blank" class="text-primary-600 hover:underline text-sm">🔗 Buscar en Google Business</a>');
+                            }),
+                        Forms\Components\Placeholder::make('yelp_claim_link')
+                            ->label('Link Reclamar Yelp')
+                            ->content(function ($record) {
+                                if (!$record) return '—';
+                                if ($record->yelp_id) {
+                                    $url = 'https://biz.yelp.com/biz_info/' . $record->yelp_id;
+                                    return new \Illuminate\Support\HtmlString('<a href="' . $url . '" target="_blank" class="text-primary-600 hover:underline text-sm">🔗 Ver perfil Yelp</a> <span class="text-green-600 text-xs ml-2">✓ ID: ' . $record->yelp_id . '</span>');
+                                }
+                                $url = 'https://biz.yelp.com/claiming/search?' . http_build_query(['q' => $record->name, 'l' => $record->city . ', ' . ($record->state->abbreviation ?? '')]);
+                                return new \Illuminate\Support\HtmlString('<a href="' . $url . '" target="_blank" class="text-primary-600 hover:underline text-sm">🔗 Reclamar en Yelp</a> <span class="text-amber-600 text-xs ml-2">Sin ID Yelp</span>');
+                            }),
+                    ])->columns(2)->collapsible(),
+
                 Forms\Components\Section::make('Ubicación')
                     ->schema([
                         Forms\Components\TextInput::make('address')
