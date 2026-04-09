@@ -21,9 +21,18 @@ new #[Layout('layouts.guest')] class extends Component
         Session::regenerate();
 
         $user = auth()->user();
-        $isOwner = $user->role === 'owner' || $user->restaurants()->exists();
 
-        if ($isOwner) {
+        // Admins go to the admin panel
+        if ($user->role === 'admin') {
+            $this->redirect('/admin', navigate: false);
+            return;
+        }
+
+        // Owners with restaurants go to owner portal
+        $isOwner = $user->role === 'owner' && $user->restaurants()->exists();
+        $isTeamMember = $user->activeTeamMemberships()->exists();
+
+        if ($isOwner || $isTeamMember) {
             $this->redirect('/owner', navigate: false);
         } else {
             $this->redirect('/mi-cuenta', navigate: false);
