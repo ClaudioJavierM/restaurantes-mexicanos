@@ -65,12 +65,17 @@ return [
         'client_id'     => env('YELP_CLIENT_ID'),
         'api_key'       => env('YELP_API_KEY'),
         'monthly_limit' => env('YELP_MONTHLY_LIMIT', 5000),
+        // Premium keys listed first so they are exhausted before Enhanced keys.
+        // Add YELP_PREMIUM_KEY_1..99 for Premium plan keys (12 photos + full attributes).
+        // Add YELP_API_KEY_US_2..99 for Enhanced/Base plan keys.
         'api_keys' => array_values(array_filter(array_merge(
+            // Premium plan keys first (12 photos, full attributes)
+            array_map(fn($i) => env("YELP_PREMIUM_KEY_{$i}"), range(1, 99)),
+            // Then Enhanced/Base keys
             [
                 env('YELP_API_KEY'),
                 env('YELP_API_KEY_MEXICO'),
             ],
-            // Auto-discover YELP_API_KEY_US_2 through YELP_API_KEY_US_99
             array_map(fn($i) => env("YELP_API_KEY_US_{$i}"), range(2, 99))
         ))),
     ],
