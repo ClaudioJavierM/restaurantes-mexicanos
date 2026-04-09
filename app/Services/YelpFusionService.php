@@ -26,12 +26,34 @@ class YelpFusionService
 
         $this->apiKey = $this->apiKeys[0] ?? null;
 
+        // Always start on the key with most usage (exhaust sequentially, not randomly)
+        // This ensures each key looks like a single independent user to Yelp
         if (count($this->apiKeys) > 1) {
-            $this->currentKeyIndex = rand(0, count($this->apiKeys) - 1);
+            $this->currentKeyIndex = $this->findActiveKeyIndex();
             $this->apiKey = $this->apiKeys[$this->currentKeyIndex];
         }
 
-        Log::debug('YelpFusionService initialized with ' . count($this->apiKeys) . ' API keys');
+        Log::debug('YelpFusionService initialized with ' . count($this->apiKeys) . ' API keys, starting at index ' . $this->currentKeyIndex);
+    }
+
+    /**
+     * Find the first key that still has remaining budget this month.
+     * Keys are exhausted sequentially (0 → 1 → 2 ...) so each looks
+     * like an independent user making normal calls to Yelp.
+     */
+    protected function findActiveKeyIndex(): int
+    {
+        $perKeyLimit = (int) config('services.yelp.monthly_limit', 5000);
+
+        for ($i = 0; $i < count($this->apiKeys); $i++) {
+            $used = $this->getKeyUsage($i);
+            if ($used < $perKeyLimit) {
+                return $i;
+            }
+        }
+
+        // All exhausted — return last index (budget guard will throw on next call)
+        return count($this->apiKeys) - 1;
     }
 
     protected function rotateApiKey(): bool
