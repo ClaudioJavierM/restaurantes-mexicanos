@@ -6,7 +6,7 @@
     $favoritesCount = $user->favorites()->count();
     try { $reviewsCount = $user->reviews()->count(); } catch(\Exception $e) { $reviewsCount = 0; }
     try { $checkInsCount = $user->checkIns()->count(); } catch(\Exception $e) { $checkInsCount = 0; }
-    $recentFavorites = $user->favorites()->latest('favorites.created_at')->take(4)->get();
+    $recentFavorites = $user->favoriteRestaurants()->with('state')->latest('favorites.created_at')->take(4)->get();
     try { $recentReviews = $user->reviews()->with('restaurant')->latest()->take(3)->get(); } catch(\Exception $e) { $recentReviews = collect(); }
     try { $ordersCount = \App\Models\Order::where('user_id', $user->id)->count(); $recentOrders = \App\Models\Order::with('restaurant')->where('user_id', $user->id)->latest()->take(3)->get(); } catch(\Exception $e) { $ordersCount = 0; $recentOrders = collect(); }
     try {
