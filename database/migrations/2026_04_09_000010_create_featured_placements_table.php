@@ -21,7 +21,7 @@ return new class extends Migration
             $table->unsignedInteger('impressions')->default(0);
             $table->unsignedInteger('clicks')->default(0);
             $table->timestamps();
-            $table->index(['placement_type', 'scope', 'status', 'starts_at', 'ends_at']);
+            $table->index(['placement_type', 'scope', 'status', 'starts_at', 'ends_at'], 'fp_type_scope_status_dates');
             $table->index(['restaurant_id', 'status']);
         });
     }
