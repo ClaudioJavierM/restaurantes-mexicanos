@@ -134,8 +134,11 @@ function restaurantsMap() {
                 this.markers.push(marker);
             });
 
-            // Fit bounds if multiple restaurants
-            if (this.restaurants.length > 1) {
+            // Fit bounds only when user location is NOT known.
+            // When userLat/userLng are set, keep the map centered on the user —
+            // calling fitBounds would drag the center to the geographic midpoint
+            // of all markers (e.g. downtown Dallas) instead of the user's position.
+            if (this.restaurants.length > 1 && !(this.userLat && this.userLng)) {
                 this.map.fitBounds(bounds);
                 // Don't zoom too close
                 google.maps.event.addListenerOnce(this.map, 'bounds_changed', () => {
@@ -215,9 +218,15 @@ function restaurantsMap() {
 
             const pos = { lat: parseFloat(lat), lng: parseFloat(lng) };
 
-            // Pan to user location immediately (good UX — map moves right away)
-            this.map.panTo(pos);
-            this.map.setZoom(11);
+            // Update internal state so any subsequent initMap() call (e.g. Alpine
+            // re-init after Livewire morph) also uses the GPS coords.
+            this.userLat = pos.lat;
+            this.userLng = pos.lng;
+
+            // setCenter + setZoom is immediate; panTo animates and can be
+            // interrupted by concurrent Livewire DOM updates.
+            this.map.setCenter(pos);
+            this.map.setZoom(13);
 
             // Update or add user location dot immediately
             if (this._userMarker) {
