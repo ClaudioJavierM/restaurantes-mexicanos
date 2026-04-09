@@ -16,7 +16,7 @@ class FoodTagResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-tag';
     protected static ?string $navigationGroup = 'Clasificación';
     protected static ?string $navigationLabel = 'Tags de Comida';
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 2;
 
     public static function form(Form $form): Form
     {

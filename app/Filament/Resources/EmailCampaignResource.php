@@ -25,8 +25,8 @@ class EmailCampaignResource extends Resource
     protected static ?string $navigationLabel = 'Campañas de Email';
     protected static ?string $modelLabel = 'Campaña';
     protected static ?string $pluralModelLabel = 'Campañas de Email';
-    protected static ?string $navigationGroup = 'Comunicaciones';
-    protected static ?int $navigationSort = 5;
+    protected static ?string $navigationGroup = 'Marketing & SEO';
+    protected static ?int $navigationSort = 2;
 
     public static function getNavigationBadge(): ?string
     {

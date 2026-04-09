@@ -19,9 +19,9 @@ class MenuItemResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
 
-    protected static ?string $navigationGroup = 'Restaurant Management';
+    protected static ?string $navigationGroup = 'Restaurantes';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 4;
 
     public static function getLabel(): string
     {

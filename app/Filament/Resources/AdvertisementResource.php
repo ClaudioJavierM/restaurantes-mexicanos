@@ -23,9 +23,9 @@ class AdvertisementResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Anuncios';
 
-    protected static ?string $navigationGroup = 'Gestión';
+    protected static ?string $navigationGroup = 'Comunicaciones';
 
-    protected static ?int $navigationSort = 4;
+    protected static ?int $navigationSort = 3;
 
     public static function form(Form $form): Form
     {

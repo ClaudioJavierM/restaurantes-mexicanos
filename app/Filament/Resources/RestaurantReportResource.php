@@ -24,7 +24,7 @@ class RestaurantReportResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Reportes';
 
-    protected static ?string $navigationGroup = 'Gestión';
+    protected static ?string $navigationGroup = 'Restaurantes';
 
     protected static ?int $navigationSort = 3;
 

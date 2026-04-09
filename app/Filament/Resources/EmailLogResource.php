@@ -30,7 +30,7 @@ class EmailLogResource extends Resource
     protected static ?string $modelLabel = 'Email';
     protected static ?string $pluralModelLabel = 'Emails Enviados';
     protected static ?string $navigationGroup = 'Comunicaciones';
-    protected static ?int $navigationSort = 10;
+    protected static ?int $navigationSort = 1;
 
     public static function getWidgets(): array
     {
