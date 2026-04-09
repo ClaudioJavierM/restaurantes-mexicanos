@@ -52,19 +52,31 @@
             </p>
 
             {{-- CTAs --}}
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-4">
+                @auth
                 <a href="{{ route('claim.restaurant') }}" class="inline-flex items-center px-8 py-4 text-lg font-bold rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg" style="background-color: #D4AF37; color: #0B0B0B; box-shadow: 0 4px 24px rgba(212,175,55,0.25);">
                     {{ app()->getLocale() === 'en' ? 'Claim Your Restaurant' : 'Reclama Tu Restaurante' }}
                     <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
                 </a>
+                @else
+                <a href="/register?type=owner&next=claim" class="inline-flex items-center px-8 py-4 text-lg font-bold rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg" style="background-color: #D4AF37; color: #0B0B0B; box-shadow: 0 4px 24px rgba(212,175,55,0.25);">
+                    {{ app()->getLocale() === 'en' ? 'Claim Your Restaurant' : 'Reclama Tu Restaurante' }}
+                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                </a>
+                @endauth
                 <a href="{{ app()->getLocale() === 'en' ? '/how-famer-works' : '/como-funciona-famer' }}" class="inline-flex items-center px-8 py-4 text-lg font-semibold rounded-xl transition-all duration-300 hover:bg-white/5" style="border: 1px solid #D4AF37; color: #D4AF37;">
                     {{ app()->getLocale() === 'en' ? 'See How It Works' : 'Cómo Funciona' }}
                     <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
                 </a>
             </div>
+            @guest
+            <p style="text-align:center; margin-top:0.75rem; margin-bottom:2.5rem; font-size:0.875rem; color:#6B7280;">
+                {{ app()->getLocale() === 'en' ? 'Already have an account?' : '¿Ya tienes cuenta?' }} <a href="/login?next=/claim" style="color:#D4AF37; text-decoration:underline;">{{ app()->getLocale() === 'en' ? 'Sign in →' : 'Inicia sesión →' }}</a>
+            </p>
+            @endguest
 
             {{-- Stats Bar --}}
-            <div class="grid grid-cols-3 gap-6 md:gap-12 max-w-3xl mx-auto">
+            <div class="grid grid-cols-3 gap-6 md:gap-12 max-w-3xl mx-auto mt-10">
                 <div class="text-center">
                     <div class="text-3xl md:text-4xl font-black" style="color: #D4AF37;">{{ number_format($stats['total_restaurants'] ?? 26000) }}+</div>
                     <div class="text-sm mt-1" style="color: #CCCCCC;">{{ app()->getLocale() === 'en' ? 'Restaurants' : 'Restaurantes' }}</div>
@@ -441,9 +453,18 @@
                     </li>
                     @endforeach
                 </ul>
+                @auth
                 <a href="{{ route('claim.restaurant') }}" class="block w-full text-center py-3 px-6 rounded-xl font-semibold transition-all duration-300 hover:bg-white/10" style="border: 1px solid rgba(255,255,255,0.1); color: #F5F5F5;">
                     {{ app()->getLocale() === 'en' ? 'Start Free' : 'Reclamar Gratis' }}
                 </a>
+                @else
+                <a href="/register?type=owner&next=claim" class="block w-full text-center py-3 px-6 rounded-xl font-semibold transition-all duration-300 hover:bg-white/10" style="border: 1px solid rgba(255,255,255,0.1); color: #F5F5F5;">
+                    {{ app()->getLocale() === 'en' ? 'Start Free' : 'Reclamar Gratis' }}
+                </a>
+                <p style="text-align:center; margin-top:0.75rem; font-size:0.875rem; color:#6B7280;">
+                    {{ app()->getLocale() === 'en' ? 'Already have an account?' : '¿Ya tienes cuenta?' }} <a href="/login?next=/claim" style="color:#D4AF37; text-decoration:underline;">{{ app()->getLocale() === 'en' ? 'Sign in →' : 'Inicia sesión →' }}</a>
+                </p>
+                @endauth
             </div>
 
             {{-- PREMIUM Plan (Highlighted) --}}
@@ -469,9 +490,18 @@
                     </li>
                     @endforeach
                 </ul>
+                @auth
                 <a href="{{ route('claim.restaurant') }}?plan=premium" class="block w-full text-center py-3 px-6 rounded-xl font-bold transition-all duration-300 hover:scale-105" style="background-color: #D4AF37; color: #0B0B0B; box-shadow: 0 4px 20px rgba(212,175,55,0.25);">
                     {{ app()->getLocale() === 'en' ? 'Start for $9.99' : 'Suscribirse por $9.99' }}
                 </a>
+                @else
+                <a href="/register?type=owner&next=claim&plan=premium" class="block w-full text-center py-3 px-6 rounded-xl font-bold transition-all duration-300 hover:scale-105" style="background-color: #D4AF37; color: #0B0B0B; box-shadow: 0 4px 20px rgba(212,175,55,0.25);">
+                    {{ app()->getLocale() === 'en' ? 'Start for $9.99' : 'Suscribirse por $9.99' }}
+                </a>
+                <p style="text-align:center; margin-top:0.75rem; font-size:0.875rem; color:#6B7280;">
+                    {{ app()->getLocale() === 'en' ? 'Already have an account?' : '¿Ya tienes cuenta?' }} <a href="/login?next=/claim" style="color:#D4AF37; text-decoration:underline;">{{ app()->getLocale() === 'en' ? 'Sign in →' : 'Inicia sesión →' }}</a>
+                </p>
+                @endauth
                 <p class="text-center text-xs mt-3" style="color: #999;">{{ app()->getLocale() === 'en' ? '4 Quarterly coupons (10% off) at MF Group' : '4 Cupones Trimestrales (10% off) en MF Group' }}</p>
             </div>
 
@@ -493,9 +523,18 @@
                     </li>
                     @endforeach
                 </ul>
+                @auth
                 <a href="{{ route('claim.restaurant') }}?plan=elite" class="block w-full text-center py-3 px-6 rounded-xl font-semibold transition-all duration-300 hover:bg-white/10" style="border: 1px solid rgba(255,255,255,0.1); color: #F5F5F5;">
                     {{ app()->getLocale() === 'en' ? 'Go Elite' : 'Ir a Elite' }}
                 </a>
+                @else
+                <a href="/register?type=owner&next=claim&plan=elite" class="block w-full text-center py-3 px-6 rounded-xl font-semibold transition-all duration-300 hover:bg-white/10" style="border: 1px solid rgba(255,255,255,0.1); color: #F5F5F5;">
+                    {{ app()->getLocale() === 'en' ? 'Go Elite' : 'Ir a Elite' }}
+                </a>
+                <p style="text-align:center; margin-top:0.75rem; font-size:0.875rem; color:#6B7280;">
+                    {{ app()->getLocale() === 'en' ? 'Already have an account?' : '¿Ya tienes cuenta?' }} <a href="/login?next=/claim" style="color:#D4AF37; text-decoration:underline;">{{ app()->getLocale() === 'en' ? 'Sign in →' : 'Inicia sesión →' }}</a>
+                </p>
+                @endauth
             </div>
         </div>
 
@@ -504,6 +543,10 @@
             <a href="{{ app()->getLocale() === 'en' ? '/how-famer-works' : '/como-funciona-famer' }}#precios" style="color: #D4AF37; text-decoration: none; margin-left: 4px;">
                 {{ app()->getLocale() === 'en' ? 'See full comparison →' : 'Ver comparación completa →' }}
             </a>
+        </p>
+        <p class="text-center mt-4 text-sm" style="color: #6B7280;">
+            {{ app()->getLocale() === 'en' ? 'Questions? Write to us at' : '¿Preguntas? Escríbenos a' }}
+            <a href="mailto:hola@restaurantesmexicanosfamosos.com" style="color: #9CA3AF; text-decoration: underline;">hola@restaurantesmexicanosfamosos.com</a>
         </p>
     </div>
 </section>
@@ -523,14 +566,35 @@
                 ? 'Join 26,000+ Mexican restaurant owners already on FAMER. Free to start — no credit card required.'
                 : 'Únete a 26,000+ dueños de restaurantes mexicanos que ya están en FAMER. Gratis para empezar — sin tarjeta de crédito.' }}
         </p>
+        @auth
         <a href="{{ route('claim.restaurant') }}" class="inline-flex items-center px-10 py-5 text-lg font-bold rounded-xl transition-all duration-300 hover:scale-105" style="background-color: #D4AF37; color: #0B0B0B; box-shadow: 0 4px 30px rgba(212,175,55,0.3);">
             {{ app()->getLocale() === 'en' ? 'Claim Your Restaurant' : 'Reclama Tu Restaurante' }}
             <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
         </a>
+        @else
+        <a href="/register?type=owner&next=claim" class="inline-flex items-center px-10 py-5 text-lg font-bold rounded-xl transition-all duration-300 hover:scale-105" style="background-color: #D4AF37; color: #0B0B0B; box-shadow: 0 4px 30px rgba(212,175,55,0.3);">
+            {{ app()->getLocale() === 'en' ? 'Claim Your Restaurant' : 'Reclama Tu Restaurante' }}
+            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+        </a>
+        <p style="text-align:center; margin-top:0.75rem; font-size:0.875rem; color:#6B7280;">
+            {{ app()->getLocale() === 'en' ? 'Already have an account?' : '¿Ya tienes cuenta?' }} <a href="/login?next=/claim" style="color:#D4AF37; text-decoration:underline;">{{ app()->getLocale() === 'en' ? 'Sign in →' : 'Inicia sesión →' }}</a>
+        </p>
+        @endauth
         <p class="mt-6 text-sm" style="color: #CCCCCC;">
             {{ app()->getLocale() === 'en' ? 'Free to get started. Upgrade anytime.' : 'Gratis para empezar. Mejora cuando quieras.' }}
         </p>
     </div>
 </section>
+
+{{-- ============================================ --}}
+{{-- STICKY MOBILE BAR (guests only)             --}}
+{{-- ============================================ --}}
+@guest
+<div class="md:hidden" style="position:fixed; bottom:0; left:0; right:0; z-index:40; padding:1rem; display:flex; justify-content:center; background:#D4AF37;">
+    <a href="/register?type=owner&next=claim" style="font-weight:700; font-size:1rem; color:#0B0B0B; text-decoration:none; display:inline-flex; align-items:center; gap:0.5rem;">
+        {{ app()->getLocale() === 'en' ? 'Register Your Restaurant FREE →' : 'Registra tu restaurante GRATIS →' }}
+    </a>
+</div>
+@endguest
 
 </div>

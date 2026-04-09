@@ -108,9 +108,11 @@ Route::get('/mejores/{state}', [\App\Http\Controllers\RankingController::class, 
 Route::get('/mejores/{state}/{city}', [\App\Http\Controllers\RankingController::class, 'mejoresCiudad'])->name('rankings.mejores-ciudad');
 
 // Auth Routes (Breeze)
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
+Route::view('/mi-cuenta', 'mi-cuenta')
+    ->middleware(['auth'])
     ->name('dashboard');
+
+Route::redirect('/dashboard', '/mi-cuenta');
 
 Route::view('profile', 'profile')
     ->middleware(['auth'])
@@ -278,3 +280,12 @@ Route::get('/owner/certificate-pdf/{restaurant}', function (App\Models\Restauran
 
 // Checkout
 Route::get('/checkout', \App\Livewire\Checkout::class)->name('checkout');
+
+// Order confirmation
+Route::get('/pedido/{order_number}', \App\Livewire\OrderConfirmation::class)->name('order.confirmation');
+
+// Customer account sub-pages
+Route::middleware(['auth'])->group(function () {
+    Route::get('/mi-cuenta/pedidos', \App\Livewire\MiCuentaPedidos::class)->name('mi-cuenta.pedidos');
+    Route::get('/mi-cuenta/perfil', \App\Livewire\MiCuentaPerfil::class)->name('mi-cuenta.perfil');
+});

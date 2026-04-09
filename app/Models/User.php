@@ -10,6 +10,7 @@ use Filament\Models\Contracts\FilamentUser;
 use Laravel\Sanctum\HasApiTokens;
 use Filament\Panel;
 use App\Notifications\BilingualVerifyEmail;
+use App\Notifications\ResetPasswordNotification;
 
 class User extends Authenticatable implements FilamentUser
 {
@@ -245,5 +246,13 @@ class User extends Authenticatable implements FilamentUser
     public function sendEmailVerificationNotification()
     {
         $this->notify(new BilingualVerifyEmail);
+    }
+
+    /**
+     * Send the password reset notification with FAMER branding.
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new ResetPasswordNotification($token));
     }
 }

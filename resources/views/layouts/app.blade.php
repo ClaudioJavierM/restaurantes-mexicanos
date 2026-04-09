@@ -257,11 +257,57 @@
                     <x-language-switcher />
 
                     @auth
-                        @if(auth()->user()->ownedRestaurants && auth()->user()->ownedRestaurants->first())
-                            <a href="/owner/{{ auth()->user()->ownedRestaurants->first()->id }}" class="text-[#D4AF37] hover:text-[#E8C67A] px-3 py-2 text-sm font-medium transition-colors duration-200">
-                                {{ app()->getLocale() === 'en' ? 'My Dashboard' : 'Mi Dashboard' }}
-                            </a>
-                        @endif
+                        @php
+                            $isOwner = auth()->user()->role === 'owner' || auth()->user()->restaurants()->exists();
+                            $ownerRestaurant = $isOwner ? auth()->user()->restaurants()->first() : null;
+                            $userInitial = strtoupper(substr(auth()->user()->name, 0, 1));
+                        @endphp
+                        <div class="relative" x-data="{open:false}" @click.outside="open=false">
+                            <button @click="open=!open" class="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-[#1A1A1A] transition-colors duration-200 focus:outline-none">
+                                <span class="w-9 h-9 rounded-full bg-[#D4AF37] text-[#0B0B0B] flex items-center justify-center text-sm font-bold select-none">{{ $userInitial }}</span>
+                                <svg class="w-4 h-4 text-gray-400 transition-transform duration-200" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                            </button>
+                            <div x-show="open" x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-100" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" style="position:absolute;right:0;top:calc(100% + 8px);min-width:200px;background:#1A1A1A;border:1px solid #2A2A2A;border-radius:12px;padding:8px;z-index:50;" x-cloak>
+                                @if($isOwner)
+                                    <a href="/owner" style="display:block;padding:8px 12px;border-radius:8px;font-size:14px;font-weight:700;color:#D4AF37;" class="hover:bg-[#2A2A2A] transition-colors duration-150">
+                                        {{ app()->getLocale() === 'en' ? 'My Restaurant' : 'Mi Restaurante' }}
+                                    </a>
+                                    @if($ownerRestaurant)
+                                        <a href="/restaurante/{{ $ownerRestaurant->slug }}" style="display:block;padding:8px 12px;border-radius:8px;font-size:14px;color:#9CA3AF;" class="hover:bg-[#2A2A2A] transition-colors duration-150">
+                                            {{ app()->getLocale() === 'en' ? 'View Public Profile' : 'Ver perfil público' }}
+                                        </a>
+                                    @endif
+                                    <div style="border-top:1px solid #2A2A2A;margin:6px 0;"></div>
+                                    <form method="POST" action="/logout">
+                                        @csrf
+                                        <button type="submit" style="display:block;width:100%;text-align:left;padding:8px 12px;border-radius:8px;font-size:14px;color:#F87171;background:none;border:none;cursor:pointer;" class="hover:bg-[#2A2A2A] transition-colors duration-150">
+                                            {{ app()->getLocale() === 'en' ? 'Sign out' : 'Cerrar sesión' }}
+                                        </button>
+                                    </form>
+                                @else
+                                    <a href="/mi-cuenta" style="display:block;padding:8px 12px;border-radius:8px;font-size:14px;color:#9CA3AF;" class="hover:bg-[#2A2A2A] transition-colors duration-150">
+                                        {{ app()->getLocale() === 'en' ? 'My Account' : 'Mi Cuenta' }}
+                                    </a>
+                                    <a href="/my-favorites" style="display:block;padding:8px 12px;border-radius:8px;font-size:14px;color:#9CA3AF;" class="hover:bg-[#2A2A2A] transition-colors duration-150">
+                                        {{ app()->getLocale() === 'en' ? 'My Favorites' : 'Mis Favoritos' }}
+                                    </a>
+                                    <a href="/my-reviews" style="display:block;padding:8px 12px;border-radius:8px;font-size:14px;color:#9CA3AF;" class="hover:bg-[#2A2A2A] transition-colors duration-150">
+                                        {{ app()->getLocale() === 'en' ? 'My Reviews' : 'Mis Reseñas' }}
+                                    </a>
+                                    <div style="border-top:1px solid #2A2A2A;margin:6px 0;"></div>
+                                    <a href="/claim" style="display:block;padding:8px 12px;border-radius:8px;font-size:14px;color:#D4AF37;" class="hover:bg-[#2A2A2A] transition-colors duration-150">
+                                        {{ app()->getLocale() === 'en' ? 'Do you own a restaurant?' : '¿Tienes un restaurante?' }}
+                                    </a>
+                                    <div style="border-top:1px solid #2A2A2A;margin:6px 0;"></div>
+                                    <form method="POST" action="/logout">
+                                        @csrf
+                                        <button type="submit" style="display:block;width:100%;text-align:left;padding:8px 12px;border-radius:8px;font-size:14px;color:#F87171;background:none;border:none;cursor:pointer;" class="hover:bg-[#2A2A2A] transition-colors duration-150">
+                                            {{ app()->getLocale() === 'en' ? 'Sign out' : 'Cerrar sesión' }}
+                                        </button>
+                                    </form>
+                                @endif
+                            </div>
+                        </div>
                     @else
                         <a href="/login" class="text-gray-400 hover:text-[#F5F5F5] px-3 py-2 text-sm font-medium transition-colors duration-200">
                             Login
@@ -293,15 +339,57 @@
 
                     <!-- Auth Links (Desktop) -->
                     @auth
-                        <a href="/my-favorites" class="text-gray-400 hover:text-[#D4AF37] px-3 py-2 text-sm font-medium transition-colors duration-200 flex items-center gap-1">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path>
-                            </svg>
-                            {{ app()->getLocale() === 'en' ? 'Favorites' : 'Favoritos' }}
-                        </a>
-                        <a href="/dashboard" class="text-gray-400 hover:text-[#D4AF37] px-3 py-2 text-sm font-medium transition-colors duration-200">
-                            Dashboard
-                        </a>
+                        @php
+                            $isOwner = auth()->user()->role === 'owner' || auth()->user()->restaurants()->exists();
+                            $ownerRestaurant = $isOwner ? auth()->user()->restaurants()->first() : null;
+                            $userInitial = strtoupper(substr(auth()->user()->name, 0, 1));
+                        @endphp
+                        <div class="relative" x-data="{open:false}" @click.outside="open=false">
+                            <button @click="open=!open" class="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-[#1A1A1A] transition-colors duration-200 focus:outline-none">
+                                <span class="w-9 h-9 rounded-full bg-[#D4AF37] text-[#0B0B0B] flex items-center justify-center text-sm font-bold select-none">{{ $userInitial }}</span>
+                                <svg class="w-4 h-4 text-gray-400 transition-transform duration-200" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                            </button>
+                            <div x-show="open" x-transition:enter="transition ease-out duration-150" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-100" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" style="position:absolute;right:0;top:calc(100% + 8px);min-width:200px;background:#1A1A1A;border:1px solid #2A2A2A;border-radius:12px;padding:8px;z-index:50;" x-cloak>
+                                @if($isOwner)
+                                    <a href="/owner" style="display:block;padding:8px 12px;border-radius:8px;font-size:14px;font-weight:700;color:#D4AF37;" class="hover:bg-[#2A2A2A] transition-colors duration-150">
+                                        {{ app()->getLocale() === 'en' ? 'My Restaurant' : 'Mi Restaurante' }}
+                                    </a>
+                                    @if($ownerRestaurant)
+                                        <a href="/restaurante/{{ $ownerRestaurant->slug }}" style="display:block;padding:8px 12px;border-radius:8px;font-size:14px;color:#9CA3AF;" class="hover:bg-[#2A2A2A] transition-colors duration-150">
+                                            {{ app()->getLocale() === 'en' ? 'View Public Profile' : 'Ver perfil público' }}
+                                        </a>
+                                    @endif
+                                    <div style="border-top:1px solid #2A2A2A;margin:6px 0;"></div>
+                                    <form method="POST" action="/logout">
+                                        @csrf
+                                        <button type="submit" style="display:block;width:100%;text-align:left;padding:8px 12px;border-radius:8px;font-size:14px;color:#F87171;background:none;border:none;cursor:pointer;" class="hover:bg-[#2A2A2A] transition-colors duration-150">
+                                            {{ app()->getLocale() === 'en' ? 'Sign out' : 'Cerrar sesión' }}
+                                        </button>
+                                    </form>
+                                @else
+                                    <a href="/mi-cuenta" style="display:block;padding:8px 12px;border-radius:8px;font-size:14px;color:#9CA3AF;" class="hover:bg-[#2A2A2A] transition-colors duration-150">
+                                        {{ app()->getLocale() === 'en' ? 'My Account' : 'Mi Cuenta' }}
+                                    </a>
+                                    <a href="/my-favorites" style="display:block;padding:8px 12px;border-radius:8px;font-size:14px;color:#9CA3AF;" class="hover:bg-[#2A2A2A] transition-colors duration-150">
+                                        {{ app()->getLocale() === 'en' ? 'My Favorites' : 'Mis Favoritos' }}
+                                    </a>
+                                    <a href="/my-reviews" style="display:block;padding:8px 12px;border-radius:8px;font-size:14px;color:#9CA3AF;" class="hover:bg-[#2A2A2A] transition-colors duration-150">
+                                        {{ app()->getLocale() === 'en' ? 'My Reviews' : 'Mis Reseñas' }}
+                                    </a>
+                                    <div style="border-top:1px solid #2A2A2A;margin:6px 0;"></div>
+                                    <a href="/claim" style="display:block;padding:8px 12px;border-radius:8px;font-size:14px;color:#D4AF37;" class="hover:bg-[#2A2A2A] transition-colors duration-150">
+                                        {{ app()->getLocale() === 'en' ? 'Do you own a restaurant?' : '¿Tienes un restaurante?' }}
+                                    </a>
+                                    <div style="border-top:1px solid #2A2A2A;margin:6px 0;"></div>
+                                    <form method="POST" action="/logout">
+                                        @csrf
+                                        <button type="submit" style="display:block;width:100%;text-align:left;padding:8px 12px;border-radius:8px;font-size:14px;color:#F87171;background:none;border:none;cursor:pointer;" class="hover:bg-[#2A2A2A] transition-colors duration-150">
+                                            {{ app()->getLocale() === 'en' ? 'Sign out' : 'Cerrar sesión' }}
+                                        </button>
+                                    </form>
+                                @endif
+                            </div>
+                        </div>
                     @else
                         <a href="/login" class="text-gray-400 hover:text-[#F5F5F5] px-3 py-2 text-sm font-medium transition-colors duration-200">
                             Login
@@ -358,11 +446,40 @@
                 </a>
                 <div class="border-t border-[#2A2A2A] my-2"></div>
                 @auth
-                    @if(auth()->user()->ownedRestaurants && auth()->user()->ownedRestaurants->first())
-                        <a href="/owner/{{ auth()->user()->ownedRestaurants->first()->id }}" class="block text-[#D4AF37] px-3 py-2.5 rounded-lg text-base font-medium">
-                            {{ app()->getLocale() === 'en' ? 'My Dashboard' : 'Mi Dashboard' }}
+                    @php
+                        $isOwnerMobile = auth()->user()->role === 'owner' || auth()->user()->restaurants()->exists();
+                        $ownerRestaurantMobile = $isOwnerMobile ? auth()->user()->restaurants()->first() : null;
+                    @endphp
+                    @if($isOwnerMobile)
+                        <a href="/owner" class="block text-[#D4AF37] font-bold px-3 py-2.5 rounded-lg text-base hover:bg-[#1A1A1A] transition-colors duration-150">
+                            {{ app()->getLocale() === 'en' ? 'My Restaurant' : 'Mi Restaurante' }}
+                        </a>
+                        @if($ownerRestaurantMobile)
+                            <a href="/restaurante/{{ $ownerRestaurantMobile->slug }}" class="block text-gray-400 hover:text-[#F5F5F5] px-3 py-2.5 rounded-lg text-base font-medium transition-colors duration-150">
+                                {{ app()->getLocale() === 'en' ? 'View Public Profile' : 'Ver perfil público' }}
+                            </a>
+                        @endif
+                    @else
+                        <a href="/mi-cuenta" class="block text-gray-400 hover:text-[#F5F5F5] px-3 py-2.5 rounded-lg text-base font-medium transition-colors duration-150">
+                            {{ app()->getLocale() === 'en' ? 'My Account' : 'Mi Cuenta' }}
+                        </a>
+                        <a href="/my-favorites" class="block text-gray-400 hover:text-[#F5F5F5] px-3 py-2.5 rounded-lg text-base font-medium transition-colors duration-150">
+                            {{ app()->getLocale() === 'en' ? 'My Favorites' : 'Mis Favoritos' }}
+                        </a>
+                        <a href="/my-reviews" class="block text-gray-400 hover:text-[#F5F5F5] px-3 py-2.5 rounded-lg text-base font-medium transition-colors duration-150">
+                            {{ app()->getLocale() === 'en' ? 'My Reviews' : 'Mis Reseñas' }}
+                        </a>
+                        <a href="/claim" class="block text-[#D4AF37] px-3 py-2.5 rounded-lg text-base font-medium hover:bg-[#1A1A1A] transition-colors duration-150">
+                            {{ app()->getLocale() === 'en' ? 'Do you own a restaurant?' : '¿Tienes un restaurante?' }}
                         </a>
                     @endif
+                    <div class="border-t border-[#2A2A2A] my-2"></div>
+                    <form method="POST" action="/logout">
+                        @csrf
+                        <button type="submit" class="block w-full text-left text-red-400 px-3 py-2.5 rounded-lg text-base font-medium hover:bg-[#1A1A1A] transition-colors duration-150">
+                            {{ app()->getLocale() === 'en' ? 'Sign out' : 'Cerrar sesión' }}
+                        </button>
+                    </form>
                 @else
                     <a href="/login" class="block text-gray-400 hover:text-[#F5F5F5] px-3 py-2.5 rounded-lg text-base font-medium transition-colors duration-200">
                         Login
@@ -390,12 +507,40 @@
                 </a>
                 <div class="border-t border-[#2A2A2A] my-2"></div>
                 @auth
-                    <a href="/my-favorites" class="block text-gray-400 hover:text-[#D4AF37] px-3 py-2.5 rounded-lg text-base font-medium transition-colors duration-200">
-                        {{ app()->getLocale() === 'en' ? 'My Favorites' : 'Mis Favoritos' }}
-                    </a>
-                    <a href="/dashboard" class="block text-gray-400 hover:text-[#D4AF37] px-3 py-2.5 rounded-lg text-base font-medium transition-colors duration-200">
-                        Dashboard
-                    </a>
+                    @php
+                        $isOwnerCustMobile = auth()->user()->role === 'owner' || auth()->user()->restaurants()->exists();
+                        $ownerRestaurantCustMobile = $isOwnerCustMobile ? auth()->user()->restaurants()->first() : null;
+                    @endphp
+                    @if($isOwnerCustMobile)
+                        <a href="/owner" class="block text-[#D4AF37] font-bold px-3 py-2.5 rounded-lg text-base hover:bg-[#1A1A1A] transition-colors duration-150">
+                            {{ app()->getLocale() === 'en' ? 'My Restaurant' : 'Mi Restaurante' }}
+                        </a>
+                        @if($ownerRestaurantCustMobile)
+                            <a href="/restaurante/{{ $ownerRestaurantCustMobile->slug }}" class="block text-gray-400 hover:text-[#F5F5F5] px-3 py-2.5 rounded-lg text-base font-medium transition-colors duration-150">
+                                {{ app()->getLocale() === 'en' ? 'View Public Profile' : 'Ver perfil público' }}
+                            </a>
+                        @endif
+                    @else
+                        <a href="/mi-cuenta" class="block text-gray-400 hover:text-[#F5F5F5] px-3 py-2.5 rounded-lg text-base font-medium transition-colors duration-150">
+                            {{ app()->getLocale() === 'en' ? 'My Account' : 'Mi Cuenta' }}
+                        </a>
+                        <a href="/my-favorites" class="block text-gray-400 hover:text-[#F5F5F5] px-3 py-2.5 rounded-lg text-base font-medium transition-colors duration-150">
+                            {{ app()->getLocale() === 'en' ? 'My Favorites' : 'Mis Favoritos' }}
+                        </a>
+                        <a href="/my-reviews" class="block text-gray-400 hover:text-[#F5F5F5] px-3 py-2.5 rounded-lg text-base font-medium transition-colors duration-150">
+                            {{ app()->getLocale() === 'en' ? 'My Reviews' : 'Mis Reseñas' }}
+                        </a>
+                        <a href="/claim" class="block text-[#D4AF37] px-3 py-2.5 rounded-lg text-base font-medium hover:bg-[#1A1A1A] transition-colors duration-150">
+                            {{ app()->getLocale() === 'en' ? 'Do you own a restaurant?' : '¿Tienes un restaurante?' }}
+                        </a>
+                    @endif
+                    <div class="border-t border-[#2A2A2A] my-2"></div>
+                    <form method="POST" action="/logout">
+                        @csrf
+                        <button type="submit" class="block w-full text-left text-red-400 px-3 py-2.5 rounded-lg text-base font-medium hover:bg-[#1A1A1A] transition-colors duration-150">
+                            {{ app()->getLocale() === 'en' ? 'Sign out' : 'Cerrar sesión' }}
+                        </button>
+                    </form>
                 @else
                     <a href="/login" class="block text-gray-400 hover:text-[#F5F5F5] px-3 py-2.5 rounded-lg text-base font-medium transition-colors duration-200">
                         Login
