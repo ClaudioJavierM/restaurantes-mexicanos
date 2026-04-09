@@ -38,14 +38,14 @@ class AdminPanelProvider extends PanelProvider
                 'primary' => Color::Amber,
             ])
             ->navigationGroups([
-                NavigationGroup::make('Plataforma')->icon('heroicon-o-globe-alt'),
-                NavigationGroup::make('Ingresos')->icon('heroicon-o-currency-dollar'),
-                NavigationGroup::make('Marketing & SEO')->icon('heroicon-o-megaphone'),
-                NavigationGroup::make('Comunicaciones')->icon('heroicon-o-envelope'),
-                NavigationGroup::make('Restaurantes')->icon('heroicon-o-building-storefront'),
-                NavigationGroup::make('Clasificación')->icon('heroicon-o-tag'),
-                NavigationGroup::make('Analytics')->icon('heroicon-o-chart-bar'),
-                NavigationGroup::make('Sistema')->icon('heroicon-o-cog-6-tooth'),
+                NavigationGroup::make('Plataforma'),
+                NavigationGroup::make('Ingresos'),
+                NavigationGroup::make('Marketing & SEO'),
+                NavigationGroup::make('Comunicaciones'),
+                NavigationGroup::make('Restaurantes'),
+                NavigationGroup::make('Clasificación'),
+                NavigationGroup::make('Analytics'),
+                NavigationGroup::make('Sistema'),
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
