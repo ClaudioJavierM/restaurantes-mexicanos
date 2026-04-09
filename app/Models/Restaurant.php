@@ -146,6 +146,10 @@ class Restaurant extends Model implements HasMedia
         'facebook_review_count',
         'facebook_hours',
         'facebook_enriched_at',
+        // Social media
+        'instagram_url',
+        'tiktok_url',
+        'twitter_url',
         // Import metadata
         'import_source',
         'imported_at',
