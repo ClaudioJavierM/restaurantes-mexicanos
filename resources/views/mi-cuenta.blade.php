@@ -9,6 +9,11 @@
     $recentFavorites = $user->favorites()->latest('favorites.created_at')->take(4)->get();
     try { $recentReviews = $user->reviews()->with('restaurant')->latest()->take(3)->get(); } catch(\Exception $e) { $recentReviews = collect(); }
     try { $ordersCount = \App\Models\Order::where('user_id', $user->id)->count(); $recentOrders = \App\Models\Order::with('restaurant')->where('user_id', $user->id)->latest()->take(3)->get(); } catch(\Exception $e) { $ordersCount = 0; $recentOrders = collect(); }
+    try {
+        $votesThisMonth = \App\Models\RestaurantVote::where('user_id', $user->id)->where('year', now()->year)->where('month', now()->month)->with('restaurant')->get();
+        $recentVotes = \App\Models\RestaurantVote::where('user_id', $user->id)->with('restaurant')->orderByDesc('year')->orderByDesc('month')->orderByDesc('created_at')->take(6)->get();
+        $totalVotes = \App\Models\RestaurantVote::where('user_id', $user->id)->count();
+    } catch(\Exception $e) { $votesThisMonth = collect(); $recentVotes = collect(); $totalVotes = 0; }
 @endphp
 
 @section('content')
@@ -83,6 +88,19 @@
                 </div>
             </div>
 
+            {{-- Votos este mes --}}
+            <a href="#mis-votos"
+               style="display:block; background:#1A1A1A; border:1px solid #2A2A2A; border-radius:16px; padding:1.5rem; text-align:center; text-decoration:none; transition:border-color 0.2s, background 0.2s;"
+               onmouseover="this.style.borderColor='rgba(212,175,55,0.4)'; this.style.background='#1E1E1E';"
+               onmouseout="this.style.borderColor='#2A2A2A'; this.style.background='#1A1A1A';">
+                <div style="font-size:2.25rem; font-weight:700; font-family:'Playfair Display',serif; color:#D4AF37; line-height:1;">
+                    {{ $votesThisMonth->count() }}
+                </div>
+                <div style="font-family:'Poppins',sans-serif; font-size:0.85rem; color:#9CA3AF; margin-top:0.5rem;">
+                    {{ $votesThisMonth->count() === 1 ? 'Voto este mes →' : 'Votos este mes →' }}
+                </div>
+            </a>
+
             {{-- Pedidos --}}
             <a href="{{ route('mi-cuenta.pedidos') }}"
                style="display:block; background:#1A1A1A; border:1px solid #2A2A2A; border-radius:16px; padding:1.5rem; text-align:center; text-decoration:none; transition:border-color 0.2s, background 0.2s;"
@@ -155,7 +173,118 @@
         @endif
 
         {{-- ============================================================
-             4. MIS FAVORITOS — LAST 4
+             4. MIS VOTOS
+        ============================================================ --}}
+        <div id="mis-votos" style="margin-bottom:2.5rem;">
+            <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:1.25rem; flex-wrap:wrap; gap:0.5rem;">
+                <h2 style="font-family:'Playfair Display',serif; font-size:1.5rem; font-weight:700; color:#D4AF37; margin:0;">
+                    Mis Votos FAMER
+                </h2>
+                @if($totalVotes > 0)
+                    <span style="font-family:'Poppins',sans-serif; font-size:0.8rem; color:#6B7280;">
+                        {{ $totalVotes }} {{ $totalVotes === 1 ? 'voto total' : 'votos en total' }}
+                    </span>
+                @endif
+            </div>
+
+            @if($recentVotes->isEmpty())
+                <div style="background:#1A1A1A; border:1px solid #2A2A2A; border-radius:16px; padding:2rem; text-align:center;">
+                    <div style="font-size:2rem; margin-bottom:0.75rem;">🏆</div>
+                    <p style="font-family:'Poppins',sans-serif; color:#6B7280; margin:0 0 1rem 0;">
+                        Aún no has votado este mes.
+                    </p>
+                    <a href="{{ route('votar') }}"
+                       style="display:inline-block; font-family:'Poppins',sans-serif; font-size:0.875rem; font-weight:600; background:#D4AF37; color:#0B0B0B; padding:0.6rem 1.5rem; border-radius:8px; text-decoration:none;">
+                        Votar por mi restaurante favorito
+                    </a>
+                </div>
+            @else
+                {{-- Este mes --}}
+                @if($votesThisMonth->isNotEmpty())
+                <div style="background:linear-gradient(135deg, #1A1500 0%, #0F0D00 100%); border:1px solid rgba(212,175,55,0.25); border-radius:16px; padding:1.25rem 1.5rem; margin-bottom:1rem;">
+                    <div style="font-family:'Poppins',sans-serif; font-size:0.7rem; font-weight:700; color:#D4AF37; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:1rem;">
+                        🗓️ {{ now()->translatedFormat('F Y') }} — Este mes
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:0.75rem;">
+                        @foreach($votesThisMonth as $vote)
+                        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.5rem;">
+                            <div>
+                                @if($vote->restaurant)
+                                    <a href="/restaurante/{{ $vote->restaurant->slug }}"
+                                       style="font-family:'Poppins',sans-serif; font-size:0.9rem; font-weight:600; color:#F5F5F5; text-decoration:none;"
+                                       onmouseover="this.style.color='#D4AF37'" onmouseout="this.style.color='#F5F5F5'">
+                                        {{ $vote->restaurant->name }}
+                                    </a>
+                                    <div style="font-family:'Poppins',sans-serif; font-size:0.75rem; color:#6B7280; margin-top:0.1rem;">
+                                        {{ $vote->restaurant->city }}@if($vote->restaurant->state), {{ $vote->restaurant->state }}@endif
+                                    </div>
+                                @else
+                                    <span style="font-family:'Poppins',sans-serif; font-size:0.9rem; color:#6B7280;">Restaurante eliminado</span>
+                                @endif
+                            </div>
+                            <div style="display:flex; align-items:center; gap:0.5rem;">
+                                <span style="font-family:'Poppins',sans-serif; font-size:0.72rem; font-weight:600; padding:0.25rem 0.65rem; border-radius:20px; background:rgba(212,175,55,0.12); color:#D4AF37; border:1px solid rgba(212,175,55,0.25);">
+                                    ⭐ {{ match($vote->vote_type) { 'up' => 'Voto', 'favorite' => 'Favorito', 'must_visit' => 'Must Visit', 'qr_scan' => 'QR', 'qr_email' => 'QR verificado', default => $vote->vote_type } }}
+                                </span>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                    <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid rgba(212,175,55,0.1); text-align:center;">
+                        <a href="{{ route('votar') }}"
+                           style="font-family:'Poppins',sans-serif; font-size:0.8rem; color:#D4AF37; text-decoration:none; opacity:0.8;"
+                           onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">
+                            Votar por otro restaurante este mes →
+                        </a>
+                    </div>
+                </div>
+                @else
+                <div style="background:#1A1A1A; border:1px dashed rgba(212,175,55,0.25); border-radius:16px; padding:1rem 1.5rem; margin-bottom:1rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.75rem;">
+                    <span style="font-family:'Poppins',sans-serif; font-size:0.875rem; color:#9CA3AF;">
+                        🗓️ Aún no has votado en {{ now()->translatedFormat('F') }}
+                    </span>
+                    <a href="{{ route('votar') }}"
+                       style="font-family:'Poppins',sans-serif; font-size:0.8rem; font-weight:600; color:#D4AF37; text-decoration:none; background:rgba(212,175,55,0.1); border:1px solid rgba(212,175,55,0.25); padding:0.4rem 1rem; border-radius:8px;">
+                        Votar ahora →
+                    </a>
+                </div>
+                @endif
+
+                {{-- Historial de votos anteriores --}}
+                @php $pastVotes = $recentVotes->filter(fn($v) => !($v->year == now()->year && $v->month == now()->month)); @endphp
+                @if($pastVotes->isNotEmpty())
+                <div style="background:#1A1A1A; border:1px solid #2A2A2A; border-radius:16px; padding:1.25rem 1.5rem;">
+                    <div style="font-family:'Poppins',sans-serif; font-size:0.7rem; font-weight:700; color:#6B7280; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:1rem;">
+                        Votos anteriores
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:0.65rem;">
+                        @foreach($pastVotes as $vote)
+                        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.5rem;">
+                            <div>
+                                @if($vote->restaurant)
+                                    <a href="/restaurante/{{ $vote->restaurant->slug }}"
+                                       style="font-family:'Poppins',sans-serif; font-size:0.875rem; color:#9CA3AF; text-decoration:none;"
+                                       onmouseover="this.style.color='#F5F5F5'" onmouseout="this.style.color='#9CA3AF'">
+                                        {{ $vote->restaurant->name }}
+                                    </a>
+                                @else
+                                    <span style="font-family:'Poppins',sans-serif; font-size:0.875rem; color:#4B5563;">Restaurante eliminado</span>
+                                @endif
+                            </div>
+                            <span style="font-family:'Poppins',sans-serif; font-size:0.72rem; color:#4B5563;">
+                                @php $months = ['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic']; @endphp
+                                {{ $months[$vote->month] ?? $vote->month }} {{ $vote->year }}
+                            </span>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+                @endif
+            @endif
+        </div>
+
+        {{-- ============================================================
+             5. MIS FAVORITOS — LAST 4
         ============================================================ --}}
         <div style="margin-bottom:2.5rem;">
             <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:1.25rem; flex-wrap:wrap; gap:0.5rem;">
