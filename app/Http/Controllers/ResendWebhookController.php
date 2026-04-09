@@ -32,16 +32,20 @@ class ResendWebhookController extends Controller
         try {
             $emailLog = null;
 
+            // 1. Try exact match by Resend email_id
             if ($messageId) {
                 $emailLog = EmailLog::where("message_id", $messageId)->first();
             }
 
-            if (!$emailLog) {
+            // 2. Fallback: match by recipient within a 48h window (covers Symfony Message-ID mismatch)
+            if (!$emailLog && $toEmail) {
                 $emailLog = EmailLog::where("to_email", $toEmail)
-                    ->whereNull("message_id")
-                    ->orderBy("created_at", "desc")
+                    ->where("sent_at", ">=", now()->subHours(48))
+                    ->whereNotIn("status", ["bounced", "complained"])
+                    ->orderBy("sent_at", "desc")
                     ->first();
 
+                // Save the real Resend email_id so future webhook events match directly
                 if ($emailLog && $messageId) {
                     $emailLog->message_id = $messageId;
                 }
