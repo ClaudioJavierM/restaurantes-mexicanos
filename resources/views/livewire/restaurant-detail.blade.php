@@ -1181,6 +1181,13 @@
                     </div>
                     @livewire('review-list', ['restaurant' => $restaurant])
                 </div>
+
+                <!-- Dish Reviews Section -->
+                <div style="background:#1A1A1A; border:1px solid #2A2A2A; border-radius:0.5rem; padding:1.5rem; margin-bottom:1.5rem; box-shadow:0 4px 6px rgba(0,0,0,0.3);">
+                    <h2 class="text-xl font-bold mb-4" style="color:#F5F5F5;">Reseñas de Platillos</h2>
+                    @livewire('dish-review-form', ['restaurantId' => $restaurant->id])
+                    @livewire('dish-reviews', ['restaurantId' => $restaurant->id])
+                </div>
             </div>
 
             <!-- Right Column - Sticky Sidebar -->

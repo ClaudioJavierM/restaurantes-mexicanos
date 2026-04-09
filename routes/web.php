@@ -174,6 +174,9 @@ Route::get('/catering', \App\Livewire\CateringRequest::class)->name('catering');
 Route::get('/restaurantes-mexicanos-en-{city}-{state}', \App\Livewire\CityRestaurants::class)->name('city.restaurants');
 Route::get('/mexican-restaurants-in-{city}-{state}', \App\Livewire\CityRestaurants::class)->name('city.restaurants.en');
 
+// Restaurant Comparator
+Route::get('/comparar', \App\Livewire\RestaurantComparator::class)->name('comparar');
+
 require __DIR__.'/auth.php';
 
 // FAMER Email Webhook for N8N
