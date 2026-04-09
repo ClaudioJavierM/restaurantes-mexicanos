@@ -30,8 +30,7 @@ class FavoriteButton extends Component
     public function toggleFavorite()
     {
         if (!auth()->check()) {
-            session()->flash('error', __('Please login to save favorites'));
-            return redirect()->route('login');
+            return $this->redirect(route('login', ['redirect' => url()->current()]));
         }
 
         if ($this->isFavorited) {
@@ -41,9 +40,7 @@ class FavoriteButton extends Component
                 ->delete();
 
             $this->isFavorited = false;
-            $this->favoritesCount--;
-
-            session()->flash('success', __('Removed from favorites'));
+            $this->favoritesCount = max(0, $this->favoritesCount - 1);
         } else {
             // Add to favorites
             Favorite::create([
@@ -53,8 +50,6 @@ class FavoriteButton extends Component
 
             $this->isFavorited = true;
             $this->favoritesCount++;
-
-            session()->flash('success', __('Added to favorites'));
         }
 
         $this->dispatch('favorite-toggled');

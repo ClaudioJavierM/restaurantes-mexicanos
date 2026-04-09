@@ -87,8 +87,14 @@ class RestaurantList extends Component
         'selectedBusinessType' => ['except' => '', 'as' => 'type'],
     ];
 
+    public array $userFavoriteIds = [];
+
     public function mount()
     {
+        if (auth()->check()) {
+            $this->userFavoriteIds = auth()->user()->favoriteRestaurants()->pluck('restaurants.id')->toArray();
+        }
+
         if (session()->has('user_location')) {
             $location = session('user_location');
             $this->userLatitude = $location['lat'];
@@ -215,6 +221,23 @@ class RestaurantList extends Component
             $this->selectedFoodTags[] = $tagId;
         }
         $this->resetPage();
+    }
+
+    public function toggleFavorite(int $restaurantId): void
+    {
+        if (!auth()->check()) {
+            $this->redirect(route('login', ['redirect' => url()->current()]));
+            return;
+        }
+
+        $user = auth()->user();
+        if (in_array($restaurantId, $this->userFavoriteIds)) {
+            \App\Models\Favorite::where('user_id', $user->id)->where('restaurant_id', $restaurantId)->delete();
+            $this->userFavoriteIds = array_values(array_diff($this->userFavoriteIds, [$restaurantId]));
+        } else {
+            \App\Models\Favorite::firstOrCreate(['user_id' => $user->id, 'restaurant_id' => $restaurantId]);
+            $this->userFavoriteIds[] = $restaurantId;
+        }
     }
 
     public function render()
