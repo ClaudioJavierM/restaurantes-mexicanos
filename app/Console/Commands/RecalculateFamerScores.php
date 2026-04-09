@@ -56,15 +56,29 @@ class RecalculateFamerScores extends Command
             return Command::SUCCESS;
         }
 
-        // Process multiple restaurants
-        $total = $limit > 0 ? $limit : Restaurant::count();
+        // Process multiple restaurants in chunks to avoid memory exhaustion
+        $query = Restaurant::approved();
+        $total = $limit > 0 ? min($limit, $query->count()) : $query->count();
         $this->info("Recalculating FAMER Scores for {$total} restaurants...");
-        
+
         $bar = $this->output->createProgressBar($total);
         $bar->start();
 
-        $updated = $scoreService->recalculateAll($limit, function () use ($bar) {
-            $bar->advance();
+        $updated = 0;
+        $processed = 0;
+
+        $query->chunkById(200, function ($restaurants) use ($scoreService, $bar, $limit, &$updated, &$processed) {
+            foreach ($restaurants as $restaurant) {
+                if ($limit > 0 && $processed >= $limit) return false;
+                try {
+                    $scoreService->calculateScore($restaurant);
+                    $updated++;
+                } catch (\Exception $e) {
+                    \Log::warning("Score calc failed for {$restaurant->id}: " . $e->getMessage());
+                }
+                $processed++;
+                $bar->advance();
+            }
         });
 
         $bar->finish();
