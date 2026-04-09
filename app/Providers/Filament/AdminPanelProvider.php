@@ -30,7 +30,9 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
-            ->brandName('FAMER Admin')
+            ->brandName('FAMER')
+            ->brandLogo(asset('images/logo-horizontal.png'))
+            ->brandLogoHeight('2rem')
             ->favicon(asset('images/branding/famer55.png'))
             ->colors([
                 'primary' => Color::Amber,

@@ -17,9 +17,15 @@ class Dashboard extends BaseDashboard
 
     protected static ?string $title = 'Command Center';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = -1; // Always first, before any group
 
     protected static ?string $navigationGroup = null;
+
+    // Override the default /admin path so this is the landing page
+    public static function getRouteName(?string $panel = null): string
+    {
+        return 'filament.admin.pages.dashboard';
+    }
 
     public function getWidgets(): array
     {
