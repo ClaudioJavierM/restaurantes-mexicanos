@@ -16,6 +16,8 @@ use Spatie\Sluggable\SlugOptions;
 use Spatie\Translatable\HasTranslations;
 use App\Models\Traits\HasCountry;
 use App\Models\RestaurantReport;
+use App\Models\RestaurantEvent;
+use App\Models\CheckIn;
 
 class Restaurant extends Model implements HasMedia
 {
@@ -385,6 +387,16 @@ class Restaurant extends Model implements HasMedia
     public function reports(): HasMany
     {
         return $this->hasMany(RestaurantReport::class);
+    }
+
+    public function events(): HasMany
+    {
+        return $this->hasMany(RestaurantEvent::class);
+    }
+
+    public function checkIns(): HasMany
+    {
+        return $this->hasMany(CheckIn::class);
     }
 
     public function votes(): HasMany
