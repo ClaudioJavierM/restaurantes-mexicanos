@@ -280,3 +280,12 @@ Route::get('/owner/certificate-pdf/{restaurant}', function (App\Models\Restauran
 
 // Checkout
 Route::get('/checkout', \App\Livewire\Checkout::class)->name('checkout');
+
+// Order confirmation
+Route::get('/pedido/{order_number}', \App\Livewire\OrderConfirmation::class)->name('order.confirmation');
+
+// Customer account sub-pages
+Route::middleware(['auth'])->group(function () {
+    Route::get('/mi-cuenta/pedidos', \App\Livewire\MiCuentaPedidos::class)->name('mi-cuenta.pedidos');
+    Route::get('/mi-cuenta/perfil', \App\Livewire\MiCuentaPerfil::class)->name('mi-cuenta.perfil');
+});

@@ -8,6 +8,7 @@
     try { $checkInsCount = $user->checkIns()->count(); } catch(\Exception $e) { $checkInsCount = 0; }
     $recentFavorites = $user->favorites()->latest('favorites.created_at')->take(4)->get();
     try { $recentReviews = $user->reviews()->with('restaurant')->latest()->take(3)->get(); } catch(\Exception $e) { $recentReviews = collect(); }
+    try { $ordersCount = \App\Models\Order::where('user_id', $user->id)->count(); $recentOrders = \App\Models\Order::with('restaurant')->where('user_id', $user->id)->latest()->take(3)->get(); } catch(\Exception $e) { $ordersCount = 0; $recentOrders = collect(); }
 @endphp
 
 @section('content')
@@ -26,12 +27,19 @@
                     Tu cuenta en FAMER
                 </p>
             </div>
-            <a href="{{ route('logout') }}"
-               onclick="event.preventDefault(); document.getElementById('logout-form-cuenta').submit();"
-               style="font-family:'Poppins',sans-serif; font-size:0.8rem; color:#6B7280; text-decoration:none; transition:color 0.2s;"
-               onmouseover="this.style.color='#9CA3AF'" onmouseout="this.style.color='#6B7280'">
-                Cerrar sesión
-            </a>
+            <div style="display:flex; align-items:center; gap:1.25rem; flex-wrap:wrap;">
+                <a href="{{ route('mi-cuenta.perfil') }}"
+                   style="font-family:'Poppins',sans-serif; font-size:0.85rem; font-weight:500; color:#D4AF37; text-decoration:none; border:1px solid rgba(212,175,55,0.35); border-radius:8px; padding:0.4rem 1rem; transition:background 0.2s;"
+                   onmouseover="this.style.background='rgba(212,175,55,0.08)'" onmouseout="this.style.background='transparent'">
+                    Editar perfil
+                </a>
+                <a href="{{ route('logout') }}"
+                   onclick="event.preventDefault(); document.getElementById('logout-form-cuenta').submit();"
+                   style="font-family:'Poppins',sans-serif; font-size:0.8rem; color:#6B7280; text-decoration:none; transition:color 0.2s;"
+                   onmouseover="this.style.color='#9CA3AF'" onmouseout="this.style.color='#6B7280'">
+                    Cerrar sesión
+                </a>
+            </div>
             <form id="logout-form-cuenta" action="{{ route('logout') }}" method="POST" style="display:none;">
                 @csrf
             </form>
@@ -74,10 +82,80 @@
                     Restaurantes visitados
                 </div>
             </div>
+
+            {{-- Pedidos --}}
+            <a href="{{ route('mi-cuenta.pedidos') }}"
+               style="display:block; background:#1A1A1A; border:1px solid #2A2A2A; border-radius:16px; padding:1.5rem; text-align:center; text-decoration:none; transition:border-color 0.2s, background 0.2s;"
+               onmouseover="this.style.borderColor='rgba(212,175,55,0.4)'; this.style.background='#1E1E1E';"
+               onmouseout="this.style.borderColor='#2A2A2A'; this.style.background='#1A1A1A';">
+                <div style="font-size:2.25rem; font-weight:700; font-family:'Playfair Display',serif; color:#D4AF37; line-height:1;">
+                    {{ $ordersCount }}
+                </div>
+                <div style="font-family:'Poppins',sans-serif; font-size:0.85rem; color:#9CA3AF; margin-top:0.5rem;">
+                    Pedidos realizados →
+                </div>
+            </a>
         </div>
 
         {{-- ============================================================
-             3. MIS FAVORITOS — LAST 4
+             3. MIS PEDIDOS RECIENTES
+        ============================================================ --}}
+        @if($ordersCount > 0)
+        <div style="margin-bottom:2.5rem;">
+            <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:1.25rem; flex-wrap:wrap; gap:0.5rem;">
+                <h2 style="font-family:'Playfair Display',serif; font-size:1.5rem; font-weight:700; color:#D4AF37; margin:0;">
+                    Mis Pedidos Recientes
+                </h2>
+                <a href="{{ route('mi-cuenta.pedidos') }}"
+                   style="font-family:'Poppins',sans-serif; font-size:0.85rem; color:#D4AF37; text-decoration:none;"
+                   onmouseover="this.style.opacity='0.75'" onmouseout="this.style.opacity='1'">
+                    Ver historial completo →
+                </a>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:0.75rem;">
+                @foreach($recentOrders as $order)
+                @php
+                    $statusStyles = [
+                        'pending'          => 'background:rgba(212,175,55,0.15); color:#D4AF37;',
+                        'confirmed'        => 'background:rgba(59,130,246,0.15); color:#93C5FD;',
+                        'preparing'        => 'background:rgba(249,115,22,0.15); color:#FDBA74;',
+                        'ready'            => 'background:rgba(74,222,128,0.15); color:#4ADE80;',
+                        'out_for_delivery' => 'background:rgba(167,139,250,0.15); color:#C4B5FD;',
+                        'completed'        => 'background:rgba(74,222,128,0.1); color:#86EFAC;',
+                        'cancelled'        => 'background:rgba(239,68,68,0.15); color:#FCA5A5;',
+                    ];
+                    $statusLabels = [
+                        'pending' => 'Pendiente', 'confirmed' => 'Confirmado', 'preparing' => 'Preparando',
+                        'ready' => 'Listo', 'out_for_delivery' => 'En camino',
+                        'completed' => 'Completado', 'cancelled' => 'Cancelado',
+                    ];
+                    $badgeStyle = $statusStyles[$order->status] ?? 'background:#2A2A2A; color:#9CA3AF;';
+                @endphp
+                <div style="background:#1A1A1A; border:1px solid #2A2A2A; border-radius:16px; padding:1.25rem 1.5rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.75rem;">
+                    <div>
+                        <div style="font-family:'Playfair Display',serif; font-size:1rem; font-weight:600; color:#F5F5F5; margin-bottom:0.2rem;">
+                            {{ $order->restaurant?->name ?? 'Restaurante' }}
+                        </div>
+                        <div style="font-family:'Poppins',sans-serif; font-size:0.78rem; color:#6B7280;">
+                            #{{ $order->order_number }} · {{ $order->created_at->format('d M Y') }}
+                        </div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:1rem; flex-wrap:wrap;">
+                        <span style="font-family:'Poppins',sans-serif; font-size:0.75rem; font-weight:600; padding:0.3rem 0.75rem; border-radius:20px; {{ $badgeStyle }}">
+                            {{ $statusLabels[$order->status] ?? $order->status }}
+                        </span>
+                        <div style="font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:700; color:#D4AF37;">
+                            ${{ number_format($order->total, 2) }}
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+        @endif
+
+        {{-- ============================================================
+             4. MIS FAVORITOS — LAST 4
         ============================================================ --}}
         <div style="margin-bottom:2.5rem;">
             <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:1.25rem; flex-wrap:wrap; gap:0.5rem;">
@@ -128,7 +206,7 @@
         </div>
 
         {{-- ============================================================
-             4. MIS RESEÑAS — LAST 3
+             5. MIS RESEÑAS — LAST 3
         ============================================================ --}}
         <div style="margin-bottom:2.5rem;">
             <h2 style="font-family:'Playfair Display',serif; font-size:1.5rem; font-weight:700; color:#D4AF37; margin:0 0 1.25rem 0;">
@@ -178,7 +256,7 @@
         </div>
 
         {{-- ============================================================
-             5. CTA — ¿TIENES UN RESTAURANTE?
+             6. CTA — ¿TIENES UN RESTAURANTE?
         ============================================================ --}}
         <div style="margin-bottom:2.5rem; background:linear-gradient(135deg, #2A1F00 0%, #1A1200 50%, #0D0900 100%); border:1px solid #D4AF37; border-radius:16px; padding:2rem 2rem; text-align:center;">
             <h3 style="font-family:'Playfair Display',serif; font-size:1.35rem; font-weight:700; color:#D4AF37; margin:0 0 0.75rem 0;">
@@ -195,7 +273,39 @@
         </div>
 
         {{-- ============================================================
-             6. EXPLORAR — 3 QUICK LINKS
+             7. CUENTA — ACCIONES RÁPIDAS
+        ============================================================ --}}
+        <div style="margin-bottom:2.5rem;">
+            <h2 style="font-family:'Playfair Display',serif; font-size:1.5rem; font-weight:700; color:#D4AF37; margin:0 0 1.25rem 0;">
+                Mi Cuenta
+            </h2>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:1rem;">
+
+                <a href="{{ route('mi-cuenta.perfil') }}"
+                   style="display:block; background:#1A1A1A; border:1px solid #2A2A2A; border-radius:16px; padding:1.5rem; text-decoration:none; transition:background 0.2s, border-color 0.2s;"
+                   onmouseover="this.style.background='#252525'; this.style.borderColor='rgba(212,175,55,0.35)';"
+                   onmouseout="this.style.background='#1A1A1A'; this.style.borderColor='#2A2A2A';">
+                    <div style="font-size:1.5rem; margin-bottom:0.5rem;">👤</div>
+                    <div style="font-family:'Poppins',sans-serif; font-size:0.9rem; font-weight:600; color:#F5F5F5;">
+                        Editar Perfil →
+                    </div>
+                </a>
+
+                <a href="{{ route('mi-cuenta.pedidos') }}"
+                   style="display:block; background:#1A1A1A; border:1px solid #2A2A2A; border-radius:16px; padding:1.5rem; text-decoration:none; transition:background 0.2s, border-color 0.2s;"
+                   onmouseover="this.style.background='#252525'; this.style.borderColor='rgba(212,175,55,0.35)';"
+                   onmouseout="this.style.background='#1A1A1A'; this.style.borderColor='#2A2A2A';">
+                    <div style="font-size:1.5rem; margin-bottom:0.5rem;">🛍️</div>
+                    <div style="font-family:'Poppins',sans-serif; font-size:0.9rem; font-weight:600; color:#F5F5F5;">
+                        Historial de Pedidos →
+                    </div>
+                </a>
+
+            </div>
+        </div>
+
+        {{-- ============================================================
+             8. EXPLORAR — QUICK LINKS
         ============================================================ --}}
         <div>
             <h2 style="font-family:'Playfair Display',serif; font-size:1.5rem; font-weight:700; color:#D4AF37; margin:0 0 1.25rem 0;">
