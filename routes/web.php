@@ -162,6 +162,18 @@ Route::get('/owner-email/unsubscribe/{token}', [\App\Http\Controllers\OwnerEmail
 Route::get('/votar', \App\Livewire\VoteRestaurant::class)->name('votar');
 Route::redirect('/contacto', '/contact');
 
+// FAMER Awards
+Route::get('/awards', \App\Livewire\AwardsWinners::class)->name('awards.winners');
+Route::get('/awards/hall-of-fame', \App\Livewire\AwardsHallOfFame::class)->name('awards.hall-of-fame');
+Route::get('/awards/{year}/{month}', \App\Livewire\AwardsWinners::class)->name('awards.month');
+
+// Catering
+Route::get('/catering', \App\Livewire\CateringRequest::class)->name('catering');
+
+// City SEO pages
+Route::get('/restaurantes-mexicanos-en-{city}-{state}', \App\Livewire\CityRestaurants::class)->name('city.restaurants');
+Route::get('/mexican-restaurants-in-{city}-{state}', \App\Livewire\CityRestaurants::class)->name('city.restaurants.en');
+
 require __DIR__.'/auth.php';
 
 // FAMER Email Webhook for N8N

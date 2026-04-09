@@ -327,7 +327,7 @@
                     <a href="/guia" class="text-gray-400 hover:text-[#D4AF37] px-4 py-2 text-sm font-medium transition-colors duration-200">
                         {{ app()->getLocale() === 'en' ? 'City Guide' : 'Guia' }}
                     </a>
-                    <a href="/famer-awards" class="text-gray-400 hover:text-[#D4AF37] px-4 py-2 text-sm font-medium transition-colors duration-200">
+                    <a href="{{ route('awards.winners') }}" class="text-gray-400 hover:text-[#D4AF37] px-4 py-2 text-sm font-medium transition-colors duration-200">
                         FAMER Awards
                     </a>
                     <a href="/blog" class="text-gray-400 hover:text-[#D4AF37] px-4 py-2 text-sm font-medium transition-colors duration-200 {{ request()->is('blog*') ? 'text-[#D4AF37]' : '' }}">
@@ -499,7 +499,7 @@
                 <a href="/guia" class="block text-gray-400 hover:text-[#D4AF37] px-3 py-2.5 rounded-lg text-base font-medium transition-colors duration-200">
                     {{ app()->getLocale() === 'en' ? 'City Guide' : 'Guia' }}
                 </a>
-                <a href="/famer-awards" class="block text-gray-400 hover:text-[#D4AF37] px-3 py-2.5 rounded-lg text-base font-medium transition-colors duration-200">
+                <a href="{{ route('awards.winners') }}" class="block text-gray-400 hover:text-[#D4AF37] px-3 py-2.5 rounded-lg text-base font-medium transition-colors duration-200">
                     FAMER Awards
                 </a>
                 <a href="/blog" class="block text-gray-400 hover:text-[#D4AF37] px-3 py-2.5 rounded-lg text-base font-medium transition-colors duration-200 {{ request()->is('blog*') ? 'text-[#D4AF37]' : '' }}">
@@ -617,8 +617,10 @@
                         <li><a href="/mejores-restaurantes-mexicanos" class="text-gray-500 hover:text-[#D4AF37] transition-colors duration-200">Top 10</a></li>
                         <li><a href="/restaurantes" class="text-gray-500 hover:text-[#D4AF37] transition-colors duration-200">{{ app()->getLocale() === 'en' ? 'Categories' : 'Categorias' }}</a></li>
                         <li><a href="/guia" class="text-gray-500 hover:text-[#D4AF37] transition-colors duration-200">{{ app()->getLocale() === 'en' ? 'City Guide' : 'Guia por Ciudad' }}</a></li>
-                        <li><a href="/famer-awards" class="text-gray-500 hover:text-[#D4AF37] transition-colors duration-200">FAMER Awards</a></li>
+                        <li><a href="{{ route('awards.winners') }}" class="text-gray-500 hover:text-[#D4AF37] transition-colors duration-200">FAMER Awards</a></li>
+                        <li><a href="{{ route('awards.hall-of-fame') }}" class="text-gray-500 hover:text-[#D4AF37] transition-colors duration-200">Hall of Fame</a></li>
                         <li><a href="/votar" class="text-gray-500 hover:text-[#D4AF37] transition-colors duration-200">{{ app()->getLocale() === 'en' ? 'Vote Now' : 'Votar Ahora' }}</a></li>
+                        <li><a href="{{ route('catering') }}" class="text-gray-500 hover:text-[#D4AF37] transition-colors duration-200">{{ app()->getLocale() === 'en' ? 'Catering' : 'Catering' }}</a></li>
                     </ul>
                 </div>
 
