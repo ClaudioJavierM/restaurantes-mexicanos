@@ -38,6 +38,11 @@ class SendClaimInvitations extends Command
             ->where(function ($q) {
                 $q->whereNotNull("owner_email")
                   ->orWhereNotNull("email");
+            })
+            ->whereNotIn('email', \App\Models\EmailSuppression::pluck('email'))
+            ->whereNotIn('owner_email', \App\Models\EmailSuppression::pluck('email'))
+            ->where(function ($q) {
+                $q->whereNull('owner_newsletter')->orWhere('owner_newsletter', true);
             });
 
         if ($state) {

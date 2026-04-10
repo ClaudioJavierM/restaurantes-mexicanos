@@ -94,6 +94,9 @@ class SendFamerEmails extends Command
             })
             ->where("is_claimed", false)
             ->whereNull("famer_email_1_sent_at")
+            ->whereNotExists(function ($q) {
+                $q->from('email_suppressions')->whereColumn('email_suppressions.email', 'restaurants.email');
+            })
             ->limit($limit)
             ->get();
 
@@ -152,6 +155,9 @@ class SendFamerEmails extends Command
             ->whereNotNull("famer_email_1_sent_at")
             ->where("famer_email_1_sent_at", "<", $tenDaysAgo)
             ->whereNull("famer_email_2_sent_at")
+            ->whereNotExists(function ($q) {
+                $q->from('email_suppressions')->whereColumn('email_suppressions.email', 'restaurants.email');
+            })
             ->limit($limit)
             ->get();
 
@@ -210,6 +216,9 @@ class SendFamerEmails extends Command
             ->whereNotNull("famer_email_2_sent_at")
             ->where("famer_email_2_sent_at", "<", $tenDaysAgo)
             ->whereNull("famer_email_3_sent_at")
+            ->whereNotExists(function ($q) {
+                $q->from('email_suppressions')->whereColumn('email_suppressions.email', 'restaurants.email');
+            })
             ->limit($limit)
             ->get();
 

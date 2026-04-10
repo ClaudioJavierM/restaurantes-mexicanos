@@ -402,3 +402,11 @@ Schedule::command('famer:campaign-report --alert --format=json')
     ->onSuccess(function () {
         \Log::info('Hourly campaign alert check OK');
     });
+
+/**
+ * Email health check — cada 30 minutos, solo output si bounce/complaint crítico
+ */
+Schedule::command('famer:email-health --alert')
+    ->everyThirtyMinutes()
+    ->timezone('America/New_York')
+    ->description('Email health check — alerta si bounce/complaint rate crítico');

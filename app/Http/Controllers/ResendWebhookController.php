@@ -106,6 +106,7 @@ class ResendWebhookController extends Controller
                     $emailLog->status = "bounced";
                     $emailLog->bounced_at = now();
                     $emailLog->error_message = $data["bounce"]["message"] ?? "Bounced";
+                    \App\Models\EmailSuppression::suppress($toEmail, 'bounced', 'resend_webhook');
                     break;
 
                 case "email.complained":
@@ -113,6 +114,7 @@ class ResendWebhookController extends Controller
                     $metadata = $emailLog->metadata ?? [];
                     $metadata["complained_at"] = now()->toISOString();
                     $emailLog->metadata = $metadata;
+                    \App\Models\EmailSuppression::suppress($toEmail, 'complained', 'resend_webhook');
                     break;
             }
 
