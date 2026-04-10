@@ -410,3 +410,17 @@ Schedule::command('famer:email-health --alert')
     ->everyThirtyMinutes()
     ->timezone('America/New_York')
     ->description('Email health check — alerta si bounce/complaint rate crítico');
+
+// ============================================================================
+// GSC Sync — datos de keywords, impressiones, CTR y posiciones desde Google
+// Corre diario a las 6 AM ET (GSC tiene retraso de ~3 días en los datos)
+// Requiere GOOGLE_SERVICE_ACCOUNT_JSON en .env — sin credenciales, no crashea
+// ============================================================================
+Schedule::command('famer:sync-gsc --days=7')
+    ->dailyAt('06:00')
+    ->timezone('America/New_York')
+    ->description('Sync GSC data: keywords, impressions, CTR, positions')
+    ->onFailure(function () {
+        \Log::error('GSC sync failed');
+        notifyN8nFailure('famer:sync-gsc', 'Google Search Console sync');
+    });

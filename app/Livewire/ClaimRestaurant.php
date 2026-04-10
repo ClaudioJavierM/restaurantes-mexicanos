@@ -44,6 +44,22 @@ class ClaimRestaurant extends Component
     {
         $this->searchResults = collect();
 
+        // Track claim page view
+        try {
+            \App\Models\AnalyticsEvent::create([
+                'restaurant_id' => null,
+                'event_type' => 'claim_page_view',
+                'user_type' => 'owner',
+                'ip_address' => request()->ip(),
+                'referrer' => request()->header('referer'),
+                'user_agent' => request()->userAgent(),
+                'session_id' => session()->getId(),
+                'metadata' => ['url' => request()->fullUrl()],
+            ]);
+        } catch (\Exception $e) {
+            Log::warning('Failed to track claim_page_view: ' . $e->getMessage());
+        }
+
         $searchQuery = request()->query("search");
         if ($searchQuery) {
             $this->search = $searchQuery;
@@ -102,6 +118,22 @@ class ClaimRestaurant extends Component
             'search' => 'required|min:3',
         ]);
 
+        // Track claim search
+        try {
+            \App\Models\AnalyticsEvent::create([
+                'restaurant_id' => null,
+                'event_type' => 'claim_search',
+                'user_type' => 'owner',
+                'ip_address' => request()->ip(),
+                'referrer' => request()->header('referer'),
+                'user_agent' => request()->userAgent(),
+                'session_id' => session()->getId(),
+                'metadata' => ['query' => $this->search, 'state' => $this->selectedState],
+            ]);
+        } catch (\Exception $e) {
+            Log::warning('Failed to track claim_search: ' . $e->getMessage());
+        }
+
         $query = Restaurant::query()
             ->where('status', 'approved');
 
@@ -135,6 +167,26 @@ class ClaimRestaurant extends Component
         if ($this->selectedRestaurant->is_claimed) {
             session()->flash('error', 'This restaurant has already been claimed');
             return;
+        }
+
+        // Track restaurant selected
+        try {
+            \App\Models\AnalyticsEvent::create([
+                'restaurant_id' => $this->selectedRestaurant->id,
+                'event_type' => 'claim_restaurant_selected',
+                'user_type' => 'owner',
+                'ip_address' => request()->ip(),
+                'referrer' => request()->header('referer'),
+                'user_agent' => request()->userAgent(),
+                'session_id' => session()->getId(),
+                'metadata' => [
+                    'restaurant_name' => $this->selectedRestaurant->name,
+                    'restaurant_slug' => $this->selectedRestaurant->slug,
+                    'search_query' => $this->search,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            Log::warning('Failed to track claim_restaurant_selected: ' . $e->getMessage());
         }
 
         $this->detectAvailableMethods();
@@ -176,6 +228,25 @@ class ClaimRestaurant extends Component
             'ownerEmail' => 'required|email',
             'ownerPhone' => 'required|min:10',
         ]);
+
+        // Track verification started
+        try {
+            \App\Models\AnalyticsEvent::create([
+                'restaurant_id' => $this->selectedRestaurant->id ?? null,
+                'event_type' => 'claim_verification_started',
+                'user_type' => 'owner',
+                'ip_address' => request()->ip(),
+                'referrer' => request()->header('referer'),
+                'user_agent' => request()->userAgent(),
+                'session_id' => session()->getId(),
+                'metadata' => [
+                    'method' => $this->verificationMethod,
+                    'restaurant_id' => $this->selectedRestaurant->id ?? null,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            Log::warning('Failed to track claim_verification_started: ' . $e->getMessage());
+        }
 
         $restaurantEmail = $this->selectedRestaurant->email;
         $restaurantPhone = $this->selectedRestaurant->phone;
@@ -361,6 +432,25 @@ class ClaimRestaurant extends Component
             'email_verified_for_claim' => true,
         ]);
 
+        // Track verification completed
+        try {
+            \App\Models\AnalyticsEvent::create([
+                'restaurant_id' => $this->selectedRestaurant->id ?? null,
+                'event_type' => 'claim_verification_completed',
+                'user_type' => 'owner',
+                'ip_address' => request()->ip(),
+                'referrer' => request()->header('referer'),
+                'user_agent' => request()->userAgent(),
+                'session_id' => session()->getId(),
+                'metadata' => [
+                    'method' => $this->verificationMethod,
+                    'restaurant_id' => $this->selectedRestaurant->id ?? null,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            Log::warning('Failed to track claim_verification_completed: ' . $e->getMessage());
+        }
+
         $this->step = 'select_plan';
         $this->dispatch('scroll-top');
     }
@@ -406,6 +496,27 @@ class ClaimRestaurant extends Component
     {
         $this->selectedPlan = $plan;
 
+        if ($plan !== 'free') {
+            // Track upgrade to premium
+            try {
+                \App\Models\AnalyticsEvent::create([
+                    'restaurant_id' => $this->selectedRestaurant->id ?? null,
+                    'event_type' => 'claim_upgrade_to_premium',
+                    'user_type' => 'owner',
+                    'ip_address' => request()->ip(),
+                    'referrer' => request()->header('referer'),
+                    'user_agent' => request()->userAgent(),
+                    'session_id' => session()->getId(),
+                    'metadata' => [
+                        'plan' => $plan,
+                        'restaurant_id' => $this->selectedRestaurant->id ?? null,
+                    ],
+                ]);
+            } catch (\Exception $e) {
+                Log::warning('Failed to track claim_upgrade_to_premium: ' . $e->getMessage());
+            }
+        }
+
         if ($plan === 'free') {
             return $this->completeFreeClai();
         }
@@ -447,6 +558,26 @@ class ClaimRestaurant extends Component
 
         auth()->login($user);
         session()->regenerate();
+
+        // Track claim completed
+        try {
+            \App\Models\AnalyticsEvent::create([
+                'restaurant_id' => $this->selectedRestaurant->id ?? null,
+                'event_type' => 'claim_completed',
+                'user_type' => 'owner',
+                'ip_address' => request()->ip(),
+                'referrer' => request()->header('referer'),
+                'user_agent' => request()->userAgent(),
+                'session_id' => session()->getId(),
+                'metadata' => [
+                    'plan' => $this->selectedPlan,
+                    'restaurant_id' => $this->selectedRestaurant->id ?? null,
+                    'restaurant_name' => $this->selectedRestaurant->name ?? null,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            Log::warning('Failed to track claim_completed: ' . $e->getMessage());
+        }
 
         session()->flash('success', '¡Felicidades! Tu restaurante ha sido reclamado exitosamente.');
         return $this->redirect(route('filament.owner.pages.dashboard'), navigate: false);

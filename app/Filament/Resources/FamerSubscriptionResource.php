@@ -55,10 +55,8 @@ class FamerSubscriptionResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return Restaurant::query()
-            ->where(function (Builder $query) {
-                $query->whereNotNull('subscription_tier')
-                    ->orWhere('is_claimed', true);
-            });
+            ->where(fn (Builder $q) => $q->where('is_claimed', true)
+                ->orWhereIn('subscription_tier', ['premium', 'elite']));
     }
 
     // ─── Form ────────────────────────────────────────────────────────────────
@@ -139,17 +137,29 @@ class FamerSubscriptionResource extends Resource
                 Tables\Columns\TextColumn::make('subscription_tier')
                     ->label('Plan')
                     ->badge()
-                    ->formatStateUsing(fn (?string $state): string => match ($state) {
-                        'claimed' => 'Reclamado',
-                        'premium' => 'Premium ⭐',
-                        'elite'   => 'Elite 👑',
-                        default   => 'Sin plan',
+                    ->formatStateUsing(function (?string $state, Restaurant $record): string {
+                        if ($record->is_claimed) {
+                            return match ($state) {
+                                'premium' => 'Premium ⭐',
+                                'elite'   => 'Elite 👑',
+                                default   => 'Reclamado (Free)',
+                            };
+                        }
+                        return match ($state) {
+                            'premium' => 'Premium ⭐',
+                            'elite'   => 'Elite 👑',
+                            default   => 'Sin reclamar',
+                        };
                     })
-                    ->color(fn (?string $state): string => match ($state) {
-                        'claimed' => 'info',
-                        'premium' => 'warning',
-                        'elite'   => 'purple',
-                        default   => 'gray',
+                    ->color(function (?string $state, Restaurant $record): string {
+                        if ($record->is_claimed) {
+                            return match ($state) {
+                                'premium' => 'success',
+                                'elite'   => 'warning',
+                                default   => 'info',
+                            };
+                        }
+                        return 'gray';
                     })
                     ->sortable(),
 
@@ -212,11 +222,19 @@ class FamerSubscriptionResource extends Resource
                 Tables\Filters\SelectFilter::make('subscription_tier')
                     ->label('Plan')
                     ->options([
-                        'claimed' => 'Reclamado',
                         'premium' => 'Premium ⭐',
                         'elite'   => 'Elite 👑',
                     ])
                     ->placeholder('Todos los planes'),
+
+                Tables\Filters\TernaryFilter::make('is_claimed')
+                    ->label('Estado de Claim')
+                    ->trueLabel('Reclamados')
+                    ->falseLabel('Sin reclamar')
+                    ->queries(
+                        true: fn ($query) => $query->where('is_claimed', true),
+                        false: fn ($query) => $query->where('is_claimed', false),
+                    ),
 
                 Tables\Filters\SelectFilter::make('subscription_status')
                     ->label('Estado')
