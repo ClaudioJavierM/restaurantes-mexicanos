@@ -58,9 +58,146 @@
     .score-breakdown-val { color: #F5F5F5; font-weight: 600; margin-left: 0.75rem; white-space: nowrap; }
     .score-breakdown-bar { flex: 1; height: 4px; background: #2A2A2A; border-radius: 2px; overflow: hidden; margin: 0 0.75rem; }
     .score-breakdown-fill { height: 100%; border-radius: 2px; }
+    /* GSC styles */
+    .gsc-grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 0.75rem; margin-bottom: 1rem; }
+    @media (max-width: 900px) { .gsc-grid-4 { grid-template-columns: repeat(2,1fr); } }
+    .kw-table { width: 100%; border-collapse: collapse; font-size: 0.72rem; }
+    .kw-table th { text-align: left; color: #D4AF37; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.1em; padding: 0.5rem 0.75rem; border-bottom: 1px solid #2A2A2A; }
+    .kw-table td { padding: 0.4rem 0.75rem; border-bottom: 1px solid #1A1A1A; color: #ccc; }
+    .kw-table tr:hover td { background: #1E1E1E; }
+    .kw-table td:first-child { color: #F5F5F5; }
+    .pos-badge { display: inline-block; min-width: 36px; text-align: center; border-radius: 4px; padding: 1px 4px; font-weight: 700; font-size: 0.68rem; }
+    .pos-top3  { background: rgba(34,197,94,0.15); color: #22c55e; }
+    .pos-4to10 { background: rgba(245,158,11,0.15); color: #f59e0b; }
+    .pos-11p   { background: rgba(239,68,68,0.12); color: #ef4444; }
 </style>
 
 <div class="seo-dash">
+
+    {{-- ===== GSC: GOOGLE SEARCH CONSOLE ===== --}}
+    @if($this->hasGscData)
+
+    <div class="sec-title">Google Search Console — Últimos 30 días</div>
+
+    {{-- 4 KPIs --}}
+    <div class="gsc-grid-4">
+        @php
+            $gscKpis = [
+                ['label' => 'Clics', 'val' => number_format($this->totalClicks), 'color' => '#22c55e', 'icon' => '👆'],
+                ['label' => 'Impresiones', 'val' => number_format($this->totalImpressions), 'color' => '#3b82f6', 'icon' => '👁'],
+                ['label' => 'CTR Promedio', 'val' => $this->avgCtr . '%', 'color' => '#D4AF37', 'icon' => '📊'],
+                ['label' => 'Posición Media', 'val' => $this->avgPosition, 'color' => '#8b5cf6', 'icon' => '📍'],
+            ];
+        @endphp
+        @foreach ($gscKpis as $kpi)
+        <div class="seo-card-sm" style="text-align: center;">
+            <div style="font-size: 1.3rem; margin-bottom: 0.25rem;">{{ $kpi['icon'] }}</div>
+            <div style="font-size: 1.6rem; font-weight: 900; color: {{ $kpi['color'] }}; line-height: 1;">{{ $kpi['val'] }}</div>
+            <div style="font-size: 0.65rem; color: #888; text-transform: uppercase; letter-spacing: 0.08em; margin-top: 0.3rem;">{{ $kpi['label'] }}</div>
+        </div>
+        @endforeach
+    </div>
+
+    {{-- Top keywords + Oportunidades --}}
+    <div class="main-grid" style="margin-bottom: 1rem;">
+
+        {{-- Top 20 Keywords --}}
+        <div class="seo-card">
+            <div class="sec-title">Top 20 Keywords</div>
+            <div style="overflow-x: auto; max-height: 360px; overflow-y: auto;">
+                <table class="kw-table">
+                    <thead><tr><th>Query</th><th>Clics</th><th>Impr.</th><th>CTR</th><th>Pos.</th></tr></thead>
+                    <tbody>
+                        @foreach ($this->topKeywords as $kw)
+                            @php
+                                $pos = $kw['position'];
+                                $posClass = $pos <= 3 ? 'pos-top3' : ($pos <= 10 ? 'pos-4to10' : 'pos-11p');
+                            @endphp
+                            <tr>
+                                <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ $kw['query'] }}</td>
+                                <td style="color: #22c55e; font-weight: 700;">{{ $kw['clicks'] }}</td>
+                                <td style="color: #3b82f6;">{{ number_format($kw['impressions']) }}</td>
+                                <td>{{ $kw['ctr'] }}</td>
+                                <td><span class="pos-badge {{ $posClass }}">{{ $pos }}</span></td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {{-- Oportunidades (pos 4-10) --}}
+        <div class="seo-card">
+            <div class="sec-title" style="color: #f59e0b;">Oportunidades — Posición 4–10</div>
+            <p style="font-size: 0.7rem; color: #666; margin-bottom: 0.75rem;">Keywords con alto potencial — pequeña mejora = salto a top 3</p>
+            <div style="overflow-x: auto; max-height: 360px; overflow-y: auto;">
+                <table class="kw-table">
+                    <thead><tr><th>Query</th><th>Impr.</th><th>Clics</th><th>CTR</th><th>Pos.</th></tr></thead>
+                    <tbody>
+                        @foreach ($this->opportunities as $opp)
+                            <tr>
+                                <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ $opp['query'] }}</td>
+                                <td style="color: #3b82f6;">{{ number_format($opp['impressions']) }}</td>
+                                <td style="color: #22c55e; font-weight: 700;">{{ $opp['clicks'] }}</td>
+                                <td>{{ $opp['ctr'] }}</td>
+                                <td><span class="pos-badge pos-4to10">{{ $opp['position'] }}</span></td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {{-- Top páginas + Dispositivos --}}
+    <div class="main-grid" style="margin-bottom: 1rem;">
+        {{-- Top páginas --}}
+        <div class="seo-card">
+            <div class="sec-title">Top 10 Páginas</div>
+            <div style="overflow-x: auto;">
+                <table class="kw-table">
+                    <thead><tr><th>Página</th><th>Clics</th><th>Impr.</th><th>Pos.</th></tr></thead>
+                    <tbody>
+                        @foreach ($this->topPages as $pg)
+                            @php $slug = ltrim(parse_url($pg['page'], PHP_URL_PATH) ?? $pg['page'], '/'); @endphp
+                            <tr>
+                                <td style="max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #D4AF37;">
+                                    <a href="{{ $pg['page'] }}" target="_blank" style="color: #D4AF37; text-decoration: none;">{{ $slug ?: 'Inicio' }}</a>
+                                </td>
+                                <td style="color: #22c55e; font-weight: 700;">{{ $pg['clicks'] }}</td>
+                                <td style="color: #3b82f6;">{{ number_format($pg['impressions']) }}</td>
+                                <td>{{ $pg['position'] }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {{-- Por dispositivo --}}
+        <div class="seo-card">
+            <div class="sec-title">Clics por Dispositivo</div>
+            @php $totalDevClicks = array_sum(array_column($this->byDevice, 'clicks')) ?: 1; @endphp
+            @foreach ($this->byDevice as $dev)
+                @php
+                    $devPct = round($dev['clicks'] / $totalDevClicks * 100, 1);
+                    $devColor = match(strtolower($dev['device'])) { 'mobile' => '#22c55e', 'desktop' => '#3b82f6', default => '#f59e0b' };
+                @endphp
+                <div style="margin-bottom: 0.75rem;">
+                    <div style="display: flex; justify-content: space-between; font-size: 0.72rem; margin-bottom: 0.3rem;">
+                        <span style="color: #ccc;">{{ $dev['device'] }}</span>
+                        <span style="color: {{ $devColor }}; font-weight: 700;">{{ number_format($dev['clicks']) }} clics ({{ $devPct }}%)</span>
+                    </div>
+                    <div class="prog-bar-wrap">
+                        <div class="prog-bar-fill" style="width: {{ $devPct }}%; background: {{ $devColor }};"></div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    </div>
+
+    <hr style="border: none; border-top: 1px solid #2A2A2A; margin: 1.5rem 0;">
+    @endif
 
     {{-- ===== SECTION 1: SEO HEALTH SCORE ===== --}}
     @php
