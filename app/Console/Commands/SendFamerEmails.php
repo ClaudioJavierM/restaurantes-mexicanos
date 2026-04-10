@@ -63,6 +63,7 @@ class SendFamerEmails extends Command
         $this->info("Procesando Email 1 (Introduction)...");
 
         $restaurants = Restaurant::query()
+            ->where("country", "US")
             ->where("status", "approved")
             ->where(function ($q) {
                 $q->whereNotNull("email")->where("email", "<>", "");
@@ -120,6 +121,7 @@ class SendFamerEmails extends Command
         $tenDaysAgo = Carbon::now()->subDays(10);
 
         $restaurants = Restaurant::query()
+            ->where("country", "US")
             ->where("status", "approved")
             ->where("is_claimed", false)
             ->whereNotNull("famer_email_1_sent_at")
@@ -176,6 +178,7 @@ class SendFamerEmails extends Command
         $tenDaysAgo = Carbon::now()->subDays(10);
 
         $restaurants = Restaurant::query()
+            ->where("country", "US")
             ->where("status", "approved")
             ->where("is_claimed", false)
             ->whereNotNull("famer_email_2_sent_at")

@@ -31,6 +31,7 @@ class SendClaimInvitations extends Command
         $this->info("Searching for unclaimed restaurants with emails...");
 
         $query = Restaurant::query()
+            ->where("country", "US")
             ->where("is_claimed", false)
             ->where("status", "approved")
             ->whereNull("claim_invitation_sent_at")
