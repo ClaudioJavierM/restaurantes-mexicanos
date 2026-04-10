@@ -40,6 +40,7 @@
 <div id="restaurants-map-data" data-restaurants="{!! htmlspecialchars($restaurantsJson, ENT_QUOTES) !!}" style="display:none;"></div>
 
 <div
+    wire:ignore
     x-data="restaurantsMap()"
     x-init="initMap()"
     @highlight-marker.window="highlightMarker($event.detail.index)"
@@ -47,7 +48,7 @@
     {{ $attributes->merge(['class' => 'rounded-lg overflow-hidden shadow-lg border border-gray-200 bg-gray-100']) }}
     style="height: {{ $heightStyle }};"
 >
-    <div wire:ignore id="restaurants-map" style="height: 100%; width: 100%;"></div>
+    <div id="restaurants-map" style="height: 100%; width: 100%;"></div>
 </div>
 
 @push('scripts')
