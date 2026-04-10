@@ -199,12 +199,23 @@ Schedule::command('owners:send-reminders --days=30 --limit=100')
     });
 
 /**
- * Send claim invitations - Mondays, Wednesdays, Fridays 11:00 AM (150 × 3 = 450/semana)
+ * FAMER Campaign — Rampa progresiva (Resend Pro: 50K/mes, sin límite diario)
+ *
+ * Semana 1 (días 1-3): 300/día  → warming domain reputation
+ * Semana 1 (días 4-7): 500/día  → subida gradual
+ * Semana 2+:           800/día  → velocidad de crucero (pipeline ~3,944 US en ~2 semanas)
+ *
+ * AJUSTAR --limit manualmente según semana:
+ *   Semana 1 inicio: --limit=300
+ *   Semana 1 final:  --limit=500
+ *   Semana 2+:       --limit=800
+ *
+ * País: solo US (country='US') — MX tiene campaña separada pendiente de diseño
  */
-Schedule::command('restaurants:send-claim-invitations --limit=150 --delay=1')
-    ->cron('0 11 * * 1,3,5')
+Schedule::command('restaurants:send-claim-invitations --limit=500 --delay=1')
+    ->dailyAt('11:00')
     ->timezone('America/New_York')
-    ->description('Send claim invitations — 450 emails/semana')
+    ->description('DAILY: Claim invitations US — 500/día (Resend Pro 50K/mes)')
     ->onSuccess(function () {
         \Log::info('Claim invitations sent successfully');
     })
@@ -214,25 +225,25 @@ Schedule::command('restaurants:send-claim-invitations --limit=150 --delay=1')
     });
 
 /**
- * FAMER Email Sequence — Email 2 (How It Works) — Lunes, Miércoles, Viernes 10am ET
- * Envía a restaurantes que recibieron Email 1 hace 10+ días y no han reclamado
+ * FAMER Email Sequence — Email 2 (How It Works) — Diario 10am ET
+ * Restaurantes que recibieron Email 1 hace 10+ días y no han reclamado (solo US)
  */
-Schedule::command('famer:send-emails --email2 --limit=100')
-    ->cron('0 10 * * 1,3,5')
+Schedule::command('famer:send-emails --email2 --limit=200')
+    ->dailyAt('10:00')
     ->timezone('America/New_York')
-    ->description('FAMER Email 2: How It Works — follow-up 10 días post Email 1')
+    ->description('DAILY: FAMER Email 2 follow-up — 200/día (US only)')
     ->onFailure(function () {
         \Log::error('FAMER Email 2 sequence failed');
     });
 
 /**
- * FAMER Email Sequence — Email 3 (Reminder) — Martes, Jueves 10am ET
- * Envía a restaurantes que recibieron Email 2 hace 10+ días y no han reclamado
+ * FAMER Email Sequence — Email 3 (Final Reminder) — Diario 10:30am ET
+ * Restaurantes que recibieron Email 2 hace 10+ días y no han reclamado (solo US)
  */
-Schedule::command('famer:send-emails --email3 --limit=100')
-    ->cron('0 10 * * 2,4')
+Schedule::command('famer:send-emails --email3 --limit=200')
+    ->dailyAt('10:30')
     ->timezone('America/New_York')
-    ->description('FAMER Email 3: Final Reminder — follow-up 10 días post Email 2')
+    ->description('DAILY: FAMER Email 3 final reminder — 200/día (US only)')
     ->onFailure(function () {
         \Log::error('FAMER Email 3 sequence failed');
     });
