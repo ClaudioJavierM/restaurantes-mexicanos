@@ -9,6 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Mail\Mailables\Headers;
 use Illuminate\Queue\SerializesModels;
 use Carbon\Carbon;
 
@@ -84,6 +85,18 @@ class WeeklyReport extends Mailable implements ShouldQueue
     {
         return new Envelope(
             subject: '📊 Reporte Semanal: ' . $this->restaurant->name . ' | FAMER',
+        );
+    }
+
+    public function headers(): Headers
+    {
+        return new Headers(
+            text: [
+                'X-Mailer' => 'FAMER-Platform',
+                'List-Unsubscribe' => '<mailto:unsubscribe@restaurantesmexicanosfamosos.com>',
+                'List-Unsubscribe-Post' => 'List-Unsubscribe=One-Click',
+                'Precedence' => 'bulk',
+            ],
         );
     }
 

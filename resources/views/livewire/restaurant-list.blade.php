@@ -283,6 +283,12 @@
                         Mostrando {{ $restaurants->count() }} de {{ $restaurants->total() }} restaurantes
                     </div>
 
+                    <!-- Featured Restaurants (Sponsored) -->
+                    @livewire('featured-restaurants', [
+                        'city' => '',
+                        'stateCode' => $selectedState ?? '',
+                    ])
+
                     <!-- Restaurant Grid - 2 columns on larger screens when map is showing -->
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
                         @foreach($restaurants as $index => $restaurant)

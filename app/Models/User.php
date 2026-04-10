@@ -35,6 +35,9 @@ class User extends Authenticatable implements FilamentUser
         'sms_marketing_consent',
         'sms_consent_at',
         'sms_opted_out_at',
+        'newsletter_subscribed',
+        'newsletter_subscribed_at',
+        'listmonk_subscriber_id',
     ];
 
     /**
@@ -57,9 +60,11 @@ class User extends Authenticatable implements FilamentUser
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'sms_marketing_consent' => 'boolean',
-            'sms_consent_at' => 'datetime',
-            'sms_opted_out_at' => 'datetime',
+            'sms_marketing_consent'  => 'boolean',
+            'sms_consent_at'         => 'datetime',
+            'sms_opted_out_at'       => 'datetime',
+            'newsletter_subscribed'  => 'boolean',
+            'newsletter_subscribed_at' => 'datetime',
         ];
     }
 

@@ -12,11 +12,11 @@ use Illuminate\Support\Facades\DB;
 class SendClaimInvitations extends Command
 {
     protected $signature = "restaurants:send-claim-invitations
-                            {--limit=50 : Maximum number of emails to send}
+                            {--limit=150 : Maximum number of emails to send}
                             {--state= : Filter by state code (e.g., TX, CA)}
                             {--city= : Filter by city name}
                             {--dry-run : Show what would be sent without actually sending}
-                            {--delay=2 : Delay in seconds between emails to avoid rate limits}";
+                            {--delay=1 : Delay in seconds between emails to avoid rate limits}";
 
     protected $description = "Send claim invitation emails to unclaimed restaurants with email addresses";
 
@@ -31,12 +31,18 @@ class SendClaimInvitations extends Command
         $this->info("Searching for unclaimed restaurants with emails...");
 
         $query = Restaurant::query()
+            ->where("country", "US")
             ->where("is_claimed", false)
             ->where("status", "approved")
             ->whereNull("claim_invitation_sent_at")
             ->where(function ($q) {
                 $q->whereNotNull("owner_email")
                   ->orWhereNotNull("email");
+            })
+            ->whereNotIn('email', \App\Models\EmailSuppression::pluck('email'))
+            ->whereNotIn('owner_email', \App\Models\EmailSuppression::pluck('email'))
+            ->where(function ($q) {
+                $q->whereNull('owner_newsletter')->orWhere('owner_newsletter', true);
             });
 
         if ($state) {
@@ -84,11 +90,31 @@ class SendClaimInvitations extends Command
 
             try {
                 if (!$dryRun) {
-                    // Enviar email de forma sincrónica
+                    // Capturar el Resend email_id via header X-Resend-Email-ID
+                    // que el transport agrega al mensaje Symfony después de enviarlo
+                    $resendEmailId = null;
                     $mailable = new ClaimInvitation($restaurant);
+                    $mailable->withSymfonyMessage(function (\Symfony\Component\Mime\Email $msg) use (&$resendEmailId) {
+                        // Capturar referencia al objeto — el ID se leerá post-send
+                        // usando el evento MessageSent
+                    });
+
+                    $capturedId = null;
+                    $listener = \Illuminate\Support\Facades\Event::listen(
+                        \Illuminate\Mail\Events\MessageSent::class,
+                        function ($event) use (&$capturedId) {
+                            $headers = $event->sent->getOriginalMessage()->getHeaders();
+                            if ($headers->has('X-Resend-Email-ID')) {
+                                $capturedId = $headers->get('X-Resend-Email-ID')->getBody();
+                            }
+                        }
+                    );
+
                     Mail::to($email)->send($mailable);
 
-                    // Registrar en email_logs INMEDIATAMENTE
+                    \Illuminate\Support\Facades\Event::forget(\Illuminate\Mail\Events\MessageSent::class);
+
+                    // Registrar en email_logs con el Resend message_id capturado
                     EmailLog::create([
                         "type" => "campaign",
                         "category" => "claim_invitation",
@@ -96,11 +122,12 @@ class SendClaimInvitations extends Command
                         "to_name" => $restaurant->name,
                         "from_email" => config("mail.from.address"),
                         "from_name" => config("mail.from.name"),
-                        "subject" => "🌮 {$restaurant->name} - ¡Reclama tu perfil GRATIS en Restaurantes Mexicanos Famosos!",
+                        "subject" => "{$restaurant->name} — Tu perfil ya está en el directorio de restaurantes mexicanos",
                         "mailable_class" => ClaimInvitation::class,
                         "status" => "sent",
                         "sent_at" => now(),
                         "provider" => "resend",
+                        "message_id" => $capturedId,
                         "restaurant_id" => $restaurant->id,
                         "metadata" => json_encode([
                             "restaurant_name" => $restaurant->name,
@@ -135,7 +162,7 @@ class SendClaimInvitations extends Command
                         "to_email" => $email,
                         "to_name" => $restaurant->name,
                         "from_email" => config("mail.from.address"),
-                        "subject" => "🌮 {$restaurant->name} - ¡Reclama tu perfil GRATIS!",
+                        "subject" => "{$restaurant->name} — Tu perfil ya está en el directorio de restaurantes mexicanos",
                         "status" => "failed",
                         "error_message" => $e->getMessage(),
                         "provider" => "resend",

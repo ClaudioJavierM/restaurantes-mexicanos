@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\EmailLog;
+use App\Models\NewsletterEvent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -105,6 +106,7 @@ class ResendWebhookController extends Controller
                     $emailLog->status = "bounced";
                     $emailLog->bounced_at = now();
                     $emailLog->error_message = $data["bounce"]["message"] ?? "Bounced";
+                    \App\Models\EmailSuppression::suppress($toEmail, 'bounced', 'resend_webhook');
                     break;
 
                 case "email.complained":
@@ -112,10 +114,33 @@ class ResendWebhookController extends Controller
                     $metadata = $emailLog->metadata ?? [];
                     $metadata["complained_at"] = now()->toISOString();
                     $emailLog->metadata = $metadata;
+                    \App\Models\EmailSuppression::suppress($toEmail, 'complained', 'resend_webhook');
                     break;
             }
 
             $emailLog->save();
+
+            // Also mirror to newsletter_events for campaign emails
+            $resendToNewsletterType = [
+                'email.delivered'        => 'delivered',
+                'email.opened'           => 'opened',
+                'email.clicked'          => 'clicked',
+                'email.bounced'          => 'bounced',
+                'email.complained'       => 'complained',
+                'email.sent'             => 'sent',
+                'email.delivery_delayed' => 'delayed',
+            ];
+            if ($toEmail && isset($resendToNewsletterType[$type])) {
+                NewsletterEvent::create([
+                    'source'      => 'resend',
+                    'event_type'  => $resendToNewsletterType[$type],
+                    'email'       => $toEmail,
+                    'message_id'  => $messageId,
+                    'link_url'    => $data['click']['link'] ?? null,
+                    'raw_payload' => $payload,
+                    'occurred_at' => $createdAt ? \Carbon\Carbon::parse($createdAt) : now(),
+                ]);
+            }
 
             return response()->json(["status" => "processed", "email_log_id" => $emailLog->id], 200);
         } catch (\Throwable $e) {

@@ -290,6 +290,31 @@ $breadcrumbSchema = [
     ],
 ];
 
+$collectionPageSchema = [
+    '@context'    => 'https://schema.org',
+    '@type'       => 'CollectionPage',
+    'name'        => "Mejores Restaurantes Mexicanos en {$state->name} | FAMER",
+    'description' => "Descubre los {$stats->total} mejores restaurantes mexicanos en {$state->name}. {$cities->count()} ciudades, calificaciones verificadas de Google y más.",
+    'url'         => url()->current(),
+    'inLanguage'  => 'es',
+    'about'       => [
+        '@type'   => 'State',
+        'name'    => $state->name,
+        'containedInPlace' => [
+            '@type' => 'Country',
+            'name'  => ($state->country ?? 'US') === 'MX' ? 'Mexico' : 'United States',
+        ],
+    ],
+    'breadcrumb' => $breadcrumbSchema,
+    'hasPart'    => $cities->take(10)->map(function ($city) use ($state) {
+        return [
+            '@type' => 'WebPage',
+            'name'  => "Restaurantes Mexicanos en {$city->city}, {$state->name}",
+            'url'   => route('city-guides.city', [strtolower($state->code), \Illuminate\Support\Str::slug($city->city)]),
+        ];
+    })->values()->all(),
+];
+
 $restaurantListSchema = null;
 if ($top10Restaurants->isNotEmpty()) {
     $restaurantListSchema = [
@@ -356,6 +381,10 @@ $cityListSchema = [
 
 <script type="application/ld+json">
 {!! json_encode($breadcrumbSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) !!}
+</script>
+
+<script type="application/ld+json">
+{!! json_encode($collectionPageSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) !!}
 </script>
 
 @if($restaurantListSchema)

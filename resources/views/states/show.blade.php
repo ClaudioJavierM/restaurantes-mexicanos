@@ -189,7 +189,7 @@
             <div style="display:flex; flex-wrap:wrap; gap:0.75rem;">
                 @foreach($cities as $cityRow)
                 @php $citySlug = \Illuminate\Support\Str::slug($cityRow->city); @endphp
-                <a href="/restaurantes?state={{ $state->code }}&city={{ urlencode($cityRow->city) }}"
+                <a href="{{ route('city-guides.city', [strtolower($state->code), $citySlug]) }}"
                    style="display:inline-flex; align-items:center; gap:0.5rem; background:#1A1A1A; border:1px solid #2A2A2A; color:#F5F5F5; padding:0.625rem 1.25rem; border-radius:9999px; text-decoration:none; font-size:0.9375rem; transition:border-color 0.2s;"
                    onmouseover="this.style.borderColor='#D4AF37';this.style.color='#D4AF37'" onmouseout="this.style.borderColor='#2A2A2A';this.style.color='#F5F5F5'">
                     <svg style="width:0.875rem; height:0.875rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -311,5 +311,46 @@
         }
     ]
 }
+</script>
+
+@php
+$collectionPageSchema = [
+    '@context'    => 'https://schema.org',
+    '@type'       => 'CollectionPage',
+    'name'        => $isEn
+        ? "Best Mexican Restaurants in {$state->name} — Top {$total} | FAMER"
+        : "Restaurantes Mexicanos en {$state->name} — Top {$total} | FAMER",
+    'description' => $isEn
+        ? "Discover the {$total} best Mexican restaurants in {$state->name}. Verified reviews, photos and menus."
+        : "Descubre los {$total} mejores restaurantes mexicanos en {$state->name}. Reseñas verificadas, fotos y menús.",
+    'url'         => url()->current(),
+    'inLanguage'  => $isEn ? 'en' : 'es',
+    'about'       => [
+        '@type'   => 'State',
+        'name'    => $state->name,
+        'containedInPlace' => [
+            '@type' => 'Country',
+            'name'  => $state->country === 'MX' ? 'Mexico' : 'United States',
+        ],
+    ],
+    'breadcrumb'  => [
+        '@type' => 'BreadcrumbList',
+        'itemListElement' => [
+            ['@type' => 'ListItem', 'position' => 1, 'name' => 'FAMER', 'item' => url('/')],
+            ['@type' => 'ListItem', 'position' => 2, 'name' => $isEn ? 'States' : 'Estados', 'item' => url('/estados')],
+            ['@type' => 'ListItem', 'position' => 3, 'name' => $state->name, 'item' => url()->current()],
+        ],
+    ],
+    'hasPart' => $cities->map(function ($cityRow) use ($state) {
+        return [
+            '@type' => 'WebPage',
+            'name'  => "Restaurantes Mexicanos en {$cityRow->city}, {$state->name}",
+            'url'   => route('city-guides.city', [strtolower($state->code), \Illuminate\Support\Str::slug($cityRow->city)]),
+        ];
+    })->values()->all(),
+];
+@endphp
+<script type="application/ld+json">
+{!! json_encode($collectionPageSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) !!}
 </script>
 @endpush

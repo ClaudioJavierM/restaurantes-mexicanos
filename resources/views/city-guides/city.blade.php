@@ -438,24 +438,40 @@
 }
 </script>
 
-{{-- WebPage Schema --}}
+{{-- CollectionPage Schema --}}
+@php
+$collectionPageCitySchema = [
+    '@context'    => 'https://schema.org',
+    '@type'       => 'CollectionPage',
+    'name'        => "Mejores Restaurantes Mexicanos en {$cityName}, {$state->name} | FAMER",
+    'description' => "Descubre los {$stats->total} mejores restaurantes mexicanos en {$cityName}, {$state->name}. Calificaciones verificadas, menús, horarios y más.",
+    'url'         => url()->current(),
+    'inLanguage'  => 'es',
+    'about'       => [
+        '@type'            => 'City',
+        'name'             => $cityName,
+        'containedInPlace' => [
+            '@type'            => 'State',
+            'name'             => $state->name,
+            'containedInPlace' => [
+                '@type' => 'Country',
+                'name'  => ($state->country ?? 'US') === 'MX' ? 'Mexico' : 'United States',
+            ],
+        ],
+    ],
+    'breadcrumb' => [
+        '@type' => 'BreadcrumbList',
+        'itemListElement' => [
+            ['@type' => 'ListItem', 'position' => 1, 'name' => 'Inicio', 'item' => url('/')],
+            ['@type' => 'ListItem', 'position' => 2, 'name' => 'Guía por Ciudad', 'item' => route('city-guides.states')],
+            ['@type' => 'ListItem', 'position' => 3, 'name' => $state->name, 'item' => route('city-guides.state', strtolower($state->code))],
+            ['@type' => 'ListItem', 'position' => 4, 'name' => $cityName, 'item' => url()->current()],
+        ],
+    ],
+];
+@endphp
 <script type="application/ld+json">
-{
-    "@@context": "https://schema.org",
-    "@@type": "WebPage",
-    "name": "Mejores Restaurantes Mexicanos en {{ $cityName }}, {{ $state->name }}",
-    "description": "Descubre los {{ $stats->total }} mejores restaurantes mexicanos en {{ $cityName }}, {{ $state->name }}. Calificaciones verificadas, menús, horarios y más.",
-    "url": "{{ url()->current() }}",
-    "inLanguage": "es",
-    "about": {
-        "@@type": "City",
-        "name": "{{ $cityName }}",
-        "containedInPlace": {
-            "@@type": "State",
-            "name": "{{ $state->name }}"
-        }
-    }
-}
+{!! json_encode($collectionPageCitySchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) !!}
 </script>
 @endpush
 @endsection

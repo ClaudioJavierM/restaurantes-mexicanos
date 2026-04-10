@@ -1,86 +1,139 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Completa tu Verificacion</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="format-detection" content="telephone=no">
+    <title>Completa la verificación de tu restaurante — FAMER</title>
 </head>
-<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f5f5;">
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f5f5f5;">
-        <tr>
-            <td align="center" style="padding: 40px 20px;">
-                <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+<body style="margin:0; padding:0; background-color:#F5F0E8; font-family:'Segoe UI',Arial,Helvetica,sans-serif; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%;">
 
-                    <!-- Header -->
-                    <tr>
-                        <td style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); padding: 30px 40px; border-radius: 12px 12px 0 0; text-align: center;">
-                            <img src="https://restaurantesmexicanosfamosos.com/images/branding/logo.png?v=3" alt="Restaurantes Mexicanos Famosos" style="max-height: 50px; width: auto; margin-bottom: 12px;" />
-                            <h1 style="color: #ffffff; margin: 0; font-size: 24px;">
-                                @if($reminderNumber === 1)
-                                    Casi terminas!
-                                @else
-                                    Ultimo recordatorio!
-                                @endif
-                            </h1>
-                        </td>
-                    </tr>
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:#F5F0E8;">
+    <tr>
+        <td align="center" style="padding:40px 16px;">
 
-                    <!-- Main Content -->
-                    <tr>
-                        <td style="padding: 40px;">
-                            <p style="color: #4b5563; font-size: 16px; line-height: 1.8; margin: 0 0 20px 0;">
-                                Hola <strong>{{ $claim->owner_name }}</strong>,
-                            </p>
+            <table role="presentation" width="100%" style="max-width:580px;" cellspacing="0" cellpadding="0" border="0">
 
-                            <p style="color: #4b5563; font-size: 16px; line-height: 1.8; margin: 0 0 20px 0;">
-                                Iniciaste el proceso para reclamar <strong>{{ $claim->restaurant->name }}</strong> pero aun no has verificado tu identidad.
-                            </p>
+                <!-- HEADER -->
+                <tr>
+                    <td style="background-color:#0B0B0B; border-radius:16px 16px 0 0; padding:28px 40px; text-align:center;">
+                        <img src="https://restaurantesmexicanosfamosos.com.mx/images/branding/logo-horizontal.png"
+                             alt="FAMER" width="160" style="max-width:160px; height:auto; display:block; margin:0 auto 12px;">
+                        <p style="margin:0; color:#D4AF37; font-size:11px; font-weight:700; letter-spacing:3px; text-transform:uppercase;">FAMOUS MEXICAN RESTAURANTS</p>
+                    </td>
+                </tr>
 
-                            @if($reminderNumber === 2)
-                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #fef3c7; border: 1px solid #fcd34d; border-radius: 8px; margin: 20px 0;">
-                                <tr>
-                                    <td style="padding: 15px;">
-                                        <p style="color: #92400e; margin: 0; font-size: 14px;">
-                                            <strong>Importante:</strong> Tu codigo de verificacion expirara pronto. Completa el proceso ahora para no perder tu progreso.
-                                        </p>
-                                    </td>
-                                </tr>
-                            </table>
+                <!-- SEPARADOR DORADO -->
+                <tr>
+                    <td style="background:linear-gradient(90deg,#D4AF37,#F0D060,#D4AF37); height:3px; font-size:0; line-height:0;">&nbsp;</td>
+                </tr>
+
+                <!-- CUERPO -->
+                <tr>
+                    <td style="background-color:#FFFFFF; padding:48px 40px 40px;">
+
+                        <!-- Headline según número de reminder -->
+                        <h1 style="margin:0 0 8px; font-size:24px; font-weight:700; color:#111827; text-align:center; font-family:'Segoe UI',Arial,sans-serif;">
+                            @if(isset($reminderNumber) && $reminderNumber >= 2)
+                                Un paso más para completar tu registro
+                            @else
+                                Falta completar la verificación
                             @endif
+                        </h1>
+                        <p style="margin:0 0 28px; font-size:15px; color:#6B7280; text-align:center; line-height:1.6;">
+                            Hola {{ $claim->owner_name }},
+                        </p>
 
-                            <p style="color: #4b5563; font-size: 16px; line-height: 1.8; margin: 0 0 25px 0;">
-                                Te enviamos un codigo de 6 digitos a tu {{ $claim->verification_method === 'email' ? 'correo electronico' : 'telefono' }}. Ingresalo para completar la verificacion.
-                            </p>
+                        <p style="margin:0 0 20px; font-size:15px; color:#374151; line-height:1.7;">
+                            Iniciaste el proceso para reclamar <strong style="color:#111827;">{{ $claim->restaurant->name }}</strong>, pero aún no completaste la verificación de identidad.
+                        </p>
 
-                            <!-- CTA Button -->
-                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin: 25px 0;">
-                                <tr>
-                                    <td align="center">
-                                        <a href="{{ $verifyUrl }}" style="display: inline-block; background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 8px; font-size: 18px; font-weight: bold;">
-                                            COMPLETAR VERIFICACION
-                                        </a>
-                                    </td>
-                                </tr>
-                            </table>
+                        <!-- Box de código de verificación -->
+                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"
+                               style="background-color:#FBF6E9; border:1px solid #D4AF37; border-radius:10px; margin:0 0 24px;">
+                            <tr>
+                                <td style="padding:20px 24px;">
+                                    <p style="margin:0 0 8px; font-size:14px; color:#374151; line-height:1.6;">
+                                        Te enviamos un código de 6 dígitos a tu
+                                        <strong>{{ $claim->verification_method === 'email' ? 'correo electrónico' : 'teléfono' }}</strong>.
+                                        Ingrésalo para activar tu perfil de propietario.
+                                    </p>
+                                    @if(isset($reminderNumber) && $reminderNumber >= 2)
+                                    <p style="margin:8px 0 0; font-size:13px; color:#9CA3AF; line-height:1.5;">
+                                        Tu código de verificación vence pronto. Completa el proceso antes de que expire.
+                                    </p>
+                                    @endif
+                                </td>
+                            </tr>
+                        </table>
 
-                            <p style="color: #6b7280; font-size: 14px; line-height: 1.6; margin: 25px 0 0 0;">
-                                Si no solicitaste esto, puedes ignorar este mensaje.
-                            </p>
-                        </td>
-                    </tr>
+                        <!-- Botón principal -->
+                        <div style="text-align:center; margin-bottom:32px;">
+                            <a href="{{ $verificationUrl ?? $claimUrl }}"
+                               style="display:inline-block; background-color:#D4AF37; color:#0B0B0B; text-decoration:none; font-weight:700; font-size:16px; padding:16px 40px; border-radius:10px; font-family:'Segoe UI',Arial,sans-serif; letter-spacing:0.3px;">
+                                Completar Verificación
+                            </a>
+                        </div>
 
-                    <!-- Footer -->
-                    <tr>
-                        <td style="background-color: #1f2937; padding: 25px 40px; border-radius: 0 0 12px 12px; text-align: center;">
-                            <p style="color: #6b7280; margin: 0; font-size: 12px;">
-                                <a href="{{ config('app.url') }}" style="color: #10b981; text-decoration: none;">restaurantesmexicanosfamosos.com</a>
-                            </p>
-                        </td>
-                    </tr>
+                        <!-- Qué pasa al verificar -->
+                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"
+                               style="background-color:#F9FAFB; border-radius:10px; margin-bottom:24px;">
+                            <tr>
+                                <td style="padding:20px 24px;">
+                                    <p style="margin:0 0 12px; font-size:14px; font-weight:700; color:#111827;">Al verificar obtienes acceso a:</p>
+                                    <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+                                        <tr>
+                                            <td style="padding:4px 0; font-size:14px; color:#374151;">
+                                                <span style="color:#D4AF37; font-weight:700; margin-right:8px;">&#10003;</span>Panel de propietario de {{ $claim->restaurant->name }}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding:4px 0; font-size:14px; color:#374151;">
+                                                <span style="color:#D4AF37; font-weight:700; margin-right:8px;">&#10003;</span>Insignia de Restaurante Verificado
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding:4px 0; font-size:14px; color:#374151;">
+                                                <span style="color:#D4AF37; font-weight:700; margin-right:8px;">&#10003;</span>Control total de tu información y fotos
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="padding:4px 0; font-size:14px; color:#374151;">
+                                                <span style="color:#D4AF37; font-weight:700; margin-right:8px;">&#10003;</span>Responder reseñas de clientes
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
 
-                </table>
-            </td>
-        </tr>
-    </table>
+                        <!-- Divider -->
+                        <hr style="border:none; border-top:1px solid #F3F4F6; margin:0 0 20px;">
+
+                        <p style="margin:0; font-size:13px; color:#9CA3AF; line-height:1.7; text-align:center;">
+                            Si no iniciaste este proceso, puedes ignorar este mensaje — tu restaurante no se verá afectado.
+                        </p>
+
+                    </td>
+                </tr>
+
+                <!-- FOOTER -->
+                <tr>
+                    <td style="background-color:#F9FAFB; border-radius:0 0 16px 16px; padding:24px 40px; text-align:center; border-top:1px solid #F3F4F6;">
+                        <p style="margin:0 0 8px; font-size:12px; color:#9CA3AF;">
+                            © {{ date('Y') }} FAMER — Restaurantes Mexicanos Famosos. Todos los derechos reservados.
+                        </p>
+                        <p style="margin:0; font-size:11px; color:#D1D5DB;">
+                            Este es un correo automático relacionado con tu proceso de verificación.
+                        </p>
+                    </td>
+                </tr>
+
+            </table>
+        </td>
+    </tr>
+</table>
+
 </body>
 </html>

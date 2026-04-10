@@ -257,8 +257,11 @@
                     </div>
                 @endif
 
-                {{-- Owner Response --}}
-                @if($review->owner_response)
+                {{-- Owner Response (new FAMER reply system) --}}
+                <x-owner-reply :review="$review" />
+
+                {{-- Owner Response (legacy field fallback) --}}
+                @if(!$review->owner_reply && $review->owner_response)
                     <div class="bg-gray-50 rounded-lg p-4 mb-4 border-l-4 border-red-600">
                         <div class="flex items-center gap-2 mb-2">
                             <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

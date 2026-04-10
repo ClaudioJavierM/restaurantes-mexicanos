@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\FamerSubscriptionResource\Pages;
 
 use App\Filament\Resources\FamerSubscriptionResource;
+use App\Filament\Widgets\SubscriptionFunnelWidget;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -12,8 +13,13 @@ class ListFamerSubscriptions extends ListRecords
 
     protected function getHeaderActions(): array
     {
+        return [];
+    }
+
+    protected function getHeaderWidgets(): array
+    {
         return [
-            Actions\CreateAction::make(),
+            SubscriptionFunnelWidget::class,
         ];
     }
 }

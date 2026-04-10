@@ -8,6 +8,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Mail\Mailables\Headers;
 use Illuminate\Queue\SerializesModels;
 
 class ClaimSuccessNotification extends Mailable
@@ -41,6 +42,13 @@ class ClaimSuccessNotification extends Mailable
 
         return new Envelope(
             subject: "Bienvenido a {$planName}! Tu restaurante {$this->restaurant->name} esta listo",
+        );
+    }
+
+    public function headers(): Headers
+    {
+        return new Headers(
+            text: ['X-Mailer' => 'FAMER-Platform'],
         );
     }
 

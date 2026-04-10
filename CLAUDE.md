@@ -21,7 +21,7 @@ sudo -u nginx git reset --hard origin/main
 sudo -u nginx composer install --no-dev --optimize-autoloader
 sudo -u nginx php artisan migrate --force
 sudo -u nginx php artisan config:cache
-sudo -u nginx php artisan route:cache
+sudo -u nginx php artisan route:clear  # NO route:cache — closure routes in web.php prevent proper caching
 sudo -u nginx php artisan view:clear
 sudo chown -R nginx:nginx storage bootstrap/cache
 npm run build  # si hay cambios de assets/tailwind

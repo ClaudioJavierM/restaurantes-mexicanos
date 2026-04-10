@@ -1,132 +1,131 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Restaurante Verificado</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="format-detection" content="telephone=no">
+    <title>Tu restaurante fue aprobado — FAMER</title>
 </head>
-<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f5f5;">
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f5f5f5;">
-        <tr>
-            <td align="center" style="padding: 40px 20px;">
-                <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+<body style="margin:0; padding:0; background-color:#F5F0E8; font-family:'Segoe UI',Arial,Helvetica,sans-serif; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%;">
 
-                    <!-- Header -->
-                    <tr>
-                        <td style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); padding: 30px 40px; border-radius: 12px 12px 0 0; text-align: center;">
-                            <img src="https://restaurantesmexicanosfamosos.com/images/branding/logo.png?v=3" alt="Restaurantes Mexicanos Famosos" style="max-height: 50px; width: auto; margin-bottom: 12px;" />
-                            <h1 style="color: #ffffff; margin: 0; font-size: 28px;">
-                                Felicidades {{ $user->name }}!
-                            </h1>
-                            <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0; font-size: 18px;">
-                                Tu restaurante ha sido verificado
-                            </p>
-                        </td>
-                    </tr>
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:#F5F0E8;">
+    <tr>
+        <td align="center" style="padding:40px 16px;">
 
-                    <!-- Main Content -->
-                    <tr>
-                        <td style="padding: 40px;">
-                            <!-- Success Icon -->
-                            <div style="text-align: center; margin-bottom: 25px;">
-                                <span style="font-size: 60px;">&#9989;</span>
-                            </div>
+            <table role="presentation" width="100%" style="max-width:580px;" cellspacing="0" cellpadding="0" border="0">
 
-                            <!-- Restaurant Name -->
-                            <h2 style="color: #1f2937; margin: 0 0 20px 0; font-size: 24px; text-align: center;">
-                                {{ $restaurant->name }}
-                            </h2>
+                <!-- HEADER -->
+                <tr>
+                    <td style="background-color:#0B0B0B; border-radius:16px 16px 0 0; padding:28px 40px; text-align:center;">
+                        <img src="https://restaurantesmexicanosfamosos.com.mx/images/branding/logo-horizontal.png"
+                             alt="FAMER" width="160" style="max-width:160px; height:auto; display:block; margin:0 auto 12px;">
+                        <p style="margin:0; color:#D4AF37; font-size:11px; font-weight:700; letter-spacing:3px; text-transform:uppercase;">FAMOUS MEXICAN RESTAURANTS</p>
+                    </td>
+                </tr>
 
-                            <p style="color: #4b5563; font-size: 16px; line-height: 1.8; text-align: center; margin: 0 0 25px 0;">
-                                Tu restaurante ahora tiene la <strong style="color: #059669;">insignia de verificado</strong> 
-                                y aparece con prioridad en los resultados de busqueda.
-                            </p>
+                <!-- SEPARADOR DORADO -->
+                <tr>
+                    <td style="background:linear-gradient(90deg,#D4AF37,#F0D060,#D4AF37); height:3px; font-size:0; line-height:0;">&nbsp;</td>
+                </tr>
 
-                            <!-- Account Info Box -->
-                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; margin: 25px 0;">
-                                <tr>
-                                    <td style="padding: 20px;">
-                                        <h3 style="color: #166534; margin: 0 0 15px 0; font-size: 16px;">
-                                            Tu cuenta ha sido creada:
-                                        </h3>
-                                        <p style="color: #15803d; margin: 0 0 8px 0; font-size: 15px;">
-                                            <strong>Email:</strong> {{ $user->email }}
-                                        </p>
-                                        <p style="color: #15803d; margin: 0; font-size: 15px;">
-                                            <strong>Contrasena:</strong> <em>Necesitas establecerla</em>
-                                        </p>
-                                    </td>
-                                </tr>
-                            </table>
+                <!-- CUERPO -->
+                <tr>
+                    <td style="background-color:#FFFFFF; padding:48px 40px 40px;">
 
-                            <!-- CTA Button - Reset Password -->
-                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin: 25px 0;">
-                                <tr>
-                                    <td align="center">
-                                        <a href="{{ $resetPasswordUrl }}" style="display: inline-block; background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); color: #ffffff; text-decoration: none; padding: 14px 35px; border-radius: 8px; font-size: 16px; font-weight: bold; box-shadow: 0 4px 6px rgba(220, 38, 38, 0.3);">
-                                            ESTABLECER MI CONTRASENA
-                                        </a>
-                                    </td>
-                                </tr>
-                            </table>
+                        <!-- Headline -->
+                        <h1 style="margin:0 0 8px; font-size:26px; font-weight:700; color:#111827; text-align:center; font-family:'Segoe UI',Arial,sans-serif;">
+                            Tu restaurante fue aprobado
+                        </h1>
+                        <p style="margin:0 0 28px; font-size:15px; color:#6B7280; text-align:center; line-height:1.6;">
+                            Hola {{ $ownerName }},
+                        </p>
 
-                            <!-- Dashboard CTA -->
-                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin: 20px 0;">
-                                <tr>
-                                    <td align="center">
-                                        <a href="{{ $dashboardUrl }}" style="display: inline-block; background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: #ffffff; text-decoration: none; padding: 14px 35px; border-radius: 8px; font-size: 16px; font-weight: bold; box-shadow: 0 4px 6px rgba(5, 150, 105, 0.3);">
-                                            IR A MI PANEL DE CONTROL
-                                        </a>
-                                    </td>
-                                </tr>
-                            </table>
+                        <p style="margin:0 0 20px; font-size:15px; color:#374151; line-height:1.7;">
+                            El claim de <strong style="color:#111827;">{{ $restaurant->name }}</strong> fue verificado y aprobado. Tu perfil ahora cuenta con la insignia de <strong style="color:#D4AF37;">Restaurante Verificado</strong> y tiene mayor visibilidad en el directorio.
+                        </p>
 
-                            <!-- What you can do now -->
-                            <h3 style="color: #1f2937; margin: 30px 0 15px 0; font-size: 18px;">
-                                Que puedes hacer ahora:
-                            </h3>
-                            <ul style="color: #4b5563; font-size: 15px; line-height: 2; padding-left: 20px; margin: 0;">
-                                <li>Actualizar la informacion de tu restaurante</li>
-                                <li>Subir fotos de tus platillos y local</li>
-                                <li>Agregar o actualizar tu menu</li>
-                                <li>Responder a resenas de clientes</li>
-                                <li>Ver estadisticas de visitas a tu perfil</li>
-                            </ul>
+                        <!-- Botón principal -->
+                        <div style="text-align:center; margin-bottom:32px;">
+                            <a href="{{ $dashboardUrl ?? (config('app.url') . '/owner') }}"
+                               style="display:inline-block; background-color:#D4AF37; color:#0B0B0B; text-decoration:none; font-weight:700; font-size:16px; padding:16px 40px; border-radius:10px; font-family:'Segoe UI',Arial,sans-serif; letter-spacing:0.3px;">
+                                Ir a Mi Panel
+                            </a>
+                        </div>
 
-                            <!-- Premium Upgrade Section -->
-                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%); border-radius: 8px; margin: 30px 0;">
-                                <tr>
-                                    <td style="padding: 25px; text-align: center;">
-                                        <h3 style="color: #ffffff; margin: 0 0 10px 0; font-size: 18px;">
-                                            Quieres destacar aun mas?
-                                        </h3>
-                                        <p style="color: rgba(255,255,255,0.9); margin: 0 0 15px 0; font-size: 14px;">
-                                            Actualiza a <strong>Premium</strong> por solo $39/mes y obtiene:
-                                        </p>
-                                        <p style="color: #fcd34d; margin: 0; font-size: 13px;">
-                                            Insignia Premium | Analytics Avanzados | Menu Digital + QR | Chatbot IA
-                                        </p>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
+                        <!-- Divider -->
+                        <hr style="border:none; border-top:1px solid #F3F4F6; margin:0 0 24px;">
 
-                    <!-- Footer -->
-                    <tr>
-                        <td style="background-color: #1f2937; padding: 25px 40px; border-radius: 0 0 12px 12px; text-align: center;">
-                            <p style="color: #9ca3af; margin: 0 0 10px 0; font-size: 13px;">
-                                Gracias por ser parte de Restaurantes Mexicanos Famosos
-                            </p>
-                            <p style="color: #6b7280; margin: 0; font-size: 12px;">
-                                <a href="{{ config('app.url') }}" style="color: #10b981; text-decoration: none;">restaurantesmexicanosfamosos.com</a>
-                            </p>
-                        </td>
-                    </tr>
+                        <!-- Próximos pasos -->
+                        <p style="margin:0 0 16px; font-size:15px; font-weight:700; color:#111827;">Primeros pasos recomendados:</p>
 
-                </table>
-            </td>
-        </tr>
-    </table>
+                        <!-- Paso 1 -->
+                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-bottom:12px;">
+                            <tr>
+                                <td width="36" valign="top" style="padding-top:1px;">
+                                    <div style="width:28px; height:28px; background-color:#D4AF37; border-radius:50%; text-align:center; line-height:28px; font-size:13px; font-weight:700; color:#0B0B0B;">1</div>
+                                </td>
+                                <td style="padding-left:12px;">
+                                    <p style="margin:0; font-size:14px; color:#374151; line-height:1.6;">
+                                        <strong style="color:#111827;">Completa tu perfil</strong> — agrega descripción, horarios y datos de contacto actualizados.
+                                    </p>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- Paso 2 -->
+                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-bottom:12px;">
+                            <tr>
+                                <td width="36" valign="top" style="padding-top:1px;">
+                                    <div style="width:28px; height:28px; background-color:#D4AF37; border-radius:50%; text-align:center; line-height:28px; font-size:13px; font-weight:700; color:#0B0B0B;">2</div>
+                                </td>
+                                <td style="padding-left:12px;">
+                                    <p style="margin:0; font-size:14px; color:#374151; line-height:1.6;">
+                                        <strong style="color:#111827;">Sube fotos</strong> — los perfiles con imágenes reciben hasta 3 veces más visitas.
+                                    </p>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- Paso 3 -->
+                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-bottom:24px;">
+                            <tr>
+                                <td width="36" valign="top" style="padding-top:1px;">
+                                    <div style="width:28px; height:28px; background-color:#D4AF37; border-radius:50%; text-align:center; line-height:28px; font-size:13px; font-weight:700; color:#0B0B0B;">3</div>
+                                </td>
+                                <td style="padding-left:12px;">
+                                    <p style="margin:0; font-size:14px; color:#374151; line-height:1.6;">
+                                        <strong style="color:#111827;">Responde reseñas</strong> — muestra a los clientes que hay alguien detrás del restaurante.
+                                    </p>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <p style="margin:0; font-size:13px; color:#9CA3AF; line-height:1.7; text-align:center;">
+                            ¿Necesitas ayuda? Escríbenos a
+                            <a href="mailto:soporte@restaurantesmexicanosfamosos.com.mx"
+                               style="color:#D4AF37; text-decoration:none;">soporte@restaurantesmexicanosfamosos.com.mx</a>
+                        </p>
+
+                    </td>
+                </tr>
+
+                <!-- FOOTER -->
+                <tr>
+                    <td style="background-color:#F9FAFB; border-radius:0 0 16px 16px; padding:24px 40px; text-align:center; border-top:1px solid #F3F4F6;">
+                        <p style="margin:0 0 8px; font-size:12px; color:#9CA3AF;">
+                            © {{ date('Y') }} FAMER — Restaurantes Mexicanos Famosos. Todos los derechos reservados.
+                        </p>
+                        <p style="margin:0; font-size:11px; color:#D1D5DB;">
+                            Este es un correo automático relacionado con tu cuenta de propietario.
+                        </p>
+                    </td>
+                </tr>
+
+            </table>
+        </td>
+    </tr>
+</table>
+
 </body>
 </html>

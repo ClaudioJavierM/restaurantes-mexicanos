@@ -1,124 +1,150 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FAMER - Tu restaurante ya esta en la lista</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="format-detection" content="telephone=no">
+  <title>Bienvenido a tu panel FAMER</title>
 </head>
-<body style="margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; background-color: #f5f5f5;">
-    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5; padding: 40px 20px;">
-        <tr>
-            <td align="center">
-                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                    
-                    <!-- Header con bandera mexicana -->
-                    <tr>
-                        <td style="background: linear-gradient(135deg, #006847 0%, #1a1a1a 50%, #CE1126 100%); padding: 40px 30px; text-align: center;">
-                            <img src="https://restaurantesmexicanosfamosos.com/images/branding/logo.png?v=3" alt="Restaurantes Mexicanos Famosos" style="max-height: 50px; width: auto; margin-bottom: 12px;" />
-                            <h1 style="color: #FFD700; margin: 0; font-size: 32px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">FAMER</h1>
-                            <p style="color: #ffffff; margin: 10px 0 0 0; font-size: 14px; letter-spacing: 2px;">RESTAURANTES MEXICANOS FAMOSOS</p>
-                        </td>
-                    </tr>
-                    
-                    <!-- Contenido principal -->
-                    <tr>
-                        <td style="padding: 40px 30px;">
-                            <h2 style="color: #000000; font-size: 24px; margin: 0 0 20px 0;">Hola {{ $restaurantName }},</h2>
-                            
-                            <p style="color: #000000; font-size: 16px; line-height: 1.8; margin: 0 0 20px 0;">
-                                Queremos compartirte algo importante.
-                            </p>
-                            
-                            <p style="color: #000000; font-size: 16px; line-height: 1.8; margin: 0 0 20px 0;">
-                                <strong>Tu restaurante ya forma parte de la lista de FAMER</strong> – Restaurantes Mexicanos Famosos, una iniciativa creada para reconocer, promover y celebrar la gastronomia mexicana en Estados Unidos.
-                            </p>
-                            
-                            <p style="color: #000000; font-size: 16px; line-height: 1.8; margin: 0 0 30px 0;">
-                                Durante anos, miles de restaurantes han representado a Mexico con orgullo, tradicion y sabor... pero nunca habian tenido una plataforma creada exclusivamente para ellos.
-                                <br><br>
-                                <strong style="color: #006847;">Eso es lo que hoy nace con FAMER.</strong>
-                            </p>
-                            
-                            <!-- Seccion Que es FAMER -->
-                            <div style="background-color: #ffffff; border-left: 4px solid #006847; padding: 20px; margin: 0 0 30px 0; border-radius: 0 8px 8px 0;">
-                                <h3 style="color: #006847; margin: 0 0 15px 0; font-size: 18px;">🌮 Que es FAMER?</h3>
-                                <p style="color: #000000; font-size: 15px; line-height: 1.7; margin: 0;">
-                                    FAMER (Famous Mexican Restaurant) es una plataforma especializada en:
-                                </p>
-                                <ul style="color: #000000; font-size: 15px; line-height: 1.8; margin: 15px 0 0 0; padding-left: 20px;">
-                                    <li>Promover restaurantes mexicanos por ciudad, estado, region y especialidad</li>
-                                    <li>Mostrar la diversidad real de la gastronomia mexicana</li>
-                                    <li>Dar visibilidad y reconocimiento a los restaurantes que representan autenticamente a Mexico</li>
-                                </ul>
-                            </div>
-                            
-                            <!-- Seccion FAMER Awards -->
-                            <div style="background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); padding: 25px; margin: 0 0 30px 0; border-radius: 8px;">
-                                <h3 style="color: #000000; margin: 0 0 15px 0; font-size: 18px;">🏆 FAMER Awards 2026</h3>
-                                <p style="color: #000000; font-size: 15px; line-height: 1.7; margin: 0 0 15px 0;">
-                                    En 2026 se celebrara la primera edicion de los FAMER Awards, donde se reconocera a:
-                                </p>
-                                <ul style="color: #000000; font-size: 15px; line-height: 1.8; margin: 0; padding-left: 20px;">
-                                    <li><strong>Los Top 10 Restaurantes Mexicanos por Ciudad</strong></li>
-                                    <li><strong>Los Top 10 por Estado</strong></li>
-                                    <li><strong>Los 100 Restaurantes Mexicanos que debes visitar en USA</strong></li>
-                                </ul>
-                                <p style="color: #CE1126; font-size: 14px; font-weight: bold; margin: 15px 0 0 0;">
-                                    👉 Solo los restaurantes que reclamen su perfil podran participar en estos rankings.
-                                </p>
-                            </div>
-                            
-                            <!-- Seccion Beneficios -->
-                            <div style="background-color: #ffffff; border: 1px solid #006847; padding: 20px; margin: 0 0 30px 0; border-radius: 8px;">
-                                <h3 style="color: #006847; margin: 0 0 15px 0; font-size: 18px;">🎁 Reclama tu restaurante (sin costo en esta etapa)</h3>
-                                <p style="color: #000000; font-size: 15px; line-height: 1.7; margin: 0 0 15px 0;">
-                                    Durante estos primeros meses puedes:
-                                </p>
-                                <ul style="color: #000000; font-size: 15px; line-height: 1.8; margin: 0; padding-left: 20px;">
-                                    <li>Reclamar tu restaurante</li>
-                                    <li>Activar tu perfil oficial en FAMER</li>
-                                    <li>Aparecer en busquedas por ciudad, estado y tipo de platillo</li>
-                                    <li>Invitar a tus clientes a votar por tu restaurante</li>
-                                    <li>Tener la oportunidad de estar en el Top 10 de tu ciudad y estado</li>
-                                </ul>
-                            </div>
-                            
-                            <!-- Boton CTA -->
-                            <div style="text-align: center; margin: 40px 0;">
-                                <a href="{{ $claimUrl }}" style="display: inline-block; background: linear-gradient(135deg, #CE1126 0%, #a00d1e 100%); color: #ffffff; text-decoration: none; padding: 18px 40px; font-size: 18px; font-weight: bold; border-radius: 8px; box-shadow: 0 4px 15px rgba(206, 17, 38, 0.4);">
-                                    RECLAMAR MI RESTAURANTE
-                                </a>
-                            </div>
-                            
-                            <!-- Firma -->
-                            <p style="color: #000000; font-size: 16px; line-height: 1.6; margin: 30px 0 0 0;">
-                                Con orgullo mexicano,<br>
-                                <strong style="color: #006847;">Equipo FAMER</strong><br>
-                                <span style="color: #555555; font-size: 14px;">Restaurantes Mexicanos Famosos</span>
-                            </p>
-                        </td>
-                    </tr>
-                    
-                    <!-- Footer -->
-                    <tr>
-                        <td style="background-color: #000000; padding: 25px 30px; text-align: center;">
-                            <p style="color: #555555; font-size: 12px; line-height: 1.6; margin: 0 0 10px 0;">
-                                Este perfil fue creado a partir de informacion publica disponible.<br>
-                                Al reclamarlo, puedes administrar y actualizar la informacion de tu restaurante directamente.
-                            </p>
-                            <p style="color: #FFD700; font-size: 12px; margin: 15px 0 0 0;">
-                                <strong>P.D.</strong> Los rankings del FAMER Awards 2026 ya se estan formando.<br>
-                                Reclamar tu restaurante es el primer paso para ser considerado.
-                            </p>
-                            <p style="color: #444444; font-size: 11px; margin: 20px 0 0 0;">
-                                <a href="https://famousmexicanrestaurants.com/unsubscribe?email={{ urlencode($restaurant->email ?? $restaurant->owner_email) }}" style="color: #555555;">Cancelar suscripcion</a>
-                            </p>
-                        </td>
-                    </tr>
-                    
+<body style="margin:0; padding:0; background-color:#F5F0E8; font-family:'Segoe UI',Arial,Helvetica,sans-serif; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%;">
+
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:#F5F0E8;">
+  <tr><td align="center" style="padding:40px 16px;">
+
+    <table role="presentation" width="100%" style="max-width:580px;" cellspacing="0" cellpadding="0" border="0">
+
+      <!-- HEADER -->
+      <tr>
+        <td style="background-color:#0B0B0B; border-radius:16px 16px 0 0; padding:28px 40px; text-align:center;">
+          <img src="https://restaurantesmexicanosfamosos.com.mx/images/branding/logo-horizontal.png"
+               alt="FAMER" width="160" style="max-width:160px; height:auto; display:block; margin:0 auto 12px;">
+          <p style="margin:0; color:#D4AF37; font-size:11px; font-weight:700; letter-spacing:3px; text-transform:uppercase;">FAMOUS MEXICAN RESTAURANTS</p>
+        </td>
+      </tr>
+
+      <!-- SEPARADOR -->
+      <tr>
+        <td style="background:linear-gradient(90deg,#D4AF37,#F0D060,#D4AF37); height:3px; font-size:0; line-height:0;">&nbsp;</td>
+      </tr>
+
+      <!-- CUERPO -->
+      <tr>
+        <td style="background-color:#FFFFFF; padding:48px 40px 40px;">
+
+          <!-- Saludo -->
+          <h1 style="margin:0 0 12px; font-size:26px; font-weight:700; color:#111827; font-family:'Segoe UI',Arial,sans-serif;">
+            Bienvenido a tu panel de dueño
+          </h1>
+          <p style="margin:0 0 6px; font-size:16px; color:#374151; line-height:1.7;">
+            @isset($ownerName)
+            Hola {{ $ownerName }},
+            @else
+            Hola,
+            @endisset
+          </p>
+          <p style="margin:0 0 28px; font-size:15px; color:#6B7280; line-height:1.7;">
+            Tu restaurante <strong style="color:#111827;">{{ $restaurantName }}</strong> ya está activo en FAMER — el directorio líder de restaurantes mexicanos en Estados Unidos con más de 26,000 establecimientos.
+            Aquí te mostramos cómo sacarle el máximo provecho a tu perfil.
+          </p>
+
+          <!-- Separador interno -->
+          <hr style="border:none; border-top:1px solid #F3F4F6; margin:0 0 28px;">
+
+          <!-- 3 pasos -->
+          <p style="margin:0 0 20px; font-size:13px; font-weight:700; color:#D4AF37; letter-spacing:2px; text-transform:uppercase;">Por donde empezar</p>
+
+          <!-- Paso 1 -->
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-bottom:16px;">
+            <tr>
+              <td style="border:1.5px solid #D4AF37; border-radius:12px; padding:20px 24px;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                  <tr>
+                    <td width="44" valign="top">
+                      <div style="width:36px; height:36px; background-color:#D4AF37; border-radius:50%; text-align:center; line-height:36px; font-weight:700; font-size:16px; color:#0B0B0B;">1</div>
+                    </td>
+                    <td valign="top" style="padding-left:12px;">
+                      <p style="margin:0 0 4px; font-size:15px; font-weight:700; color:#111827;">Completa tu perfil</p>
+                      <p style="margin:0; font-size:13px; color:#6B7280; line-height:1.6;">Agrega descripción, horarios, teléfono y dirección exacta. Un perfil completo recibe hasta 3 veces más visitas.</p>
+                    </td>
+                  </tr>
                 </table>
-            </td>
-        </tr>
+              </td>
+            </tr>
+          </table>
+
+          <!-- Paso 2 -->
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-bottom:16px;">
+            <tr>
+              <td style="border:1.5px solid #E5E7EB; border-radius:12px; padding:20px 24px;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                  <tr>
+                    <td width="44" valign="top">
+                      <div style="width:36px; height:36px; background-color:#F5F0E8; border:1.5px solid #D4AF37; border-radius:50%; text-align:center; line-height:34px; font-weight:700; font-size:16px; color:#D4AF37;">2</div>
+                    </td>
+                    <td valign="top" style="padding-left:12px;">
+                      <p style="margin:0 0 4px; font-size:15px; font-weight:700; color:#111827;">Sube fotos de calidad</p>
+                      <p style="margin:0; font-size:13px; color:#6B7280; line-height:1.6;">Restaurantes con 5 o más fotos generan 68% más clicks. Muestra tus platillos, el ambiente y la experiencia.</p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+
+          <!-- Paso 3 -->
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-bottom:32px;">
+            <tr>
+              <td style="border:1.5px solid #E5E7EB; border-radius:12px; padding:20px 24px;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                  <tr>
+                    <td width="44" valign="top">
+                      <div style="width:36px; height:36px; background-color:#F5F0E8; border:1.5px solid #D4AF37; border-radius:50%; text-align:center; line-height:34px; font-weight:700; font-size:16px; color:#D4AF37;">3</div>
+                    </td>
+                    <td valign="top" style="padding-left:12px;">
+                      <p style="margin:0 0 4px; font-size:15px; font-weight:700; color:#111827;">Revisa tus analytics</p>
+                      <p style="margin:0; font-size:13px; color:#6B7280; line-height:1.6;">Desde tu panel puedes ver cuántas personas visitaron tu perfil, de dónde vienen y qué buscan.</p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+
+          <!-- CTA -->
+          <div style="text-align:center; margin-bottom:32px;">
+            <a href="{{ $dashboardUrl ?? config('app.url') . '/owner/dashboard' }}"
+               style="display:inline-block; background-color:#D4AF37; color:#0B0B0B; text-decoration:none; font-weight:700; font-size:16px; padding:16px 40px; border-radius:10px; font-family:'Segoe UI',Arial,sans-serif; letter-spacing:0.3px;">
+              Explorar Mi Panel
+            </a>
+          </div>
+
+          <!-- Nota -->
+          <p style="margin:0; font-size:13px; color:#9CA3AF; text-align:center; line-height:1.6;">
+            Si tienes dudas, responde directamente a este correo y un miembro de nuestro equipo te ayudará.
+          </p>
+
+        </td>
+      </tr>
+
+      <!-- FOOTER -->
+      <tr>
+        <td style="background-color:#F9FAFB; border-radius:0 0 16px 16px; padding:24px 40px; text-align:center; border-top:1px solid #F3F4F6;">
+          <p style="margin:0 0 8px; font-size:12px; color:#9CA3AF; text-align:center;">
+            &copy; {{ date('Y') }} FAMER — Restaurantes Mexicanos Famosos<br>
+            El directorio líder de restaurantes mexicanos en Estados Unidos
+          </p>
+          <p style="margin:0; font-size:11px; color:#D1D5DB; text-align:center;">
+            Recibiste este mensaje porque eres dueño registrado en FAMER.<br>
+            <a href="{{ config('app.url') }}/unsubscribe?email={{ urlencode($email ?? $ownerEmail ?? '') }}"
+               style="color:#D4AF37; text-decoration:none;">Cancelar notificaciones</a>
+          </p>
+        </td>
+      </tr>
+
     </table>
+  </td></tr>
+</table>
+
 </body>
 </html>

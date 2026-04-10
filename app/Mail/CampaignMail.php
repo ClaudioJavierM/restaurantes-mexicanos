@@ -39,7 +39,10 @@ class CampaignMail extends Mailable
             text: [
                 'X-Campaign-ID' => (string) $this->campaign->id,
                 'X-Tracking-Token' => $this->trackingToken,
-                'List-Unsubscribe' => '<' . url('/unsubscribe') . '>',
+                'X-Mailer' => 'FAMER-Platform',
+                'List-Unsubscribe' => '<mailto:unsubscribe@restaurantesmexicanosfamosos.com>',
+                'List-Unsubscribe-Post' => 'List-Unsubscribe=One-Click',
+                'Precedence' => 'bulk',
             ],
         );
     }

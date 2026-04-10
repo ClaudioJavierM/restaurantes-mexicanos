@@ -2,6 +2,7 @@
 
 namespace App\Filament\Owner\Pages;
 
+use App\Models\Restaurant;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Auth;
 
@@ -13,10 +14,17 @@ class FlashDeals extends Page
     protected static ?string $navigationGroup = 'Mi Negocio';
     protected static ?int $navigationSort = 21;
 
-    protected static string $view = 'filament.owner.pages.coming-soon';
+    protected static string $view = 'filament.owner.pages.flash-deals';
 
-    public string $featureName = 'Ofertas Relampago';
-    public string $featureDescription = 'Muy pronto podras crear ofertas por tiempo limitado para atraer clientes. Happy Hour, descuentos flash y promociones especiales.';
+    public ?Restaurant $restaurant = null;
+
+    public function mount(): void
+    {
+        $user = Auth::user();
+        if ($user) {
+            $this->restaurant = $user->allAccessibleRestaurants()->first();
+        }
+    }
 
     public static function shouldRegisterNavigation(): bool
     {
@@ -28,11 +36,11 @@ class FlashDeals extends Page
 
     public static function getNavigationBadge(): ?string
     {
-        return 'Pronto';
+        return null;
     }
 
     public static function getNavigationBadgeColor(): ?string
     {
-        return 'gray';
+        return 'success';
     }
 }

@@ -8,6 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Mail\Mailables\Headers;
 use Illuminate\Queue\SerializesModels;
 
 class OrderConfirmationMail extends Mailable implements ShouldQueue
@@ -22,6 +23,13 @@ class OrderConfirmationMail extends Mailable implements ShouldQueue
     {
         return new Envelope(
             subject: "Confirmación de Pedido #{$this->order->order_number} - {$this->order->restaurant->name}",
+        );
+    }
+
+    public function headers(): Headers
+    {
+        return new Headers(
+            text: ['X-Mailer' => 'FAMER-Platform'],
         );
     }
 

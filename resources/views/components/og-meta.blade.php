@@ -45,15 +45,9 @@ if ($restaurant) {
     
     $ogDescription = implode(' | ', $descriptionParts);
     
-    // Restaurant image - check if exists and generate full URL
-    if ($restaurant->image && !str_starts_with($restaurant->image, 'http')) {
-        $ogImage = asset('storage/' . $restaurant->image);
-    } elseif ($restaurant->image) {
-        $ogImage = $restaurant->image;
-    } else {
-        // Default restaurant image
-        $ogImage = asset('images/branding/default-restaurant-og.jpg');
-    }
+    // Restaurant image — use dynamic branded OG image endpoint
+    // Falls back to static photo if OG image generation fails (the controller handles this)
+    $ogImage = route('og-image', ['slug' => $restaurant->slug]);
 }
 
 // City guide page specific OG tags

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\OgImageController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\TeamInvitationController;
@@ -84,6 +85,9 @@ Route::get('/team/accept/{token}', [TeamInvitationController::class, 'show'])->n
 Route::post('/team/accept/{token}', [TeamInvitationController::class, 'accept'])->name('team.invitation.accept');
 Route::post('/team/decline/{token}', [TeamInvitationController::class, 'decline'])->name('team.invitation.decline');
 
+// Dynamic OG Image generation
+Route::get('/og-image/{slug}.jpg', [OgImageController::class, 'show'])->name('og-image');
+
 // SEO Routes — Sitemap index + sub-sitemaps
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 Route::get('/sitemap-main.xml', [SitemapController::class, 'main'])->name('sitemap.main');
@@ -149,6 +153,7 @@ Route::prefix('staging/livewire-owner')->middleware(['auth'])->group(function ()
     Route::get('/{restaurant:slug}/reviews', \App\Livewire\Owner\ReviewHub::class)->name('owner.livewire.reviews');
     Route::get('/{restaurant:slug}/menu', \App\Livewire\Owner\MenuUpload::class)->name('owner.livewire.menu');
     Route::get('/{restaurant:slug}/famer', \App\Livewire\Owner\FamerDashboard::class)->name('owner.livewire.famer');
+    Route::get('/{restaurant:slug}/badges', \App\Livewire\Owner\WinnerBadge::class)->name('owner.livewire.badges');
 });
 
 // Owner Email Tracking Routes  
@@ -162,15 +167,38 @@ Route::get('/owner-email/unsubscribe/{token}', [\App\Http\Controllers\OwnerEmail
 Route::get('/votar', \App\Livewire\VoteRestaurant::class)->name('votar');
 Route::redirect('/contacto', '/contact');
 
+// FAMER Awards
+Route::get('/awards', \App\Livewire\AwardsWinners::class)->name('awards.winners');
+Route::get('/awards/hall-of-fame', \App\Livewire\AwardsHallOfFame::class)->name('awards.hall-of-fame');
+Route::get('/awards/{year}/{month}', \App\Livewire\AwardsWinners::class)->name('awards.month');
+
+// Catering
+Route::get('/catering', \App\Livewire\CateringRequest::class)->name('catering');
+
+// City SEO pages
+Route::get('/restaurantes-mexicanos-en-{city}-{state}', \App\Livewire\CityRestaurants::class)->name('city.restaurants');
+Route::get('/mexican-restaurants-in-{city}-{state}', \App\Livewire\CityRestaurants::class)->name('city.restaurants.en');
+
+// Restaurant Comparator
+Route::get('/comparar', \App\Livewire\RestaurantComparator::class)->name('comparar');
+
 require __DIR__.'/auth.php';
 
 // FAMER Email Webhook for N8N
+// CSRF excluded globally via validateCsrfTokens(except: ['webhooks/*']) in bootstrap/app.php
 Route::post("/webhooks/famer-emails", [\App\Http\Controllers\FamerWebhookController::class, "trigger"])
-    ->name("webhooks.famer-emails")
-    ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+    ->name("webhooks.famer-emails");
+
+// Resend Email Tracking Webhooks (delivered, opened, clicked, bounced, complained)
+Route::post('/webhooks/resend', [\App\Http\Controllers\ResendWebhookController::class, 'handle'])
+    ->name('webhooks.resend');
+
+// Listmonk Newsletter Webhooks (subscribe, unsubscribe, campaign events, link_click, bounce)
+Route::post('/webhooks/listmonk', [\App\Http\Controllers\ListmonkWebhookController::class, 'handle'])
+    ->name('webhooks.listmonk');
 
 // Import Webhooks for N8N
-Route::prefix('webhooks/import')->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class])->group(function () {
+Route::prefix('webhooks/import')->group(function () {
     Route::post('/smart', [\App\Http\Controllers\ImportWebhookController::class, 'smartImport'])->name('webhooks.import.smart');
     Route::post('/bulk', [\App\Http\Controllers\ImportWebhookController::class, 'bulkImport'])->name('webhooks.import.bulk');
     Route::post('/status', [\App\Http\Controllers\ImportWebhookController::class, 'status'])->name('webhooks.import.status');
@@ -197,12 +225,10 @@ Route::get("/pwa/{slug}", App\Livewire\PwaRestaurant::class)->name("pwa.restaura
 // TwiML endpoint for Twilio voice verification calls (no CSRF)
 Route::get('/webhooks/twilio/claim-twiml', [\App\Http\Controllers\TwimlController::class, 'claimVerification'])->name('twilio.claim-twiml');
 Route::post('/webhooks/twilio/sms', [\App\Http\Controllers\TwilioWebhookController::class, 'handleIncomingSms'])
-    ->name('webhooks.twilio.sms')
-    ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+    ->name('webhooks.twilio.sms');
 
 Route::post('/webhooks/twilio/status', [\App\Http\Controllers\TwilioWebhookController::class, 'handleStatusCallback'])
-    ->name('webhooks.twilio.status')
-    ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+    ->name('webhooks.twilio.status');
 require __DIR__.'/chat-widget.php';
 
 // QR Print page for restaurant owners
@@ -278,6 +304,11 @@ Route::get('/owner/certificate-pdf/{restaurant}', function (App\Models\Restauran
     return $pdf->download('certificado-famer-' . $restaurant->slug . '-' . $year . '.pdf');
 })->middleware(['auth'])->name('owner.certificate-pdf');
 
+// Winner Badge SVG download for restaurant owners
+Route::get('/owner/badge/download', [\App\Http\Controllers\BadgeDownloadController::class, 'download'])
+    ->middleware(['auth'])
+    ->name('owner.badge.download');
+
 // Checkout
 Route::get('/checkout', \App\Livewire\Checkout::class)->name('checkout');
 
@@ -288,4 +319,5 @@ Route::get('/pedido/{order_number}', \App\Livewire\OrderConfirmation::class)->na
 Route::middleware(['auth'])->group(function () {
     Route::get('/mi-cuenta/pedidos', \App\Livewire\MiCuentaPedidos::class)->name('mi-cuenta.pedidos');
     Route::get('/mi-cuenta/perfil', \App\Livewire\MiCuentaPerfil::class)->name('mi-cuenta.perfil');
+    Route::get('/mis-listas', \App\Livewire\UserCollections::class)->name('mi-cuenta.listas');
 });

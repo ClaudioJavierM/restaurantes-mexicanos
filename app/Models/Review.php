@@ -23,6 +23,8 @@ class Review extends Model
         'owner_response',
         'owner_response_by',
         'owner_response_at',
+        'owner_reply',
+        'owner_replied_at',
         'helpful_count',
         'not_helpful_count',
         'status',
@@ -42,6 +44,7 @@ class Review extends Model
         'not_helpful_count' => 'integer',
         'approved_at' => 'datetime',
         'owner_response_at' => 'datetime',
+        'owner_replied_at' => 'datetime',
     ];
 
     public function restaurant(): BelongsTo

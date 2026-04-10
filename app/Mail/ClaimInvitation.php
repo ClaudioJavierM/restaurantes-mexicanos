@@ -8,6 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Mail\Mailables\Headers;
 use Illuminate\Queue\SerializesModels;
 
 class ClaimInvitation extends Mailable implements ShouldQueue
@@ -32,7 +33,19 @@ class ClaimInvitation extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: "🌮 {$this->restaurant->name} - ¡Reclama tu perfil GRATIS en Restaurantes Mexicanos Famosos!",
+            subject: "{$this->restaurant->name} — Tu perfil ya está en el directorio de restaurantes mexicanos",
+        );
+    }
+
+    public function headers(): Headers
+    {
+        return new Headers(
+            text: [
+                'X-Mailer' => 'FAMER-Platform',
+                'List-Unsubscribe' => '<mailto:unsubscribe@restaurantesmexicanosfamosos.com>',
+                'List-Unsubscribe-Post' => 'List-Unsubscribe=One-Click',
+                'Precedence' => 'bulk',
+            ],
         );
     }
 

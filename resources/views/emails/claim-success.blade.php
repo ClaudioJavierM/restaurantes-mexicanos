@@ -1,178 +1,172 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bienvenido a tu Dashboard</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="format-detection" content="telephone=no">
+    <title>Bienvenido a tu panel — FAMER</title>
 </head>
-<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f5f5;">
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f5f5f5;">
-        <tr>
-            <td align="center" style="padding: 40px 20px;">
-                <table role="presentation" width="600" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+<body style="margin:0; padding:0; background-color:#F5F0E8; font-family:'Segoe UI',Arial,Helvetica,sans-serif; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%;">
 
-                    <!-- Header -->
-                    <tr>
-                        <td style="background: linear-gradient(135deg, {{ $plan === 'elite' ? '#b45309' : '#dc2626' }} 0%, {{ $plan === 'elite' ? '#d97706' : '#ef4444' }} 100%); padding: 30px 40px; border-radius: 12px 12px 0 0; text-align: center;">
-                            <img src="https://restaurantesmexicanosfamosos.com/images/branding/logo.png?v=3" alt="Restaurantes Mexicanos Famosos" style="max-height: 50px; width: auto; margin-bottom: 12px;" />
-                            @if($plan === 'elite')
-                                <p style="color: #fcd34d; margin: 0 0 8px 0; font-size: 40px;">&#127942;</p>
-                            @elseif($plan === 'premium')
-                                <p style="color: #fcd34d; margin: 0 0 8px 0; font-size: 40px;">&#11088;</p>
-                            @else
-                                <p style="color: #ffffff; margin: 0 0 8px 0; font-size: 40px;">&#127881;</p>
-                            @endif
-                            <h1 style="color: #ffffff; margin: 0; font-size: 26px;">
-                                Bienvenido{{ $plan === 'elite' ? ' al Club Elite' : ($plan === 'premium' ? ' a Premium' : '') }}, {{ $user->name }}!
-                            </h1>
-                            <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0; font-size: 16px;">
-                                Tu suscripcion <strong>{{ ucfirst($plan) }}</strong> esta activa
-                            </p>
-                        </td>
-                    </tr>
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:#F5F0E8;">
+    <tr>
+        <td align="center" style="padding:40px 16px;">
 
-                    <!-- Main Content -->
-                    <tr>
-                        <td style="padding: 40px;">
-                            <!-- Restaurant Name -->
-                            <h2 style="color: #1f2937; margin: 0 0 20px 0; font-size: 22px; text-align: center;">
-                                {{ $restaurant->name }}
-                            </h2>
+            <table role="presentation" width="100%" style="max-width:580px;" cellspacing="0" cellpadding="0" border="0">
 
-                            <p style="color: #4b5563; font-size: 15px; line-height: 1.7; text-align: center; margin: 0 0 25px 0;">
-                                Tu restaurante ha sido verificado y tu plan <strong>{{ ucfirst($plan) }}</strong> esta completamente activo.
-                                Ya puedes acceder a tu panel de propietario para gestionar tu restaurante.
-                            </p>
+                <!-- HEADER -->
+                <tr>
+                    <td style="background-color:#0B0B0B; border-radius:16px 16px 0 0; padding:28px 40px; text-align:center;">
+                        <img src="https://restaurantesmexicanosfamosos.com.mx/images/branding/logo-horizontal.png"
+                             alt="FAMER" width="160" style="max-width:160px; height:auto; display:block; margin:0 auto 12px;">
+                        <p style="margin:0; color:#D4AF37; font-size:11px; font-weight:700; letter-spacing:3px; text-transform:uppercase;">FAMOUS MEXICAN RESTAURANTS</p>
+                    </td>
+                </tr>
 
-                            <!-- Account Credentials Box -->
-                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #fef3c7; border: 1px solid #fcd34d; border-radius: 8px; margin: 25px 0;">
-                                <tr>
-                                    <td style="padding: 20px;">
-                                        <h3 style="color: #92400e; margin: 0 0 12px 0; font-size: 16px;">
-                                            &#128273; Datos de acceso a tu cuenta:
-                                        </h3>
-                                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
-                                            <tr>
-                                                <td style="padding: 4px 0;">
-                                                    <p style="color: #78350f; margin: 0; font-size: 14px;">
-                                                        <strong>Email:</strong> {{ $user->email }}
-                                                    </p>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td style="padding: 4px 0;">
-                                                    <p style="color: #78350f; margin: 0; font-size: 14px;">
-                                                        <strong>Contrasena temporal:</strong> {{ $tempPassword }}
-                                                    </p>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                        <p style="color: #92400e; margin: 12px 0 0 0; font-size: 12px;">
-                                            &#9888; Te recomendamos cambiar tu contrasena al iniciar sesion.
-                                        </p>
-                                    </td>
-                                </tr>
-                            </table>
+                <!-- SEPARADOR DORADO -->
+                <tr>
+                    <td style="background:linear-gradient(90deg,#D4AF37,#F0D060,#D4AF37); height:3px; font-size:0; line-height:0;">&nbsp;</td>
+                </tr>
 
-                            <!-- CTA Button - Dashboard -->
-                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin: 25px 0;">
-                                <tr>
-                                    <td align="center">
-                                        <a href="{{ $dashboardUrl }}" style="display: inline-block; background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%); color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 8px; font-size: 16px; font-weight: bold; box-shadow: 0 4px 6px rgba(220, 38, 38, 0.3); letter-spacing: 0.5px;">
-                                            ACCEDER A MI DASHBOARD
-                                        </a>
-                                    </td>
-                                </tr>
-                            </table>
+                <!-- CUERPO -->
+                <tr>
+                    <td style="background-color:#FFFFFF; padding:48px 40px 40px;">
 
-                            <!-- Reset Password Link -->
-                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin: 10px 0 25px 0;">
-                                <tr>
-                                    <td align="center">
-                                        <a href="{{ $resetPasswordUrl }}" style="color: #dc2626; text-decoration: underline; font-size: 13px;">
-                                            Cambiar mi contrasena
-                                        </a>
-                                    </td>
-                                </tr>
-                            </table>
+                        <!-- Headline -->
+                        <h1 style="margin:0 0 8px; font-size:26px; font-weight:700; color:#111827; text-align:center; font-family:'Segoe UI',Arial,sans-serif;">
+                            Tu cuenta está lista
+                        </h1>
+                        <p style="margin:0 0 28px; font-size:15px; color:#6B7280; text-align:center; line-height:1.6;">
+                            Hola @if(!empty($ownerName)){{ $ownerName }},@else,@endif tu perfil en FAMER está activo y verificado.
+                        </p>
 
-                            <!-- Plan Features -->
-                            @if($plan === 'elite')
-                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #fffbeb; border: 1px solid #fcd34d; border-radius: 8px; margin: 25px 0;">
-                                <tr>
-                                    <td style="padding: 20px;">
-                                        <h3 style="color: #92400e; margin: 0 0 12px 0; font-size: 16px;">
-                                            &#127942; Tu Plan Elite incluye:
-                                        </h3>
-                                        <ul style="color: #78350f; font-size: 14px; line-height: 2; padding-left: 20px; margin: 0;">
-                                            <li>Badge Elite Dorado - La maxima distincion</li>
-                                            <li>Posicion #1 en busquedas de tu area</li>
-                                            <li>Menu Digital + Codigo QR</li>
-                                            <li>Dashboard de Analiticas Avanzadas</li>
-                                            <li>Marketing Automatizado (email y SMS)</li>
-                                            <li>Chatbot AI 24/7</li>
-                                            <li>Account Manager Dedicado</li>
-                                            <li>6 Cupones con 15% Extra de descuento</li>
-                                        </ul>
-                                    </td>
-                                </tr>
-                            </table>
-                            @elseif($plan === 'premium')
-                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; margin: 25px 0;">
-                                <tr>
-                                    <td style="padding: 20px;">
-                                        <h3 style="color: #991b1b; margin: 0 0 12px 0; font-size: 16px;">
-                                            &#11088; Tu Plan Premium incluye:
-                                        </h3>
-                                        <ul style="color: #7f1d1d; font-size: 14px; line-height: 2; padding-left: 20px; margin: 0;">
-                                            <li>Badge Premium Verificado</li>
-                                            <li>Top 3 en busquedas locales</li>
-                                            <li>Menu Digital + Codigo QR</li>
-                                            <li>Sistema de Reservaciones</li>
-                                            <li>Dashboard de Analiticas</li>
-                                            <li>Fotos y Videos Ilimitados</li>
-                                            <li>Chatbot AI 24/7</li>
-                                            <li>4 Cupones Trimestrales de descuento</li>
-                                        </ul>
-                                    </td>
-                                </tr>
-                            </table>
-                            @endif
+                        <!-- Restaurante -->
+                        <h2 style="margin:0 0 6px; font-size:18px; font-weight:700; color:#111827; text-align:center;">
+                            {{ $restaurant->name }}
+                        </h2>
+                        <p style="margin:0 0 28px; font-size:14px; color:#D4AF37; text-align:center; font-weight:700; letter-spacing:1px; text-transform:uppercase;">
+                            Restaurante Verificado
+                        </p>
 
-                            <!-- Next Steps -->
-                            <h3 style="color: #1f2937; margin: 25px 0 15px 0; font-size: 17px;">
-                                &#128161; Primeros pasos recomendados:
-                            </h3>
-                            <ol style="color: #4b5563; font-size: 14px; line-height: 2; padding-left: 20px; margin: 0;">
-                                <li>Inicia sesion en tu dashboard</li>
-                                <li>Actualiza la informacion de tu restaurante</li>
-                                <li>Sube fotos de tus platillos y local</li>
-                                <li>Configura tu menu digital</li>
-                                <li>Responde a las resenas de tus clientes</li>
-                            </ol>
-                        </td>
-                    </tr>
+                        <!-- Credenciales / datos de acceso -->
+                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"
+                               style="background-color:#FBF6E9; border:1px solid #D4AF37; border-radius:10px; margin:0 0 28px;">
+                            <tr>
+                                <td style="padding:20px 24px;">
+                                    <p style="margin:0 0 10px; font-size:14px; font-weight:700; color:#111827;">Datos de acceso a tu cuenta:</p>
+                                    <p style="margin:0 0 6px; font-size:14px; color:#374151;">
+                                        <strong>Email:</strong> {{ $user->email }}
+                                    </p>
+                                    <p style="margin:0 0 10px; font-size:14px; color:#374151;">
+                                        <strong>Contraseña temporal:</strong> {{ $tempPassword }}
+                                    </p>
+                                    <p style="margin:0; font-size:12px; color:#9CA3AF; line-height:1.5;">
+                                        Cambia tu contraseña al iniciar sesión por primera vez.
+                                    </p>
+                                </td>
+                            </tr>
+                        </table>
 
-                    <!-- Footer -->
-                    <tr>
-                        <td style="background-color: #1f2937; padding: 25px 40px; border-radius: 0 0 12px 12px; text-align: center;">
-                            <p style="color: #d1d5db; margin: 0 0 8px 0; font-size: 14px; font-weight: bold;">
-                                Restaurantes Mexicanos Famosos
-                            </p>
-                            <p style="color: #9ca3af; margin: 0 0 10px 0; font-size: 13px;">
-                                Gracias por confiar en nosotros para hacer crecer tu negocio
-                            </p>
-                            <p style="color: #6b7280; margin: 0; font-size: 12px;">
-                                <a href="https://restaurantesmexicanosfamosos.com" style="color: #ef4444; text-decoration: none;">restaurantesmexicanosfamosos.com</a>
-                                &nbsp;|&nbsp;
-                                <a href="mailto:support@restaurantesmexicanosfamosos.com" style="color: #ef4444; text-decoration: none;">Soporte</a>
-                            </p>
-                        </td>
-                    </tr>
+                        <!-- Botón principal -->
+                        <div style="text-align:center; margin-bottom:16px;">
+                            <a href="{{ $dashboardUrl }}"
+                               style="display:inline-block; background-color:#D4AF37; color:#0B0B0B; text-decoration:none; font-weight:700; font-size:16px; padding:16px 40px; border-radius:10px; font-family:'Segoe UI',Arial,sans-serif; letter-spacing:0.3px;">
+                                Explorar Mi Panel
+                            </a>
+                        </div>
 
-                </table>
-            </td>
-        </tr>
-    </table>
+                        <!-- Link cambiar contraseña -->
+                        <div style="text-align:center; margin-bottom:32px;">
+                            <a href="{{ $resetPasswordUrl }}"
+                               style="color:#D4AF37; text-decoration:none; font-size:13px;">
+                                Cambiar mi contraseña
+                            </a>
+                        </div>
+
+                        <!-- Divider -->
+                        <hr style="border:none; border-top:1px solid #F3F4F6; margin:0 0 24px;">
+
+                        <!-- Qué puedes hacer -->
+                        <p style="margin:0 0 16px; font-size:15px; font-weight:700; color:#111827;">Desde tu panel puedes:</p>
+
+                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin-bottom:24px;">
+                            <tr>
+                                <td style="padding:5px 0; font-size:14px; color:#374151;">
+                                    <span style="color:#D4AF37; font-weight:700; margin-right:8px;">&#10003;</span>Actualizar descripción, horarios y contacto
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding:5px 0; font-size:14px; color:#374151;">
+                                    <span style="color:#D4AF37; font-weight:700; margin-right:8px;">&#10003;</span>Subir fotos de tus platillos y local
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding:5px 0; font-size:14px; color:#374151;">
+                                    <span style="color:#D4AF37; font-weight:700; margin-right:8px;">&#10003;</span>Agregar o actualizar tu menú
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding:5px 0; font-size:14px; color:#374151;">
+                                    <span style="color:#D4AF37; font-weight:700; margin-right:8px;">&#10003;</span>Responder reseñas de clientes
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding:5px 0; font-size:14px; color:#374151;">
+                                    <span style="color:#D4AF37; font-weight:700; margin-right:8px;">&#10003;</span>Ver estadísticas de visitas a tu perfil
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- Plan section si es premium/elite -->
+                        @if(isset($plan) && in_array($plan, ['premium', 'elite']))
+                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"
+                               style="background-color:#F9FAFB; border-radius:10px; margin-bottom:24px;">
+                            <tr>
+                                <td style="padding:20px 24px;">
+                                    <p style="margin:0 0 10px; font-size:14px; font-weight:700; color:#111827;">
+                                        Tu Plan {{ ucfirst($plan) }} también incluye:
+                                    </p>
+                                    @if($plan === 'elite')
+                                    <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+                                        <tr><td style="padding:4px 0; font-size:13px; color:#374151;"><span style="color:#D4AF37; font-weight:700; margin-right:8px;">&#10003;</span>Badge Elite — la máxima distinción</td></tr>
+                                        <tr><td style="padding:4px 0; font-size:13px; color:#374151;"><span style="color:#D4AF37; font-weight:700; margin-right:8px;">&#10003;</span>Posición prioritaria en búsquedas</td></tr>
+                                        <tr><td style="padding:4px 0; font-size:13px; color:#374151;"><span style="color:#D4AF37; font-weight:700; margin-right:8px;">&#10003;</span>Menú digital con código QR</td></tr>
+                                        <tr><td style="padding:4px 0; font-size:13px; color:#374151;"><span style="color:#D4AF37; font-weight:700; margin-right:8px;">&#10003;</span>Analytics avanzados y reportes</td></tr>
+                                        <tr><td style="padding:4px 0; font-size:13px; color:#374151;"><span style="color:#D4AF37; font-weight:700; margin-right:8px;">&#10003;</span>Account manager dedicado</td></tr>
+                                    </table>
+                                    @else
+                                    <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+                                        <tr><td style="padding:4px 0; font-size:13px; color:#374151;"><span style="color:#D4AF37; font-weight:700; margin-right:8px;">&#10003;</span>Badge Premium Verificado</td></tr>
+                                        <tr><td style="padding:4px 0; font-size:13px; color:#374151;"><span style="color:#D4AF37; font-weight:700; margin-right:8px;">&#10003;</span>Menú digital con código QR</td></tr>
+                                        <tr><td style="padding:4px 0; font-size:13px; color:#374151;"><span style="color:#D4AF37; font-weight:700; margin-right:8px;">&#10003;</span>Sistema de reservaciones</td></tr>
+                                        <tr><td style="padding:4px 0; font-size:13px; color:#374151;"><span style="color:#D4AF37; font-weight:700; margin-right:8px;">&#10003;</span>Analytics y estadísticas avanzadas</td></tr>
+                                    </table>
+                                    @endif
+                                </td>
+                            </tr>
+                        </table>
+                        @endif
+
+                    </td>
+                </tr>
+
+                <!-- FOOTER -->
+                <tr>
+                    <td style="background-color:#F9FAFB; border-radius:0 0 16px 16px; padding:24px 40px; text-align:center; border-top:1px solid #F3F4F6;">
+                        <p style="margin:0 0 8px; font-size:12px; color:#9CA3AF;">
+                            © {{ date('Y') }} FAMER — Restaurantes Mexicanos Famosos. Todos los derechos reservados.
+                        </p>
+                        <p style="margin:0; font-size:11px; color:#D1D5DB;">
+                            Este es un correo automático relacionado con tu cuenta de propietario.
+                        </p>
+                    </td>
+                </tr>
+
+            </table>
+        </td>
+    </tr>
+</table>
+
 </body>
 </html>

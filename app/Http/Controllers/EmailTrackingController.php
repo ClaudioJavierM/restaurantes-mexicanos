@@ -79,8 +79,11 @@ class EmailTrackingController extends Controller
             ]);
         }
 
-        // TODO: Mark email as unsubscribed in a dedicated table
-        // For now, we'll just show a confirmation
+        \App\Models\EmailSuppression::suppress($email, 'unsubscribed', 'user_request');
+
+        // También marcar owner_newsletter = false si existe el restaurante
+        \App\Models\Restaurant::where('email', $email)->orWhere('owner_email', $email)
+            ->update(['owner_newsletter' => false]);
 
         Log::info("Email unsubscribed: {$email}");
 

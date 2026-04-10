@@ -199,18 +199,53 @@ Schedule::command('owners:send-reminders --days=30 --limit=100')
     });
 
 /**
- * Send claim invitations - Tuesdays and Fridays 11:00 AM
+ * FAMER Campaign — Rampa progresiva (Resend Pro: 50K/mes, sin límite diario)
+ *
+ * Semana 1 (días 1-3): 300/día  → warming domain reputation
+ * Semana 1 (días 4-7): 500/día  → subida gradual
+ * Semana 2+:           800/día  → velocidad de crucero (pipeline ~3,944 US en ~2 semanas)
+ *
+ * AJUSTAR --limit manualmente según semana:
+ *   Semana 1 inicio: --limit=300
+ *   Semana 1 final:  --limit=500
+ *   Semana 2+:       --limit=800
+ *
+ * País: solo US (country='US') — MX tiene campaña separada pendiente de diseño
  */
-Schedule::command('restaurants:send-claim-invitations --limit=50 --delay=3')
-    ->cron('0 11 * * 2,5')
+Schedule::command('restaurants:send-claim-invitations --limit=500 --delay=1')
+    ->dailyAt('11:00')
     ->timezone('America/New_York')
-    ->description('Send claim invitations to unclaimed restaurants')
+    ->description('DAILY: Claim invitations US — 500/día (Resend Pro 50K/mes)')
     ->onSuccess(function () {
         \Log::info('Claim invitations sent successfully');
     })
     ->onFailure(function () {
         \Log::error('Claim invitations failed');
         notifyN8nFailure('restaurants:send-claim-invitations', 'Claim invitations');
+    });
+
+/**
+ * FAMER Email Sequence — Email 2 (How It Works) — Diario 10am ET
+ * Restaurantes que recibieron Email 1 hace 10+ días y no han reclamado (solo US)
+ */
+Schedule::command('famer:send-emails --email2 --limit=200')
+    ->dailyAt('10:00')
+    ->timezone('America/New_York')
+    ->description('DAILY: FAMER Email 2 follow-up — 200/día (US only)')
+    ->onFailure(function () {
+        \Log::error('FAMER Email 2 sequence failed');
+    });
+
+/**
+ * FAMER Email Sequence — Email 3 (Final Reminder) — Diario 10:30am ET
+ * Restaurantes que recibieron Email 2 hace 10+ días y no han reclamado (solo US)
+ */
+Schedule::command('famer:send-emails --email3 --limit=200')
+    ->dailyAt('10:30')
+    ->timezone('America/New_York')
+    ->description('DAILY: FAMER Email 3 final reminder — 200/día (US only)')
+    ->onFailure(function () {
+        \Log::error('FAMER Email 3 sequence failed');
     });
 
 // ============================================================================
@@ -231,6 +266,39 @@ Schedule::command('rankings:calculate')
     ->onFailure(function () {
         \Log::error('Weekly rankings calculation failed');
         notifyN8nFailure('rankings:calculate', 'Weekly Top 10 city/state rankings');
+    });
+
+/**
+ * Recalculate FAMER Scores for all restaurants
+ * Runs every Sunday at 4:00 AM (after rankings:calculate finishes)
+ * Combines Google/Yelp/TripAdvisor ratings + vote bonus into a single score
+ */
+Schedule::command('famer:recalculate-scores')
+    ->cron('0 4 * * 0')
+    ->timezone('America/New_York')
+    ->description('WEEKLY: Recalculate FAMER composite scores for all restaurants')
+    ->onSuccess(function () {
+        \Log::info('Weekly FAMER score recalculation completed');
+    })
+    ->onFailure(function () {
+        \Log::error('Weekly FAMER score recalculation failed');
+        notifyN8nFailure('famer:recalculate-scores', 'Weekly FAMER score recalculation');
+    });
+
+/**
+ * Assign monthly badges and populate monthly_rankings from votes
+ * Runs on the 1st of each month at 2:00 AM (processes previous month's votes)
+ */
+Schedule::command('famer:assign-badges')
+    ->cron('0 2 1 * *')
+    ->timezone('America/New_York')
+    ->description('MONTHLY: Assign city/state/national badges from previous month votes')
+    ->onSuccess(function () {
+        \Log::info('Monthly badge assignment completed');
+    })
+    ->onFailure(function () {
+        \Log::error('Monthly badge assignment failed');
+        notifyN8nFailure('famer:assign-badges', 'Monthly badge assignment');
     });
 
 // ============================================================================
@@ -306,3 +374,39 @@ Schedule::command('blog:generate-posts --count=2 --lang=es')
     ->timezone('America/New_York')
     ->description('Auto-generate 2 AI blog posts (Thursday)')
     ->onFailure(fn() => notifyN8nFailure('blog:generate-posts', 'Weekly AI blog generation Thu'));
+
+// ============================================================================
+// Campaign Report — monitoreo para agente Maya (OpenClaw)
+// ============================================================================
+
+/**
+ * Campaign Report Diario — genera reporte y lo guarda en storage para Maya
+ * Corre cada mañana a las 9am ET (8am CST)
+ */
+Schedule::command('famer:campaign-report --period=7 --format=markdown')
+    ->dailyAt('09:00')
+    ->timezone('America/New_York')
+    ->description('Daily campaign health report')
+    ->sendOutputTo(storage_path('logs/campaign-report-daily.md'))
+    ->onSuccess(function () {
+        \Log::info('Daily campaign report generated');
+    });
+
+/**
+ * Alert check cada hora — solo notifica si hay problemas
+ */
+Schedule::command('famer:campaign-report --alert --format=json')
+    ->hourly()
+    ->timezone('America/New_York')
+    ->description('Hourly bounce rate alert check')
+    ->onSuccess(function () {
+        \Log::info('Hourly campaign alert check OK');
+    });
+
+/**
+ * Email health check — cada 30 minutos, solo output si bounce/complaint crítico
+ */
+Schedule::command('famer:email-health --alert')
+    ->everyThirtyMinutes()
+    ->timezone('America/New_York')
+    ->description('Email health check — alerta si bounce/complaint rate crítico');
