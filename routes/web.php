@@ -189,6 +189,16 @@ Route::post("/webhooks/famer-emails", [\App\Http\Controllers\FamerWebhookControl
     ->name("webhooks.famer-emails")
     ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
 
+// Resend Email Tracking Webhooks (delivered, opened, clicked, bounced, complained)
+Route::post('/webhooks/resend', [\App\Http\Controllers\ResendWebhookController::class, 'handle'])
+    ->name('webhooks.resend')
+    ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+
+// Listmonk Newsletter Webhooks (subscribe, unsubscribe, campaign events, link_click, bounce)
+Route::post('/webhooks/listmonk', [\App\Http\Controllers\ListmonkWebhookController::class, 'handle'])
+    ->name('webhooks.listmonk')
+    ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+
 // Import Webhooks for N8N
 Route::prefix('webhooks/import')->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class])->group(function () {
     Route::post('/smart', [\App\Http\Controllers\ImportWebhookController::class, 'smartImport'])->name('webhooks.import.smart');
