@@ -185,22 +185,20 @@ Route::get('/comparar', \App\Livewire\RestaurantComparator::class)->name('compar
 require __DIR__.'/auth.php';
 
 // FAMER Email Webhook for N8N
+// CSRF excluded globally via validateCsrfTokens(except: ['webhooks/*']) in bootstrap/app.php
 Route::post("/webhooks/famer-emails", [\App\Http\Controllers\FamerWebhookController::class, "trigger"])
-    ->name("webhooks.famer-emails")
-    ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+    ->name("webhooks.famer-emails");
 
 // Resend Email Tracking Webhooks (delivered, opened, clicked, bounced, complained)
 Route::post('/webhooks/resend', [\App\Http\Controllers\ResendWebhookController::class, 'handle'])
-    ->name('webhooks.resend')
-    ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+    ->name('webhooks.resend');
 
 // Listmonk Newsletter Webhooks (subscribe, unsubscribe, campaign events, link_click, bounce)
 Route::post('/webhooks/listmonk', [\App\Http\Controllers\ListmonkWebhookController::class, 'handle'])
-    ->name('webhooks.listmonk')
-    ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+    ->name('webhooks.listmonk');
 
 // Import Webhooks for N8N
-Route::prefix('webhooks/import')->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class])->group(function () {
+Route::prefix('webhooks/import')->group(function () {
     Route::post('/smart', [\App\Http\Controllers\ImportWebhookController::class, 'smartImport'])->name('webhooks.import.smart');
     Route::post('/bulk', [\App\Http\Controllers\ImportWebhookController::class, 'bulkImport'])->name('webhooks.import.bulk');
     Route::post('/status', [\App\Http\Controllers\ImportWebhookController::class, 'status'])->name('webhooks.import.status');
@@ -227,12 +225,10 @@ Route::get("/pwa/{slug}", App\Livewire\PwaRestaurant::class)->name("pwa.restaura
 // TwiML endpoint for Twilio voice verification calls (no CSRF)
 Route::get('/webhooks/twilio/claim-twiml', [\App\Http\Controllers\TwimlController::class, 'claimVerification'])->name('twilio.claim-twiml');
 Route::post('/webhooks/twilio/sms', [\App\Http\Controllers\TwilioWebhookController::class, 'handleIncomingSms'])
-    ->name('webhooks.twilio.sms')
-    ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+    ->name('webhooks.twilio.sms');
 
 Route::post('/webhooks/twilio/status', [\App\Http\Controllers\TwilioWebhookController::class, 'handleStatusCallback'])
-    ->name('webhooks.twilio.status')
-    ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+    ->name('webhooks.twilio.status');
 require __DIR__.'/chat-widget.php';
 
 // QR Print page for restaurant owners
