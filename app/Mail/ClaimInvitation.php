@@ -33,7 +33,7 @@ class ClaimInvitation extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: "🌮 {$this->restaurant->name} - ¡Reclama tu perfil GRATIS en Restaurantes Mexicanos Famosos!",
+            subject: "{$this->restaurant->name} — Tu perfil ya está en el directorio de restaurantes mexicanos",
         );
     }
 
