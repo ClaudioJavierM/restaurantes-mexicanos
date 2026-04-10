@@ -85,11 +85,31 @@ class SendClaimInvitations extends Command
 
             try {
                 if (!$dryRun) {
-                    // Enviar email de forma sincrónica
+                    // Capturar el Resend email_id via header X-Resend-Email-ID
+                    // que el transport agrega al mensaje Symfony después de enviarlo
+                    $resendEmailId = null;
                     $mailable = new ClaimInvitation($restaurant);
+                    $mailable->withSymfonyMessage(function (\Symfony\Component\Mime\Email $msg) use (&$resendEmailId) {
+                        // Capturar referencia al objeto — el ID se leerá post-send
+                        // usando el evento MessageSent
+                    });
+
+                    $capturedId = null;
+                    $listener = \Illuminate\Support\Facades\Event::listen(
+                        \Illuminate\Mail\Events\MessageSent::class,
+                        function ($event) use (&$capturedId) {
+                            $headers = $event->sent->getOriginalMessage()->getHeaders();
+                            if ($headers->has('X-Resend-Email-ID')) {
+                                $capturedId = $headers->get('X-Resend-Email-ID')->getBody();
+                            }
+                        }
+                    );
+
                     Mail::to($email)->send($mailable);
 
-                    // Registrar en email_logs INMEDIATAMENTE
+                    \Illuminate\Support\Facades\Event::forget(\Illuminate\Mail\Events\MessageSent::class);
+
+                    // Registrar en email_logs con el Resend message_id capturado
                     EmailLog::create([
                         "type" => "campaign",
                         "category" => "claim_invitation",
@@ -102,6 +122,7 @@ class SendClaimInvitations extends Command
                         "status" => "sent",
                         "sent_at" => now(),
                         "provider" => "resend",
+                        "message_id" => $capturedId,
                         "restaurant_id" => $restaurant->id,
                         "metadata" => json_encode([
                             "restaurant_name" => $restaurant->name,

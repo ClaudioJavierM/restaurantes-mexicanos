@@ -8,6 +8,8 @@ use App\Mail\FamerReminder;
 use App\Models\EmailLog;
 use App\Models\Restaurant;
 use Illuminate\Console\Command;
+use Illuminate\Mail\Events\MessageSent;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
 
@@ -26,6 +28,28 @@ class SendFamerEmails extends Command
     private int $email1Count = 0;
     private int $email2Count = 0;
     private int $email3Count = 0;
+
+    /**
+     * Send a mailable and capture the Resend email_id from the X-Resend-Email-ID header.
+     * Returns the Resend message ID or null if not captured.
+     */
+    private function sendAndCaptureId(\Illuminate\Mail\Mailable $mailable, string $email): ?string
+    {
+        $capturedId = null;
+
+        Event::listen(MessageSent::class, function ($event) use (&$capturedId) {
+            $headers = $event->sent->getOriginalMessage()->getHeaders();
+            if ($headers->has('X-Resend-Email-ID')) {
+                $capturedId = $headers->get('X-Resend-Email-ID')->getBody();
+            }
+        });
+
+        Mail::to($email)->send($mailable);
+
+        Event::forget(MessageSent::class);
+
+        return $capturedId;
+    }
 
     public function handle(): int
     {
@@ -84,7 +108,7 @@ class SendFamerEmails extends Command
                 $this->line("  [DRY] Would send Email 1 to: {$email} ({$restaurant->name})");
             } else {
                 try {
-                    Mail::to($email)->send(new FamerIntroduction($restaurant));
+                    $resendId = $this->sendAndCaptureId(new FamerIntroduction($restaurant), $email);
                     $restaurant->update(["famer_email_1_sent_at" => now()]);
                     EmailLog::create([
                         'type'           => 'campaign',
@@ -98,6 +122,7 @@ class SendFamerEmails extends Command
                         'status'         => 'sent',
                         'sent_at'        => now(),
                         'provider'       => 'resend',
+                        'message_id'     => $resendId,
                         'restaurant_id'  => $restaurant->id,
                     ]);
                     $this->line("  Sent Email 1 to: {$email}");
@@ -141,7 +166,7 @@ class SendFamerEmails extends Command
                 $this->line("  [DRY] Would send Email 2 to: {$email}");
             } else {
                 try {
-                    Mail::to($email)->send(new FamerHowItWorks($restaurant));
+                    $resendId = $this->sendAndCaptureId(new FamerHowItWorks($restaurant), $email);
                     $restaurant->update(["famer_email_2_sent_at" => now()]);
                     EmailLog::create([
                         'type'           => 'campaign',
@@ -155,6 +180,7 @@ class SendFamerEmails extends Command
                         'status'         => 'sent',
                         'sent_at'        => now(),
                         'provider'       => 'resend',
+                        'message_id'     => $resendId,
                         'restaurant_id'  => $restaurant->id,
                     ]);
                     $this->line("  Sent Email 2 to: {$email}");
@@ -198,7 +224,7 @@ class SendFamerEmails extends Command
                 $this->line("  [DRY] Would send Email 3 to: {$email}");
             } else {
                 try {
-                    Mail::to($email)->send(new FamerReminder($restaurant));
+                    $resendId = $this->sendAndCaptureId(new FamerReminder($restaurant), $email);
                     $restaurant->update(["famer_email_3_sent_at" => now()]);
                     EmailLog::create([
                         'type'           => 'campaign',
@@ -212,6 +238,7 @@ class SendFamerEmails extends Command
                         'status'         => 'sent',
                         'sent_at'        => now(),
                         'provider'       => 'resend',
+                        'message_id'     => $resendId,
                         'restaurant_id'  => $restaurant->id,
                     ]);
                     $this->line("  Sent Email 3 to: {$email}");
