@@ -445,11 +445,6 @@ class Restaurant extends Model implements HasMedia
         return $this->hasMany(LoyaltyReward::class);
     }
 
-    public function customers(): HasMany
-    {
-        return $this->hasMany(RestaurantCustomer::class);
-    }
-
     public function rankings(): HasMany
     {
         return $this->hasMany(RestaurantRanking::class);
