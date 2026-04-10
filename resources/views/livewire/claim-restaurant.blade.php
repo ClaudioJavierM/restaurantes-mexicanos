@@ -821,7 +821,7 @@
                             loading: true,
                             processing: false,
                             errorMsg: '',
-                            clientSecret: $wire.entangle('stripeClientSecret').live,
+                            clientSecret: @json($stripeClientSecret),
 
                             initStripeElements(secret) {
                                 if (!secret || !window.Stripe) return;
@@ -875,7 +875,15 @@
                                 }
                             }
                         }"
-                        x-init="$watch('clientSecret', val => { if (val) initStripeElements(val) })"
+                        x-init="
+                            const tryInit = () => { if (clientSecret) initStripeElements(clientSecret); };
+                            if (window.Stripe) {
+                                tryInit();
+                            } else {
+                                const s = document.querySelector('script[src*=\'js.stripe.com\']');
+                                if (s) { s.addEventListener('load', tryInit, { once: true }); }
+                            }
+                        "
                         @stripe-payment-error.window="errorMsg = $event.detail.message; processing = false;"
                     >
                         {{-- Loading skeleton --}}

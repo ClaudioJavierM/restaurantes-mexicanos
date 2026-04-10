@@ -209,6 +209,8 @@
     </script>
 
     <!-- Conversion Tracking + Clarity moved to body bottom for performance -->
+    <!-- Stripe.js (loaded on all pages per Stripe's fraud detection recommendation) -->
+    <script src="https://js.stripe.com/v3/" defer></script>
 </head>
 <body class="bg-[#0B0B0B] antialiased text-[#F5F5F5]">
     <!-- Navigation -->
