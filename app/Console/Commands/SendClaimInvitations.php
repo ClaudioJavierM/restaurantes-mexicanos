@@ -12,11 +12,11 @@ use Illuminate\Support\Facades\DB;
 class SendClaimInvitations extends Command
 {
     protected $signature = "restaurants:send-claim-invitations
-                            {--limit=50 : Maximum number of emails to send}
+                            {--limit=150 : Maximum number of emails to send}
                             {--state= : Filter by state code (e.g., TX, CA)}
                             {--city= : Filter by city name}
                             {--dry-run : Show what would be sent without actually sending}
-                            {--delay=2 : Delay in seconds between emails to avoid rate limits}";
+                            {--delay=1 : Delay in seconds between emails to avoid rate limits}";
 
     protected $description = "Send claim invitation emails to unclaimed restaurants with email addresses";
 
@@ -96,7 +96,7 @@ class SendClaimInvitations extends Command
                         "to_name" => $restaurant->name,
                         "from_email" => config("mail.from.address"),
                         "from_name" => config("mail.from.name"),
-                        "subject" => "🌮 {$restaurant->name} - ¡Reclama tu perfil GRATIS en Restaurantes Mexicanos Famosos!",
+                        "subject" => "{$restaurant->name} — Tu perfil ya está en el directorio de restaurantes mexicanos",
                         "mailable_class" => ClaimInvitation::class,
                         "status" => "sent",
                         "sent_at" => now(),
@@ -135,7 +135,7 @@ class SendClaimInvitations extends Command
                         "to_email" => $email,
                         "to_name" => $restaurant->name,
                         "from_email" => config("mail.from.address"),
-                        "subject" => "🌮 {$restaurant->name} - ¡Reclama tu perfil GRATIS!",
+                        "subject" => "{$restaurant->name} — Tu perfil ya está en el directorio de restaurantes mexicanos",
                         "status" => "failed",
                         "error_message" => $e->getMessage(),
                         "provider" => "resend",

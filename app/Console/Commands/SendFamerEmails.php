@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Mail\FamerIntroduction;
 use App\Mail\FamerHowItWorks;
 use App\Mail\FamerReminder;
+use App\Models\EmailLog;
 use App\Models\Restaurant;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
@@ -84,7 +85,20 @@ class SendFamerEmails extends Command
                 try {
                     Mail::to($email)->send(new FamerIntroduction($restaurant));
                     $restaurant->update(["famer_email_1_sent_at" => now()]);
-                    // EmailLog is created automatically by LogSentEmail listener
+                    EmailLog::create([
+                        'type'           => 'campaign',
+                        'category'       => 'famer_email_1',
+                        'to_email'       => $email,
+                        'to_name'        => $restaurant->name,
+                        'from_email'     => config('mail.from.address'),
+                        'from_name'      => config('mail.from.name'),
+                        'subject'        => "Bienvenido a FAMER — {$restaurant->name}",
+                        'mailable_class' => FamerIntroduction::class,
+                        'status'         => 'sent',
+                        'sent_at'        => now(),
+                        'provider'       => 'resend',
+                        'restaurant_id'  => $restaurant->id,
+                    ]);
                     $this->line("  Sent Email 1 to: {$email}");
                 } catch (\Exception $e) {
                     $this->error("  Failed: {$email} - {$e->getMessage()}");
@@ -103,13 +117,13 @@ class SendFamerEmails extends Command
     {
         $this->info("Procesando Email 2 (How It Works)...");
 
-        $sevenDaysAgo = Carbon::now()->subDays(7);
+        $tenDaysAgo = Carbon::now()->subDays(10);
 
         $restaurants = Restaurant::query()
             ->where("status", "approved")
             ->where("is_claimed", false)
             ->whereNotNull("famer_email_1_sent_at")
-            ->where("famer_email_1_sent_at", "<", $sevenDaysAgo)
+            ->where("famer_email_1_sent_at", "<", $tenDaysAgo)
             ->whereNull("famer_email_2_sent_at")
             ->limit($limit)
             ->get();
@@ -127,7 +141,20 @@ class SendFamerEmails extends Command
                 try {
                     Mail::to($email)->send(new FamerHowItWorks($restaurant));
                     $restaurant->update(["famer_email_2_sent_at" => now()]);
-                    // EmailLog is created automatically by LogSentEmail listener
+                    EmailLog::create([
+                        'type'           => 'campaign',
+                        'category'       => 'famer_email_2',
+                        'to_email'       => $email,
+                        'to_name'        => $restaurant->name,
+                        'from_email'     => config('mail.from.address'),
+                        'from_name'      => config('mail.from.name'),
+                        'subject'        => "Cómo funciona FAMER — {$restaurant->name}",
+                        'mailable_class' => FamerHowItWorks::class,
+                        'status'         => 'sent',
+                        'sent_at'        => now(),
+                        'provider'       => 'resend',
+                        'restaurant_id'  => $restaurant->id,
+                    ]);
                     $this->line("  Sent Email 2 to: {$email}");
                 } catch (\Exception $e) {
                     $this->error("  Failed: {$email} - {$e->getMessage()}");
@@ -146,13 +173,13 @@ class SendFamerEmails extends Command
     {
         $this->info("Procesando Email 3 (Reminder)...");
 
-        $sevenDaysAgo = Carbon::now()->subDays(7);
+        $tenDaysAgo = Carbon::now()->subDays(10);
 
         $restaurants = Restaurant::query()
             ->where("status", "approved")
             ->where("is_claimed", false)
             ->whereNotNull("famer_email_2_sent_at")
-            ->where("famer_email_2_sent_at", "<", $sevenDaysAgo)
+            ->where("famer_email_2_sent_at", "<", $tenDaysAgo)
             ->whereNull("famer_email_3_sent_at")
             ->limit($limit)
             ->get();
@@ -170,7 +197,20 @@ class SendFamerEmails extends Command
                 try {
                     Mail::to($email)->send(new FamerReminder($restaurant));
                     $restaurant->update(["famer_email_3_sent_at" => now()]);
-                    // EmailLog is created automatically by LogSentEmail listener
+                    EmailLog::create([
+                        'type'           => 'campaign',
+                        'category'       => 'famer_email_3',
+                        'to_email'       => $email,
+                        'to_name'        => $restaurant->name,
+                        'from_email'     => config('mail.from.address'),
+                        'from_name'      => config('mail.from.name'),
+                        'subject'        => "Última invitación — {$restaurant->name} en FAMER",
+                        'mailable_class' => FamerReminder::class,
+                        'status'         => 'sent',
+                        'sent_at'        => now(),
+                        'provider'       => 'resend',
+                        'restaurant_id'  => $restaurant->id,
+                    ]);
                     $this->line("  Sent Email 3 to: {$email}");
                 } catch (\Exception $e) {
                     $this->error("  Failed: {$email} - {$e->getMessage()}");
