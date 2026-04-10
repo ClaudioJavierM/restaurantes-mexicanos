@@ -1,3 +1,4 @@
+<div>
 @if($featured->isNotEmpty())
 <div style="margin-bottom:2rem;">
     {{-- Section header --}}
@@ -56,3 +57,4 @@
     </div>
 </div>
 @endif
+</div>
