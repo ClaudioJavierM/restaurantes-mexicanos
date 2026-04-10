@@ -7,7 +7,6 @@ use App\Models\Restaurant;
 use App\Models\Review;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 
 class SeoAnalytics extends Page
 {
@@ -69,11 +68,10 @@ class SeoAnalytics extends Page
             return;
         }
 
-        $since = Carbon::now()->subDays(30)->format('Y-m-d');
-
+        // No date filter — table is always truncated and replaced on each sync
         try {
             $totals = DB::table('gsc_performance')
-                ->where('date', '>=', $since)
+                ->whereRaw('1=1') // no date filter — table is truncated/replaced on each sync
                 ->selectRaw('SUM(clicks) as total_clicks, SUM(impressions) as total_impressions, AVG(ctr) as avg_ctr, AVG(position) as avg_position')
                 ->first();
 
@@ -85,7 +83,7 @@ class SeoAnalytics extends Page
 
         try {
             $this->topKeywords = DB::table('gsc_performance')
-                ->where('date', '>=', $since)
+                ->whereRaw('1=1') // no date filter — table is truncated/replaced on each sync
                 ->whereNotNull('query')
                 ->selectRaw('query, SUM(clicks) as clicks, SUM(impressions) as impressions, AVG(ctr) as ctr, AVG(position) as position')
                 ->groupBy('query')
@@ -104,7 +102,7 @@ class SeoAnalytics extends Page
 
         try {
             $this->topPages = DB::table('gsc_performance')
-                ->where('date', '>=', $since)
+                ->whereRaw('1=1') // no date filter — table is truncated/replaced on each sync
                 ->whereNotNull('page')
                 ->selectRaw('page, SUM(clicks) as clicks, SUM(impressions) as impressions, AVG(position) as position')
                 ->groupBy('page')
@@ -122,7 +120,7 @@ class SeoAnalytics extends Page
 
         try {
             $this->opportunities = DB::table('gsc_performance')
-                ->where('date', '>=', $since)
+                ->whereRaw('1=1') // no date filter — table is truncated/replaced on each sync
                 ->whereNotNull('query')
                 ->selectRaw('query, SUM(clicks) as clicks, SUM(impressions) as impressions, AVG(ctr) as ctr, AVG(position) as position')
                 ->groupBy('query')
@@ -142,7 +140,7 @@ class SeoAnalytics extends Page
 
         try {
             $this->byDevice = DB::table('gsc_performance')
-                ->where('date', '>=', $since)
+                ->whereRaw('1=1') // no date filter — table is truncated/replaced on each sync
                 ->whereNotNull('device')
                 ->selectRaw('device, SUM(clicks) as clicks, SUM(impressions) as impressions')
                 ->groupBy('device')

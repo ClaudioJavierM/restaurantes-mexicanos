@@ -112,6 +112,9 @@ class SyncGscData extends Command
         // ----------------------------------------------------------------
         $this->info('Guardando en base de datos...');
 
+        // Truncate before insert — each sync replaces all data with fresh aggregated period
+        DB::table('gsc_performance')->truncate();
+
         $bar     = $this->output->createProgressBar(count($rows));
         $saved   = 0;
         $chunk   = [];
@@ -125,7 +128,7 @@ class SyncGscData extends Command
             $device  = $keys[3] ?? null;
 
             $chunk[] = [
-                'date'        => $startDate, // placeholder; real date not in dimensions for range queries
+                'date'        => $endDate, // date of the most recent data in the period
                 'query'       => $query ? mb_substr($query, 0, 500) : null,
                 'page'        => $page  ? mb_substr($page, 0, 500)  : null,
                 'country'     => $countryIso,
