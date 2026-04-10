@@ -49,6 +49,16 @@ class FlashDeal extends Model
             });
     }
 
+    public function scopeForRestaurant(Builder $query, int $restaurantId): Builder
+    {
+        return $query->where('restaurant_id', $restaurantId);
+    }
+
+    public function getIsExpiredAttribute(): bool
+    {
+        return $this->ends_at->isPast();
+    }
+
     public function scopeUpcoming(Builder $query): Builder
     {
         return $query->where('is_active', true)

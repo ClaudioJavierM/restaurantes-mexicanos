@@ -149,6 +149,7 @@ Route::prefix('staging/livewire-owner')->middleware(['auth'])->group(function ()
     Route::get('/{restaurant:slug}/reviews', \App\Livewire\Owner\ReviewHub::class)->name('owner.livewire.reviews');
     Route::get('/{restaurant:slug}/menu', \App\Livewire\Owner\MenuUpload::class)->name('owner.livewire.menu');
     Route::get('/{restaurant:slug}/famer', \App\Livewire\Owner\FamerDashboard::class)->name('owner.livewire.famer');
+    Route::get('/{restaurant:slug}/badges', \App\Livewire\Owner\WinnerBadge::class)->name('owner.livewire.badges');
 });
 
 // Owner Email Tracking Routes  
@@ -293,6 +294,11 @@ Route::get('/owner/certificate-pdf/{restaurant}', function (App\Models\Restauran
     return $pdf->download('certificado-famer-' . $restaurant->slug . '-' . $year . '.pdf');
 })->middleware(['auth'])->name('owner.certificate-pdf');
 
+// Winner Badge SVG download for restaurant owners
+Route::get('/owner/badge/download', [\App\Http\Controllers\BadgeDownloadController::class, 'download'])
+    ->middleware(['auth'])
+    ->name('owner.badge.download');
+
 // Checkout
 Route::get('/checkout', \App\Livewire\Checkout::class)->name('checkout');
 
@@ -303,4 +309,5 @@ Route::get('/pedido/{order_number}', \App\Livewire\OrderConfirmation::class)->na
 Route::middleware(['auth'])->group(function () {
     Route::get('/mi-cuenta/pedidos', \App\Livewire\MiCuentaPedidos::class)->name('mi-cuenta.pedidos');
     Route::get('/mi-cuenta/perfil', \App\Livewire\MiCuentaPerfil::class)->name('mi-cuenta.perfil');
+    Route::get('/mis-listas', \App\Livewire\UserCollections::class)->name('mi-cuenta.listas');
 });

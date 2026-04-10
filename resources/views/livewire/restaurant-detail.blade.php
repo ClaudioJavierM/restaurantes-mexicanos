@@ -892,6 +892,9 @@
                 </div>
                 @endif
 
+                <!-- Flash Deals / Ofertas Activas -->
+                @livewire('restaurant-deals', ['restaurantId' => $restaurant->id])
+
                 <!-- Popular Dishes (shown in info tab if restaurant has popular items) -->
                 @if($popularMenuItems->isNotEmpty())
                 <div style="background:#1A1A1A; border:1px solid #2A2A2A; border-radius:0.5rem; padding:1.5rem; margin-bottom:1.5rem; box-shadow:0 4px 6px rgba(0,0,0,0.3);">
@@ -1287,6 +1290,9 @@
                         </div>
                     </div>
                     @endif
+
+                    <!-- Check-In Widget -->
+                    @livewire('check-in', ['restaurantId' => $restaurant->id])
 
                     <!-- Contact Card (Yelp Style) -->
                     <div style="background:#1A1A1A; border:1px solid #2A2A2A; border-radius:0.75rem; overflow:hidden;">
