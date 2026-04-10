@@ -50,8 +50,8 @@ class CityRestaurants extends Component
         $stateCode   = $this->stateCode;
         $total       = $restaurants->total();
 
-        $title    = "Restaurantes Mexicanos en {$cityName}, {$stateCode}";
-        $metaDesc = "Descubre los mejores {$total} restaurantes mexicanos en {$cityName}, {$stateCode}. Reseñas verificadas, fotos, menús y más en FAMER.";
+        $title    = __('famer.restaurants_in', ['city' => $cityName, 'state' => $stateCode]);
+        $metaDesc = __('famer.meta_desc_city', ['total' => $total, 'city' => $cityName, 'state' => $stateCode]);
 
         return view('livewire.city-restaurants', compact(
             'restaurants', 'cityName', 'stateName', 'stateCode', 'total', 'title', 'metaDesc'

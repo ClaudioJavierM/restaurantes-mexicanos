@@ -189,6 +189,12 @@ class Restaurant extends Model implements HasMedia
         'famer_email_1_sent_at',
         'famer_email_2_sent_at',
         'famer_email_3_sent_at',
+        // Onboarding
+        'onboarding_completed',
+        'onboarding_step',
+        'onboarding_completed_at',
+        // Newsletter
+        'owner_newsletter',
     ];
 
     protected $casts = [
@@ -252,6 +258,9 @@ class Restaurant extends Model implements HasMedia
         'famer_email_1_sent_at' => 'datetime',
         'famer_email_2_sent_at' => 'datetime',
         'famer_email_3_sent_at' => 'datetime',
+        // Onboarding
+        'onboarding_completed'    => 'boolean',
+        'onboarding_completed_at' => 'datetime',
         'subscription_started_at' => 'datetime',
         'subscription_expires_at' => 'datetime',
         'chatbot_settings' => 'array',
@@ -270,6 +279,8 @@ class Restaurant extends Model implements HasMedia
         'reservation_send_reminder' => 'boolean',
         // Photo gallery
         'photos' => 'array',
+        // Newsletter
+        'owner_newsletter' => 'boolean',
     ];
 
     // ──────────────────────────────────────────────────────────────

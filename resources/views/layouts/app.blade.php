@@ -659,6 +659,11 @@
                 </div>
             </div>
 
+            <!-- Newsletter Signup -->
+            <div class="border-t border-[#2A2A2A] pt-10 pb-6">
+                @livewire('newsletter-signup')
+            </div>
+
             <!-- Bottom Bar -->
             <div class="border-t border-[#2A2A2A] pt-8">
                 <div class="flex flex-col md:flex-row justify-between items-center gap-4">

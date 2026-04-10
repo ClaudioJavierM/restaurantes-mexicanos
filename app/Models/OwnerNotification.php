@@ -45,11 +45,21 @@ class OwnerNotification extends Model
         return $query->whereNotNull('read_at');
     }
 
+    public function scopeForRestaurant($query, int $restaurantId)
+    {
+        return $query->where('restaurant_id', $restaurantId);
+    }
+
     public function markAsRead(): void
     {
         if (!$this->read_at) {
-            $this->update(['read_at' => now()]);
+            $this->update(['read_at' => now(), 'is_read' => true]);
         }
+    }
+
+    public function getIsUnreadAttribute(): bool
+    {
+        return is_null($this->read_at);
     }
 
     // Helper methods to create notifications

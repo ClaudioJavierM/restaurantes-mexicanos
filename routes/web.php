@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\OgImageController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\TeamInvitationController;
@@ -83,6 +84,9 @@ Route::post('/stripe/webhook', [\App\Http\Controllers\StripeWebhookController::c
 Route::get('/team/accept/{token}', [TeamInvitationController::class, 'show'])->name('team.invitation.show');
 Route::post('/team/accept/{token}', [TeamInvitationController::class, 'accept'])->name('team.invitation.accept');
 Route::post('/team/decline/{token}', [TeamInvitationController::class, 'decline'])->name('team.invitation.decline');
+
+// Dynamic OG Image generation
+Route::get('/og-image/{slug}.jpg', [OgImageController::class, 'show'])->name('og-image');
 
 // SEO Routes — Sitemap index + sub-sitemaps
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');

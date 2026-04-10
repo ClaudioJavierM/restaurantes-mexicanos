@@ -28,6 +28,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             \App\Http\Middleware\DomainLocale::class,
             \App\Http\Middleware\SetLocaleFromDomain::class,
+            \App\Http\Middleware\LocaleDetect::class,
         ]);
 
         // Public cache headers: prepend globally so it runs LAST on response

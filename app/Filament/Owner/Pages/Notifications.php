@@ -3,6 +3,7 @@
 namespace App\Filament\Owner\Pages;
 
 use App\Models\OwnerNotification;
+use App\Services\OwnerNotificationService;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Auth;
 
@@ -18,6 +19,7 @@ class Notifications extends Page
     public $notifications = [];
     public $unreadCount = 0;
     public $restaurant = null;
+    public ?int $restaurantId = null;
 
     public function mount(): void
     {
@@ -25,18 +27,23 @@ class Notifications extends Page
         $this->restaurant = $user->allAccessibleRestaurants()->first();
 
         if ($this->restaurant) {
+            $this->restaurantId = $this->restaurant->id;
             $this->loadNotifications();
         }
     }
 
     public function loadNotifications(): void
     {
-        $this->notifications = OwnerNotification::where('restaurant_id', $this->restaurant->id)
+        if (!$this->restaurant) {
+            return;
+        }
+
+        $this->notifications = OwnerNotification::forRestaurant($this->restaurant->id)
             ->orderBy('created_at', 'desc')
             ->take(50)
             ->get();
 
-        $this->unreadCount = OwnerNotification::where('restaurant_id', $this->restaurant->id)
+        $this->unreadCount = OwnerNotification::forRestaurant($this->restaurant->id)
             ->unread()
             ->count();
     }
@@ -52,10 +59,10 @@ class Notifications extends Page
 
     public function markAllAsRead(): void
     {
-        OwnerNotification::where('restaurant_id', $this->restaurant->id)
+        OwnerNotification::forRestaurant($this->restaurant->id)
             ->unread()
-            ->update(['read_at' => now()]);
-        
+            ->update(['read_at' => now(), 'is_read' => true]);
+
         $this->loadNotifications();
     }
 
@@ -67,7 +74,7 @@ class Notifications extends Page
         $restaurant = $user->allAccessibleRestaurants()->first();
         if (!$restaurant) return null;
 
-        $count = OwnerNotification::where('restaurant_id', $restaurant->id)
+        $count = OwnerNotification::forRestaurant($restaurant->id)
             ->unread()
             ->count();
 

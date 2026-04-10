@@ -3,12 +3,22 @@
 namespace App\Filament\Owner\Pages;
 
 use Filament\Pages\Dashboard as BaseDashboard;
+use App\Models\Restaurant;
+use Illuminate\Support\Facades\Auth;
 
 class Dashboard extends BaseDashboard
 {
     protected static ?string $navigationIcon = 'heroicon-o-home';
 
     protected static string $view = 'filament.owner.pages.dashboard';
+
+    public function mount(): void
+    {
+        $restaurant = Restaurant::where('user_id', Auth::id())->first();
+        if ($restaurant && !$restaurant->onboarding_completed) {
+            $this->redirect(OnboardingPage::getUrl());
+        }
+    }
 
     public function getWidgets(): array
     {

@@ -112,4 +112,12 @@ return [
         'api_key' => env('OPENAI_API_KEY'),
     ],
 
+    'listmonk' => [
+        'url'           => env('LISTMONK_URL', 'http://localhost:9000'),
+        'username'      => env('LISTMONK_USERNAME', 'listmonk'),
+        'password'      => env('LISTMONK_PASSWORD'),
+        'list_users_id' => env('LISTMONK_LIST_USERS_ID', 1),
+        'list_owners_id'=> env('LISTMONK_LIST_OWNERS_ID', 2),
+    ],
+
 ];

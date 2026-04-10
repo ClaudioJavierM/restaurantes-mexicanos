@@ -1463,6 +1463,9 @@
                 </div>
                 <div class="p-6 overflow-y-auto flex-1">
                     @livewire('photo-gallery', ['restaurant' => $restaurant])
+                    <div class="mt-6">
+                        @livewire('public-photo-upload', ['restaurantId' => $restaurant->id])
+                    </div>
                 </div>
             </div>
         </div>
