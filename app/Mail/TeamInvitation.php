@@ -7,6 +7,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Mail\Mailables\Headers;
 use Illuminate\Queue\SerializesModels;
 
 class TeamInvitation extends Mailable
@@ -23,6 +24,13 @@ class TeamInvitation extends Mailable
 
         return new Envelope(
             subject: "Invitacion para unirte al equipo de {$restaurant}",
+        );
+    }
+
+    public function headers(): Headers
+    {
+        return new Headers(
+            text: ['X-Mailer' => 'FAMER-Platform'],
         );
     }
 

@@ -8,6 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Mail\Mailables\Headers;
 use Illuminate\Queue\SerializesModels;
 
 class ClaimApprovalPending extends Mailable implements ShouldQueue
@@ -31,6 +32,13 @@ class ClaimApprovalPending extends Mailable implements ShouldQueue
             : "Actualizacion: Tu restaurante {$restaurant->name} sera aprobado pronto";
             
         return new Envelope(subject: $subject);
+    }
+
+    public function headers(): Headers
+    {
+        return new Headers(
+            text: ['X-Mailer' => 'FAMER-Platform'],
+        );
     }
 
     public function content(): Content

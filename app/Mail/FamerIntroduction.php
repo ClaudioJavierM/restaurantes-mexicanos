@@ -8,6 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Mail\Mailables\Headers;
 use Illuminate\Queue\SerializesModels;
 
 class FamerIntroduction extends Mailable implements ShouldQueue
@@ -29,6 +30,18 @@ class FamerIntroduction extends Mailable implements ShouldQueue
     {
         return new Envelope(
             subject: "Tu restaurante ya esta en la lista de FAMER | Reclamalo gratis",
+        );
+    }
+
+    public function headers(): Headers
+    {
+        return new Headers(
+            text: [
+                'X-Mailer' => 'FAMER-Platform',
+                'List-Unsubscribe' => '<mailto:unsubscribe@restaurantesmexicanosfamosos.com>',
+                'List-Unsubscribe-Post' => 'List-Unsubscribe=One-Click',
+                'Precedence' => 'bulk',
+            ],
         );
     }
 

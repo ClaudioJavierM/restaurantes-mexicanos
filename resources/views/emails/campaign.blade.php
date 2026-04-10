@@ -1,213 +1,107 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>{{ $campaignName ?? 'FAMER' }}</title>
-    @if(!empty($previewText))
-    <meta name="description" content="{{ $previewText }}">
-    <!--[if !mso]><!-->
-    <span style="display:none !important;visibility:hidden;mso-hide:all;font-size:1px;color:#ffffff;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">
-        {{ $previewText }}
-    </span>
-    <!--<![endif]-->
-    @endif
-    <style>
-        /* Reset styles */
-        body, table, td, p, a, li { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
-        table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
-        img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
-
-        body {
-            margin: 0;
-            padding: 0;
-            width: 100% !important;
-            height: 100% !important;
-            background-color: #f5f5f5;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
-
-        .email-container {
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: #ffffff;
-        }
-
-        .email-header {
-            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-            padding: 30px 40px;
-            text-align: center;
-        }
-
-        .email-header img {
-            max-height: 50px;
-        }
-
-        .email-header h1 {
-            color: #ffffff;
-            font-size: 24px;
-            margin: 10px 0 0 0;
-            font-weight: 600;
-        }
-
-        .email-body {
-            padding: 40px;
-            color: #374151;
-            font-size: 16px;
-            line-height: 1.6;
-        }
-
-        .email-body h1, .email-body h2, .email-body h3 {
-            color: #111827;
-            margin-top: 0;
-        }
-
-        .email-body a {
-            color: #dc2626;
-            text-decoration: underline;
-        }
-
-        .email-body a:hover {
-            color: #b91c1c;
-        }
-
-        .cta-button {
-            display: inline-block;
-            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-            color: #ffffff !important;
-            text-decoration: none !important;
-            padding: 14px 32px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 16px;
-            margin: 20px 0;
-        }
-
-        .cta-button:hover {
-            background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
-        }
-
-        .email-footer {
-            background-color: #f9fafb;
-            padding: 30px 40px;
-            text-align: center;
-            border-top: 1px solid #e5e7eb;
-        }
-
-        .email-footer p {
-            color: #6b7280;
-            font-size: 13px;
-            margin: 5px 0;
-        }
-
-        .email-footer a {
-            color: #6b7280;
-            text-decoration: underline;
-        }
-
-        .social-links {
-            margin: 15px 0;
-        }
-
-        .social-links a {
-            display: inline-block;
-            margin: 0 8px;
-        }
-
-        .test-banner {
-            background-color: #fef3c7;
-            border: 1px solid #f59e0b;
-            color: #92400e;
-            padding: 12px;
-            text-align: center;
-            font-weight: 600;
-        }
-
-        /* Responsive */
-        @media screen and (max-width: 600px) {
-            .email-container {
-                width: 100% !important;
-            }
-            .email-header, .email-body, .email-footer {
-                padding: 20px !important;
-            }
-        }
-    </style>
+    <meta name="format-detection" content="telephone=no">
+    <title>{{ $subject ?? ($campaignName ?? 'FAMER') }}</title>
+    @isset($previewText)
+    <span style="display:none !important; visibility:hidden; mso-hide:all; font-size:1px; color:#F5F0E8; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden;">{{ $previewText }}</span>
+    @endisset
 </head>
-<body>
-    <center style="width: 100%; background-color: #f5f5f5; padding: 40px 0;">
-        <!--[if mso]>
-        <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" align="center">
-        <tr>
-        <td>
-        <![endif]-->
+<body style="margin:0; padding:0; background-color:#F5F0E8; font-family:'Segoe UI',Arial,Helvetica,sans-serif; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%;">
 
-        <table role="presentation" class="email-container" cellpadding="0" cellspacing="0" border="0" align="center" width="600" style="margin: auto;">
-            @if($isTest ?? false)
-            <tr>
-                <td class="test-banner">
-                    ⚠️ ESTE ES UN EMAIL DE PRUEBA - No será enviado a destinatarios reales
-                </td>
-            </tr>
-            @endif
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:#F5F0E8;">
+    <tr>
+        <td align="center" style="padding:40px 16px;">
 
-            <!-- Header -->
-            <tr>
-                <td class="email-header">
-                    <img src="https://restaurantesmexicanosfamosos.com/images/branding/logo.png?v=3" alt="Restaurantes Mexicanos Famosos" style="max-height: 50px; width: auto; margin-bottom: 12px;" />
-                    <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0; font-size: 14px;">
-                        Find Authentic Mexican Eats & Restaurants
-                    </p>
-                </td>
-            </tr>
+            <table role="presentation" width="100%" style="max-width:580px;" cellspacing="0" cellpadding="0" border="0">
 
-            <!-- Body Content -->
-            <tr>
-                <td class="email-body">
-                    {!! $htmlContent !!}
-                </td>
-            </tr>
+                @if($isTest ?? false)
+                <!-- TEST BANNER -->
+                <tr>
+                    <td style="background-color:#FEF3C7; border:1px solid #F59E0B; border-radius:8px 8px 0 0; padding:12px 20px; text-align:center;">
+                        <p style="margin:0; font-size:13px; color:#92400E; font-weight:600;">
+                            Modo prueba — Este mensaje no fue enviado a destinatarios reales
+                        </p>
+                    </td>
+                </tr>
+                @endif
 
-            <!-- Footer -->
-            <tr>
-                <td class="email-footer">
-                    <div class="social-links">
-                        <a href="https://facebook.com/famerapp" target="_blank">
-                            <img src="{{ asset('images/email/icon-facebook.png') }}" alt="Facebook" width="24" height="24">
-                        </a>
-                        <a href="https://instagram.com/famerapp" target="_blank">
-                            <img src="{{ asset('images/email/icon-instagram.png') }}" alt="Instagram" width="24" height="24">
-                        </a>
-                        <a href="https://twitter.com/famerapp" target="_blank">
-                            <img src="{{ asset('images/email/icon-twitter.png') }}" alt="Twitter" width="24" height="24">
-                        </a>
-                    </div>
+                <!-- HEADER -->
+                <tr>
+                    <td style="background-color:#0B0B0B; border-radius:16px 16px 0 0; padding:32px 40px; text-align:center;">
+                        <img src="https://restaurantesmexicanosfamosos.com.mx/images/branding/logo-horizontal.png"
+                             alt="FAMER" width="160" style="max-width:160px; height:auto; display:block; margin:0 auto 16px;">
+                        <p style="margin:0; color:#D4AF37; font-size:11px; font-weight:700; letter-spacing:3px; text-transform:uppercase;">
+                            Famous Mexican Restaurants
+                        </p>
+                    </td>
+                </tr>
 
-                    <p>
-                        <strong>FAMER - Restaurantes Mexicanos</strong><br>
-                        El directorio más grande de restaurantes mexicanos auténticos
-                    </p>
+                <!-- GOLD DIVIDER -->
+                <tr>
+                    <td style="background:linear-gradient(90deg, #D4AF37, #F0D060, #D4AF37); height:3px; font-size:0; line-height:0;">&nbsp;</td>
+                </tr>
 
-                    <p>
-                        <a href="{{ url('/') }}">Visitar FAMER</a> |
-                        <a href="{{ url('/contact') }}">Contacto</a> |
-                        <a href="{!! $unsubscribeUrl ?? url('/unsubscribe') !!}">Cancelar suscripción</a>
-                    </p>
+                <!-- BODY -->
+                <tr>
+                    <td style="background-color:#FFFFFF; padding:48px 40px 40px;">
 
-                    <p style="font-size: 11px; color: #9ca3af; margin-top: 20px;">
-                        © {{ date('Y') }} FAMER. Todos los derechos reservados.<br>
-                        Este email fue enviado porque tu restaurante está listado en FAMER.
-                    </p>
-                </td>
-            </tr>
-        </table>
+                        @isset($campaignName)
+                        <h1 style="margin:0 0 24px; font-size:24px; font-weight:700; color:#111827; font-family:'Segoe UI',Arial,sans-serif; line-height:1.3;">
+                            {{ $campaignName }}
+                        </h1>
+                        @endisset
 
-        <!--[if mso]>
+                        @isset($restaurant)
+                        <p style="margin:0 0 20px; font-size:15px; color:#6B7280; line-height:1.6;">
+                            Hola <strong style="color:#111827;">{{ $restaurant->name }}</strong>,
+                        </p>
+                        @endisset
+
+                        <!-- Dynamic content -->
+                        <div style="font-size:15px; color:#374151; line-height:1.7;">
+                            {!! $content ?? $htmlContent ?? '' !!}
+                        </div>
+
+                        @isset($ctaUrl)
+                        <!-- CTA Button -->
+                        <div style="text-align:center; margin:36px 0 8px;">
+                            <a href="{{ $ctaUrl }}"
+                               style="display:inline-block; background-color:#D4AF37; color:#0B0B0B; text-decoration:none; font-weight:700; font-size:16px; padding:16px 40px; border-radius:10px; font-family:'Segoe UI',Arial,sans-serif; letter-spacing:0.3px;">
+                                {{ $ctaText ?? 'Ver más' }}
+                            </a>
+                        </div>
+                        @endisset
+
+                    </td>
+                </tr>
+
+                <!-- FOOTER -->
+                <tr>
+                    <td style="background-color:#F9FAFB; border-radius:0 0 16px 16px; padding:28px 40px; text-align:center; border-top:1px solid #F3F4F6;">
+                        <p style="margin:0 0 8px; font-size:12px; color:#9CA3AF; text-align:center;">
+                            © {{ date('Y') }} FAMER — Restaurantes Mexicanos Famosos<br>
+                            El directorio líder de restaurantes mexicanos en Estados Unidos
+                        </p>
+                        <p style="margin:0; font-size:11px; color:#D1D5DB; text-align:center;">
+                            Recibiste este mensaje como parte de nuestra lista de restaurantes.<br>
+                            <a href="{{ $unsubscribeUrl ?? config('app.url').'/unsubscribe' }}"
+                               style="color:#D4AF37; text-decoration:none;">Cancelar suscripción</a>
+                        </p>
+                    </td>
+                </tr>
+
+            </table>
         </td>
-        </tr>
-        </table>
-        <![endif]-->
-    </center>
+    </tr>
+</table>
+
+@isset($trackingPixelUrl)
+<img src="{{ $trackingPixelUrl }}" width="1" height="1" style="display:none;" alt="">
+@endisset
+
 </body>
 </html>

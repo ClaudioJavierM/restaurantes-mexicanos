@@ -1,153 +1,143 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultima Oportunidad - FAMER Awards</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="format-detection" content="telephone=no">
+  <title>Tu perfil tiene pasos pendientes — FAMER</title>
 </head>
-<body style="margin: 0; padding: 0; font-family: Georgia, Times, serif; background-color: #000000;">
-    <div style="text-align: center; padding: 20px 0 0 0;"><img src="https://restaurantesmexicanosfamosos.com/images/branding/logo.png?v=3" alt="Restaurantes Mexicanos Famosos" style="max-height: 50px; width: auto; margin-bottom: 12px;" /></div>
-    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #000000; padding: 20px 0;">
-        <tr>
-            <td align="center">
-                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
-                    <!-- Header con urgencia -->
-                    <tr>
-                        <td style="background: linear-gradient(135deg, #8B0000 0%, #DC143C 50%, #FF4500 100%); padding: 30px; text-align: center;">
-                            <div style="font-size: 14px; color: #FFD700; letter-spacing: 3px; margin-bottom: 10px; font-weight: bold;">⏰ ULTIMA OPORTUNIDAD</div>
-                            <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">FAMER Awards 2026</h1>
-                            <p style="color: #FFD700; margin: 10px 0 0 0; font-size: 14px;">Famous Mexican Restaurants</p>
-                        </td>
-                    </tr>
+<body style="margin:0; padding:0; background-color:#F5F0E8; font-family:'Segoe UI',Arial,Helvetica,sans-serif; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%;">
 
-                    <!-- Mensaje urgente -->
-                    <tr>
-                        <td style="padding: 30px;">
-                            <div style="background-color: #FFF3CD; border-left: 4px solid #FFD700; padding: 15px; margin-bottom: 25px;">
-                                <p style="color: #856404; margin: 0; font-size: 16px;">
-                                    <strong>⚠️ Aun no has reclamado tu restaurante.</strong><br>
-                                    Esta es tu ultima oportunidad para participar en FAMER Awards 2026.
-                                </p>
-                            </div>
+<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:#F5F0E8;">
+  <tr><td align="center" style="padding:40px 16px;">
 
-                            <h2 style="color: #000000; font-size: 22px; margin: 0 0 20px 0;">
-                                {{ $restaurant->name }}
-                            </h2>
-                            
-                            <p style="color: #000000; font-size: 16px; line-height: 1.8; margin: 0 0 20px 0;">
-                                Tu restaurante ya tiene un perfil en nuestra plataforma y esta siendo visto por 
-                                miles de personas que buscan los mejores restaurantes mexicanos.
-                            </p>
+    <table role="presentation" width="100%" style="max-width:580px;" cellspacing="0" cellpadding="0" border="0">
 
-                            <p style="color: #000000; font-size: 16px; line-height: 1.8; margin: 0 0 25px 0;">
-                                <strong>Sin embargo, sin reclamar tu perfil:</strong>
-                            </p>
+      <!-- HEADER -->
+      <tr>
+        <td style="background-color:#0B0B0B; border-radius:16px 16px 0 0; padding:28px 40px; text-align:center;">
+          <img src="https://restaurantesmexicanosfamosos.com.mx/images/branding/logo-horizontal.png"
+               alt="FAMER" width="160" style="max-width:160px; height:auto; display:block; margin:0 auto 12px;">
+          <p style="margin:0; color:#D4AF37; font-size:11px; font-weight:700; letter-spacing:3px; text-transform:uppercase;">FAMOUS MEXICAN RESTAURANTS</p>
+        </td>
+      </tr>
 
-                            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 25px;">
-                                <tr>
-                                    <td style="padding: 12px; background-color: #FFEBEE; border-radius: 8px; margin-bottom: 10px;">
-                                        <span style="color: #C62828; font-size: 18px;">✗</span>
-                                        <span style="color: #000000; font-size: 15px; margin-left: 10px;">No puedes actualizar tu informacion</span>
-                                    </td>
-                                </tr>
-                                <tr><td style="height: 10px;"></td></tr>
-                                <tr>
-                                    <td style="padding: 12px; background-color: #FFEBEE; border-radius: 8px;">
-                                        <span style="color: #C62828; font-size: 18px;">✗</span>
-                                        <span style="color: #000000; font-size: 15px; margin-left: 10px;">No participas en el ranking FAMER Awards</span>
-                                    </td>
-                                </tr>
-                                <tr><td style="height: 10px;"></td></tr>
-                                <tr>
-                                    <td style="padding: 12px; background-color: #FFEBEE; border-radius: 8px;">
-                                        <span style="color: #C62828; font-size: 18px;">✗</span>
-                                        <span style="color: #000000; font-size: 15px; margin-left: 10px;">Pierdes clientes potenciales cada dia</span>
-                                    </td>
-                                </tr>
-                                <tr><td style="height: 10px;"></td></tr>
-                                <tr>
-                                    <td style="padding: 12px; background-color: #FFEBEE; border-radius: 8px;">
-                                        <span style="color: #C62828; font-size: 18px;">✗</span>
-                                        <span style="color: #000000; font-size: 15px; margin-left: 10px;">No recibes el reconocimiento que mereces</span>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
+      <!-- SEPARADOR -->
+      <tr>
+        <td style="background:linear-gradient(90deg,#D4AF37,#F0D060,#D4AF37); height:3px; font-size:0; line-height:0;">&nbsp;</td>
+      </tr>
 
-                    <!-- CTA Principal -->
-                    <tr>
-                        <td style="padding: 0 30px 30px 30px; text-align: center;">
-                            <div style="background: linear-gradient(135deg, #006847 0%, #004d35 100%); padding: 25px; border-radius: 12px;">
-                                <p style="color: #ffffff; font-size: 18px; margin: 0 0 20px 0; font-weight: bold;">
-                                    🎯 Reclama tu restaurante AHORA
-                                </p>
-                                <p style="color: #90EE90; font-size: 14px; margin: 0 0 20px 0;">
-                                    Es GRATIS y solo toma 2 minutos
-                                </p>
-                                <a href="{{ $claimUrl }}" 
-                                   style="display: inline-block; background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: #000000; padding: 18px 50px; text-decoration: none; border-radius: 30px; font-weight: bold; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(255,215,0,0.4);">
-                                    RECLAMAR MI RESTAURANTE
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
+      <!-- CUERPO -->
+      <tr>
+        <td style="background-color:#FFFFFF; padding:48px 40px 40px;">
 
-                    <!-- Lo que obtienen -->
-                    <tr>
-                        <td style="padding: 0 30px 30px 30px;">
-                            <h3 style="color: #000000; font-size: 18px; margin: 0 0 15px 0; text-align: center;">
-                                Al reclamar tu perfil obtendras:
-                            </h3>
-                            <table width="100%" cellpadding="0" cellspacing="0">
-                                <tr>
-                                    <td style="padding: 10px; background-color: #E8F5E9; border-radius: 8px;">
-                                        <span style="color: #2E7D32; font-size: 18px;">✓</span>
-                                        <span style="color: #000000; font-size: 15px; margin-left: 10px;">Participacion automatica en FAMER Awards 2026</span>
-                                    </td>
-                                </tr>
-                                <tr><td style="height: 8px;"></td></tr>
-                                <tr>
-                                    <td style="padding: 10px; background-color: #E8F5E9; border-radius: 8px;">
-                                        <span style="color: #2E7D32; font-size: 18px;">✓</span>
-                                        <span style="color: #000000; font-size: 15px; margin-left: 10px;">Panel de control con estadisticas</span>
-                                    </td>
-                                </tr>
-                                <tr><td style="height: 8px;"></td></tr>
-                                <tr>
-                                    <td style="padding: 10px; background-color: #E8F5E9; border-radius: 8px;">
-                                        <span style="color: #2E7D32; font-size: 18px;">✓</span>
-                                        <span style="color: #000000; font-size: 15px; margin-left: 10px;">Fotos ilimitadas y menu digital</span>
-                                    </td>
-                                </tr>
-                                <tr><td style="height: 8px;"></td></tr>
-                                <tr>
-                                    <td style="padding: 10px; background-color: #E8F5E9; border-radius: 8px;">
-                                        <span style="color: #2E7D32; font-size: 18px;">✓</span>
-                                        <span style="color: #000000; font-size: 15px; margin-left: 10px;">Distintivo de restaurante verificado</span>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
+          <!-- Saludo -->
+          <h1 style="margin:0 0 12px; font-size:24px; font-weight:700; color:#111827; font-family:'Segoe UI',Arial,sans-serif;">
+            Tu perfil está casi listo
+          </h1>
+          <p style="margin:0 0 6px; font-size:16px; color:#374151; line-height:1.7;">
+            @isset($ownerName)
+            Hola {{ $ownerName }},
+            @else
+            Hola,
+            @endisset
+          </p>
+          <p style="margin:0 0 28px; font-size:15px; color:#6B7280; line-height:1.7;">
+            Notamos que el perfil de <strong style="color:#111827;">{{ $restaurant->name ?? $restaurantName ?? 'tu restaurante' }}</strong> en FAMER todavía tiene algunos pasos por completar. Te tomará solo unos minutos y marcará una diferencia real en tu visibilidad.
+          </p>
 
-                    <!-- Footer con urgencia -->
-                    <tr>
-                        <td style="background-color: #000000; padding: 25px; text-align: center;">
-                            <p style="color: #FFD700; font-size: 14px; margin: 0 0 15px 0; font-weight: bold;">
-                                No dejes pasar esta oportunidad
-                            </p>
-                            <p style="color: #888; font-size: 12px; margin: 0 0 10px 0;">
-                                Famous Mexican Restaurants - FAMER Awards 2026
-                            </p>
-                            <p style="color: #666; font-size: 11px; margin: 0;">
-                                <a href="https://famousmexicanrestaurants.com/unsubscribe?email={{ urlencode($restaurant->email ?? $restaurant->owner_email) }}" style="color: #666;">Cancelar suscripcion</a>
-                            </p>
-                        </td>
-                    </tr>
+          <!-- Acciones pendientes -->
+          @isset($pendingActions)
+          @if(count($pendingActions) > 0)
+          <p style="margin:0 0 16px; font-size:13px; font-weight:700; color:#D4AF37; letter-spacing:2px; text-transform:uppercase;">Acciones pendientes</p>
+
+          @foreach($pendingActions as $action)
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-bottom:10px;">
+            <tr>
+              <td style="background-color:#FAFAFA; border-left:3px solid #D4AF37; border-radius:0 8px 8px 0; padding:14px 18px;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                  <tr>
+                    <td width="20" valign="top" style="padding-top:2px;">
+                      <div style="width:16px; height:16px; border:2px solid #D4AF37; border-radius:50%;"></div>
+                    </td>
+                    <td valign="top" style="padding-left:10px;">
+                      <p style="margin:0; font-size:14px; color:#111827; font-weight:600;">{{ $action['title'] ?? $action }}</p>
+                      @isset($action['description'])
+                      <p style="margin:4px 0 0; font-size:13px; color:#6B7280;">{{ $action['description'] }}</p>
+                      @endisset
+                    </td>
+                  </tr>
                 </table>
-            </td>
-        </tr>
+              </td>
+            </tr>
+          </table>
+          @endforeach
+
+          <div style="margin-top:8px; margin-bottom:28px;"></div>
+          @endif
+          @else
+          <!-- Acciones genéricas si no se pasan -->
+          <p style="margin:0 0 16px; font-size:13px; font-weight:700; color:#D4AF37; letter-spacing:2px; text-transform:uppercase;">Qué falta completar</p>
+
+          @foreach([['Agregar fotos del restaurante','Los perfiles con fotos reciben 3 veces más visitas'],['Completar descripción y horarios','Ayuda a los clientes a encontrarte y visitarte'],['Verificar información de contacto','Teléfono, dirección y sitio web actualizados']] as $item)
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-bottom:10px;">
+            <tr>
+              <td style="background-color:#FAFAFA; border-left:3px solid #D4AF37; border-radius:0 8px 8px 0; padding:14px 18px;">
+                <p style="margin:0; font-size:14px; color:#111827; font-weight:600;">{{ $item[0] }}</p>
+                <p style="margin:4px 0 0; font-size:13px; color:#6B7280;">{{ $item[1] }}</p>
+              </td>
+            </tr>
+          </table>
+          @endforeach
+
+          <div style="margin-top:8px; margin-bottom:28px;"></div>
+          @endisset
+
+          <!-- Nota informativa -->
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-bottom:32px;">
+            <tr>
+              <td style="background-color:#FBF6E9; border-radius:10px; padding:18px 20px;">
+                <p style="margin:0; font-size:14px; color:#78540A; line-height:1.6;">
+                  Los restaurantes con perfil completo en FAMER aparecen mejor posicionados en el directorio y en las búsquedas de nuestros 26,000+ listados.
+                </p>
+              </td>
+            </tr>
+          </table>
+
+          <!-- CTA -->
+          <div style="text-align:center; margin-bottom:32px;">
+            <a href="{{ $dashboardUrl ?? config('app.url') . '/owner/profile' }}"
+               style="display:inline-block; background-color:#D4AF37; color:#0B0B0B; text-decoration:none; font-weight:700; font-size:16px; padding:16px 40px; border-radius:10px; font-family:'Segoe UI',Arial,sans-serif; letter-spacing:0.3px;">
+              Completar Mi Perfil
+            </a>
+          </div>
+
+          <p style="margin:0; font-size:13px; color:#9CA3AF; text-align:center; line-height:1.6;">
+            Si ya completaste tu perfil, ignora este mensaje — no necesitas hacer nada más.
+          </p>
+
+        </td>
+      </tr>
+
+      <!-- FOOTER -->
+      <tr>
+        <td style="background-color:#F9FAFB; border-radius:0 0 16px 16px; padding:24px 40px; text-align:center; border-top:1px solid #F3F4F6;">
+          <p style="margin:0 0 8px; font-size:12px; color:#9CA3AF; text-align:center;">
+            &copy; {{ date('Y') }} FAMER — Restaurantes Mexicanos Famosos<br>
+            El directorio líder de restaurantes mexicanos en Estados Unidos
+          </p>
+          <p style="margin:0; font-size:11px; color:#D1D5DB; text-align:center;">
+            Recibiste este mensaje porque eres dueño registrado en FAMER.<br>
+            <a href="{{ config('app.url') }}/unsubscribe?email={{ urlencode($email ?? $ownerEmail ?? ($restaurant->owner_email ?? '')) }}"
+               style="color:#D4AF37; text-decoration:none;">Cancelar notificaciones</a>
+          </p>
+        </td>
+      </tr>
+
     </table>
+  </td></tr>
+</table>
+
 </body>
 </html>

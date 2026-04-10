@@ -8,6 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Mail\Mailables\Headers;
 use Illuminate\Queue\SerializesModels;
 
 class ClaimVerificationReminder extends Mailable implements ShouldQueue
@@ -33,6 +34,13 @@ class ClaimVerificationReminder extends Mailable implements ShouldQueue
             : "Ultimo recordatorio: Tu codigo de verificacion esta por expirar";
             
         return new Envelope(subject: $subject);
+    }
+
+    public function headers(): Headers
+    {
+        return new Headers(
+            text: ['X-Mailer' => 'FAMER-Platform'],
+        );
     }
 
     public function content(): Content
