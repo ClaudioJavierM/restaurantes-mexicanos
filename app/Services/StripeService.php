@@ -298,4 +298,99 @@ class StripeService
     {
         return config('stripe.plans', []);
     }
+
+    /**
+     * Create a SetupIntent for embedded Stripe Payment Element
+     * Returns clientSecret for the front-end to initialize Stripe Elements
+     */
+    public function createSubscriptionSetupIntent(Restaurant $restaurant, string $plan, ?string $couponCode = null): array
+    {
+        try {
+            $customer = $this->getOrCreateCustomer($restaurant);
+
+            $setupIntent = \Stripe\SetupIntent::create([
+                'customer' => $customer->id,
+                'payment_method_types' => ['card'],
+                'usage' => 'off_session',
+                'metadata' => [
+                    'restaurant_id' => $restaurant->id,
+                    'plan' => $plan,
+                ],
+            ]);
+
+            return [
+                'clientSecret' => $setupIntent->client_secret,
+                'customerId' => $customer->id,
+            ];
+        } catch (Exception $e) {
+            throw new Exception("Error creating SetupIntent: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Create a subscription using the payment method from a confirmed SetupIntent
+     */
+    public function createSubscriptionFromSetupIntent(string $setupIntentId, Restaurant $restaurant, string $plan, ?string $couponCode = null): Subscription
+    {
+        try {
+            $priceId = config("stripe.prices.{$plan}");
+
+            if (!$priceId) {
+                throw new Exception("Invalid plan: {$plan}");
+            }
+
+            // Retrieve SetupIntent to get the confirmed payment method
+            $setupIntent = \Stripe\SetupIntent::retrieve($setupIntentId);
+            $paymentMethodId = $setupIntent->payment_method;
+
+            if (!$paymentMethodId) {
+                throw new Exception("No payment method found on SetupIntent {$setupIntentId}");
+            }
+
+            $customer = $this->getOrCreateCustomer($restaurant);
+
+            // Attach payment method to customer (may already be attached)
+            try {
+                $paymentMethod = \Stripe\PaymentMethod::retrieve($paymentMethodId);
+                if (!$paymentMethod->customer) {
+                    $paymentMethod->attach(['customer' => $customer->id]);
+                }
+            } catch (Exception $e) {
+                // Already attached — continue
+            }
+
+            // Set as default payment method on customer
+            Customer::update($customer->id, [
+                'invoice_settings' => ['default_payment_method' => $paymentMethodId],
+            ]);
+
+            // Build subscription data
+            $subscriptionData = [
+                'customer' => $customer->id,
+                'items' => [['price' => $priceId]],
+                'default_payment_method' => $paymentMethodId,
+                'metadata' => [
+                    'restaurant_id' => $restaurant->id,
+                    'plan' => $plan,
+                ],
+            ];
+
+            // Apply coupon if provided
+            if ($couponCode) {
+                $promotionCode = $this->validatePromotionCode($couponCode);
+                if ($promotionCode) {
+                    $subscriptionData['promotion_code'] = $promotionCode->id;
+                }
+            } elseif ($plan === 'premium') {
+                $introCouponId = config('stripe.intro_coupon_premium');
+                if ($introCouponId) {
+                    $subscriptionData['coupon'] = $introCouponId;
+                }
+            }
+
+            return Subscription::create($subscriptionData);
+        } catch (Exception $e) {
+            throw new Exception("Error creating subscription from SetupIntent: " . $e->getMessage());
+        }
+    }
 }

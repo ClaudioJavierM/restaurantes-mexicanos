@@ -40,6 +40,9 @@ class ClaimRestaurant extends Component
     public $couponApplied = false;
     public $couponMessage = '';
 
+    // Stripe embedded payment
+    public ?string $stripeClientSecret = null;
+
     public function mount()
     {
         $this->searchResults = collect();
@@ -522,6 +525,7 @@ class ClaimRestaurant extends Component
         }
 
         $this->step = 'payment';
+        $this->initStripePayment();
         $this->dispatch('scroll-top');
     }
 
@@ -580,7 +584,7 @@ class ClaimRestaurant extends Component
         }
 
         session()->flash('success', '¡Felicidades! Tu restaurante ha sido reclamado exitosamente.');
-        return $this->redirect(route('filament.owner.pages.dashboard'), navigate: false);
+        return $this->redirect('/owner', navigate: false);
     }
 
     public function applyCoupon()
@@ -632,6 +636,91 @@ class ClaimRestaurant extends Component
             return redirect($session->url);
         } catch (\Exception $e) {
             session()->flash('error', 'Error processing payment: ' . $e->getMessage());
+        }
+    }
+
+    public function initStripePayment(): void
+    {
+        try {
+            $stripeService = new StripeService();
+            $result = $stripeService->createSubscriptionSetupIntent(
+                $this->selectedRestaurant,
+                $this->selectedPlan,
+                $this->couponApplied ? $this->couponCode : null
+            );
+            $this->stripeClientSecret = $result['clientSecret'];
+        } catch (\Exception $e) {
+            Log::error('Error initializing Stripe payment: ' . $e->getMessage());
+            session()->flash('error', 'Error al inicializar el pago. Por favor intenta de nuevo.');
+        }
+    }
+
+    public function completeSubscriptionPayment(string $setupIntentId): mixed
+    {
+        try {
+            $stripeService = new StripeService();
+
+            // Create subscription from the confirmed SetupIntent
+            $subscription = $stripeService->createSubscriptionFromSetupIntent(
+                $setupIntentId,
+                $this->selectedRestaurant,
+                $this->selectedPlan,
+                $this->couponApplied ? $this->couponCode : null
+            );
+
+            // Mark restaurant as claimed and set subscription data
+            $stripeService->handleSuccessfulSubscription(
+                $subscription->id,
+                $this->selectedRestaurant,
+                $this->selectedPlan
+            );
+
+            // Create or find the owner user account
+            $user = User::firstOrCreate(
+                ['email' => $this->ownerEmail],
+                [
+                    'name' => $this->ownerName,
+                    'password' => bcrypt(Str::random(12)),
+                    'phone' => $this->ownerPhone,
+                ]
+            );
+            $user->role = 'owner';
+            if (!$user->email_verified_at) {
+                $user->email_verified_at = now();
+            }
+            $user->save();
+            $this->selectedRestaurant->update(['user_id' => $user->id]);
+
+            auth()->login($user);
+            session()->regenerate();
+
+            // Track claim completed
+            try {
+                \App\Models\AnalyticsEvent::create([
+                    'restaurant_id' => $this->selectedRestaurant->id ?? null,
+                    'event_type' => 'claim_completed',
+                    'user_type' => 'owner',
+                    'ip_address' => request()->ip(),
+                    'referrer' => request()->header('referer'),
+                    'user_agent' => request()->userAgent(),
+                    'session_id' => session()->getId(),
+                    'metadata' => [
+                        'plan' => $this->selectedPlan,
+                        'restaurant_id' => $this->selectedRestaurant->id ?? null,
+                        'restaurant_name' => $this->selectedRestaurant->name ?? null,
+                        'subscription_id' => $subscription->id,
+                    ],
+                ]);
+            } catch (\Exception $e) {
+                Log::warning('Failed to track claim_completed: ' . $e->getMessage());
+            }
+
+            session()->flash('success', '¡Felicidades! Tu restaurante ha sido reclamado y tu suscripción activada.');
+            return $this->redirect('/owner', navigate: false);
+        } catch (\Exception $e) {
+            Log::error('Error completing subscription payment: ' . $e->getMessage());
+            $this->dispatch('stripe-payment-error', message: 'Error al completar el pago: ' . $e->getMessage());
+            return null;
         }
     }
 
