@@ -45,6 +45,8 @@ return [
         'maps_api_key' => env('GOOGLE_MAPS_API_KEY', env('GOOGLE_PLACES_API_KEY')),
         // Vision API for image moderation (uses same key by default)
         'vision_api_key' => env('GOOGLE_VISION_API_KEY', env('GOOGLE_PLACES_API_KEY')),
+        // Search Console — service account for GSC data sync
+        'service_account_path' => env('GOOGLE_SERVICE_ACCOUNT_PATH'),
         'analytics' => [
             'en' => env('GOOGLE_ANALYTICS_EN'), // famousmexicanrestaurants.com
             'es' => env('GOOGLE_ANALYTICS_ES'), // restaurantesmexicanosfamosos.com
