@@ -22,8 +22,8 @@ class ImportDashboard extends Page
     protected static string $view = "filament.pages.import-dashboard";
     protected static ?string $navigationLabel = "Import Dashboard";
     protected static ?string $title = "Import & Analytics Dashboard";
-    protected static ?string $navigationGroup = "System";
-    protected static ?int $navigationSort = 1;
+    protected static ?string $navigationGroup = "Sistema";
+    protected static ?int $navigationSort = 2;
 
     public string $period = "30days";
 
