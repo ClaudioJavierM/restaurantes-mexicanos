@@ -24,7 +24,7 @@ class Notifications extends Page
     public function mount(): void
     {
         $user = Auth::user();
-        $this->restaurant = $user->allAccessibleRestaurants()->first();
+        $this->restaurant = $user->firstAccessibleRestaurant();
 
         if ($this->restaurant) {
             $this->restaurantId = $this->restaurant->id;
@@ -71,7 +71,7 @@ class Notifications extends Page
         $user = Auth::user();
         if (!$user) return null;
 
-        $restaurant = $user->allAccessibleRestaurants()->first();
+        $restaurant = $user->firstAccessibleRestaurant();
         if (!$restaurant) return null;
 
         $count = OwnerNotification::forRestaurant($restaurant->id)

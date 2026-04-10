@@ -48,7 +48,7 @@ class Analytics extends Page
 
     public function mount(): void
     {
-        $this->restaurant = Auth::user()->allAccessibleRestaurants()->first();
+        $this->restaurant = Auth::user()->firstAccessibleRestaurant();
         $this->isPremium = $this->restaurant && in_array($this->restaurant->subscription_tier, ['premium', 'elite']);
         $this->loadStats();
         $this->loadComparison();
@@ -255,7 +255,7 @@ class Analytics extends Page
         $user = Auth::user();
         if (!$user) return null;
         
-        $restaurant = $user->allAccessibleRestaurants()->first();
+        $restaurant = $user->firstAccessibleRestaurant();
         if ($restaurant && !in_array($restaurant->subscription_tier, ["premium", "elite"])) {
             return "PRO";
         }

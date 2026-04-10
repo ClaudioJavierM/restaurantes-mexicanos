@@ -43,13 +43,13 @@ class MyReservationsResource extends Resource
             }
         }
 
-        $restaurant = auth()->user()?->allAccessibleRestaurants()->first();
+        $restaurant = auth()->user()?->firstAccessibleRestaurant();
         return $restaurant && $restaurant->is_claimed;
     }
 
     public static function canAccess(): bool
     {
-        $restaurant = auth()->user()?->allAccessibleRestaurants()->first();
+        $restaurant = auth()->user()?->firstAccessibleRestaurant();
         return $restaurant && $restaurant->is_claimed;
     }
 
@@ -82,7 +82,7 @@ class MyReservationsResource extends Resource
 
     public static function canCreate(): bool
     {
-        $restaurant = auth()->user()?->allAccessibleRestaurants()->first();
+        $restaurant = auth()->user()?->firstAccessibleRestaurant();
         return $restaurant && in_array($restaurant->subscription_tier, ["premium", "elite"]);
     }
 

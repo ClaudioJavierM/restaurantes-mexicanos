@@ -24,7 +24,7 @@ class MyBenefits extends Page
     public function mount(): void
     {
         $user = Auth::user();
-        $this->restaurant = $user->allAccessibleRestaurants()->first();
+        $this->restaurant = $user->firstAccessibleRestaurant();
 
         if ($this->restaurant) {
             // Get or create subscriber coupon
@@ -60,7 +60,7 @@ class MyBenefits extends Page
         $user = Auth::user();
         if (!$user) return false;
 
-        $restaurant = $user->allAccessibleRestaurants()->first();
+        $restaurant = $user->firstAccessibleRestaurant();
         return $restaurant && $restaurant->is_claimed;
     }
 }

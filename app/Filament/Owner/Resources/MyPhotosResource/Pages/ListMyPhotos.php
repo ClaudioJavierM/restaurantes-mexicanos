@@ -14,7 +14,7 @@ class ListMyPhotos extends ListRecords
     protected function getHeaderActions(): array
     {
         $canCreate = MyPhotosResource::canCreate();
-        $restaurant = auth()->user()->allAccessibleRestaurants()->first();
+        $restaurant = auth()->user()->firstAccessibleRestaurant();
         $plan = $restaurant?->subscription_tier ?? 'free';
         $isFree = !in_array($plan, ['premium', 'elite']);
         $currentCount = MyPhotosResource::getCurrentPhotoCount();
@@ -43,7 +43,7 @@ class ListMyPhotos extends ListRecords
     {
         $currentCount = MyPhotosResource::getCurrentPhotoCount();
         $maxPhotos = MyPhotosResource::getMaxPhotos();
-        $restaurant = auth()->user()->allAccessibleRestaurants()->first();
+        $restaurant = auth()->user()->firstAccessibleRestaurant();
         $plan = $restaurant?->subscription_tier ?? 'free';
         $isFree = !in_array($plan, ['premium', 'elite']);
 
@@ -57,7 +57,7 @@ class ListMyPhotos extends ListRecords
     public function getSubheading(): ?string
     {
         $canCreate = MyPhotosResource::canCreate();
-        $restaurant = auth()->user()->allAccessibleRestaurants()->first();
+        $restaurant = auth()->user()->firstAccessibleRestaurant();
         $plan = $restaurant?->subscription_tier ?? 'free';
         $isFree = !in_array($plan, ['premium', 'elite']);
 

@@ -165,6 +165,20 @@ class User extends Authenticatable implements FilamentUser
             });
     }
 
+    /**
+     * Get the first accessible restaurant, memoized per request.
+     * Use this instead of allAccessibleRestaurants()->first() in hot paths
+     * like Filament shouldRegisterNavigation() which runs 30+ times per request.
+     */
+    public function firstAccessibleRestaurant(): ?Restaurant
+    {
+        static $cache = [];
+        if (!array_key_exists($this->id, $cache)) {
+            $cache[$this->id] = $this->allAccessibleRestaurants()->first();
+        }
+        return $cache[$this->id];
+    }
+
     public function hasAccessToRestaurant(Restaurant $restaurant): bool
     {
         // Is the owner

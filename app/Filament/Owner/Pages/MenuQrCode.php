@@ -19,7 +19,7 @@ class MenuQrCode extends Page
     {
         $user = Auth::user();
         if (!$user) return false;
-        $restaurant = $user->allAccessibleRestaurants()->first();
+        $restaurant = $user->firstAccessibleRestaurant();
         return $restaurant && $restaurant->is_claimed;
     }
     

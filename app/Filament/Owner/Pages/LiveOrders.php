@@ -42,7 +42,7 @@ class LiveOrders extends Page
     public function mount(): void
     {
         $user = Auth::user();
-        $restaurant = $user->allAccessibleRestaurants()->first();
+        $restaurant = $user->firstAccessibleRestaurant();
         
         if ($restaurant) {
             $this->restaurantId = $restaurant->id;

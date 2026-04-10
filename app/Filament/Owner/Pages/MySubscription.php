@@ -92,7 +92,7 @@ class MySubscription extends Page
 
     public function mount(): void
     {
-        $this->restaurant = Auth::user()->allAccessibleRestaurants()->first();
+        $this->restaurant = Auth::user()->firstAccessibleRestaurant();
         $this->currentPlan = $this->restaurant?->subscription_tier ?? 'free';
         $this->planDetails = $this->plans[$this->currentPlan] ?? $this->plans['free'];
     }

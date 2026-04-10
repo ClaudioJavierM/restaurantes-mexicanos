@@ -65,7 +65,7 @@ class SmsMarketing extends Page implements HasForms, HasTable
 
     public function mount(): void
     {
-        $this->restaurant = Auth::user()->allAccessibleRestaurants()->first();
+        $this->restaurant = Auth::user()->firstAccessibleRestaurant();
         $this->loadStats();
     }
 

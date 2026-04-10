@@ -19,14 +19,14 @@ class LoyaltyProgram extends Page
 
     public function mount(): void
     {
-        $this->restaurant = Auth::user()?->allAccessibleRestaurants()->first();
+        $this->restaurant = Auth::user()?->firstAccessibleRestaurant();
     }
 
     public static function shouldRegisterNavigation(): bool
     {
         $user = Auth::user();
         if (!$user) return false;
-        $restaurant = $user->allAccessibleRestaurants()->first();
+        $restaurant = $user->firstAccessibleRestaurant();
         return $restaurant && in_array($restaurant->subscription_tier, ['premium', 'elite']);
     }
 }

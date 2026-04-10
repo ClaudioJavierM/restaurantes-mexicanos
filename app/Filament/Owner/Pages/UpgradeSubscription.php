@@ -24,7 +24,7 @@ class UpgradeSubscription extends Page
     public function mount(): void
     {
         $user = Auth::user();
-        $this->restaurant = $user->allAccessibleRestaurants()->first();
+        $this->restaurant = $user->firstAccessibleRestaurant();
 
         if ($this->restaurant) {
             $this->currentPlan = $this->restaurant->subscription_tier ?? 'free';
@@ -134,7 +134,7 @@ class UpgradeSubscription extends Page
         $user = Auth::user();
         if (!$user) return false;
 
-        $restaurant = $user->allAccessibleRestaurants()->first();
+        $restaurant = $user->firstAccessibleRestaurant();
         return $restaurant && $restaurant->is_claimed;
     }
 }

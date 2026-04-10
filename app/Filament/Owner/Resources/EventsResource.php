@@ -33,7 +33,7 @@ class EventsResource extends Resource
             Forms\Components\Section::make('Informacion del Evento')
                 ->schema([
                     Forms\Components\Hidden::make('restaurant_id')
-                        ->default(fn () => auth()->user()->allAccessibleRestaurants()->first()?->id),
+                        ->default(fn () => auth()->user()->firstAccessibleRestaurant()?->id),
                     Forms\Components\TextInput::make('title')->label('Titulo')->required()->maxLength(255),
                     Forms\Components\TextInput::make('title_en')->label('Titulo (Ingles)')->maxLength(255),
                     Forms\Components\Select::make('event_type')->label('Tipo de Evento')
@@ -97,19 +97,19 @@ class EventsResource extends Resource
 
         $user = auth()->user();
         if (!$user) return false;
-        $restaurant = $user->allAccessibleRestaurants()->first();
+        $restaurant = $user->firstAccessibleRestaurant();
         return $restaurant && $restaurant->is_claimed;
     }
 
     public static function canCreate(): bool
     {
-        $restaurant = auth()->user()?->allAccessibleRestaurants()->first();
+        $restaurant = auth()->user()?->firstAccessibleRestaurant();
         return $restaurant && in_array($restaurant->subscription_tier, ['premium', 'elite']);
     }
 
     public static function getNavigationBadge(): ?string
     {
-        $restaurant = auth()->user()?->allAccessibleRestaurants()->first();
+        $restaurant = auth()->user()?->firstAccessibleRestaurant();
         if ($restaurant && !in_array($restaurant->subscription_tier, ['premium', 'elite'])) {
             return 'PRO';
         }

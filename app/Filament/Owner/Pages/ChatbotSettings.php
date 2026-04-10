@@ -30,7 +30,7 @@ class ChatbotSettings extends Page implements HasForms
 
     protected function getRestaurant()
     {
-        return Auth::user()?->allAccessibleRestaurants()->first();
+        return Auth::user()?->firstAccessibleRestaurant();
     }
 
     public function mount(): void
@@ -164,7 +164,7 @@ class ChatbotSettings extends Page implements HasForms
         $user = Auth::user();
         if (!$user) return false;
 
-        $restaurant = $user->allAccessibleRestaurants()->first();
+        $restaurant = $user->firstAccessibleRestaurant();
         return $restaurant && $restaurant->is_claimed;
     }
 
@@ -173,7 +173,7 @@ class ChatbotSettings extends Page implements HasForms
         $user = Auth::user();
         if (!$user) return null;
 
-        $restaurant = $user->allAccessibleRestaurants()->first();
+        $restaurant = $user->firstAccessibleRestaurant();
         if ($restaurant && !in_array($restaurant->subscription_tier, ['premium', 'elite'])) {
             return 'PRO';
         }

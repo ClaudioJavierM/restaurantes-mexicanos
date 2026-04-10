@@ -44,19 +44,19 @@ class MyMenuResource extends Resource
                 }
             }
         }
-        $restaurant = auth()->user()?->allAccessibleRestaurants()->first();
+        $restaurant = auth()->user()?->firstAccessibleRestaurant();
         return $restaurant && $restaurant->is_claimed;
     }
 
     public static function canAccess(): bool
     {
-        $restaurant = auth()->user()?->allAccessibleRestaurants()->first();
+        $restaurant = auth()->user()?->firstAccessibleRestaurant();
         return $restaurant && $restaurant->is_claimed;
     }
 
     public static function getNavigationBadge(): ?string
     {
-        $restaurant = auth()->user()?->allAccessibleRestaurants()->first();
+        $restaurant = auth()->user()?->firstAccessibleRestaurant();
         if ($restaurant && !in_array($restaurant->subscription_tier, ['premium', 'elite'])) {
             return 'PRO';
         }
@@ -70,7 +70,7 @@ class MyMenuResource extends Resource
 
     public static function canCreate(): bool
     {
-        $restaurant = auth()->user()?->allAccessibleRestaurants()->first();
+        $restaurant = auth()->user()?->firstAccessibleRestaurant();
         return $restaurant && $restaurant->is_claimed;
     }
 

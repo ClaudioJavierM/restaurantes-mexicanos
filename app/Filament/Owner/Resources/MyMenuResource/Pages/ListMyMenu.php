@@ -13,7 +13,7 @@ class ListMyMenu extends ListRecords
 
     protected function getHeaderActions(): array
     {
-        $restaurant = auth()->user()->allAccessibleRestaurants()->first();
+        $restaurant = auth()->user()->firstAccessibleRestaurant();
         $plan = $restaurant?->subscription_tier ?? 'free';
         $hasPremium = in_array($plan, ['premium', 'elite']);
 

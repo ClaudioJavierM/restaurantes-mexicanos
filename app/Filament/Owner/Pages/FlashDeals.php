@@ -22,7 +22,7 @@ class FlashDeals extends Page
     {
         $user = Auth::user();
         if ($user) {
-            $this->restaurant = $user->allAccessibleRestaurants()->first();
+            $this->restaurant = $user->firstAccessibleRestaurant();
         }
     }
 
@@ -30,7 +30,7 @@ class FlashDeals extends Page
     {
         $user = Auth::user();
         if (!$user) return false;
-        $restaurant = $user->allAccessibleRestaurants()->first();
+        $restaurant = $user->firstAccessibleRestaurant();
         return $restaurant && $restaurant->is_claimed;
     }
 

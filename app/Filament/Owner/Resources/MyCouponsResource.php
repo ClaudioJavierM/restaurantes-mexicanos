@@ -43,7 +43,7 @@ class MyCouponsResource extends Resource
                 Forms\Components\Section::make('Información del Cupón')
                     ->schema([
                         Forms\Components\Hidden::make('restaurant_id')
-                            ->default(fn () => auth()->user()->allAccessibleRestaurants()->first()?->id),
+                            ->default(fn () => auth()->user()->firstAccessibleRestaurant()?->id),
 
                         Forms\Components\TextInput::make('title')
                             ->label('Título del Cupón')
@@ -258,7 +258,7 @@ class MyCouponsResource extends Resource
         $user = auth()->user();
         if (!$user) return false;
         
-        $restaurant = $user->allAccessibleRestaurants()->first();
+        $restaurant = $user->firstAccessibleRestaurant();
         if (!$restaurant) return false;
         
         return in_array($restaurant->subscription_tier, ["premium", "elite"]);
@@ -282,7 +282,7 @@ class MyCouponsResource extends Resource
         $user = auth()->user();
         if (!$user) return false;
         
-        $restaurant = $user->allAccessibleRestaurants()->first();
+        $restaurant = $user->firstAccessibleRestaurant();
         return $restaurant && $restaurant->is_claimed;
     }
 
@@ -291,7 +291,7 @@ class MyCouponsResource extends Resource
         $user = auth()->user();
         if (!$user) return null;
         
-        $restaurant = $user->allAccessibleRestaurants()->first();
+        $restaurant = $user->firstAccessibleRestaurant();
         if ($restaurant && !in_array($restaurant->subscription_tier, ["premium", "elite"])) {
             return "PRO";
         }
@@ -308,7 +308,7 @@ class MyCouponsResource extends Resource
     public static function getNavigationBadgeColor(): ?string
     {
         $restaurantIds = auth()->user()?->allAccessibleRestaurants()?->pluck("id") ?? collect();
-        $restaurant = auth()->user()?->allAccessibleRestaurants()->first();
+        $restaurant = auth()->user()?->firstAccessibleRestaurant();
         
         if ($restaurant && !in_array($restaurant->subscription_tier, ["premium", "elite"])) {
             return "warning";

@@ -24,7 +24,7 @@ class OnboardingPage extends Page
         $user = Auth::user();
 
         /** @var Restaurant|null $restaurant */
-        $restaurant = $user->allAccessibleRestaurants()->first();
+        $restaurant = $user->firstAccessibleRestaurant();
 
         if (!$restaurant) {
             $this->redirect(filament()->getHomeUrl());

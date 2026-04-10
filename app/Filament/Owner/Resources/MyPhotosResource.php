@@ -58,7 +58,7 @@ class MyPhotosResource extends Resource
 
     public static function form(Form $form): Form
     {
-        $restaurant = auth()->user()->allAccessibleRestaurants()->first();
+        $restaurant = auth()->user()->firstAccessibleRestaurant();
         $maxPhotos = static::getMaxPhotos();
         $currentCount = static::getCurrentPhotoCount();
         
@@ -209,7 +209,7 @@ class MyPhotosResource extends Resource
 
     public static function getMaxPhotos(): int
     {
-        $restaurant = auth()->user()?->allAccessibleRestaurants()->first();
+        $restaurant = auth()->user()?->firstAccessibleRestaurant();
         $plan = $restaurant?->subscription_tier ?? 'free';
         
         return match($plan) {
