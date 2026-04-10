@@ -161,6 +161,9 @@ class Restaurant extends Model implements HasMedia
         // Subscription
         'subscription_tier',
         'chatbot_settings',
+        'loyalty_enabled',
+        'points_per_dollar',
+        'points_per_visit',
         'stripe_customer_id',
         'stripe_subscription_id',
         'subscription_started_at',
@@ -255,6 +258,9 @@ class Restaurant extends Model implements HasMedia
         'subscription_started_at' => 'datetime',
         'subscription_expires_at' => 'datetime',
         'chatbot_settings' => 'array',
+        'loyalty_enabled' => 'boolean',
+        'points_per_dollar' => 'integer',
+        'points_per_visit' => 'integer',
         'premium_analytics' => 'boolean',
         'premium_seo' => 'boolean',
         'premium_featured' => 'boolean',
@@ -421,6 +427,16 @@ class Restaurant extends Model implements HasMedia
     public function activeCoupons(): HasMany
     {
         return $this->coupons()->active()->valid()->hasUsagesLeft();
+    }
+
+    public function loyaltyRewards(): HasMany
+    {
+        return $this->hasMany(LoyaltyReward::class);
+    }
+
+    public function customers(): HasMany
+    {
+        return $this->hasMany(RestaurantCustomer::class);
     }
 
     public function rankings(): HasMany
