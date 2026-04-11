@@ -59,6 +59,39 @@ class ClaimRestaurant extends Component
     {
         $this->searchResults = collect();
 
+        // If user is already logged in and has a claimed restaurant, skip straight to plan selection
+        if (auth()->check()) {
+            $user = auth()->user();
+            $restaurant = \App\Models\Restaurant::where('owner_user_id', $user->id)
+                ->where('status', 'approved')
+                ->with('state', 'category', 'owner')
+                ->first();
+
+            if ($restaurant) {
+                $this->selectedRestaurant = $restaurant;
+                $this->search = $restaurant->name;
+
+                // Load stats for the plan modal
+                try {
+                    $this->restaurantMonthlyViews = \App\Models\AnalyticsEvent::where('restaurant_id', $restaurant->id)
+                        ->where('event_type', \App\Models\AnalyticsEvent::EVENT_PAGE_VIEW)
+                        ->where('created_at', '>=', now()->subDays(30))
+                        ->count();
+                    $this->restaurantTotalViews = \App\Models\AnalyticsEvent::where('restaurant_id', $restaurant->id)
+                        ->where('event_type', \App\Models\AnalyticsEvent::EVENT_PAGE_VIEW)
+                        ->count();
+                    $this->competitorCount = \App\Models\Restaurant::where('state_id', $restaurant->state_id)
+                        ->where('status', 'approved')
+                        ->where('id', '!=', $restaurant->id)
+                        ->count();
+                } catch (\Exception $e) {}
+
+                $this->step = 'select_plan';
+                $this->dispatch('scroll-top');
+                return;
+            }
+        }
+
         // Track claim page view
         try {
             \App\Models\AnalyticsEvent::create([
