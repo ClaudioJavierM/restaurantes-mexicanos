@@ -384,7 +384,7 @@
     </script>
 
     {{-- FAQPage Schema --}}
-    @if(count($faqItems) > 0)
+    @if(count($faqItems ?? []) > 0)
     @php
         $faqSchema = [
             '@context'   => 'https://schema.org',
