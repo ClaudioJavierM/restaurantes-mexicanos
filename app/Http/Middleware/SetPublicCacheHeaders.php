@@ -19,7 +19,11 @@ class SetPublicCacheHeaders
                 || str_starts_with($path, 'login')
                 || str_starts_with($path, 'register');
 
-            if (!$request->ajax() && !$isPrivatePath) {
+            // Stateful Livewire pages must never be browser-cached
+            $isStatefulPage = in_array($path, ['claim', 'sugerir', 'votar', 'checkout', 'catering'])
+                || str_starts_with($path, 'claim');
+
+            if (!$request->ajax() && !$isPrivatePath && !$isStatefulPage) {
                 // Disable Livewire's cache buster before it runs
                 \Livewire\Features\SupportDisablingBackButtonCache\SupportDisablingBackButtonCache::$disableBackButtonCache = false;
             }
@@ -36,10 +40,16 @@ class SetPublicCacheHeaders
                 || str_starts_with($path, 'login')
                 || str_starts_with($path, 'register');
 
-            if (!$request->ajax() && !$isPrivatePath) {
+            // Stateful Livewire pages must never be browser-cached
+            $isStatefulPage = in_array($path, ['claim', 'sugerir', 'votar', 'checkout', 'catering'])
+                || str_starts_with($path, 'claim');
+
+            if (!$request->ajax() && !$isPrivatePath && !$isStatefulPage) {
                 $response->headers->set('Cache-Control', 'public, max-age=60, s-maxage=300');
                 $response->headers->remove('Pragma');
                 $response->headers->remove('Expires');
+            } elseif ($isStatefulPage) {
+                $response->headers->set('Cache-Control', 'no-store, no-cache, must-revalidate');
             }
         }
 
