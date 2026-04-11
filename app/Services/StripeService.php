@@ -419,17 +419,21 @@ class StripeService
             $restaurant->update(['stripe_subscription_id' => $subscription->id]);
 
             if ($plan === 'elite') {
-                // Trial subscriptions generate a $0 invoice, so Stripe creates a SetupIntent
-                // (not a PaymentIntent) to collect the card for future billing.
-                $subscription = \Stripe\Subscription::retrieve([
-                    'id'     => $subscription->id,
-                    'expand' => ['pending_setup_intent'],
+                // For trial subscriptions we explicitly create a SetupIntent to collect the card.
+                // Relying on pending_setup_intent is unreliable — Stripe skips it when the
+                // customer already has a default payment method on file.
+                $setupIntent = \Stripe\SetupIntent::create([
+                    'customer' => $customer->id,
+                    'usage'    => 'off_session',
+                    'metadata' => [
+                        'subscription_id' => $subscription->id,
+                        'restaurant_id'   => $restaurant->id,
+                    ],
                 ]);
-                $clientSecret = $subscription->pending_setup_intent->client_secret;
 
                 return [
                     'subscription_id' => $subscription->id,
-                    'client_secret'   => $clientSecret,
+                    'client_secret'   => $setupIntent->client_secret,
                     'is_trial'        => true,
                     'trial_days'      => 30,
                     'amount'          => 0,
@@ -441,7 +445,29 @@ class StripeService
                     'id'     => $subscription->id,
                     'expand' => ['latest_invoice.payment_intent'],
                 ]);
-                $paymentIntent = $subscription->latest_invoice->payment_intent;
+                $paymentIntent = $subscription->latest_invoice->payment_intent ?? null;
+
+                if (!$paymentIntent) {
+                    // The intro coupon reduced the invoice to $0 — Stripe paid it automatically.
+                    // Subscription is already active; collect card via SetupIntent for future billing.
+                    $setupIntent = \Stripe\SetupIntent::create([
+                        'customer' => $customer->id,
+                        'usage'    => 'off_session',
+                        'metadata' => [
+                            'subscription_id' => $subscription->id,
+                            'restaurant_id'   => $restaurant->id,
+                        ],
+                    ]);
+
+                    return [
+                        'subscription_id' => $subscription->id,
+                        'client_secret'   => $setupIntent->client_secret,
+                        'is_trial'        => true,
+                        'trial_days'      => 0,
+                        'amount'          => 0,
+                        'currency'        => 'usd',
+                    ];
+                }
 
                 return [
                     'subscription_id' => $subscription->id,
