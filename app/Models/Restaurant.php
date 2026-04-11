@@ -196,6 +196,7 @@ class Restaurant extends Model implements HasMedia
         'onboarding_completed',
         'onboarding_step',
         'onboarding_completed_at',
+        'onboarding_dismissed_at',
         // Newsletter
         'owner_newsletter',
     ];
@@ -264,6 +265,7 @@ class Restaurant extends Model implements HasMedia
         // Onboarding
         'onboarding_completed'    => 'boolean',
         'onboarding_completed_at' => 'datetime',
+        'onboarding_dismissed_at' => 'datetime',
         'subscription_started_at' => 'datetime',
         'subscription_expires_at' => 'datetime',
         'chatbot_settings' => 'array',

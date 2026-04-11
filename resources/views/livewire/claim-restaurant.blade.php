@@ -305,6 +305,38 @@
                         @enderror
                     </div>
 
+                    {{-- Password --}}
+                    <div>
+                        <label class="block text-sm font-medium mb-2" style="color:#9CA3AF;">
+                            Crea tu contraseña <span style="color:#D4AF37;">*</span>
+                        </label>
+                        <input
+                            type="password"
+                            wire:model="password"
+                            placeholder="Mínimo 8 caracteres"
+                            class="w-full px-4 py-3 rounded-lg focus:outline-none transition-colors"
+                            style="background:#0B0B0B; border:1px solid #2A2A2A; color:#F5F5F5;"
+                            onfocus="this.style.borderColor='#D4AF37'" onblur="this.style.borderColor='#2A2A2A'"
+                        >
+                        @error('password') <p class="mt-1 text-sm" style="color:#EF4444;">{{ $message }}</p> @enderror
+                    </div>
+
+                    {{-- Confirm Password --}}
+                    <div>
+                        <label class="block text-sm font-medium mb-2" style="color:#9CA3AF;">
+                            Confirma tu contraseña <span style="color:#D4AF37;">*</span>
+                        </label>
+                        <input
+                            type="password"
+                            wire:model="passwordConfirmation"
+                            placeholder="Repite tu contraseña"
+                            class="w-full px-4 py-3 rounded-lg focus:outline-none transition-colors"
+                            style="background:#0B0B0B; border:1px solid #2A2A2A; color:#F5F5F5;"
+                            onfocus="this.style.borderColor='#D4AF37'" onblur="this.style.borderColor='#2A2A2A'"
+                        >
+                        @error('passwordConfirmation') <p class="mt-1 text-sm" style="color:#EF4444;">{{ $message }}</p> @enderror
+                    </div>
+
                     {{-- Verification Method Selection --}}
                     <div>
                         <label class="block text-sm font-medium mb-3" style="color:#CCCCCC;">
@@ -719,6 +751,9 @@
                     <p style="color:#9CA3AF;">{{ __('app.claim_payment_subtitle') }}</p>
                 </div>
 
+                {{-- NOTE: This step is now only reached if selectPlan() fails to redirect.
+                     The normal flow redirects directly to Stripe Checkout. --}}
+
                 {{-- Order Summary --}}
                 <div class="max-w-2xl mx-auto">
                     <div class="rounded-lg p-6 mb-6" style="background:#111111; border:1px solid #2A2A2A;">
@@ -807,139 +842,38 @@
                         </div>
                     </div>
 
-                    {{-- Stripe.js (load once) --}}
-                    @once
-                    <script src="https://js.stripe.com/v3/"></script>
-                    @endonce
+                    {{-- Stripe Checkout redirect button --}}
+                    <div class="rounded-lg p-6" style="background:#111111; border:1px solid #2A2A2A;">
 
-                    {{-- Embedded Stripe Payment Element --}}
-                    <div class="rounded-lg p-8" style="background:#111111; border:1px solid #2A2A2A;"
-                        x-data="{
-                            stripe: null,
-                            elements: null,
-                            paymentEl: null,
-                            loading: true,
-                            processing: false,
-                            errorMsg: '',
-                            clientSecret: @js($stripeClientSecret),
+                        @if(session('error'))
+                            <div class="mb-4 p-3 rounded-lg" style="background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3);">
+                                <p class="text-sm" style="color:#EF4444;">{{ session('error') }}</p>
+                            </div>
+                        @endif
 
-                            initStripeElements(secret) {
-                                if (!secret || !window.Stripe) return;
-                                this.stripe = Stripe('{{ $stripeKey }}');
-                                this.elements = this.stripe.elements({
-                                    clientSecret: secret,
-                                    appearance: {
-                                        theme: 'night',
-                                        variables: {
-                                            colorPrimary: '#D4AF37',
-                                            colorBackground: '#111111',
-                                            colorText: '#F5F5F5',
-                                            colorDanger: '#EF4444',
-                                            fontFamily: 'Poppins, system-ui, sans-serif',
-                                            borderRadius: '8px',
-                                            spacingUnit: '4px',
-                                        },
-                                        rules: {
-                                            '.Input': { border: '1px solid #2A2A2A', backgroundColor: '#0B0B0B' },
-                                            '.Input:focus': { border: '1px solid #D4AF37', boxShadow: 'none' },
-                                            '.Label': { color: '#9CA3AF' },
-                                        }
-                                    }
-                                });
-                                this.paymentEl = this.elements.create('payment');
-                                this.paymentEl.mount(this.$refs.paymentMount);
-                                this.paymentEl.on('ready', () => { this.loading = false; });
-                            },
-
-                            async submitPayment() {
-                                if (this.processing || !this.stripe) return;
-                                this.processing = true;
-                                this.errorMsg = '';
-
-                                const { error, setupIntent } = await this.stripe.confirmSetup({
-                                    elements: this.elements,
-                                    redirect: 'if_required',
-                                });
-
-                                if (error) {
-                                    this.errorMsg = error.message;
-                                    this.processing = false;
-                                    return;
-                                }
-
-                                if (setupIntent && setupIntent.status === 'succeeded') {
-                                    $wire.completeSubscriptionPayment(setupIntent.id);
-                                } else {
-                                    this.errorMsg = 'El pago no pudo completarse. Por favor intenta de nuevo.';
-                                    this.processing = false;
-                                }
-                            }
-                        }"
-                        x-init="
-                            const tryInit = () => { if (clientSecret) initStripeElements(clientSecret); };
-                            if (window.Stripe) {
-                                tryInit();
-                            } else {
-                                const s = document.querySelector('script[src*=\'js.stripe.com\']');
-                                if (s) { s.addEventListener('load', tryInit, { once: true }); }
-                            }
-                        "
-                        @stripe-payment-error.window="errorMsg = $event.detail.message; processing = false;"
-                    >
-                        {{-- Loading skeleton --}}
-                        <div x-show="loading" class="space-y-3">
-                            <div class="h-3 rounded animate-pulse mb-2" style="background:#2A2A2A; width:35%;"></div>
-                            <div class="h-12 rounded animate-pulse" style="background:#2A2A2A;"></div>
-                            <div class="h-3 rounded animate-pulse mt-4 mb-2" style="background:#2A2A2A; width:50%;"></div>
-                            <div class="h-12 rounded animate-pulse" style="background:#2A2A2A;"></div>
-                            <div class="h-3 rounded animate-pulse mt-4 mb-2" style="background:#2A2A2A; width:30%;"></div>
-                            <div class="h-12 rounded animate-pulse" style="background:#2A2A2A;"></div>
-                        </div>
-
-                        {{-- Stripe Payment Element mount point --}}
-                        <div x-ref="paymentMount" x-show="!loading" style="min-height:100px;"></div>
-
-                        {{-- Error message --}}
-                        <div x-show="errorMsg" x-cloak class="mt-4 p-3 rounded-lg" style="background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3);">
-                            <p class="text-sm flex items-center gap-2" style="color:#EF4444;">
-                                <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-                                </svg>
-                                <span x-text="errorMsg"></span>
-                            </p>
-                        </div>
-
-                        {{-- Submit button --}}
                         <button
-                            x-show="!loading"
-                            x-cloak
-                            @click="submitPayment()"
-                            :disabled="processing"
-                            class="w-full mt-6 px-8 py-4 rounded-lg font-semibold transition-all flex items-center justify-center gap-2"
+                            wire:click="processPayment"
+                            wire:loading.attr="disabled"
+                            wire:loading.class="opacity-70 cursor-not-allowed"
+                            class="w-full px-8 py-4 rounded-lg font-semibold transition-all flex items-center justify-center gap-2"
                             style="background:#D4AF37; color:#0B0B0B;"
-                            :style="processing ? 'opacity:0.7; cursor:not-allowed;' : 'cursor:pointer;'"
                         >
-                            <svg x-show="!processing" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg wire:loading.remove class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                             </svg>
-                            <svg x-show="processing" class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                            <svg wire:loading class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
                             </svg>
-                            <span x-text="processing ? 'Procesando...' : '{{ __('app.claim_payment_button') }}'"></span>
+                            <span wire:loading.remove>{{ __('app.claim_payment_button') }}</span>
+                            <span wire:loading>Redirigiendo a Stripe...</span>
                         </button>
 
-                        {{-- Stripe branding --}}
                         <div class="mt-4 flex items-center justify-center">
-                            <svg class="h-7" viewBox="0 0 468 222.5" xmlns="http://www.w3.org/2000/svg"><path fill="#635BFF" fill-rule="evenodd" d="M414 113.4c0-25.6-12.4-45.8-36.1-45.8-23.8 0-38.2 20.2-38.2 45.6 0 30.1 17 45.3 41.4 45.3 11.9 0 20.9-2.7 27.7-6.5v-20c-6.8 3.4-14.6 5.5-24.5 5.5-9.7 0-18.3-3.4-19.4-15.2h48.9c0-1.3.2-6.5.2-8.9zm-49.4-9.5c0-11.3 6.9-16 13.2-16 6.1 0 12.6 4.7 12.6 16h-25.8zm-63.5-36.3c-9.8 0-16.1 4.6-19.6 7.8l-1.3-6.2h-22v116.6l25-5.3.1-28.3c3.6 2.6 8.9 6.3 17.7 6.3 17.9 0 34.2-14.4 34.2-46.1-.1-29-16.6-44.8-34.1-44.8zm-6 68.9c-5.9 0-9.4-2.1-11.8-4.7l-.1-37.1c2.6-2.9 6.2-4.9 11.9-4.9 9.1 0 15.4 10.2 15.4 23.3 0 13.4-6.2 23.4-15.4 23.4zm-71.3-74.8l25.1-5.4V36l-25.1 5.3v20.4zm0 7.6h25.1v87.5h-25.1v-87.5zm-26.7 7.4l-1.6-7.4h-21.6v87.5h25V97.5c5.9-7.7 15.9-6.3 19-5.2v-23c-3.2-1.2-14.9-3.4-20.8 7.4zm-48.1-39.9l-24.4 5.2-.1 80.1c0 14.8 11.1 25.7 25.9 25.7 8.2 0 14.2-1.5 17.5-3.3V135c-3.2 1.3-19-2.6-19-17.6V89h19V69.3h-19l.1-32.5zm-70.8 66.5c0-3.9 3.2-5.4 8.5-5.4 7.6 0 17.2 2.3 24.8 6.4V72.2c-8.3-3.3-16.5-4.6-24.8-4.6C58.5 67.6 41 81.8 41 103.8c0 34.2 47.1 28.7 47.1 43.4 0 4.6-4 6.1-9.6 6.1-8.3 0-18.9-3.4-27.3-8v23.8c9.3 4 18.7 5.7 27.3 5.7 23.8 0 40.2-11.8 40.2-34.2-.1-36.9-47.4-30.3-47.4-44.1z"/></svg>
+                            <svg class="h-6" viewBox="0 0 468 222.5" xmlns="http://www.w3.org/2000/svg"><path fill="#635BFF" fill-rule="evenodd" d="M414 113.4c0-25.6-12.4-45.8-36.1-45.8-23.8 0-38.2 20.2-38.2 45.6 0 30.1 17 45.3 41.4 45.3 11.9 0 20.9-2.7 27.7-6.5v-20c-6.8 3.4-14.6 5.5-24.5 5.5-9.7 0-18.3-3.4-19.4-15.2h48.9c0-1.3.2-6.5.2-8.9zm-49.4-9.5c0-11.3 6.9-16 13.2-16 6.1 0 12.6 4.7 12.6 16h-25.8zm-63.5-36.3c-9.8 0-16.1 4.6-19.6 7.8l-1.3-6.2h-22v116.6l25-5.3.1-28.3c3.6 2.6 8.9 6.3 17.7 6.3 17.9 0 34.2-14.4 34.2-46.1-.1-29-16.6-44.8-34.1-44.8zm-6 68.9c-5.9 0-9.4-2.1-11.8-4.7l-.1-37.1c2.6-2.9 6.2-4.9 11.9-4.9 9.1 0 15.4 10.2 15.4 23.3 0 13.4-6.2 23.4-15.4 23.4zm-71.3-74.8l25.1-5.4V36l-25.1 5.3v20.4zm0 7.6h25.1v87.5h-25.1v-87.5zm-26.7 7.4l-1.6-7.4h-21.6v87.5h25V97.5c5.9-7.7 15.9-6.3 19-5.2v-23c-3.2-1.2-14.9-3.4-20.8 7.4zm-48.1-39.9l-24.4 5.2-.1 80.1c0 14.8 11.1 25.7 25.9 25.7 8.2 0 14.2-1.5 17.5-3.3V135c-3.2 1.3-19-2.6-19-17.6V89h19V69.3h-19l.1-32.5zm-70.8 66.5c0-3.9 3.2-5.4 8.5-5.4 7.6 0 17.2 2.3 24.8 6.4V72.2c-8.3-3.3-16.5-4.6-24.8-4.6C58.5 67.6 41 81.8 41 103.8c0 34.2 47.1 28.7 47.1 43.4 0 4.6-4 6.1-9.6 6.1-8.3 0-18.9-3.4-27.3-8v23.8c9.3 4 18.7 5.7 27.3 5.7 23.8 0 40.2-11.8 40.2-34.2-.1-36.9-47.4-30.3-47.4-44.1z"/></svg>
                         </div>
-                    </div>
 
-                    <div class="mt-6 rounded-lg p-4" style="background:rgba(212,175,55,0.08); border:1px solid rgba(212,175,55,0.2);">
-                        <p class="text-sm" style="color:#D4AF37;">
-                            <svg class="w-5 h-5 inline mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
-                            </svg>
+                        <p class="text-center text-xs mt-3" style="color:#6B7280;">
                             {{ __('app.claim_payment_secure_notice') }}
                         </p>
                     </div>
@@ -959,5 +893,114 @@
         </a>
     </div>
 
-
 </div>
+
+{{-- famerMountStripe: global function called by Alpine x-data init() on the Stripe section.
+     Alpine fires init() automatically when Livewire adds the element to the DOM after morph. --}}
+@script
+<script>
+window.famerMountStripe = function(clientSecret, stripeKey) {
+    var mountEl   = document.getElementById('famer-stripe-mount');
+    var submitBtn = document.getElementById('famer-stripe-submit');
+    var errorDiv  = document.getElementById('famer-stripe-error');
+    var errorText = document.getElementById('famer-stripe-error-text');
+    var lockIcon  = document.getElementById('famer-stripe-lock-icon');
+    var spinner   = document.getElementById('famer-stripe-spinner');
+    var btnText   = document.getElementById('famer-stripe-btn-text');
+
+    if (!mountEl || mountEl._stripeInit) return;
+    mountEl._stripeInit = true;
+
+    function doMount() {
+        if (!window.Stripe) return;
+
+        var stripe   = Stripe(stripeKey);
+        var elements = stripe.elements();
+        var cardEl   = elements.create('card', {
+            style: {
+                base: {
+                    color:           '#F5F5F5',
+                    fontFamily:      'Poppins, system-ui, sans-serif',
+                    fontSize:        '16px',
+                    fontSmoothing:   'antialiased',
+                    '::placeholder': { color: '#6B7280' },
+                    iconColor:       '#D4AF37',
+                },
+                invalid: {
+                    color:     '#EF4444',
+                    iconColor: '#EF4444',
+                }
+            },
+            hidePostalCode: true,
+        });
+
+        cardEl.mount(mountEl);
+
+        cardEl.on('change', function(ev) {
+            if (ev.complete) {
+                submitBtn.disabled        = false;
+                submitBtn.style.opacity   = '1';
+                submitBtn.style.cursor    = 'pointer';
+            } else {
+                submitBtn.disabled        = true;
+                submitBtn.style.opacity   = '0.5';
+                submitBtn.style.cursor    = 'not-allowed';
+            }
+            if (ev.error) {
+                errorText.textContent  = ev.error.message;
+                errorDiv.style.display = 'block';
+            } else {
+                errorDiv.style.display = 'none';
+            }
+        });
+
+        submitBtn.addEventListener('click', async function() {
+            if (submitBtn.disabled) return;
+            submitBtn.disabled       = true;
+            submitBtn.style.opacity  = '0.7';
+            lockIcon.style.display   = 'none';
+            spinner.style.display    = 'block';
+            btnText.textContent      = 'Procesando...';
+            errorDiv.style.display   = 'none';
+
+            var result = await stripe.confirmCardSetup(clientSecret, {
+                payment_method: { card: cardEl }
+            });
+
+            if (result.error) {
+                errorText.textContent   = result.error.message;
+                errorDiv.style.display  = 'block';
+                submitBtn.disabled      = false;
+                submitBtn.style.opacity = '1';
+                submitBtn.style.cursor  = 'pointer';
+                lockIcon.style.display  = 'block';
+                spinner.style.display   = 'none';
+                btnText.textContent     = 'Pagar con Stripe';
+            } else if (result.setupIntent && result.setupIntent.status === 'succeeded') {
+                $wire.completeSubscriptionPayment(result.setupIntent.id);
+            } else {
+                errorText.textContent   = 'El pago no pudo completarse. Por favor intenta de nuevo.';
+                errorDiv.style.display  = 'block';
+                submitBtn.disabled      = false;
+                submitBtn.style.opacity = '1';
+                submitBtn.style.cursor  = 'pointer';
+                lockIcon.style.display  = 'block';
+                spinner.style.display   = 'none';
+                btnText.textContent     = 'Pagar con Stripe';
+            }
+        });
+    }
+
+    // By the time user reaches step 4, Stripe.js (defer) has long since loaded.
+    // Fallback injection just in case.
+    if (typeof window.Stripe === 'function') {
+        doMount();
+    } else {
+        var s = document.createElement('script');
+        s.src = 'https://js.stripe.com/v3/';
+        s.onload = doMount;
+        document.head.appendChild(s);
+    }
+};
+</script>
+@endscript

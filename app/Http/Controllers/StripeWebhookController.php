@@ -271,11 +271,54 @@ class StripeWebhookController extends Controller
                     \Log::error('Error sending claim success email: ' . $e->getMessage());
                 }
 
+                // Fallback: also attempt to create user from session data if restaurant email is missing
+                $claimEmail   = session('claim_owner_email');
+                $claimPassword = session('claim_owner_email') ? session('claim_password') : null; // already hashed
+                $claimName    = session('claim_owner_name');
+
+                if ($claimEmail && $claimPassword && !$user) {
+                    $user = \App\Models\User::firstOrCreate(
+                        ['email' => $claimEmail],
+                        [
+                            'name'               => $claimName ?? 'Propietario',
+                            'password'           => $claimPassword,
+                            'email_verified_at'  => now(),
+                        ]
+                    );
+                    \Illuminate\Support\Facades\Auth::login($user);
+                }
+
+                // Send welcome email with FAMER30 coupon
+                try {
+                    \App\Mail\ClaimWelcomeMail::sendAndLog(
+                        $restaurant,
+                        $restaurant->owner_name ?? $user->name,
+                        $restaurant->owner_email ?? $user->email,
+                        $plan
+                    );
+                } catch (\Exception $e) {
+                    \Log::warning('ClaimWelcomeMail (paid) failed: ' . $e->getMessage());
+                }
+
+                // Clean up claim session keys
+                session()->forget(['claim_password', 'claim_owner_email', 'claim_owner_name', 'claim_owner_phone', 'claim_restaurant_id']);
+
+                // Retrieve subscription object if available
+                $subscription = null;
+                if ($restaurant->stripe_subscription_id) {
+                    try {
+                        $subscription = \Stripe\Subscription::retrieve($restaurant->stripe_subscription_id);
+                    } catch (\Exception $e) {
+                        \Log::warning('Could not retrieve subscription object: ' . $e->getMessage());
+                    }
+                }
+
                 return view('claim.success', [
-                    'sessionId' => $sessionId,
-                    'restaurant' => $restaurant,
-                    'plan' => $plan,
-                    'user' => $user,
+                    'sessionId'    => $sessionId,
+                    'restaurant'   => $restaurant,
+                    'plan'         => $plan,
+                    'user'         => $user,
+                    'subscription' => $subscription,
                 ]);
             }
         } catch (\Exception $e) {
@@ -283,7 +326,10 @@ class StripeWebhookController extends Controller
         }
 
         return view('claim.success', [
-            'sessionId' => $sessionId,
+            'sessionId'    => $sessionId,
+            'plan'         => null,
+            'restaurant'   => null,
+            'subscription' => null,
         ]);
     }
 

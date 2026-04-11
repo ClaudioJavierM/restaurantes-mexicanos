@@ -25,6 +25,8 @@ class ClaimRestaurant extends Component
     public $ownerName = '';
     public $ownerEmail = '';
     public $ownerPhone = '';
+    public string $password = '';
+    public string $passwordConfirmation = '';
     public $verificationMethod = 'email'; // email or phone
     public $verificationCode = '';
     public $codeError = '';
@@ -231,6 +233,8 @@ class ClaimRestaurant extends Component
             'ownerName' => 'required|min:2',
             'ownerEmail' => 'required|email',
             'ownerPhone' => 'required|min:10',
+            'password' => 'required|min:8',
+            'passwordConfirmation' => 'required|same:password',
         ]);
 
         // Track verification started
@@ -525,9 +529,30 @@ class ClaimRestaurant extends Component
             return $this->completeFreeClai();
         }
 
-        $this->step = 'payment';
-        $this->initStripePayment();
-        $this->dispatch('scroll-top');
+        // Store owner data in session so StripeController can create the user after payment
+        session([
+            'claim_password' => \Illuminate\Support\Facades\Hash::make($this->password),
+            'claim_owner_name' => $this->ownerName,
+            'claim_owner_email' => $this->ownerEmail,
+            'claim_owner_phone' => $this->ownerPhone,
+            'claim_restaurant_id' => $this->selectedRestaurant->id,
+        ]);
+
+        // Redirect to Stripe Checkout hosted page — avoids all iframe/JS complexity
+        try {
+            $stripeService = new StripeService();
+            $session = $stripeService->createCheckoutSession(
+                $this->selectedRestaurant,
+                $plan,
+                route('claim.success') . '?session_id={CHECKOUT_SESSION_ID}',
+                route('claim.restaurant') . '?restaurant=' . $this->selectedRestaurant->slug,
+                $this->couponApplied ? $this->couponCode : null
+            );
+            $this->redirect($session->url, navigate: false);
+        } catch (\Exception $e) {
+            Log::error('Error creating Stripe Checkout session: ' . $e->getMessage());
+            session()->flash('error', 'Error al inicializar el pago. Por favor intenta de nuevo.');
+        }
     }
 
     public function completeFreeClai()
@@ -548,8 +573,9 @@ class ClaimRestaurant extends Component
             ['email' => $this->ownerEmail],
             [
                 'name' => $this->ownerName,
-                'password' => bcrypt(Str::random(12)),
+                'password' => \Illuminate\Support\Facades\Hash::make($this->password),
                 'phone' => $this->ownerPhone,
+                'email_verified_at' => now(),
             ]
         );
 
@@ -561,7 +587,7 @@ class ClaimRestaurant extends Component
 
         $this->selectedRestaurant->update(['user_id' => $user->id]);
 
-        auth()->login($user);
+        \Illuminate\Support\Facades\Auth::login($user);
         session()->regenerate();
 
         // Track claim completed
@@ -582,6 +608,18 @@ class ClaimRestaurant extends Component
             ]);
         } catch (\Exception $e) {
             Log::warning('Failed to track claim_completed: ' . $e->getMessage());
+        }
+
+        // Send welcome email with coupon
+        try {
+            \App\Mail\ClaimWelcomeMail::sendAndLog(
+                $this->selectedRestaurant,
+                $this->ownerName,
+                $this->ownerEmail,
+                'free'
+            );
+        } catch (\Exception $e) {
+            Log::warning('Failed to send ClaimWelcomeMail: ' . $e->getMessage());
         }
 
         session()->flash('success', '¡Felicidades! Tu restaurante ha sido reclamado exitosamente.');
@@ -650,6 +688,11 @@ class ClaimRestaurant extends Component
                 $this->couponApplied ? $this->couponCode : null
             );
             $this->stripeClientSecret = $result['clientSecret'];
+            // Dispatch browser event so JS can initialize Stripe after Livewire morphs the DOM
+            $this->dispatch('mount-stripe-card',
+                clientSecret: $result['clientSecret'],
+                stripeKey: config('stripe.key')
+            );
         } catch (\Exception $e) {
             Log::error('Error initializing Stripe payment: ' . $e->getMessage());
             session()->flash('error', 'Error al inicializar el pago. Por favor intenta de nuevo.');

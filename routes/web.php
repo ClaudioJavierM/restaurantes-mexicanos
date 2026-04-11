@@ -76,6 +76,7 @@ Route::get('/claim', \App\Livewire\ClaimRestaurant::class)->name('claim.restaura
 Route::get('/claim/verify/{verification}', \App\Livewire\ClaimRestaurantImproved::class)->name('claim.verify');
 Route::get('/claim/success', [\App\Http\Controllers\StripeWebhookController::class, 'success'])->name('claim.success');
 Route::get('/claim/cancel', [\App\Http\Controllers\StripeWebhookController::class, 'cancel'])->name('claim.cancel');
+Route::get('/claim/upgrade', fn() => redirect('/owner/upgrade-subscription'))->name('claim.upgrade');
 
 // Stripe Webhook
 Route::post('/stripe/webhook', [\App\Http\Controllers\StripeWebhookController::class, 'handleWebhook'])->name('stripe.webhook');
