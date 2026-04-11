@@ -180,7 +180,7 @@
                                                 </span>
                                             @endif
                                         </div>
-                                        @if(auth()->check() && $restaurant->owner_user_id === auth()->id())
+                                        @if(auth()->check() && $restaurant->user_id === auth()->id())
                                             <button
                                                 wire:click="selectRestaurant({{ $restaurant->id }})"
                                                 class="ml-4 px-6 py-2 rounded-lg font-semibold whitespace-nowrap" style="background:rgba(212,175,55,0.15); color:#D4AF37; border:1px solid #D4AF37;"

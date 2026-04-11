@@ -62,7 +62,7 @@ class ClaimRestaurant extends Component
         // If user is already logged in and has a claimed restaurant, skip straight to plan selection
         if (auth()->check()) {
             $user = auth()->user();
-            $restaurant = \App\Models\Restaurant::where('owner_user_id', $user->id)
+            $restaurant = \App\Models\Restaurant::where('user_id', $user->id)
                 ->where('status', 'approved')
                 ->with('state', 'category', 'owner')
                 ->first();
@@ -213,7 +213,7 @@ class ClaimRestaurant extends Component
         }
 
         // If the logged-in user already owns this restaurant, skip to plan selection
-        if (auth()->check() && $this->selectedRestaurant->owner_user_id === auth()->id()) {
+        if (auth()->check() && $this->selectedRestaurant->user_id === auth()->id()) {
             try {
                 $this->restaurantMonthlyViews = \App\Models\AnalyticsEvent::where('restaurant_id', $this->selectedRestaurant->id)
                     ->where('event_type', \App\Models\AnalyticsEvent::EVENT_PAGE_VIEW)
