@@ -6,8 +6,8 @@
             <div class="flex items-center justify-center space-x-4">
                 {{-- Step 1: Search --}}
                 <div class="flex items-center {{ $step !== 'search' ? 'cursor-pointer' : '' }}" @if($step !== 'search') wire:click="backToSearch" @endif>
-                    <div class="flex items-center justify-center w-10 h-10 rounded-full transition-colors" style="{{ $step === 'search' ? 'background:#D4AF37;color:#0B0B0B;' : ($step === 'verify' || $step === 'verify_code' || $step === 'select_plan' || $step === 'payment' ? 'background:#4ADE80;color:#0B0B0B;' : 'background:#2A2A2A;color:#9CA3AF;') }}">
-                        @if($step === 'verify' || $step === 'verify_code' || $step === 'select_plan' || $step === 'payment')
+                    <div class="flex items-center justify-center w-10 h-10 rounded-full transition-colors" style="{{ $step === 'search' ? 'background:#D4AF37;color:#0B0B0B;' : ($step === 'verify' || $step === 'verify_code' || $step === 'select_role' || $step === 'select_plan' || $step === 'payment' ? 'background:#4ADE80;color:#0B0B0B;' : 'background:#2A2A2A;color:#9CA3AF;') }}">
+                        @if($step === 'verify' || $step === 'verify_code' || $step === 'select_role' || $step === 'select_plan' || $step === 'payment')
                             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                             </svg>
@@ -18,12 +18,12 @@
                     <span class="ml-2 text-sm font-medium" style="{{ $step === 'search' ? 'color:#D4AF37;' : 'color:#9CA3AF;' }}">{{ __('app.search') }}</span>
                 </div>
 
-                <div class="w-16 h-1" style="{{ $step === 'verify' || $step === 'verify_code' || $step === 'select_plan' || $step === 'payment' ? 'background:#4ADE80;' : 'background:#2A2A2A;' }}"></div>
+                <div class="w-16 h-1" style="{{ $step === 'verify' || $step === 'verify_code' || $step === 'select_role' || $step === 'select_plan' || $step === 'payment' ? 'background:#4ADE80;' : 'background:#2A2A2A;' }}"></div>
 
                 {{-- Step 2: Verify --}}
-                <div class="flex items-center {{ $step === 'select_plan' || $step === 'payment' ? 'cursor-pointer' : '' }}" @if($step === 'select_plan' || $step === 'payment') wire:click="backToVerify" @endif>
-                    <div class="flex items-center justify-center w-10 h-10 rounded-full text-white transition-colors" style="{{ $step === 'verify' || $step === 'verify_code' ? 'background:#DC2626;' : ($step === 'select_plan' || $step === 'payment' ? 'background:#4ADE80;' : 'background:#2A2A2A;') }}">
-                        @if($step === 'select_plan' || $step === 'payment')
+                <div class="flex items-center {{ $step === 'select_role' || $step === 'select_plan' || $step === 'payment' ? 'cursor-pointer' : '' }}" @if($step === 'select_role' || $step === 'select_plan' || $step === 'payment') wire:click="backToVerify" @endif>
+                    <div class="flex items-center justify-center w-10 h-10 rounded-full text-white transition-colors" style="{{ $step === 'verify' || $step === 'verify_code' ? 'background:#DC2626;' : ($step === 'select_role' || $step === 'select_plan' || $step === 'payment' ? 'background:#4ADE80;' : 'background:#2A2A2A;') }}">
+                        @if($step === 'select_role' || $step === 'select_plan' || $step === 'payment')
                             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                             </svg>
@@ -31,14 +31,14 @@
                             2
                         @endif
                     </div>
-                    <span class="ml-2 text-sm font-medium" style="{{ $step === 'verify' ? 'color:#D4AF37;' : 'color:#9CA3AF;' }}">{{ __('app.claim_step_verify') }}</span>
+                    <span class="ml-2 text-sm font-medium" style="{{ $step === 'verify' || $step === 'verify_code' ? 'color:#D4AF37;' : 'color:#9CA3AF;' }}">{{ __('app.claim_step_verify') }}</span>
                 </div>
 
-                <div class="w-16 h-1" style="{{ $step === 'select_plan' || $step === 'payment' ? 'background:#4ADE80;' : 'background:#2A2A2A;' }}"></div>
+                <div class="w-16 h-1" style="{{ $step === 'select_role' || $step === 'select_plan' || $step === 'payment' ? 'background:#4ADE80;' : 'background:#2A2A2A;' }}"></div>
 
                 {{-- Step 3: Select Plan --}}
                 <div class="flex items-center {{ $step === 'payment' ? 'cursor-pointer' : '' }}" @if($step === 'payment') wire:click="backToSelectPlan" @endif>
-                    <div class="flex items-center justify-center w-10 h-10 rounded-full text-white transition-colors" style="{{ $step === 'select_plan' ? 'background:#DC2626;' : ($step === 'payment' ? 'background:#4ADE80;' : 'background:#2A2A2A;') }}">
+                    <div class="flex items-center justify-center w-10 h-10 rounded-full text-white transition-colors" style="{{ $step === 'select_role' || $step === 'select_plan' ? 'background:#DC2626;' : ($step === 'payment' ? 'background:#4ADE80;' : 'background:#2A2A2A;') }}">
                         @if($step === 'payment')
                             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
@@ -47,7 +47,7 @@
                             3
                         @endif
                     </div>
-                    <span class="ml-2 text-sm font-medium" style="{{ $step === 'select_plan' ? 'color:#D4AF37;' : 'color:#9CA3AF;' }}">{{ __('app.claim_step_plan') }}</span>
+                    <span class="ml-2 text-sm font-medium" style="{{ $step === 'select_role' || $step === 'select_plan' ? 'color:#D4AF37;' : 'color:#9CA3AF;' }}">{{ __('app.claim_step_plan') }}</span>
                 </div>
 
                 <div class="w-16 h-1" style="{{ $step === 'payment' ? 'background:#4ADE80;' : 'background:#2A2A2A;' }}"></div>
@@ -559,6 +559,44 @@
                         @endif
                     </p>
                     <p class="text-xs mt-2" style="color:#6B7280;">El codigo expira en 15 minutos</p>
+                </div>
+            </div>
+        @endif
+
+        {{-- STEP 2.75: SELECT ROLE --}}
+        @if($step === 'select_role')
+            <div class="rounded-2xl p-8" style="background:#1A1A1A; border:1px solid #2A2A2A; box-shadow:0 4px 20px rgba(0,0,0,0.4);">
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <h2 style="font-size: 1.5rem; font-weight: bold; color: #F5F5F5; font-family: 'Playfair Display', serif; margin-bottom: 0.5rem;">¿Cuál es tu relación con el restaurante?</h2>
+                    <p style="color: #9CA3AF; font-size: 0.95rem;">Esto nos ayuda a personalizar tu experiencia</p>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; max-width: 480px; margin: 0 auto 2rem auto;">
+                    @foreach([
+                        ['role' => 'owner', 'label' => 'Soy el Dueño', 'desc' => 'Tengo el control total del negocio', 'icon' => 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'],
+                        ['role' => 'partner', 'label' => 'Soy Socio', 'desc' => 'Tengo participación en el negocio', 'icon' => 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z'],
+                        ['role' => 'manager', 'label' => 'Soy Gerente', 'desc' => 'Administro las operaciones del lugar', 'icon' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2'],
+                        ['role' => 'other', 'label' => 'Otro', 'desc' => 'Familiar, representante u otro', 'icon' => 'M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'],
+                    ] as $option)
+                    <button wire:click="selectRole('{{ $option['role'] }}')"
+                        style="display: flex; flex-direction: column; align-items: flex-start; gap: 0.5rem; background: #1A1A1A; border: 1px solid #2A2A2A; border-radius: 0.75rem; padding: 1.25rem; cursor: pointer; text-align: left; transition: all 0.2s; width: 100%;"
+                        onmouseover="this.style.borderColor='#D4AF37'"
+                        onmouseout="this.style.borderColor='#2A2A2A'">
+                        <div style="background: #2A2A2A; width: 2.5rem; height: 2.5rem; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <svg style="width: 1.25rem; height: 1.25rem; color: #D4AF37;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $option['icon'] }}"/>
+                            </svg>
+                        </div>
+                        <span style="font-weight: 600; color: #F5F5F5; font-size: 0.95rem;">{{ $option['label'] }}</span>
+                        <span style="font-size: 0.8rem; color: #6B7280; line-height: 1.4;">{{ $option['desc'] }}</span>
+                    </button>
+                    @endforeach
+                </div>
+
+                <div style="text-align: center;">
+                    <button wire:click="$set('step', 'select_plan')" style="color: #6B7280; font-size: 0.875rem; background: none; border: none; cursor: pointer; text-decoration: underline;">
+                        Omitir este paso
+                    </button>
                 </div>
             </div>
         @endif

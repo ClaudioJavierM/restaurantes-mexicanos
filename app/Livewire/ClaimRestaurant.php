@@ -19,7 +19,10 @@ class ClaimRestaurant extends Component
     public $selectedState = '';
     public $searchResults = [];
     public $selectedRestaurant = null;
-    public $step = 'search'; // search, verify, verify_code, select_plan, payment
+    public $step = 'search'; // search, verify, verify_code, select_role, select_plan, payment
+
+    // Owner role (selected in select_role step)
+    public string $ownerRole = '';
 
     // Verification fields
     public $ownerName = '';
@@ -459,6 +462,19 @@ class ClaimRestaurant extends Component
             Log::warning('Failed to track claim_verification_completed: ' . $e->getMessage());
         }
 
+        $this->step = 'select_role';
+        $this->dispatch('scroll-top');
+    }
+
+    public function selectRole(string $role): void
+    {
+        $this->ownerRole = $role;
+
+        // Save role to restaurant
+        if ($this->selectedRestaurant) {
+            $this->selectedRestaurant->update(['owner_role' => $role]);
+        }
+
         $this->step = 'select_plan';
         $this->dispatch('scroll-top');
     }
@@ -536,6 +552,7 @@ class ClaimRestaurant extends Component
             'claim_owner_email' => $this->ownerEmail,
             'claim_owner_phone' => $this->ownerPhone,
             'claim_restaurant_id' => $this->selectedRestaurant->id,
+            'claim_owner_role' => $this->ownerRole,
         ]);
 
         // Store coupon in session so ClaimPaymentController can use it
@@ -581,6 +598,10 @@ class ClaimRestaurant extends Component
         $user->save();
 
         $this->selectedRestaurant->update(['user_id' => $user->id]);
+
+        if ($this->ownerRole) {
+            $this->selectedRestaurant->update(['owner_role' => $this->ownerRole]);
+        }
 
         \Illuminate\Support\Facades\Auth::login($user);
         session()->regenerate();
