@@ -317,20 +317,21 @@ class StripeService
 
             // Prepare session data — ui_mode=embedded uses return_url instead of success/cancel URLs
             $sessionData = [
-                'customer'           => $customer->id,
-                'ui_mode'            => 'embedded',
-                'line_items'         => [[
+                'customer'             => $customer->id,
+                'ui_mode'              => 'embedded',
+                'payment_method_types' => ['card'], // Disable Stripe Link to keep user on FAMER domain
+                'line_items'           => [[
                     'price'    => $priceId,
                     'quantity' => 1,
                 ]],
-                'mode'               => 'subscription',
-                'return_url'         => $returnUrl,
-                'client_reference_id' => $restaurant->id,
-                'metadata'           => [
+                'mode'                 => 'subscription',
+                'return_url'           => $returnUrl,
+                'client_reference_id'  => $restaurant->id,
+                'metadata'             => [
                     'restaurant_id' => $restaurant->id,
                     'plan'          => $plan,
                 ],
-                'subscription_data'  => [
+                'subscription_data'    => [
                     'metadata' => [
                         'restaurant_id' => $restaurant->id,
                         'plan'          => $plan,
