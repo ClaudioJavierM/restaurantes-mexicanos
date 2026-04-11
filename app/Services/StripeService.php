@@ -369,6 +369,71 @@ class StripeService
     }
 
     /**
+     * Create a pending Stripe Subscription and return the PaymentIntent client_secret
+     * for use with Stripe Elements (PaymentElement) on a custom checkout page.
+     * The subscription starts in 'incomplete' status until payment is confirmed.
+     */
+    public function createPendingSubscription(Restaurant $restaurant, string $plan, ?string $couponCode = null): array
+    {
+        try {
+            $priceId = config("stripe.prices.{$plan}");
+            if (!$priceId) {
+                throw new Exception("Invalid plan: {$plan}");
+            }
+
+            $customer = $this->getOrCreateCustomer($restaurant);
+
+            $subscriptionData = [
+                'customer'         => $customer->id,
+                'items'            => [['price' => $priceId]],
+                'payment_behavior' => 'default_incomplete',
+                'payment_settings' => ['save_default_payment_method' => 'on_subscription'],
+                'expand'           => ['latest_invoice.payment_intent'],
+                'metadata'         => [
+                    'restaurant_id' => $restaurant->id,
+                    'plan'          => $plan,
+                ],
+            ];
+
+            // Apply intro coupon for premium ($9.99 first month) if no custom coupon
+            $resolvedCoupon = null;
+            if ($couponCode) {
+                $promo = $this->validatePromotionCode($couponCode);
+                if ($promo) {
+                    $subscriptionData['discounts'] = [['promotion_code' => $promo->id]];
+                    $resolvedCoupon = $couponCode;
+                }
+            } elseif ($plan === 'premium') {
+                $introCouponId = config('stripe.intro_coupon_premium');
+                if ($introCouponId) {
+                    $subscriptionData['discounts'] = [['coupon' => $introCouponId]];
+                }
+            } elseif ($plan === 'elite') {
+                $introCouponId = config('stripe.intro_coupon_elite');
+                if ($introCouponId) {
+                    $subscriptionData['discounts'] = [['coupon' => $introCouponId]];
+                }
+            }
+
+            $subscription = \Stripe\Subscription::create($subscriptionData);
+
+            // Save subscription ID to restaurant immediately
+            $restaurant->update(['stripe_subscription_id' => $subscription->id]);
+
+            $paymentIntent = $subscription->latest_invoice->payment_intent;
+
+            return [
+                'subscription_id' => $subscription->id,
+                'client_secret'   => $paymentIntent->client_secret,
+                'amount'          => $paymentIntent->amount,
+                'currency'        => $paymentIntent->currency,
+            ];
+        } catch (Exception $e) {
+            throw new Exception("Error creating pending subscription: " . $e->getMessage());
+        }
+    }
+
+    /**
      * Create a SetupIntent for embedded Stripe Payment Element
      * Returns clientSecret for the front-end to initialize Stripe Elements
      */

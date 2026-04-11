@@ -4,7 +4,7 @@
 
 @section('content')
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600&display=swap');
 
     .famer-payment-page {
         background: #0B0B0B;
@@ -188,13 +188,12 @@
         color: #888;
     }
 
-    /* Stripe embed column */
+    /* Payment column */
     .checkout-column {
         background: #111111;
         border: 1px solid rgba(212, 175, 55, 0.15);
         border-radius: 16px;
         padding: 2rem;
-        min-height: 480px;
     }
 
     .checkout-column .section-label {
@@ -214,7 +213,7 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        min-height: 300px;
+        min-height: 220px;
         gap: 1rem;
         color: #666;
         font-size: 0.85rem;
@@ -233,18 +232,79 @@
         to { transform: rotate(360deg); }
     }
 
-    /* Security badges */
+    /* PaymentElement wrapper */
+    #payment-element {
+        display: none; /* shown once Stripe fires 'ready' */
+        margin-bottom: 1.5rem;
+    }
+
+    /* Error message */
+    #payment-error {
+        display: none;
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.35);
+        border-radius: 8px;
+        color: #fca5a5;
+        font-size: 0.85rem;
+        padding: 0.75rem 1rem;
+        margin-bottom: 1.25rem;
+    }
+
+    /* Pay button */
+    .pay-btn {
+        width: 100%;
+        background: #D4AF37;
+        color: #0B0B0B;
+        font-family: 'Poppins', sans-serif;
+        font-size: 1rem;
+        font-weight: 700;
+        border: none;
+        border-radius: 10px;
+        padding: 0.9rem 1.5rem;
+        cursor: pointer;
+        transition: background 0.2s, opacity 0.2s;
+        letter-spacing: 0.02em;
+    }
+
+    .pay-btn:hover:not(:disabled) { background: #c9a730; }
+
+    .pay-btn:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+    }
+
+    .pay-btn-hidden {
+        display: none; /* hidden until PaymentElement is ready */
+    }
+
+    /* Fine print */
+    .payment-fine-print {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+        font-size: 0.72rem;
+        color: #555;
+        margin-top: 1rem;
+    }
+
+    .payment-fine-print svg {
+        color: #D4AF37;
+        opacity: 0.6;
+        flex-shrink: 0;
+    }
+
+    /* Security badges row */
     .security-row {
         max-width: 1100px;
         margin: 0 auto;
-        padding: 0 1.5rem 3rem;
+        padding: 1.5rem 1.5rem 3rem;
         display: flex;
         align-items: center;
         justify-content: center;
         gap: 2rem;
         flex-wrap: wrap;
         border-top: 1px solid rgba(255,255,255,0.05);
-        padding-top: 1.5rem;
     }
 
     .security-item {
@@ -258,11 +318,6 @@
     .security-item svg {
         color: #D4AF37;
         opacity: 0.6;
-    }
-
-    /* Stripe embed overrides for dark theme */
-    #checkout {
-        /* Stripe will inject an iframe — let it take full width */
     }
 </style>
 
@@ -327,26 +382,43 @@
             </div>
         </div>
 
-        {{-- RIGHT: Stripe Embedded Checkout --}}
+        {{-- RIGHT: Stripe PaymentElement --}}
         <div class="checkout-column">
             <div class="section-label">
                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><path d="M2 10h20"/></svg>
                 Información de pago
             </div>
 
-            {{-- Loading state (hidden once Stripe mounts) --}}
-            <div id="checkout-loading" class="checkout-loading">
-                <div class="spinner"></div>
-                <span>Cargando pasarela de pago segura…</span>
-            </div>
+            <form id="payment-form">
 
-            {{-- Stripe mounts its full UI here --}}
-            <div id="checkout"></div>
+                {{-- Loading spinner (hidden once Stripe fires 'ready') --}}
+                <div id="payment-loading" class="checkout-loading">
+                    <div class="spinner"></div>
+                    <span>Cargando pasarela de pago segura…</span>
+                </div>
+
+                {{-- Stripe PaymentElement mounts here --}}
+                <div id="payment-element"></div>
+
+                {{-- Error messages --}}
+                <div id="payment-error"></div>
+
+                {{-- Submit button (hidden until ready) --}}
+                <button id="pay-button" type="submit" class="pay-btn pay-btn-hidden" disabled>
+                    Pagar ahora
+                </button>
+
+            </form>
+
+            <div class="payment-fine-print">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="11" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                Pago seguro procesado por Stripe
+            </div>
         </div>
 
     </div>
 
-    {{-- Security row --}}
+    {{-- Security badges row --}}
     <div class="security-row">
         <div class="security-item">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -372,24 +444,109 @@
 @push('scripts')
 <script src="https://js.stripe.com/v3/"></script>
 <script>
-    (function () {
-        const stripe = Stripe('{{ $stripePublicKey }}');
-        const clientSecret = '{{ $clientSecret }}';
+document.addEventListener('DOMContentLoaded', async () => {
+    const stripe = Stripe('{{ $stripePublicKey }}');
+    const clientSecret = '{{ $clientSecret }}';
+    const returnUrl = '{{ $returnUrl }}';
 
-        async function initialize() {
-            try {
-                const checkout = await stripe.initEmbeddedCheckout({ clientSecret });
-                // Hide loading spinner, mount checkout
-                document.getElementById('checkout-loading').style.display = 'none';
-                checkout.mount('#checkout');
-            } catch (err) {
-                console.error('Stripe Embedded Checkout error:', err);
-                document.getElementById('checkout-loading').innerHTML =
-                    '<p style="color:#e57373;font-size:0.9rem;text-align:center;">Error al cargar el formulario de pago.<br><a href="{{ route("claim.restaurant", ["restaurant" => $restaurant->slug]) }}" style="color:#D4AF37;">← Volver e intentar de nuevo</a></p>';
+    // Initialize Elements with dark night theme
+    const elements = stripe.elements({
+        clientSecret,
+        appearance: {
+            theme: 'night',
+            variables: {
+                colorPrimary: '#D4AF37',
+                colorBackground: '#1A1A1A',
+                colorText: '#F5F5F5',
+                colorTextSecondary: '#999999',
+                colorDanger: '#EF4444',
+                fontFamily: 'Poppins, sans-serif',
+                borderRadius: '8px',
+                spacingUnit: '4px',
+            },
+            rules: {
+                '.Input': {
+                    border: '1px solid #2A2A2A',
+                    boxShadow: 'none',
+                },
+                '.Input:focus': {
+                    border: '1px solid rgba(212,175,55,0.5)',
+                    boxShadow: '0 0 0 2px rgba(212,175,55,0.1)',
+                },
+                '.Label': {
+                    color: '#999',
+                    fontSize: '0.8rem',
+                    letterSpacing: '0.03em',
+                },
+                '.Tab': {
+                    border: '1px solid #2A2A2A',
+                    color: '#999',
+                },
+                '.Tab--selected': {
+                    border: '1px solid rgba(212,175,55,0.4)',
+                    color: '#D4AF37',
+                },
+                '.Tab:hover': {
+                    color: '#D4AF37',
+                },
             }
         }
+    });
 
-        initialize();
-    })();
+    // Create and mount PaymentElement
+    const paymentElement = elements.create('payment', {
+        layout: 'tabs',
+        defaultValues: {
+            billingDetails: {
+                name: '{{ addslashes(auth()->user()?->name ?? "") }}',
+                email: '{{ addslashes(auth()->user()?->email ?? "") }}',
+            }
+        }
+    });
+
+    paymentElement.mount('#payment-element');
+
+    // Show form once Stripe is ready
+    paymentElement.on('ready', () => {
+        document.getElementById('payment-loading').style.display = 'none';
+        document.getElementById('payment-element').style.display = 'block';
+
+        const payBtn = document.getElementById('pay-button');
+        payBtn.classList.remove('pay-btn-hidden');
+        payBtn.disabled = false;
+    });
+
+    // Handle submit
+    const form = document.getElementById('payment-form');
+    const payButton = document.getElementById('pay-button');
+    const errorDiv = document.getElementById('payment-error');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        payButton.disabled = true;
+        payButton.textContent = 'Procesando…';
+        errorDiv.style.display = 'none';
+        errorDiv.textContent = '';
+
+        const { error } = await stripe.confirmPayment({
+            elements,
+            confirmParams: {
+                return_url: returnUrl,
+            }
+        });
+
+        if (error) {
+            // Show user-friendly error
+            errorDiv.textContent = error.message;
+            errorDiv.style.display = 'block';
+
+            // Re-enable button
+            payButton.disabled = false;
+            payButton.textContent = 'Pagar ahora';
+        }
+        // On success Stripe redirects to return_url automatically — no further action needed here
+    });
+});
 </script>
 @endpush

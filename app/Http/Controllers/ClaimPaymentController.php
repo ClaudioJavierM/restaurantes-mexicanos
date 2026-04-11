@@ -14,7 +14,6 @@ class ClaimPaymentController extends Controller
         $restaurantSlug = $request->get('restaurant');
         $plan = $request->get('plan', 'premium');
 
-        // Validate plan
         if (!in_array($plan, ['premium', 'elite'])) {
             $plan = 'premium';
         }
@@ -31,12 +30,7 @@ class ClaimPaymentController extends Controller
             $stripeService = new StripeService();
             $coupon = session('claim_coupon_code');
 
-            $session = $stripeService->createEmbeddedCheckoutSession(
-                $restaurant,
-                $plan,
-                route('claim.success') . '?session_id={CHECKOUT_SESSION_ID}',
-                $coupon
-            );
+            $result = $stripeService->createPendingSubscription($restaurant, $plan, $coupon);
 
             $planDetails = [
                 'premium' => [
@@ -44,38 +38,28 @@ class ClaimPaymentController extends Controller
                     'price'    => '$9.99',
                     'period'   => 'primer mes',
                     'renewal'  => 'Después $39/mes',
-                    'features' => [
-                        'Perfil verificado con distintivo Premium',
-                        'Posicionamiento destacado en búsquedas',
-                        'Analytics avanzados de visitas',
-                        'Herramientas de SEO y marketing',
-                        'Cupones y promociones para clientes',
-                    ],
+                    'badge'    => 'Más popular',
                 ],
                 'elite' => [
                     'name'     => 'Elite',
-                    'price'    => '$79',
-                    'period'   => 'por mes',
-                    'renewal'  => 'Renovación mensual',
-                    'features' => [
-                        'Todo lo de Premium',
-                        'Distintivo Elite exclusivo',
-                        'Prioridad #1 en resultados',
-                        'Gestión de reseñas avanzada',
-                        'Soporte dedicado prioritario',
-                    ],
+                    'price'    => '$29',
+                    'period'   => 'primer mes',
+                    'renewal'  => 'Después $79/mes',
+                    'badge'    => 'Máximo impacto',
                 ],
             ];
 
             return view('claim.payment', [
-                'restaurant'     => $restaurant,
-                'plan'           => $plan,
-                'planDetails'    => $planDetails[$plan],
-                'clientSecret'   => $session->client_secret,
+                'restaurant'      => $restaurant,
+                'plan'            => $plan,
+                'planDetails'     => $planDetails[$plan],
+                'clientSecret'    => $result['client_secret'],
+                'subscriptionId'  => $result['subscription_id'],
                 'stripePublicKey' => config('stripe.key'),
+                'returnUrl'       => route('claim.success') . '?session_id=' . $result['subscription_id'],
             ]);
         } catch (\Exception $e) {
-            Log::error('Embedded checkout session error: ' . $e->getMessage());
+            \Log::error('Stripe Elements payment error: ' . $e->getMessage());
             return redirect()
                 ->route('claim.restaurant', ['restaurant' => $restaurantSlug])
                 ->with('error', 'Error al inicializar el pago. Por favor intenta de nuevo.');
