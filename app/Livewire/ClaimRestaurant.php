@@ -212,6 +212,27 @@ class ClaimRestaurant extends Component
             return;
         }
 
+        // If the logged-in user already owns this restaurant, skip to plan selection
+        if (auth()->check() && $this->selectedRestaurant->owner_user_id === auth()->id()) {
+            try {
+                $this->restaurantMonthlyViews = \App\Models\AnalyticsEvent::where('restaurant_id', $this->selectedRestaurant->id)
+                    ->where('event_type', \App\Models\AnalyticsEvent::EVENT_PAGE_VIEW)
+                    ->where('created_at', '>=', now()->subDays(30))
+                    ->count();
+                $this->restaurantTotalViews = \App\Models\AnalyticsEvent::where('restaurant_id', $this->selectedRestaurant->id)
+                    ->where('event_type', \App\Models\AnalyticsEvent::EVENT_PAGE_VIEW)
+                    ->count();
+                $this->competitorCount = \App\Models\Restaurant::where('state_id', $this->selectedRestaurant->state_id)
+                    ->where('status', 'approved')
+                    ->where('id', '!=', $this->selectedRestaurant->id)
+                    ->count();
+            } catch (\Exception $e) {}
+
+            $this->step = 'select_plan';
+            $this->dispatch('scroll-top');
+            return;
+        }
+
         if ($this->selectedRestaurant->is_claimed) {
             session()->flash('error', 'This restaurant has already been claimed');
             return;

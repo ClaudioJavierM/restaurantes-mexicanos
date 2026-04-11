@@ -180,12 +180,21 @@
                                                 </span>
                                             @endif
                                         </div>
-                                        <button
-                                            wire:click="selectRestaurant({{ $restaurant->id }})"
-                                            class="ml-4 px-6 py-2 rounded-lg font-semibold transition-colors whitespace-nowrap" style="background:#D4AF37;color:#0B0B0B;" onmouseover="this.style.background='#E8C67A'" onmouseout="this.style.background='#D4AF37'"
-                                        >
-                                            Claim
-                                        </button>
+                                        @if(auth()->check() && $restaurant->owner_user_id === auth()->id())
+                                            <button
+                                                wire:click="selectRestaurant({{ $restaurant->id }})"
+                                                class="ml-4 px-6 py-2 rounded-lg font-semibold whitespace-nowrap" style="background:rgba(212,175,55,0.15); color:#D4AF37; border:1px solid #D4AF37;"
+                                            >
+                                                ★ Tu restaurante
+                                            </button>
+                                        @else
+                                            <button
+                                                wire:click="selectRestaurant({{ $restaurant->id }})"
+                                                class="ml-4 px-6 py-2 rounded-lg font-semibold transition-colors whitespace-nowrap" style="background:#D4AF37;color:#0B0B0B;" onmouseover="this.style.background='#E8C67A'" onmouseout="this.style.background='#D4AF37'"
+                                            >
+                                                Claim
+                                            </button>
+                                        @endif
                                     </div>
                                 </div>
                             @endforeach
