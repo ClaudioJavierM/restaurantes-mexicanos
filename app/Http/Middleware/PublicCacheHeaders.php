@@ -31,6 +31,15 @@ class PublicCacheHeaders
             return $response;
         }
 
+        // Don't cache stateful/dynamic pages (Livewire multi-step forms)
+        $noCachePaths = ['/claim', '/sugerir', '/votar', '/checkout', '/catering'];
+        foreach ($noCachePaths as $path) {
+            if (str_starts_with($request->getPathInfo(), $path)) {
+                $response->headers->set('Cache-Control', 'no-store, no-cache, must-revalidate');
+                return $response;
+            }
+        }
+
         // Set public cache headers for SEO
         $response->headers->set('Cache-Control', 'public, max-age=300, s-maxage=3600');
         $response->headers->remove('Pragma');
