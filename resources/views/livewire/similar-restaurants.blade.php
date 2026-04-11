@@ -1,3 +1,4 @@
+<div>
 @if($similar->isNotEmpty())
 <div style="background:#0B0B0B; padding:2.5rem 0 3rem; border-top:1px solid #2A2A2A;">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -62,3 +63,4 @@
     </div>
 </div>
 @endif
+</div>

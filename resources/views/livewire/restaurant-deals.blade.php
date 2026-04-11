@@ -1,3 +1,4 @@
+<div>
 @if($deals->isEmpty())
 <div></div>
 @else
@@ -153,3 +154,4 @@
 }
 </style>
 @endif
+</div>
