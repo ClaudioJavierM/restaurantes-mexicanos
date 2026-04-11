@@ -538,21 +538,16 @@ class ClaimRestaurant extends Component
             'claim_restaurant_id' => $this->selectedRestaurant->id,
         ]);
 
-        // Redirect to Stripe Checkout hosted page — avoids all iframe/JS complexity
-        try {
-            $stripeService = new StripeService();
-            $session = $stripeService->createCheckoutSession(
-                $this->selectedRestaurant,
-                $plan,
-                route('claim.success') . '?session_id={CHECKOUT_SESSION_ID}',
-                route('claim.restaurant') . '?restaurant=' . $this->selectedRestaurant->slug,
-                $this->couponApplied ? $this->couponCode : null
-            );
-            $this->redirect($session->url, navigate: false);
-        } catch (\Exception $e) {
-            Log::error('Error creating Stripe Checkout session: ' . $e->getMessage());
-            session()->flash('error', 'Error al inicializar el pago. Por favor intenta de nuevo.');
+        // Store coupon in session so ClaimPaymentController can use it
+        if ($this->couponApplied && $this->couponCode) {
+            session(['claim_coupon_code' => $this->couponCode]);
         }
+
+        // Redirect to embedded checkout page (on FAMER domain)
+        $this->redirect(
+            route('claim.pay', ['restaurant' => $this->selectedRestaurant->slug, 'plan' => $plan]),
+            navigate: false
+        );
     }
 
     public function completeFreeClai()

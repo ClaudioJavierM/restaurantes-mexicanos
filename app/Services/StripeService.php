@@ -300,6 +300,74 @@ class StripeService
     }
 
     /**
+     * Create an Embedded Checkout Session (ui_mode=embedded)
+     * Returns a session with client_secret for front-end initEmbeddedCheckout()
+     */
+    public function createEmbeddedCheckoutSession(Restaurant $restaurant, string $plan, string $returnUrl, ?string $couponCode = null): Session
+    {
+        try {
+            $priceId = config("stripe.prices.{$plan}");
+
+            if (!$priceId) {
+                throw new Exception("Invalid plan: {$plan}");
+            }
+
+            // Create or retrieve Stripe customer
+            $customer = $this->getOrCreateCustomer($restaurant);
+
+            // Prepare session data — ui_mode=embedded uses return_url instead of success/cancel URLs
+            $sessionData = [
+                'customer'           => $customer->id,
+                'ui_mode'            => 'embedded',
+                'line_items'         => [[
+                    'price'    => $priceId,
+                    'quantity' => 1,
+                ]],
+                'mode'               => 'subscription',
+                'return_url'         => $returnUrl,
+                'client_reference_id' => $restaurant->id,
+                'metadata'           => [
+                    'restaurant_id' => $restaurant->id,
+                    'plan'          => $plan,
+                ],
+                'subscription_data'  => [
+                    'metadata' => [
+                        'restaurant_id' => $restaurant->id,
+                        'plan'          => $plan,
+                    ],
+                ],
+                // Allow promotion codes via Stripe's own coupon field inside embedded UI
+                'allow_promotion_codes' => true,
+            ];
+
+            // If a coupon code is provided, validate and apply it
+            if ($couponCode) {
+                $promotionCode = $this->validatePromotionCode($couponCode);
+                if ($promotionCode) {
+                    $sessionData['discounts'] = [[
+                        'promotion_code' => $promotionCode->id,
+                    ]];
+                    unset($sessionData['allow_promotion_codes']);
+                }
+            }
+            // Auto-apply introductory pricing for premium ($9.99 first month)
+            elseif ($plan === 'premium' && !isset($sessionData['discounts'])) {
+                $introCouponId = config('stripe.intro_coupon_premium');
+                if ($introCouponId) {
+                    $sessionData['discounts'] = [[
+                        'coupon' => $introCouponId,
+                    ]];
+                    unset($sessionData['allow_promotion_codes']);
+                }
+            }
+
+            return Session::create($sessionData);
+        } catch (Exception $e) {
+            throw new Exception("Error creating embedded checkout session: " . $e->getMessage());
+        }
+    }
+
+    /**
      * Create a SetupIntent for embedded Stripe Payment Element
      * Returns clientSecret for the front-end to initialize Stripe Elements
      */
