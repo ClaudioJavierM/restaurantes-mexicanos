@@ -221,6 +221,7 @@ class ClaimRestaurant extends Component
     public function backToSelectPlan()
     {
         $this->step = 'select_plan';
+        $this->stripeClientSecret = null;
         $this->dispatch('scroll-top');
     }
 
