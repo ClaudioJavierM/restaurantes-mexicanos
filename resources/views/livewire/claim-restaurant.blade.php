@@ -821,7 +821,7 @@
                             loading: true,
                             processing: false,
                             errorMsg: '',
-                            clientSecret: @json($stripeClientSecret),
+                            clientSecret: @js($stripeClientSecret),
 
                             initStripeElements(secret) {
                                 if (!secret || !window.Stripe) return;
