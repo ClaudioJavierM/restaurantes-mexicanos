@@ -359,9 +359,19 @@
             </div>
 
             <div class="price-block">
-                <div class="price-main">{{ $planDetails['price'] }}<span style="font-size:1rem;color:#888;font-family:'Poppins',sans-serif;font-weight:400"> USD</span></div>
-                <div class="price-period">{{ $planDetails['period'] }}</div>
-                <div class="price-renewal">{{ $planDetails['renewal'] }}</div>
+                @if($isTrial)
+                    <div class="price-main" style="color:#D4AF37;">30 días GRATIS</div>
+                    <div class="price-period" style="color:#aaa; margin-top:0.3rem;">No se realiza ningún cargo hoy</div>
+                    <div class="price-renewal" style="color:#666; margin-top:0.4rem;">A partir del día 31: $79/mes — cancela cuando quieras</div>
+                    <div style="display:flex; align-items:center; gap:0.5rem; margin-top:0.85rem; font-size:0.82rem; color:#4ADE80;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                        Ingresa tu tarjeta para activar el período de prueba
+                    </div>
+                @else
+                    <div class="price-main">{{ $planDetails['price'] }}<span style="font-size:1rem;color:#888;font-family:'Poppins',sans-serif;font-weight:400"> USD</span></div>
+                    <div class="price-period">{{ $planDetails['period'] }}</div>
+                    <div class="price-renewal">{{ $planDetails['renewal'] }}</div>
+                @endif
             </div>
 
             <ul class="feature-list">
@@ -384,6 +394,12 @@
 
         {{-- RIGHT: Stripe PaymentElement --}}
         <div class="checkout-column">
+            @if($isTrial)
+            <div style="background:rgba(74,222,128,0.1); border:1px solid rgba(74,222,128,0.3); border-radius:0.5rem; padding:0.75rem 1rem; margin-bottom:1rem; text-align:center;">
+                <p style="color:#4ADE80; font-weight:600; margin:0; font-size:0.9rem;">No se realizará ningún cargo durante 30 días</p>
+                <p style="color:#6B7280; font-size:0.8rem; margin:0.25rem 0 0;">Solo guardamos tu tarjeta para activar el plan al finalizar el período de prueba</p>
+            </div>
+            @endif
             <div class="section-label">
                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><path d="M2 10h20"/></svg>
                 Información de pago
@@ -405,7 +421,11 @@
 
                 {{-- Submit button (hidden until ready) --}}
                 <button id="pay-button" type="submit" class="pay-btn pay-btn-hidden" disabled>
-                    Pagar ahora
+                    @if($isTrial)
+                        Activar 30 días gratis →
+                    @else
+                        Pagar ${{ $planDetails['price'] }} ahora →
+                    @endif
                 </button>
 
             </form>
@@ -520,30 +540,40 @@ document.addEventListener('DOMContentLoaded', async () => {
     const form = document.getElementById('payment-form');
     const payButton = document.getElementById('pay-button');
     const errorDiv = document.getElementById('payment-error');
+    const isTrial = {{ $isTrial ? 'true' : 'false' }};
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-
         payButton.disabled = true;
-        payButton.textContent = 'Procesando…';
+        payButton.textContent = isTrial ? 'Activando prueba...' : 'Procesando pago...';
         errorDiv.style.display = 'none';
         errorDiv.textContent = '';
 
-        const { error } = await stripe.confirmPayment({
-            elements,
-            confirmParams: {
-                return_url: returnUrl,
-            }
-        });
+        let result;
+        if (isTrial) {
+            // SetupIntent — just save the card, no charge today
+            result = await stripe.confirmSetup({
+                elements,
+                confirmParams: {
+                    return_url: returnUrl,
+                }
+            });
+        } else {
+            // PaymentIntent — charge the card now
+            result = await stripe.confirmPayment({
+                elements,
+                confirmParams: {
+                    return_url: returnUrl,
+                }
+            });
+        }
 
+        const { error } = result;
         if (error) {
-            // Show user-friendly error
             errorDiv.textContent = error.message;
             errorDiv.style.display = 'block';
-
-            // Re-enable button
             payButton.disabled = false;
-            payButton.textContent = 'Pagar ahora';
+            payButton.textContent = isTrial ? 'Activar 30 días gratis →' : 'Pagar ahora';
         }
         // On success Stripe redirects to return_url automatically — no further action needed here
     });

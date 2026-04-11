@@ -50,6 +50,11 @@ class ClaimRestaurant extends Component
     // Stripe embedded payment
     public ?string $stripeClientSecret = null;
 
+    // Restaurant stats for plan selection modal
+    public int $restaurantMonthlyViews = 0;
+    public int $restaurantTotalViews = 0;
+    public int $competitorCount = 0;
+
     public function mount()
     {
         $this->searchResults = collect();
@@ -519,6 +524,23 @@ class ClaimRestaurant extends Component
         // Log the user in
         \Illuminate\Support\Facades\Auth::login($user);
 
+        // Load restaurant stats for plan selection modal
+        $thirtyDaysAgo = now()->subDays(30);
+        $this->restaurantMonthlyViews = \App\Models\AnalyticsEvent::where('restaurant_id', $this->selectedRestaurant->id)
+            ->where('event_type', \App\Models\AnalyticsEvent::EVENT_PAGE_VIEW)
+            ->where('created_at', '>=', $thirtyDaysAgo)
+            ->count();
+
+        $this->restaurantTotalViews = \App\Models\AnalyticsEvent::where('restaurant_id', $this->selectedRestaurant->id)
+            ->where('event_type', \App\Models\AnalyticsEvent::EVENT_PAGE_VIEW)
+            ->count();
+
+        // Count competitor restaurants in the same state
+        $this->competitorCount = \App\Models\Restaurant::where('state_id', $this->selectedRestaurant->state_id)
+            ->where('status', 'approved')
+            ->where('id', '!=', $this->selectedRestaurant->id)
+            ->count();
+
         $this->step = 'select_plan';
         $this->dispatch('scroll-top');
     }
@@ -681,6 +703,14 @@ class ClaimRestaurant extends Component
             );
         } catch (\Exception $e) {
             Log::warning('Failed to send ClaimWelcomeMail: ' . $e->getMessage());
+        }
+
+        // Dispatch 48-hour follow-up email job
+        try {
+            \App\Jobs\SendFreeClaimFollowUpJob::dispatch($this->selectedRestaurant->id)
+                ->delay(now()->addHours(48));
+        } catch (\Exception $e) {
+            Log::warning('Could not dispatch FreeClaimFollowUpJob: ' . $e->getMessage());
         }
 
         session()->flash('success', '¡Felicidades! Tu restaurante ha sido reclamado exitosamente.');

@@ -42,10 +42,10 @@ class ClaimPaymentController extends Controller
                 ],
                 'elite' => [
                     'name'     => 'Elite',
-                    'price'    => '$29',
-                    'period'   => 'primer mes',
-                    'renewal'  => 'Después $79/mes',
-                    'badge'    => 'Máximo impacto',
+                    'price'    => 'Gratis',
+                    'period'   => '30 días',
+                    'renewal'  => 'Después $79/mes — cancela cuando quieras',
+                    'badge'    => '30 días gratis',
                 ],
             ];
 
@@ -55,6 +55,8 @@ class ClaimPaymentController extends Controller
                 'planDetails'     => $planDetails[$plan],
                 'clientSecret'    => $result['client_secret'],
                 'subscriptionId'  => $result['subscription_id'],
+                'isTrial'         => $result['is_trial'],
+                'trialDays'       => $result['trial_days'],
                 'stripePublicKey' => config('stripe.key'),
                 'returnUrl'       => route('claim.success') . '?session_id=' . $result['subscription_id'],
             ]);

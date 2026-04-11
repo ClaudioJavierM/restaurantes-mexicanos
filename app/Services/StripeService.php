@@ -388,7 +388,6 @@ class StripeService
                 'items'            => [['price' => $priceId]],
                 'payment_behavior' => 'default_incomplete',
                 'payment_settings' => ['save_default_payment_method' => 'on_subscription'],
-                'expand'           => ['latest_invoice.payment_intent'],
                 'metadata'         => [
                     'restaurant_id' => $restaurant->id,
                     'plan'          => $plan,
@@ -396,6 +395,7 @@ class StripeService
             ];
 
             // Apply intro coupon for premium ($9.99 first month) if no custom coupon
+            // Elite gets a 30-day free trial instead of a coupon
             $resolvedCoupon = null;
             if ($couponCode) {
                 $promo = $this->validatePromotionCode($couponCode);
@@ -409,10 +409,8 @@ class StripeService
                     $subscriptionData['discounts'] = [['coupon' => $introCouponId]];
                 }
             } elseif ($plan === 'elite') {
-                $introCouponId = config('stripe.intro_coupon_elite');
-                if ($introCouponId) {
-                    $subscriptionData['discounts'] = [['coupon' => $introCouponId]];
-                }
+                // 30-day free trial — no charge today, card collected via SetupIntent
+                $subscriptionData['trial_period_days'] = 30;
             }
 
             $subscription = \Stripe\Subscription::create($subscriptionData);
@@ -420,14 +418,40 @@ class StripeService
             // Save subscription ID to restaurant immediately
             $restaurant->update(['stripe_subscription_id' => $subscription->id]);
 
-            $paymentIntent = $subscription->latest_invoice->payment_intent;
+            if ($plan === 'elite') {
+                // Trial subscriptions generate a $0 invoice, so Stripe creates a SetupIntent
+                // (not a PaymentIntent) to collect the card for future billing.
+                $subscription = \Stripe\Subscription::retrieve([
+                    'id'     => $subscription->id,
+                    'expand' => ['pending_setup_intent'],
+                ]);
+                $clientSecret = $subscription->pending_setup_intent->client_secret;
 
-            return [
-                'subscription_id' => $subscription->id,
-                'client_secret'   => $paymentIntent->client_secret,
-                'amount'          => $paymentIntent->amount,
-                'currency'        => $paymentIntent->currency,
-            ];
+                return [
+                    'subscription_id' => $subscription->id,
+                    'client_secret'   => $clientSecret,
+                    'is_trial'        => true,
+                    'trial_days'      => 30,
+                    'amount'          => 0,
+                    'currency'        => 'usd',
+                ];
+            } else {
+                // Paid subscriptions expand the PaymentIntent on the latest invoice
+                $subscription = \Stripe\Subscription::retrieve([
+                    'id'     => $subscription->id,
+                    'expand' => ['latest_invoice.payment_intent'],
+                ]);
+                $paymentIntent = $subscription->latest_invoice->payment_intent;
+
+                return [
+                    'subscription_id' => $subscription->id,
+                    'client_secret'   => $paymentIntent->client_secret,
+                    'is_trial'        => false,
+                    'trial_days'      => 0,
+                    'amount'          => $paymentIntent->amount,
+                    'currency'        => $paymentIntent->currency,
+                ];
+            }
         } catch (Exception $e) {
             throw new Exception("Error creating pending subscription: " . $e->getMessage());
         }
