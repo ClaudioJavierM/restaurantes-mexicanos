@@ -19,7 +19,7 @@ class ClaimRestaurant extends Component
     public $selectedState = '';
     public $searchResults = [];
     public $selectedRestaurant = null;
-    public $step = 'search'; // search, verify, verify_code, select_role, select_plan, payment
+    public $step = 'search'; // search, verify, verify_code, select_role, create_account, select_plan
 
     // Owner role (selected in select_role step)
     public string $ownerRole = '';
@@ -30,6 +30,8 @@ class ClaimRestaurant extends Component
     public $ownerPhone = '';
     public string $password = '';
     public string $passwordConfirmation = '';
+    public bool $emailConsent = true;
+    public bool $smsConsent = true;
     public $verificationMethod = 'email'; // email or phone
     public $verificationCode = '';
     public $codeError = '';
@@ -236,8 +238,6 @@ class ClaimRestaurant extends Component
             'ownerName' => 'required|min:2',
             'ownerEmail' => 'required|email',
             'ownerPhone' => 'required|min:10',
-            'password' => 'required|min:8',
-            'passwordConfirmation' => 'required|same:password',
         ]);
 
         // Track verification started
@@ -470,10 +470,54 @@ class ClaimRestaurant extends Component
     {
         $this->ownerRole = $role;
 
-        // Save role to restaurant
+        $this->step = 'create_account';
+        $this->dispatch('scroll-top');
+    }
+
+    public function submitCreateAccount(): void
+    {
+        $this->validate([
+            'password' => 'required|min:8',
+            'passwordConfirmation' => 'required|same:password',
+        ]);
+
+        // Save consents to restaurant
         if ($this->selectedRestaurant) {
-            $this->selectedRestaurant->update(['owner_role' => $role]);
+            $this->selectedRestaurant->update([
+                'email_consent' => $this->emailConsent,
+                'sms_consent'   => $this->smsConsent,
+                'owner_role'    => $this->ownerRole ?: 'owner',
+            ]);
         }
+
+        // Create or find user
+        $user = \App\Models\User::where('email', $this->ownerEmail)->first();
+        if (!$user) {
+            $user = \App\Models\User::create([
+                'name'     => $this->ownerName,
+                'email'    => $this->ownerEmail,
+                'password' => \Illuminate\Support\Facades\Hash::make($this->password),
+                'phone'    => $this->ownerPhone ?? null,
+            ]);
+        }
+
+        // Link user to restaurant
+        if ($this->selectedRestaurant && !$this->selectedRestaurant->user_id) {
+            $this->selectedRestaurant->update(['user_id' => $user->id]);
+        }
+
+        // Store for Stripe session (paid plans need this)
+        session([
+            'claim_password'      => \Illuminate\Support\Facades\Hash::make($this->password),
+            'claim_owner_name'    => $this->ownerName,
+            'claim_owner_email'   => $this->ownerEmail,
+            'claim_owner_phone'   => $this->ownerPhone,
+            'claim_restaurant_id' => $this->selectedRestaurant?->id,
+            'claim_owner_role'    => $this->ownerRole,
+        ]);
+
+        // Log the user in
+        \Illuminate\Support\Facades\Auth::login($user);
 
         $this->step = 'select_plan';
         $this->dispatch('scroll-top');
@@ -545,17 +589,8 @@ class ClaimRestaurant extends Component
             return $this->completeFreeClai();
         }
 
-        // Store owner data in session so StripeController can create the user after payment
-        session([
-            'claim_password' => \Illuminate\Support\Facades\Hash::make($this->password),
-            'claim_owner_name' => $this->ownerName,
-            'claim_owner_email' => $this->ownerEmail,
-            'claim_owner_phone' => $this->ownerPhone,
-            'claim_restaurant_id' => $this->selectedRestaurant->id,
-            'claim_owner_role' => $this->ownerRole,
-        ]);
-
-        // Store coupon in session so ClaimPaymentController can use it
+        // Session data (owner info, restaurant id, etc.) was already stored in submitCreateAccount().
+        // Store coupon in session so ClaimPaymentController can use it.
         if ($this->couponApplied && $this->couponCode) {
             session(['claim_coupon_code' => $this->couponCode]);
         }
@@ -581,29 +616,39 @@ class ClaimRestaurant extends Component
             'premium_email_marketing' => false,
         ]);
 
-        $user = User::firstOrCreate(
-            ['email' => $this->ownerEmail],
-            [
-                'name' => $this->ownerName,
-                'password' => \Illuminate\Support\Facades\Hash::make($this->password),
-                'phone' => $this->ownerPhone,
-                'email_verified_at' => now(),
-            ]
-        );
+        // User is already created and logged in by submitCreateAccount().
+        // Fallback: create user if somehow not already authenticated.
+        if (!auth()->check()) {
+            $user = User::firstOrCreate(
+                ['email' => $this->ownerEmail],
+                [
+                    'name'     => $this->ownerName,
+                    'password' => \Illuminate\Support\Facades\Hash::make($this->password),
+                    'phone'    => $this->ownerPhone,
+                    'email_verified_at' => now(),
+                ]
+            );
 
-        $user->role = 'owner';
-        if (!$user->email_verified_at) {
-            $user->email_verified_at = now();
+            $user->role = 'owner';
+            if (!$user->email_verified_at) {
+                $user->email_verified_at = now();
+            }
+            $user->save();
+
+            if (!$this->selectedRestaurant->user_id) {
+                $this->selectedRestaurant->update(['user_id' => $user->id]);
+            }
+
+            \Illuminate\Support\Facades\Auth::login($user);
+        } else {
+            $user = auth()->user();
+            $user->role = 'owner';
+            if (!$user->email_verified_at) {
+                $user->email_verified_at = now();
+                $user->save();
+            }
         }
-        $user->save();
 
-        $this->selectedRestaurant->update(['user_id' => $user->id]);
-
-        if ($this->ownerRole) {
-            $this->selectedRestaurant->update(['owner_role' => $this->ownerRole]);
-        }
-
-        \Illuminate\Support\Facades\Auth::login($user);
         session()->regenerate();
 
         // Track claim completed

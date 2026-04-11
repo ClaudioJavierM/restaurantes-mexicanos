@@ -185,6 +185,8 @@ class Restaurant extends Model implements HasMedia
         'owner_email',
         'owner_phone',
         'owner_role',
+        'email_consent',
+        'sms_consent',
         // Images
         'image',
         'photos',

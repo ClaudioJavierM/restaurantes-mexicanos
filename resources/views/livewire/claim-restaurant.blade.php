@@ -6,8 +6,8 @@
             <div class="flex items-center justify-center space-x-4">
                 {{-- Step 1: Search --}}
                 <div class="flex items-center {{ $step !== 'search' ? 'cursor-pointer' : '' }}" @if($step !== 'search') wire:click="backToSearch" @endif>
-                    <div class="flex items-center justify-center w-10 h-10 rounded-full transition-colors" style="{{ $step === 'search' ? 'background:#D4AF37;color:#0B0B0B;' : ($step === 'verify' || $step === 'verify_code' || $step === 'select_role' || $step === 'select_plan' || $step === 'payment' ? 'background:#4ADE80;color:#0B0B0B;' : 'background:#2A2A2A;color:#9CA3AF;') }}">
-                        @if($step === 'verify' || $step === 'verify_code' || $step === 'select_role' || $step === 'select_plan' || $step === 'payment')
+                    <div class="flex items-center justify-center w-10 h-10 rounded-full transition-colors" style="{{ $step === 'search' ? 'background:#D4AF37;color:#0B0B0B;' : ($step === 'verify' || $step === 'verify_code' || $step === 'select_role' || $step === 'create_account' || $step === 'select_plan' || $step === 'payment' ? 'background:#4ADE80;color:#0B0B0B;' : 'background:#2A2A2A;color:#9CA3AF;') }}">
+                        @if($step === 'verify' || $step === 'verify_code' || $step === 'select_role' || $step === 'create_account' || $step === 'select_plan' || $step === 'payment')
                             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                             </svg>
@@ -18,12 +18,12 @@
                     <span class="ml-2 text-sm font-medium" style="{{ $step === 'search' ? 'color:#D4AF37;' : 'color:#9CA3AF;' }}">{{ __('app.search') }}</span>
                 </div>
 
-                <div class="w-16 h-1" style="{{ $step === 'verify' || $step === 'verify_code' || $step === 'select_role' || $step === 'select_plan' || $step === 'payment' ? 'background:#4ADE80;' : 'background:#2A2A2A;' }}"></div>
+                <div class="w-16 h-1" style="{{ $step === 'verify' || $step === 'verify_code' || $step === 'select_role' || $step === 'create_account' || $step === 'select_plan' || $step === 'payment' ? 'background:#4ADE80;' : 'background:#2A2A2A;' }}"></div>
 
                 {{-- Step 2: Verify --}}
-                <div class="flex items-center {{ $step === 'select_role' || $step === 'select_plan' || $step === 'payment' ? 'cursor-pointer' : '' }}" @if($step === 'select_role' || $step === 'select_plan' || $step === 'payment') wire:click="backToVerify" @endif>
-                    <div class="flex items-center justify-center w-10 h-10 rounded-full text-white transition-colors" style="{{ $step === 'verify' || $step === 'verify_code' ? 'background:#DC2626;' : ($step === 'select_role' || $step === 'select_plan' || $step === 'payment' ? 'background:#4ADE80;' : 'background:#2A2A2A;') }}">
-                        @if($step === 'select_role' || $step === 'select_plan' || $step === 'payment')
+                <div class="flex items-center">
+                    <div class="flex items-center justify-center w-10 h-10 rounded-full text-white transition-colors" style="{{ $step === 'verify' || $step === 'verify_code' || $step === 'select_role' || $step === 'create_account' ? 'background:#DC2626;' : ($step === 'select_plan' || $step === 'payment' ? 'background:#4ADE80;' : 'background:#2A2A2A;') }}">
+                        @if($step === 'select_plan' || $step === 'payment')
                             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                             </svg>
@@ -31,14 +31,14 @@
                             2
                         @endif
                     </div>
-                    <span class="ml-2 text-sm font-medium" style="{{ $step === 'verify' || $step === 'verify_code' ? 'color:#D4AF37;' : 'color:#9CA3AF;' }}">{{ __('app.claim_step_verify') }}</span>
+                    <span class="ml-2 text-sm font-medium" style="{{ $step === 'verify' || $step === 'verify_code' || $step === 'select_role' || $step === 'create_account' ? 'color:#D4AF37;' : 'color:#9CA3AF;' }}">{{ __('app.claim_step_verify') }}</span>
                 </div>
 
-                <div class="w-16 h-1" style="{{ $step === 'select_role' || $step === 'select_plan' || $step === 'payment' ? 'background:#4ADE80;' : 'background:#2A2A2A;' }}"></div>
+                <div class="w-16 h-1" style="{{ $step === 'select_plan' || $step === 'payment' ? 'background:#4ADE80;' : 'background:#2A2A2A;' }}"></div>
 
                 {{-- Step 3: Select Plan --}}
-                <div class="flex items-center {{ $step === 'payment' ? 'cursor-pointer' : '' }}" @if($step === 'payment') wire:click="backToSelectPlan" @endif>
-                    <div class="flex items-center justify-center w-10 h-10 rounded-full text-white transition-colors" style="{{ $step === 'select_role' || $step === 'select_plan' ? 'background:#DC2626;' : ($step === 'payment' ? 'background:#4ADE80;' : 'background:#2A2A2A;') }}">
+                <div class="flex items-center">
+                    <div class="flex items-center justify-center w-10 h-10 rounded-full text-white transition-colors" style="{{ $step === 'select_plan' ? 'background:#DC2626;' : ($step === 'payment' ? 'background:#4ADE80;' : 'background:#2A2A2A;') }}">
                         @if($step === 'payment')
                             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
@@ -47,17 +47,7 @@
                             3
                         @endif
                     </div>
-                    <span class="ml-2 text-sm font-medium" style="{{ $step === 'select_role' || $step === 'select_plan' ? 'color:#D4AF37;' : 'color:#9CA3AF;' }}">{{ __('app.claim_step_plan') }}</span>
-                </div>
-
-                <div class="w-16 h-1" style="{{ $step === 'payment' ? 'background:#4ADE80;' : 'background:#2A2A2A;' }}"></div>
-
-                {{-- Step 4: Payment --}}
-                <div class="flex items-center">
-                    <div class="flex items-center justify-center w-10 h-10 rounded-full text-white" style="{{ $step === 'payment' ? 'background:#DC2626;' : 'background:#2A2A2A;' }}">
-                        4
-                    </div>
-                    <span class="ml-2 text-sm font-medium" style="{{ $step === 'payment' ? 'color:#D4AF37;' : 'color:#9CA3AF;' }}">{{ __('app.claim_step_payment') }}</span>
+                    <span class="ml-2 text-sm font-medium" style="{{ $step === 'select_plan' ? 'color:#D4AF37;' : 'color:#9CA3AF;' }}">{{ __('app.claim_step_plan') }}</span>
                 </div>
             </div>
         </div>
@@ -303,38 +293,6 @@
                         @error('ownerPhone')
                             <span class="text-danger-600 text-sm mt-1">{{ $message }}</span>
                         @enderror
-                    </div>
-
-                    {{-- Password --}}
-                    <div>
-                        <label class="block text-sm font-medium mb-2" style="color:#9CA3AF;">
-                            Crea tu contraseña <span style="color:#D4AF37;">*</span>
-                        </label>
-                        <input
-                            type="password"
-                            wire:model="password"
-                            placeholder="Mínimo 8 caracteres"
-                            class="w-full px-4 py-3 rounded-lg focus:outline-none transition-colors"
-                            style="background:#0B0B0B; border:1px solid #2A2A2A; color:#F5F5F5;"
-                            onfocus="this.style.borderColor='#D4AF37'" onblur="this.style.borderColor='#2A2A2A'"
-                        >
-                        @error('password') <p class="mt-1 text-sm" style="color:#EF4444;">{{ $message }}</p> @enderror
-                    </div>
-
-                    {{-- Confirm Password --}}
-                    <div>
-                        <label class="block text-sm font-medium mb-2" style="color:#9CA3AF;">
-                            Confirma tu contraseña <span style="color:#D4AF37;">*</span>
-                        </label>
-                        <input
-                            type="password"
-                            wire:model="passwordConfirmation"
-                            placeholder="Repite tu contraseña"
-                            class="w-full px-4 py-3 rounded-lg focus:outline-none transition-colors"
-                            style="background:#0B0B0B; border:1px solid #2A2A2A; color:#F5F5F5;"
-                            onfocus="this.style.borderColor='#D4AF37'" onblur="this.style.borderColor='#2A2A2A'"
-                        >
-                        @error('passwordConfirmation') <p class="mt-1 text-sm" style="color:#EF4444;">{{ $message }}</p> @enderror
                     </div>
 
                     {{-- Verification Method Selection --}}
@@ -601,18 +559,72 @@
             </div>
         @endif
 
+        {{-- STEP 2.9: CREATE ACCOUNT --}}
+        @if ($step === 'create_account')
+        <div style="max-width:480px; margin:0 auto;">
+            <div style="text-align:center; margin-bottom:2rem;">
+                <div style="width:4rem;height:4rem;background:linear-gradient(135deg,#D4AF37,#F4E4A6);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">
+                    <svg style="width:2rem;height:2rem;color:#0B0B0B;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                </div>
+                <h2 style="font-size:1.75rem;font-weight:bold;color:#F5F5F5;font-family:'Playfair Display',serif;margin-bottom:0.5rem;">Crea tu cuenta</h2>
+                <p style="color:#9CA3AF;font-size:0.95rem;">Ya verificamos que el restaurante es tuyo. Ahora crea tu acceso.</p>
+            </div>
+
+            <div style="background:#111111;border:1px solid #2A2A2A;border-radius:0.75rem;padding:1.5rem;display:flex;flex-direction:column;gap:1rem;">
+                {{-- Password --}}
+                <div>
+                    <label style="display:block;font-size:0.875rem;font-weight:500;color:#D4AF37;margin-bottom:0.5rem;">Contraseña</label>
+                    <input type="password" wire:model="password" placeholder="Mínimo 8 caracteres"
+                        style="width:100%;background:#1A1A1A;border:1px solid #2A2A2A;border-radius:0.5rem;padding:0.75rem 1rem;color:#F5F5F5;font-size:0.95rem;box-sizing:border-box;"
+                        onfocus="this.style.borderColor='#D4AF37'" onblur="this.style.borderColor='#2A2A2A'"/>
+                    @error('password')<p style="color:#EF4444;font-size:0.75rem;margin-top:0.25rem;">{{ $message }}</p>@enderror
+                </div>
+                {{-- Confirm Password --}}
+                <div>
+                    <label style="display:block;font-size:0.875rem;font-weight:500;color:#D4AF37;margin-bottom:0.5rem;">Confirmar contraseña</label>
+                    <input type="password" wire:model="passwordConfirmation" placeholder="Repite tu contraseña"
+                        style="width:100%;background:#1A1A1A;border:1px solid #2A2A2A;border-radius:0.5rem;padding:0.75rem 1rem;color:#F5F5F5;font-size:0.95rem;box-sizing:border-box;"
+                        onfocus="this.style.borderColor='#D4AF37'" onblur="this.style.borderColor='#2A2A2A'"/>
+                    @error('passwordConfirmation')<p style="color:#EF4444;font-size:0.75rem;margin-top:0.25rem;">{{ $message }}</p>@enderror
+                </div>
+
+                {{-- Divider --}}
+                <hr style="border:none;border-top:1px solid #2A2A2A;margin:0.5rem 0;"/>
+
+                {{-- Email consent --}}
+                <label style="display:flex;align-items:flex-start;gap:0.75rem;cursor:pointer;">
+                    <input type="checkbox" wire:model="emailConsent"
+                        style="width:1.125rem;height:1.125rem;accent-color:#D4AF37;margin-top:0.125rem;flex-shrink:0;cursor:pointer;"/>
+                    <span style="font-size:0.875rem;color:#CCCCCC;line-height:1.5;">
+                        <strong style="color:#F5F5F5;">Comunicaciones por email</strong><br/>
+                        <span style="color:#6B7280;font-size:0.8rem;">Recibe actualizaciones, reportes de desempeño y tips para mejorar tu perfil. Puedes cancelar en cualquier momento.</span>
+                    </span>
+                </label>
+
+                {{-- SMS consent --}}
+                <label style="display:flex;align-items:flex-start;gap:0.75rem;cursor:pointer;">
+                    <input type="checkbox" wire:model="smsConsent"
+                        style="width:1.125rem;height:1.125rem;accent-color:#D4AF37;margin-top:0.125rem;flex-shrink:0;cursor:pointer;"/>
+                    <span style="font-size:0.875rem;color:#CCCCCC;line-height:1.5;">
+                        <strong style="color:#F5F5F5;">Notificaciones por SMS</strong><br/>
+                        <span style="color:#6B7280;font-size:0.8rem;">Alertas importantes sobre nuevas reseñas y actividad de tu restaurante.</span>
+                    </span>
+                </label>
+
+                {{-- Submit --}}
+                <button wire:click="submitCreateAccount" wire:loading.attr="disabled"
+                    style="width:100%;padding:0.875rem;background:linear-gradient(135deg,#D4AF37,#F4E4A6);color:#0B0B0B;font-weight:700;font-size:1rem;border:none;border-radius:0.5rem;cursor:pointer;margin-top:0.5rem;font-family:'Poppins',sans-serif;">
+                    <span wire:loading.remove wire:target="submitCreateAccount">Crear cuenta y continuar →</span>
+                    <span wire:loading wire:target="submitCreateAccount">Creando cuenta...</span>
+                </button>
+            </div>
+        </div>
+        @endif
+
         {{-- STEP 3: SELECT PLAN --}}
         @if($step === 'select_plan')
-            <div class="rounded-2xl p-8" style="background:#1A1A1A; border:1px solid #2A2A2A; box-shadow:0 4px 20px rgba(0,0,0,0.4);">
-                <button
-                    wire:click="backToVerify"
-                    class="mb-6 font-medium flex items-center" style="color:#D4AF37;"
-                >
-                    <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                    </svg>
-                    Volver
-                </button>
+        <div style="position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(4px);z-index:50;display:flex;align-items:center;justify-content:center;padding:1rem;overflow-y:auto;">
+            <div style="width:100%;max-width:900px;background:#0B0B0B;border:1px solid #2A2A2A;border-radius:1rem;padding:2rem;position:relative;">
 
                 <div class="text-center mb-8">
                     <h1 class="text-3xl font-bold mb-2" style="color:#F5F5F5; font-family:'Playfair Display',serif;">Selecciona tu Plan</h1>
@@ -715,61 +727,66 @@
                     </div>
 
                     {{-- ELITE PLAN --}}
-                    <div class="border-2 border-purple-500 rounded-xl p-6 relative" style="background: linear-gradient(to bottom, #581c87, #6b21a8);">
+                    <div class="rounded-xl p-6 relative" style="border:2px solid rgba(212,175,55,0.4); background:linear-gradient(to bottom, rgba(212,175,55,0.05), #111111);">
                         <div class="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                            <span class="bg-purple-500 text-white px-3 py-1 rounded-full text-xs font-bold">ELITE</span>
+                            <span class="px-3 py-1 rounded-full text-xs font-bold" style="background:#1A1A1A; border:1px solid #D4AF37; color:#D4AF37;">ELITE</span>
                         </div>
 
                         <div class="text-center mb-6 mt-2">
-                            <h3 class="text-xl font-bold mb-2" style="color: #ffffff;">Elite</h3>
-                            <div class="text-4xl font-bold" style="color: #ffffff;">$79</div>
-                            <p class="text-sm" style="color: #e9d5ff;">por mes</p>
+                            <h3 class="text-xl font-bold mb-2" style="color:#F5F5F5; font-family:'Playfair Display',serif;">Elite</h3>
+                            <div class="flex items-center justify-center gap-2">
+                                <span class="text-lg line-through" style="color:#6B7280;">$79</span>
+                                <span class="text-4xl font-bold" style="color:#D4AF37;">$29</span>
+                            </div>
+                            <p class="text-sm font-semibold" style="color:#D4AF37;">$29 primer mes</p>
+                            <p class="text-xs" style="color:#9CA3AF;">Después $79/mes</p>
                         </div>
 
                         <ul class="space-y-2 mb-6 text-sm">
-                            <li class="flex items-center" style="color: #ffffff;">
-                                <svg class="w-4 h-4 mr-2" style="color: #4ade80;" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                                <span style="color: #ffffff;">Todo lo de Premium PLUS:</span>
+                            <li class="flex items-center" style="color:#CCCCCC;">
+                                <svg class="w-4 h-4 mr-2" style="color:#4ADE80;" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                <span style="color:#F5F5F5;">Todo lo de Premium PLUS:</span>
                             </li>
-                            <li class="flex items-center" style="color: #ffffff;">
-                                <svg class="w-4 h-4 mr-2" style="color: #4ade80;" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                                <span style="color: #ffffff;">App Móvil White Label</span>
+                            <li class="flex items-center" style="color:#CCCCCC;">
+                                <svg class="w-4 h-4 mr-2" style="color:#4ADE80;" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                <span style="color:#CCCCCC;">App Móvil White Label</span>
                             </li>
-                            <li class="flex items-center" style="color: #ffffff;">
-                                <svg class="w-4 h-4 mr-2" style="color: #4ade80;" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                                <span style="color: #ffffff;">Website Builder Completo</span>
+                            <li class="flex items-center" style="color:#CCCCCC;">
+                                <svg class="w-4 h-4 mr-2" style="color:#4ADE80;" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                <span style="color:#CCCCCC;">Website Builder Completo</span>
                             </li>
-                            <li class="flex items-center" style="color: #ffffff;">
-                                <svg class="w-4 h-4 mr-2" style="color: #4ade80;" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                                <span style="color: #ffffff; font-weight: bold;">Posición #1 Garantizada</span>
+                            <li class="flex items-center" style="color:#CCCCCC;">
+                                <svg class="w-4 h-4 mr-2" style="color:#4ADE80;" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                <strong style="color:#F5F5F5;">Posición #1 Garantizada</strong>
                             </li>
-                            <li class="flex items-center" style="color: #ffffff;">
-                                <svg class="w-4 h-4 mr-2" style="color: #4ade80;" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                                <span style="color: #ffffff;">Account Manager Dedicado</span>
+                            <li class="flex items-center" style="color:#CCCCCC;">
+                                <svg class="w-4 h-4 mr-2" style="color:#4ADE80;" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                <span style="color:#CCCCCC;">Account Manager Dedicado</span>
                             </li>
-                            <li class="flex items-center" style="color: #ffffff;">
-                                <svg class="w-4 h-4 mr-2" style="color: #4ade80;" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                                <span style="color: #ffffff;">Fotografía Profesional trimestral</span>
+                            <li class="flex items-center" style="color:#CCCCCC;">
+                                <svg class="w-4 h-4 mr-2" style="color:#4ADE80;" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                <span style="color:#CCCCCC;">Fotografía Profesional trimestral</span>
                             </li>
-                            <li class="flex items-center" style="color: #ffffff;">
-                                <svg class="w-4 h-4 mr-2" style="color: #4ade80;" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                                <span style="color: #ffffff;">Cobertura de Medios y PR</span>
+                            <li class="flex items-center" style="color:#CCCCCC;">
+                                <svg class="w-4 h-4 mr-2" style="color:#4ADE80;" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                <span style="color:#CCCCCC;">Cobertura de Medios y PR</span>
                             </li>
                         </ul>
 
-                        <button wire:click="selectPlan('elite')" class="w-full px-6 py-3 rounded-lg font-bold transition-colors" style="background:#D4AF37; color:#0B0B0B;">
+                        <button wire:click="selectPlan('elite')" class="w-full px-6 py-3 rounded-lg font-bold transition-colors" style="background:linear-gradient(135deg,#D4AF37,#F4E4A6); color:#0B0B0B;">
                             Comenzar Elite
                         </button>
-                        <p class="text-xs text-center mt-2" style="color: #e9d5ff;">Soporte premium incluido</p>
+                        <p class="text-xs text-center mt-2" style="color:#9CA3AF;">Soporte premium incluido</p>
                     </div>
                 </div>
 
                 <div class="mt-6 text-center">
-                    <button wire:click="backToSearch" class="text-sm transition-colors" style="color:#9CA3AF;">
+                    <button wire:click="backToSearch" class="text-sm transition-colors" style="color:#6B7280;background:none;border:none;cursor:pointer;text-decoration:underline;">
                         ← Buscar otro restaurante
                     </button>
                 </div>
             </div>
+        </div>
         @endif
 
         @if($step === 'payment')
