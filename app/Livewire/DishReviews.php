@@ -16,12 +16,12 @@ class DishReviews extends Component
             ->forRestaurant($this->restaurantId)
             ->with(['user', 'menuItem']);
 
-        return match ($this->sortBy) {
+        return (match ($this->sortBy) {
             'highest' => $query->orderByDesc('rating'),
             'lowest'  => $query->orderBy('rating'),
             'helpful' => $query->orderByDesc('helpful_count'),
             default   => $query->orderByDesc('created_at'),
-        }->limit(20)->get();
+        })->limit(20)->get();
     }
 
     public function markHelpful(int $reviewId): void

@@ -6,10 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * New unified check-in model using the `checkins` table (with visited_at + note).
- * Distinct from App\Models\CheckIn (legacy `check_ins` table with lat/lng).
+ * Unified check-in model using the `checkins` table (with visited_at + note).
  */
-class Checkin extends Model
+class CheckIn extends Model
 {
     protected $table = 'checkins';
 

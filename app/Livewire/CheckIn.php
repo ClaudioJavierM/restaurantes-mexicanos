@@ -3,7 +3,7 @@
 namespace App\Livewire;
 
 use Livewire\Component;
-use App\Models\Checkin as CheckinModel;
+use App\Models\CheckIn as CheckinModel;
 use Illuminate\Support\Facades\Auth;
 
 class CheckIn extends Component
