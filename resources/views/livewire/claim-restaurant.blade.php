@@ -636,7 +636,12 @@
         <div style="position:fixed;inset:0;background:rgba(0,0,0,0.92);backdrop-filter:blur(4px);z-index:10000;overflow-y:auto;padding:2rem 1rem;">
             <div style="width:100%;max-width:900px;margin:0 auto;background:#0B0B0B;border:1px solid #2A2A2A;border-radius:1rem;padding:2rem;position:relative;">
 
-                <div class="text-center mb-8">
+                {{-- X Close button --}}
+                <button wire:click="backToSearch" style="position:absolute;top:1rem;right:1rem;width:2rem;height:2rem;border-radius:50%;background:#2A2A2A;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#9CA3AF;transition:background 0.2s;" onmouseover="this.style.background='#3A3A3A'" onmouseout="this.style.background='#2A2A2A'" title="Cerrar">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+
+                <div class="text-center mb-6">
                     <h1 class="text-3xl font-bold mb-2" style="color:#F5F5F5; font-family:'Playfair Display',serif;">Selecciona tu Plan</h1>
                     <p style="color:#9CA3AF;">Elige el plan que mejor se adapte a tu restaurante</p>
                 </div>
@@ -827,7 +832,41 @@
                     </div>
                 </div>
 
-                <div class="mt-6 text-center">
+                {{-- Coupon field --}}
+                <div class="mt-6" x-data="{ open: {{ $couponApplied ? 'true' : 'false' }} }">
+                    <button type="button" @click="open = !open" class="flex items-center gap-2 text-sm mx-auto transition-colors" style="color:#9CA3AF;background:none;border:none;cursor:pointer;">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V7a4 4 0 014-4z"/></svg>
+                        ¿Tienes un código de descuento?
+                        <svg class="w-4 h-4 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </button>
+                    <div x-show="open" x-transition class="mt-3 max-w-sm mx-auto">
+                        <div class="flex gap-2">
+                            <input
+                                type="text"
+                                wire:model="couponCode"
+                                placeholder="Ej: FAMER1MES"
+                                class="flex-1 px-4 py-2 rounded-lg text-sm uppercase focus:outline-none"
+                                style="background:#111111; border:1px solid #2A2A2A; color:#F5F5F5;"
+                                onfocus="this.style.borderColor='#D4AF37'" onblur="this.style.borderColor='#2A2A2A'"
+                            >
+                            <button wire:click="applyCoupon" class="px-4 py-2 rounded-lg text-sm font-medium transition-colors" style="background:#2A2A2A;color:#F5F5F5;">
+                                Aplicar
+                            </button>
+                        </div>
+                        @if($couponMessage)
+                            <div class="mt-2 px-3 py-2 rounded-lg text-sm flex items-center gap-2" style="{{ $couponApplied ? 'background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);color:#4ADE80;' : 'background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#EF4444;' }}">
+                                @if($couponApplied)
+                                    <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                                @else
+                                    <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>
+                                @endif
+                                {{ $couponMessage }}
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
+                <div class="mt-4 text-center">
                     <button wire:click="backToSearch" class="text-sm transition-colors" style="color:#6B7280;background:none;border:none;cursor:pointer;text-decoration:underline;">
                         ← Buscar otro restaurante
                     </button>
