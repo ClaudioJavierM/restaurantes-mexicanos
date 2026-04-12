@@ -451,3 +451,13 @@ Schedule::command('famer:send-weekly-stats')->weeklyOn(1, '15:00');
 
 // Email extraction from restaurant websites — daily 3am UTC, 200/batch
 Schedule::command('restaurants:extract-emails --limit=200')->dailyAt('03:00');
+
+// ============================================================================
+// Unclaimed Restaurant Email Campaigns
+// ============================================================================
+
+// Unclaimed restaurants — monthly stats (1st of each month, 11am UTC)
+Schedule::command('famer:send-unclaimed-stats --limit=200')->monthlyOn(1, '11:00');
+
+// Unclaimed restaurants — quarterly coupon (1st of Jan, Apr, Jul, Oct at 11:30 UTC)
+Schedule::command('famer:send-unclaimed-coupon --limit=200')->quarterly()->at('11:30');
