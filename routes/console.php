@@ -424,3 +424,18 @@ Schedule::command('famer:sync-gsc --days=7')
         \Log::error('GSC sync failed');
         notifyN8nFailure('famer:sync-gsc', 'Google Search Console sync');
     });
+
+// ============================================================================
+// Elite Trial Ending Reminders — diario 10:00 AM UTC
+// Notifica a dueños Elite cuyo trial termina en ~5 días (ventana 4-6 días)
+// ============================================================================
+Schedule::command('famer:send-trial-ending-reminders')
+    ->dailyAt('10:00')
+    ->description('Send trial ending reminder emails to Elite owners 5 days before trial expires')
+    ->onSuccess(function () {
+        \Log::info('Trial ending reminders dispatched successfully');
+    })
+    ->onFailure(function () {
+        \Log::error('Trial ending reminders dispatch failed');
+        notifyN8nFailure('famer:send-trial-ending-reminders', 'Elite trial ending reminders');
+    });

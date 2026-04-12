@@ -431,6 +431,9 @@ class StripeService
                     ],
                 ]);
 
+                // Save trial end date for reminder scheduling
+                $restaurant->update(['trial_ends_at' => now()->addDays(30)]);
+
                 return [
                     'subscription_id' => $subscription->id,
                     'client_secret'   => $setupIntent->client_secret,
