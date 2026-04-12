@@ -448,3 +448,6 @@ Schedule::command('famer:send-trial-ending-reminders')
 
 // FAMER Weekly Stats — Every Monday at 9:00 AM CST (15:00 UTC)
 Schedule::command('famer:send-weekly-stats')->weeklyOn(1, '15:00');
+
+// Email extraction from restaurant websites — daily 3am UTC, 200/batch
+Schedule::command('restaurants:extract-emails --limit=200')->dailyAt('03:00');
