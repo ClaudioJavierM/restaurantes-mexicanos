@@ -775,11 +775,10 @@
                         <div class="text-center mb-6 mt-2">
                             <h3 class="text-xl font-bold mb-2" style="color:#F5F5F5; font-family:'Playfair Display',serif;">Elite</h3>
                             <div class="flex items-center justify-center gap-2">
-                                <span class="text-lg line-through" style="color:#6B7280;">$79</span>
-                                <span class="text-4xl font-bold" style="color:#D4AF37;">$29</span>
+                                <span class="text-4xl font-bold" style="color:#D4AF37;">GRATIS</span>
                             </div>
-                            <p class="text-sm font-semibold" style="color:#D4AF37;">$29 primer mes</p>
-                            <p class="text-xs" style="color:#9CA3AF;">Después $79/mes</p>
+                            <p class="text-sm font-semibold" style="color:#D4AF37;">30 días de prueba</p>
+                            <p class="text-xs" style="color:#9CA3AF;">Después $79/mes — cancela cuando quieras</p>
                         </div>
 
                         <ul class="space-y-2 mb-6 text-sm">
