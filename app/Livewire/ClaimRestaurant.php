@@ -47,6 +47,12 @@ class ClaimRestaurant extends Component
     public $couponApplied = false;
     public $couponMessage = '';
 
+    // Promo banner
+    public bool $promoActive = false;
+    public string $promoCode = '';
+    public string $promoLabel = '';
+    public string $promoMessage = '';
+
     // Stripe embedded payment
     public ?string $stripeClientSecret = null;
 
@@ -57,6 +63,22 @@ class ClaimRestaurant extends Component
 
     public function mount()
     {
+        $promo = config('famer-promo');
+        if ($promo['active'] && !empty($promo['code'])) {
+            // Check expiry
+            $expired = $promo['expires_at'] && now()->isAfter($promo['expires_at']);
+            if (!$expired) {
+                $this->promoActive = true;
+                $this->promoCode   = $promo['code'];
+                $this->promoLabel  = $promo['label'];
+                $this->promoMessage = $promo['message'];
+                // Auto-fill coupon if not already set by user
+                if (empty($this->couponCode)) {
+                    $this->couponCode = $promo['code'];
+                }
+            }
+        }
+
         $this->searchResults = collect();
 
         // If user is already logged in and has a claimed restaurant, skip straight to plan selection

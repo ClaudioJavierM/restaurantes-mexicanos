@@ -646,6 +646,21 @@
                     <p style="color:#9CA3AF;">Elige el plan que mejor se adapte a tu restaurante</p>
                 </div>
 
+                {{-- Active promotion banner --}}
+                @if($promoActive)
+                <div style="background:linear-gradient(135deg,rgba(139,30,30,0.25),rgba(139,30,30,0.1));border:1px solid rgba(139,30,30,0.5);border-radius:0.75rem;padding:0.875rem 1.25rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:0.875rem;">
+                    <span style="font-size:1.25rem;flex-shrink:0;">🎉</span>
+                    <div style="flex:1;">
+                        <span style="display:inline-block;background:#8B1E1E;color:#F5F5F5;font-size:0.7rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:2px 8px;border-radius:20px;margin-bottom:4px;">{{ $promoLabel }}</span>
+                        <p style="color:#F5F5F5;font-size:0.875rem;margin:0;line-height:1.4;">{{ $promoMessage }}</p>
+                    </div>
+                    <div style="background:rgba(212,175,55,0.15);border:1px dashed #D4AF37;border-radius:0.5rem;padding:4px 10px;text-align:center;flex-shrink:0;">
+                        <span style="color:#D4AF37;font-family:monospace;font-weight:700;font-size:0.9rem;letter-spacing:2px;">{{ $promoCode }}</span>
+                        <div style="color:#9CA3AF;font-size:0.65rem;">ya aplicado ✓</div>
+                    </div>
+                </div>
+                @endif
+
                 {{-- Real restaurant stats banner --}}
                 @if($restaurantMonthlyViews > 0 || $restaurantTotalViews > 0)
                 <div style="background:linear-gradient(135deg,rgba(212,175,55,0.08),rgba(212,175,55,0.03)); border:1px solid rgba(212,175,55,0.25); border-radius:0.75rem; padding:1rem 1.25rem; margin-bottom:1.5rem; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:0.75rem;">
