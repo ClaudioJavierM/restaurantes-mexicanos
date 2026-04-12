@@ -75,7 +75,7 @@ class ClaimRestaurant extends Component
                 try {
                     $this->restaurantMonthlyViews = \App\Models\AnalyticsEvent::where('restaurant_id', $restaurant->id)
                         ->where('event_type', \App\Models\AnalyticsEvent::EVENT_PAGE_VIEW)
-                        ->where('created_at', '>=', now()->subDays(30))
+                        ->where('created_at', '>=', now()->startOfMonth())
                         ->count();
                     $this->restaurantTotalViews = \App\Models\AnalyticsEvent::where('restaurant_id', $restaurant->id)
                         ->where('event_type', \App\Models\AnalyticsEvent::EVENT_PAGE_VIEW)
@@ -217,7 +217,7 @@ class ClaimRestaurant extends Component
             try {
                 $this->restaurantMonthlyViews = \App\Models\AnalyticsEvent::where('restaurant_id', $this->selectedRestaurant->id)
                     ->where('event_type', \App\Models\AnalyticsEvent::EVENT_PAGE_VIEW)
-                    ->where('created_at', '>=', now()->subDays(30))
+                    ->where('created_at', '>=', now()->startOfMonth())
                     ->count();
                 $this->restaurantTotalViews = \App\Models\AnalyticsEvent::where('restaurant_id', $this->selectedRestaurant->id)
                     ->where('event_type', \App\Models\AnalyticsEvent::EVENT_PAGE_VIEW)
@@ -579,10 +579,9 @@ class ClaimRestaurant extends Component
         \Illuminate\Support\Facades\Auth::login($user);
 
         // Load restaurant stats for plan selection modal
-        $thirtyDaysAgo = now()->subDays(30);
         $this->restaurantMonthlyViews = \App\Models\AnalyticsEvent::where('restaurant_id', $this->selectedRestaurant->id)
             ->where('event_type', \App\Models\AnalyticsEvent::EVENT_PAGE_VIEW)
-            ->where('created_at', '>=', $thirtyDaysAgo)
+            ->where('created_at', '>=', now()->startOfMonth())
             ->count();
 
         $this->restaurantTotalViews = \App\Models\AnalyticsEvent::where('restaurant_id', $this->selectedRestaurant->id)

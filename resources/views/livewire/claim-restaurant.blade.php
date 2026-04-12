@@ -643,18 +643,25 @@
                 {{-- Real restaurant stats banner --}}
                 @if($restaurantMonthlyViews > 0 || $restaurantTotalViews > 0)
                 <div style="background:linear-gradient(135deg,rgba(212,175,55,0.08),rgba(212,175,55,0.03)); border:1px solid rgba(212,175,55,0.25); border-radius:0.75rem; padding:1rem 1.25rem; margin-bottom:1.5rem; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:0.75rem;">
-                    <div style="display:flex; align-items:center; gap:0.75rem;">
+                    <div style="display:flex; align-items:center; gap:1rem;">
                         <div style="width:2.5rem;height:2.5rem;background:rgba(212,175,55,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
                             <svg style="width:1.25rem;height:1.25rem;color:#D4AF37;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                         </div>
-                        <div>
-                            <p style="color:#F5F5F5;font-weight:600;margin:0;font-size:0.95rem;">
-                                <span style="color:#D4AF37;font-size:1.25rem;font-weight:700;">{{ number_format($restaurantMonthlyViews) }}</span>
-                                personas visitaron tu perfil este mes
-                            </p>
-                            <p style="color:#6B7280;font-size:0.8rem;margin:0.2rem 0 0;">
-                                {{ number_format($competitorCount) }} restaurantes compiten por esas búsquedas en tu área
-                            </p>
+                        <div style="display:flex; gap:1.5rem; flex-wrap:wrap;">
+                            <div>
+                                <p style="color:#D4AF37;font-size:1.5rem;font-weight:700;margin:0;line-height:1;">{{ number_format($restaurantMonthlyViews) }}</p>
+                                <p style="color:#9CA3AF;font-size:0.75rem;margin:0.1rem 0 0;">visitas este mes</p>
+                            </div>
+                            @if($restaurantTotalViews > $restaurantMonthlyViews)
+                            <div>
+                                <p style="color:#F5F5F5;font-size:1.5rem;font-weight:700;margin:0;line-height:1;">{{ number_format($restaurantTotalViews) }}</p>
+                                <p style="color:#9CA3AF;font-size:0.75rem;margin:0.1rem 0 0;">visitas históricas</p>
+                            </div>
+                            @endif
+                            <div>
+                                <p style="color:#F5F5F5;font-size:1.5rem;font-weight:700;margin:0;line-height:1;">{{ number_format($competitorCount) }}</p>
+                                <p style="color:#9CA3AF;font-size:0.75rem;margin:0.1rem 0 0;">competidores en tu área</p>
+                            </div>
                         </div>
                     </div>
                     <div style="background:rgba(212,175,55,0.1);border:1px solid rgba(212,175,55,0.2);border-radius:0.5rem;padding:0.5rem 0.875rem;text-align:center;">
