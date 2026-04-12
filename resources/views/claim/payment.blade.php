@@ -505,6 +505,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 '.Tab--selected': {
                     border: '1px solid rgba(212,175,55,0.4)',
                     color: '#D4AF37',
+                    backgroundColor: '#1A1A1A',
                 },
                 '.Tab:hover': {
                     color: '#D4AF37',
