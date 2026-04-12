@@ -80,7 +80,7 @@ class SendUnclaimedStatsEmailJob implements ShouldQueue
             // Create EmailLog entry
             EmailLog::log([
                 'type'          => EmailLog::TYPE_CAMPAIGN,
-                'category'      => EmailLog::CATEGORY_FAMER,
+                'category'      => 'unclaimed_stats',
                 'to_email'      => $email,
                 'from_email'    => 'hello@restaurantesmexicanosfamosos.com',
                 'from_name'     => 'FAMER',

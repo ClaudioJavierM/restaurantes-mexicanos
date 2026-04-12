@@ -87,7 +87,7 @@ class SendUnclaimedCouponEmailJob implements ShouldQueue
 
             EmailLog::log([
                 'type'           => EmailLog::TYPE_CAMPAIGN,
-                'category'       => EmailLog::CATEGORY_FAMER,
+                'category'       => 'unclaimed_coupon',
                 'to_email'       => $email,
                 'from_email'     => 'hello@restaurantesmexicanosfamosos.com',
                 'from_name'      => 'FAMER',

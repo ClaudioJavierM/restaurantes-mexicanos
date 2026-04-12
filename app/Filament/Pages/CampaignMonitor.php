@@ -234,13 +234,15 @@ class CampaignMonitor extends Page
     public static function getCategoryLabel(string $category): string
     {
         return match ($category) {
-            'claim_invitation' => 'Invitación Claim',
-            'famer_email_1'    => 'Email 1 — Intro',
-            'famer_email_2'    => 'Email 2 — Cómo funciona',
-            'famer_email_3'    => 'Email 3 — Recordatorio',
-            'verification'     => 'Verificación',
-            'welcome'          => 'Bienvenida',
-            'other'            => 'Otros',
+            'claim_invitation'  => 'Invitación Claim',
+            'famer_email_1'     => 'Email 1 — Intro',
+            'famer_email_2'     => 'Email 2 — Cómo funciona',
+            'famer_email_3'     => 'Email 3 — Recordatorio',
+            'unclaimed_stats'   => 'No Reclamados — Stats',
+            'unclaimed_coupon'  => 'No Reclamados — Cupón',
+            'verification'      => 'Verificación',
+            'welcome'           => 'Bienvenida',
+            'other'             => 'Otros',
             default            => ucfirst(str_replace('_', ' ', $category)),
         };
     }

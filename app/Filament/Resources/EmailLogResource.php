@@ -259,14 +259,20 @@ class EmailLogResource extends Resource
                 SelectFilter::make('category')
                     ->label('Categoría')
                     ->options([
-                        'reservation' => 'Reservación',
-                        'claim' => 'Reclamo',
-                        'order' => 'Pedido',
-                        'marketing' => 'Marketing',
-                        'team' => 'Equipo',
-                        'verification' => 'Verificación',
-                        'reminder' => 'Recordatorio',
-                        'newsletter' => 'Newsletter',
+                        'reservation'      => 'Reservación',
+                        'claim'            => 'Reclamo',
+                        'claim_invitation' => 'Invitación Claim',
+                        'famer_email_1'    => 'Email 1 — Intro',
+                        'famer_email_2'    => 'Email 2 — Cómo funciona',
+                        'famer_email_3'    => 'Email 3 — Recordatorio',
+                        'unclaimed_stats'  => 'No Reclamados — Stats',
+                        'unclaimed_coupon' => 'No Reclamados — Cupón',
+                        'order'            => 'Pedido',
+                        'marketing'        => 'Marketing',
+                        'team'             => 'Equipo',
+                        'verification'     => 'Verificación',
+                        'reminder'         => 'Recordatorio',
+                        'newsletter'       => 'Newsletter',
                     ]),
                 Tables\Filters\Filter::make('opened')
                     ->label('Solo abiertos')
