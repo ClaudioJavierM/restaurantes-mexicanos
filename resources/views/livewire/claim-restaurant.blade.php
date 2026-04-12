@@ -632,8 +632,8 @@
 
         {{-- STEP 3: SELECT PLAN --}}
         @if($step === 'select_plan')
-        <div style="position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(4px);z-index:50;display:flex;align-items:center;justify-content:center;padding:1rem;overflow-y:auto;">
-            <div style="width:100%;max-width:900px;background:#0B0B0B;border:1px solid #2A2A2A;border-radius:1rem;padding:2rem;position:relative;">
+        <div style="position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(4px);z-index:50;overflow-y:auto;padding:2rem 1rem;">
+            <div style="width:100%;max-width:900px;margin:0 auto;background:#0B0B0B;border:1px solid #2A2A2A;border-radius:1rem;padding:2rem;position:relative;">
 
                 <div class="text-center mb-8">
                     <h1 class="text-3xl font-bold mb-2" style="color:#F5F5F5; font-family:'Playfair Display',serif;">Selecciona tu Plan</h1>
@@ -797,7 +797,7 @@
                             </li>
                             <li class="flex items-center" style="color:#CCCCCC;">
                                 <svg class="w-4 h-4 mr-2" style="color:#4ADE80;" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                                <strong style="color:#F5F5F5;">Posición #1 Garantizada</strong>
+                                <strong style="color:#F5F5F5;">Máxima Prioridad en Búsquedas</strong>
                             </li>
                             <li class="flex items-center" style="color:#CCCCCC;">
                                 <svg class="w-4 h-4 mr-2" style="color:#4ADE80;" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
