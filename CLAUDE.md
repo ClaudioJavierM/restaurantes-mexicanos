@@ -123,6 +123,43 @@ sudo nginx -t && sudo systemctl reload nginx
 - `email_logs.delivered_at` — agregada vía ALTER TABLE
 - `famer_email_1_sent_at`, `famer_email_2_sent_at`, `famer_email_3_sent_at` en `restaurants`
 
+## Colaboración — Git Workflow (Javier + Claudio)
+
+### Roles
+- **Javier (Isaac):** push directo a `main` — sin cambios en su workflow
+- **Claudio:** trabaja en branch `claudio/features`, abre PR o hace push directo a main cuando está listo
+
+### Regla de Claudio — sync diario obligatorio
+```bash
+# Al INICIO de cada sesión de trabajo (SIEMPRE, antes de tocar código):
+git checkout claudio/features
+git merge main     # traer cambios de Javier
+# ... trabajar ...
+git push origin claudio/features
+
+# Para subir a producción:
+git merge main     # sync final antes de deployar
+git push origin claudio/features:main
+```
+
+### Áreas de responsabilidad (evitar conflictos)
+| Área | Responsable |
+|------|-------------|
+| `app/Filament/Resources/` — admin panel | Javier |
+| `app/Filament/Pages/` — admin pages | Javier |
+| `app/Console/Commands/` + `app/Jobs/` | Javier |
+| Campañas email backend | Javier |
+| `app/Filament/Owner/` — owner panel | Claudio |
+| `app/Livewire/Owner/` | Claudio |
+| `resources/views/livewire/owner/` | Claudio |
+| Frontend público (`resources/views/livewire/`) | Claudio |
+
+### Archivos de alto riesgo — avisar antes de tocar
+- `routes/web.php` — el más conflictivo
+- `bootstrap/app.php`
+- `config/*.php`
+- `tailwind.config.js`
+
 ## Reglas
 
 - NUNCA editar archivos directamente en el VPS — todo por git o rsync desde local

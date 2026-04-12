@@ -205,6 +205,9 @@ class Restaurant extends Model implements HasMedia
         // Abandoned claim recovery
         'claim_started_at',
         'claim_abandoned_sent_at',
+        // Trial reminder
+        'trial_ends_at',
+        'trial_reminder_sent_at',
     ];
 
     protected $casts = [
@@ -277,6 +280,9 @@ class Restaurant extends Model implements HasMedia
         'claim_abandoned_sent_at' => 'datetime',
         'subscription_started_at' => 'datetime',
         'subscription_expires_at' => 'datetime',
+        // Trial
+        'trial_ends_at'           => 'datetime',
+        'trial_reminder_sent_at'  => 'datetime',
         'chatbot_settings' => 'array',
         'loyalty_enabled' => 'boolean',
         'points_per_dollar' => 'integer',

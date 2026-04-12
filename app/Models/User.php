@@ -174,7 +174,16 @@ class User extends Authenticatable implements FilamentUser
     {
         static $cache = [];
         if (!array_key_exists($this->id, $cache)) {
-            $cache[$this->id] = $this->allAccessibleRestaurants()->first();
+            $all = $this->allAccessibleRestaurants()->get();
+            $selectedId = session('famer_selected_restaurant');
+            if ($selectedId) {
+                $found = $all->firstWhere('id', $selectedId);
+                if ($found) {
+                    $cache[$this->id] = $found;
+                    return $cache[$this->id];
+                }
+            }
+            $cache[$this->id] = $all->first();
         }
         return $cache[$this->id];
     }

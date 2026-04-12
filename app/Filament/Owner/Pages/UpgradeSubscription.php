@@ -45,7 +45,7 @@ class UpgradeSubscription extends Page
             ],
             'premium' => [
                 'name' => 'Premium',
-                'price' => 29,
+                'price' => 39,
                 'first_month_price' => 9.99,
                 'price_id' => config('stripe.prices.premium', 'price_premium'),
                 'features' => [
@@ -61,7 +61,7 @@ class UpgradeSubscription extends Page
             'elite' => [
                 'name' => 'Elite',
                 'price' => 79,
-                'first_month_price' => 9.99,
+                'trial_days' => 30,
                 'price_id' => config('stripe.prices.elite', 'price_elite'),
                 'features' => [
                     'Todo lo del plan Premium',

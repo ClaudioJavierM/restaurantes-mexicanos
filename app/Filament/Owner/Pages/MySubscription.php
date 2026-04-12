@@ -43,7 +43,7 @@ class MySubscription extends Page
         ],
         'premium' => [
             'name' => 'Premium',
-            'price' => 29,
+            'price' => 39,
             'color' => 'red',
             'features' => [
                 'Todo en Gratis +',
@@ -124,9 +124,25 @@ class MySubscription extends Page
         }
     }
 
-    public function cancelSubscription(): void
+    public function openBillingPortal(): mixed
     {
-        // TODO: Implement Stripe subscription cancellation
-        session()->flash('info', 'Para cancelar tu suscripción, por favor contáctanos a soporte@restaurantesmexicanos.com');
+        $restaurant = auth()->user()->firstAccessibleRestaurant();
+
+        if (!$restaurant || !$restaurant->stripe_customer_id) {
+            \Filament\Notifications\Notification::make()
+                ->title('No tienes una suscripción activa de Stripe')
+                ->warning()
+                ->send();
+            return null;
+        }
+
+        \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+
+        $session = \Stripe\BillingPortal\Session::create([
+            'customer'   => $restaurant->stripe_customer_id,
+            'return_url' => route('filament.owner.pages.my-subscription'),
+        ]);
+
+        return redirect($session->url);
     }
 }

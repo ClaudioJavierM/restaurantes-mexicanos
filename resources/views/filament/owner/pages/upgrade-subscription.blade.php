@@ -48,6 +48,10 @@
                                 <div style="margin-top: 0.25rem;">
                                     <span style="font-size: 0.875rem; color: #22c55e; font-weight: 600;">Primer mes: ${{ $plan["first_month_price"] }}</span>
                                 </div>
+                            @elseif(isset($plan["trial_days"]))
+                                <div style="margin-top: 0.25rem;">
+                                    <span style="font-size: 0.875rem; color: #22c55e; font-weight: 600;">{{ $plan["trial_days"] }} días gratis — luego ${{ $plan["price"] }}/mes</span>
+                                </div>
                             @endif
                                 <span style="font-size: 1rem; color: #9ca3af;">/mes</span>
                             @else

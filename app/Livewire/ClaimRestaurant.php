@@ -56,6 +56,9 @@ class ClaimRestaurant extends Component
     // Stripe embedded payment
     public ?string $stripeClientSecret = null;
 
+    // Resume notice for abandoned claim recovery
+    public string $resumeNotice = '';
+
     // Restaurant stats for plan selection modal
     public int $restaurantMonthlyViews = 0;
     public int $restaurantTotalViews = 0;
@@ -278,6 +281,37 @@ class ClaimRestaurant extends Component
             return;
         }
 
+        // Detect partial claim in progress (abandoned flow)
+        if (!$this->selectedRestaurant->user_id && $this->selectedRestaurant->claim_started_at) {
+            $r = $this->selectedRestaurant;
+
+            if ($r->email_verified_for_claim) {
+                // User verified email but abandoned at role selection or later — resume from select_role
+                $this->ownerName  = $r->owner_name  ?? '';
+                $this->ownerEmail = $r->owner_email ?? '';
+                $this->ownerPhone = $r->owner_phone ?? '';
+                $this->resumeNotice = 'Tu verificación anterior sigue siendo válida, continúa desde donde lo dejaste.';
+                $this->detectAvailableMethods();
+                $this->step = 'select_role';
+                $this->dispatch('scroll-top');
+                return;
+            }
+
+            if (!empty($r->owner_email)) {
+                // User started but never completed verification — resume from verify_code and auto-resend
+                $this->ownerName  = $r->owner_name  ?? '';
+                $this->ownerEmail = $r->owner_email;
+                $this->ownerPhone = $r->owner_phone ?? '';
+                $this->resumeNotice = 'Encontramos un reclamo pendiente. Te reenviaremos el código de verificación.';
+                $this->detectAvailableMethods();
+                $this->step = 'verify_code';
+                $this->dispatch('scroll-top');
+                // Auto-resend the verification code
+                $this->resendCode();
+                return;
+            }
+        }
+
         // Track restaurant selected
         try {
             \App\Models\AnalyticsEvent::create([
@@ -325,6 +359,7 @@ class ClaimRestaurant extends Component
         $this->step = 'search';
         $this->dispatch('scroll-top');
         $this->selectedRestaurant = null;
+        $this->resumeNotice = '';
         $this->reset(['ownerName', 'ownerEmail', 'ownerPhone', 'verificationCode', 'codeError', 'availableMethods']);
     }
 
@@ -350,6 +385,17 @@ class ClaimRestaurant extends Component
 
     public function submitVerification()
     {
+        // If email was already verified for this restaurant, skip straight to role selection
+        if ($this->selectedRestaurant && $this->selectedRestaurant->email_verified_for_claim) {
+            $this->ownerName  = $this->ownerName  ?: ($this->selectedRestaurant->owner_name  ?? '');
+            $this->ownerEmail = $this->ownerEmail ?: ($this->selectedRestaurant->owner_email ?? '');
+            $this->ownerPhone = $this->ownerPhone ?: ($this->selectedRestaurant->owner_phone ?? '');
+            $this->resumeNotice = 'Tu verificación anterior sigue siendo válida, continúa desde donde lo dejaste.';
+            $this->step = 'select_role';
+            $this->dispatch('scroll-top');
+            return;
+        }
+
         $this->validate([
             'ownerName' => 'required|min:2',
             'ownerEmail' => 'required|email',

@@ -464,3 +464,13 @@ Schedule::command('famer:send-unclaimed-coupon --limit=200')->quarterly()->at('1
 
 // Abandoned claim recovery — twice daily (10 AM and 10 PM UTC)
 Schedule::command('famer:send-abandoned-claims --limit=200')->twiceDaily(10, 22);
+
+// ============================================================================
+// Elite Trial Reminder — daily 10:00 AM (reminder sent ~4 days before trial ends)
+// ============================================================================
+Schedule::command('famer:send-trial-reminders')->dailyAt('10:00');
+
+// ============================================================================
+// Subscription Auto-Downgrade — daily 01:00 AM (downgrade expired paid plans)
+// ============================================================================
+Schedule::command('famer:downgrade-expired')->dailyAt('01:00');

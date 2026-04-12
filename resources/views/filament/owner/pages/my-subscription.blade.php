@@ -178,11 +178,27 @@
             </div>
         </div>
 
+        {{-- Cancel / Manage Subscription --}}
+        @if($restaurant && $restaurant->stripe_customer_id && $plan !== 'free')
+        <div style="background-color: #1f2937; border-radius: 0.75rem; padding: 1.25rem; border: 1px solid #374151;">
+            <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem;">
+                <div>
+                    <h3 style="font-size: 1rem; font-weight: 600; color: #ffffff; margin: 0 0 0.25rem 0;">Gestionar Suscripción</h3>
+                    <p style="font-size: 0.875rem; color: #9ca3af; margin: 0;">Cancela, actualiza tu método de pago o revisa tus facturas desde el portal de Stripe.</p>
+                </div>
+                <button wire:click="openBillingPortal"
+                        style="display: inline-flex; align-items: center; gap: 0.5rem; background-color: #374151; color: #ffffff; padding: 0.625rem 1.25rem; border-radius: 0.5rem; border: 1px solid #4b5563; font-size: 0.875rem; font-weight: 500; cursor: pointer; white-space: nowrap;">
+                    Administrar en Stripe →
+                </button>
+            </div>
+        </div>
+        @endif
+
         {{-- Help Section --}}
         <div style="background-color: #1f2937; border-radius: 0.75rem; padding: 1.25rem; border: 1px solid #374151;">
             <h3 style="font-size: 1rem; font-weight: 600; color: #ffffff; margin: 0 0 0.75rem 0;">💬 Necesitas Ayuda?</h3>
             <p style="font-size: 0.875rem; color: #9ca3af; margin: 0;">
-                Si tienes preguntas sobre tu suscripcion o necesitas hacer cambios, contactanos a 
+                Si tienes preguntas sobre tu suscripcion o necesitas hacer cambios, contactanos a
                 <a href="mailto:soporte@restaurantesmexicanosfamosos.com" style="color: #818cf8;">soporte@restaurantesmexicanosfamosos.com</a>
             </p>
         </div>

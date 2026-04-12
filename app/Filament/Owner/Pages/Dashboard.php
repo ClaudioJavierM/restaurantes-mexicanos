@@ -23,6 +23,7 @@ class Dashboard extends BaseDashboard
     public function getWidgets(): array
     {
         return [
+            \App\Filament\Owner\Widgets\RestaurantSwitcherWidget::class,
             \App\Filament\Owner\Widgets\ProfileCompletenessWidget::class,
             \App\Filament\Owner\Widgets\StatsOverview::class,
             \App\Filament\Owner\Widgets\RecentReviewsWidget::class,
