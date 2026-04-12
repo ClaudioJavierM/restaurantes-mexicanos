@@ -14,6 +14,9 @@
     </div>
 
 
+    <!-- Upgrade Banner (solo free) -->
+    <livewire:owner.upgrade-banner :restaurant="$restaurant" />
+
     <!-- Plan Features Section -->
     @if(in_array($restaurant->subscription_tier, ['premium', 'elite']))
     <div class="bg-white rounded-xl shadow overflow-hidden">

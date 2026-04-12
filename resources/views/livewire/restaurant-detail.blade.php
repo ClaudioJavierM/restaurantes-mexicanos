@@ -1493,4 +1493,47 @@
         @include('livewire.partials.menu-item-modal')
     @endif
 
+    {{-- ── Sticky bottom CTA: "¿Eres el dueño?" ───────────────────────────────
+         Visible cuando el restaurante no está reclamado,
+         o el usuario logueado NO es el propietario.
+         Si el usuario ES el dueño, muestra badge verde de gestión.
+    ──────────────────────────────────────────────────────────────────────── --}}
+    @php $isEn = str_contains(request()->getHost(), 'famousmexicanrestaurants.com'); @endphp
+
+    @if(auth()->check() && auth()->id() === $restaurant->user_id)
+        {{-- Badge verde: el usuario actual es el dueño --}}
+        <div style="position:fixed;bottom:1rem;right:1rem;z-index:100;background:#1F3D2B;border:1px solid rgba(74,222,128,0.3);border-radius:0.75rem;padding:0.625rem 1rem;display:flex;align-items:center;gap:0.5rem;">
+            <span style="color:#4ADE80;font-size:0.8rem;font-weight:600;">★ {{ $isEn ? 'Your restaurant' : 'Tu restaurante' }}</span>
+            <a href="/owner/dashboard" style="color:#D4AF37;font-size:0.8rem;text-decoration:none;font-weight:500;">→ Dashboard</a>
+        </div>
+    @elseif(!$restaurant->user_id || !auth()->check() || auth()->id() !== $restaurant->user_id)
+        {{-- Banner sticky: invitar a reclamar --}}
+        <div style="position:fixed;bottom:0;left:0;right:0;z-index:100;background:linear-gradient(135deg,#1A1A1A,#0B0B0B);border-top:2px solid #D4AF37;padding:0.875rem 1.5rem;">
+            <div style="max-width:900px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+                <div>
+                    <p style="color:#F5F5F5;font-size:0.9rem;font-weight:600;margin:0;">
+                        @if($isEn)
+                            Are you the owner of <strong style="color:#D4AF37;">{{ $restaurant->name }}</strong>?
+                        @else
+                            ¿Eres el dueño de <strong style="color:#D4AF37;">{{ $restaurant->name }}</strong>?
+                        @endif
+                    </p>
+                    <p style="color:#9CA3AF;font-size:0.75rem;margin:0.2rem 0 0;">
+                        @if($isEn)
+                            Claim your profile for free and manage reviews, menu and stats.
+                        @else
+                            Reclama tu perfil gratis y gestiona reseñas, menú y estadísticas.
+                        @endif
+                    </p>
+                </div>
+                <a href="/claim?restaurant={{ $restaurant->slug }}&utm_source=detail&utm_medium=sticky&utm_campaign=claim"
+                   style="background:#D4AF37;color:#0B0B0B;font-weight:700;font-size:0.875rem;padding:0.625rem 1.25rem;border-radius:0.5rem;text-decoration:none;white-space:nowrap;flex-shrink:0;">
+                    {{ $isEn ? 'Claim for Free →' : 'Reclamar Gratis →' }}
+                </a>
+            </div>
+        </div>
+        {{-- Spacer para que el contenido no quede tapado por el banner --}}
+        <div style="height:5rem;"></div>
+    @endif
+
 </div>

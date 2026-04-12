@@ -60,6 +60,7 @@ class ClaimRestaurant extends Component
     public int $restaurantMonthlyViews = 0;
     public int $restaurantTotalViews = 0;
     public int $competitorCount = 0;
+    public int $socialProofCount = 0;
 
     public function mount()
     {
@@ -149,11 +150,28 @@ class ClaimRestaurant extends Component
 
                 if ($restaurant->is_claimed) {
                     $this->step = "claimed_options";
-        $this->dispatch('scroll-top');
+                    $this->dispatch('scroll-top');
                 } else {
+                    // Track claim start for abandoned recovery
+                    if (!$restaurant->user_id) {
+                        try {
+                            $restaurant->update(['claim_started_at' => now()]);
+                        } catch (\Exception $e) {
+                            Log::warning('Failed to update claim_started_at: ' . $e->getMessage());
+                        }
+                    }
+
+                    // Social proof: premium/elite restaurants in same state
+                    try {
+                        $this->socialProofCount = \App\Models\Restaurant::where('state_id', $restaurant->state_id)
+                            ->whereIn('subscription_tier', ['premium', 'elite'])
+                            ->where('id', '!=', $restaurant->id)
+                            ->count();
+                    } catch (\Exception $e) {}
+
                     $this->detectAvailableMethods();
                     $this->step = "verify";
-        $this->dispatch('scroll-top');
+                    $this->dispatch('scroll-top');
                 }
             }
         }
@@ -279,6 +297,23 @@ class ClaimRestaurant extends Component
         } catch (\Exception $e) {
             Log::warning('Failed to track claim_restaurant_selected: ' . $e->getMessage());
         }
+
+        // Track claim start for abandoned recovery
+        if ($this->selectedRestaurant && !$this->selectedRestaurant->user_id) {
+            try {
+                $this->selectedRestaurant->update(['claim_started_at' => now()]);
+            } catch (\Exception $e) {
+                Log::warning('Failed to update claim_started_at: ' . $e->getMessage());
+            }
+        }
+
+        // Social proof: premium/elite restaurants in same state
+        try {
+            $this->socialProofCount = \App\Models\Restaurant::where('state_id', $this->selectedRestaurant->state_id)
+                ->whereIn('subscription_tier', ['premium', 'elite'])
+                ->where('id', '!=', $this->selectedRestaurant->id)
+                ->count();
+        } catch (\Exception $e) {}
 
         $this->detectAvailableMethods();
         $this->step = 'verify';

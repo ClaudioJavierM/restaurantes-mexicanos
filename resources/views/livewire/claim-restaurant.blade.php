@@ -699,6 +699,18 @@
                 </div>
                 @endif
 
+                {{-- Social proof --}}
+                @if($socialProofCount > 0)
+                <div style="text-align:center;margin-bottom:1.25rem;">
+                    <p style="color:#9CA3AF;font-size:0.8rem;margin:0;">
+                        <span style="color:#4ADE80;font-weight:600;">{{ $socialProofCount }}</span> restaurantes en tu área ya son Premium o Elite
+                        @if($socialProofCount >= 10)
+                        — <span style="color:#D4AF37;font-weight:600;">no te quedes atrás</span>
+                        @endif
+                    </p>
+                </div>
+                @endif
+
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {{-- FREE PLAN --}}
                     <div class="rounded-xl p-6 transition-colors" style="{{ $selectedPlan === 'free' ? 'border:2px solid #D4AF37; background:#111111;' : 'border:2px solid #2A2A2A; background:#111111;' }}">
@@ -792,6 +804,17 @@
                             Suscribirse por $9.99
                         </button>
                         <p class="text-xs text-center mt-2" style="color:#9CA3AF;">Cancela cuando quieras</p>
+                        @php
+                        $recentSignups = \App\Models\Restaurant::whereIn('subscription_tier', ['premium','elite'])
+                            ->where('subscription_started_at', '>=', now()->subDays(7))
+                            ->where('state_id', $selectedRestaurant->state_id ?? 0)
+                            ->count();
+                        @endphp
+                        @if($recentSignups > 0)
+                        <p style="color:#9CA3AF;font-size:0.7rem;text-align:center;margin-top:0.5rem;">
+                            🔥 {{ $recentSignups }} {{ $recentSignups === 1 ? 'restaurante se unió' : 'restaurantes se unieron' }} esta semana en tu área
+                        </p>
+                        @endif
                     </div>
 
                     {{-- ELITE PLAN --}}

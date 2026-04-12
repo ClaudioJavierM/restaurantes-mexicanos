@@ -197,7 +197,31 @@ class StripeWebhookController extends Controller
             'subscription_status' => 'past_due',
         ]);
 
-        // TODO: Send email notification to restaurant owner about payment failure
+        // Send email notification to restaurant owner about payment failure
+        if ($restaurant->user_id) {
+            $user = User::find($restaurant->user_id);
+            if ($user) {
+                // Get Stripe billing portal URL for card update
+                try {
+                    $stripe = new \Stripe\StripeClient(config('stripe.secret'));
+                    $session = $stripe->billingPortal->sessions->create([
+                        'customer' => $restaurant->stripe_customer_id,
+                        'return_url' => url('/owner/dashboard'),
+                    ]);
+                    $updateUrl = $session->url;
+                } catch (\Exception $e) {
+                    \Log::warning("PaymentFailed: could not create billing portal session for restaurant {$restaurant->id}: " . $e->getMessage());
+                    $updateUrl = url('/owner/dashboard');
+                }
+
+                try {
+                    Mail::to($user->email)->send(new \App\Mail\PaymentFailedMail($restaurant, $user, $updateUrl));
+                    \Log::info("PaymentFailed email sent for restaurant {$restaurant->id} to {$user->email}");
+                } catch (\Exception $e) {
+                    \Log::error("PaymentFailed: could not send email for restaurant {$restaurant->id}: " . $e->getMessage());
+                }
+            }
+        }
     }
 
     /**

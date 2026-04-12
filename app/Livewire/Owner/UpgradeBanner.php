@@ -35,6 +35,27 @@ class UpgradeBanner extends Component
         return !$isPaidAndActive && !$dismissed;
     }
 
+    /**
+     * Count of premium/elite competitors in the same state.
+     */
+    public function getPremiumCompetitorCountProperty(): int
+    {
+        return Restaurant::where('state_id', $this->restaurant->state_id)
+            ->where('status', 'approved')
+            ->whereIn('subscription_tier', ['premium', 'elite'])
+            ->where('id', '!=', $this->restaurant->id)
+            ->count();
+    }
+
+    /**
+     * Page views for the current month (from restaurant_page_views or fallback to 0).
+     */
+    public function getMonthlyViewsProperty(): int
+    {
+        // Use page_views_count if tracked on the model, otherwise return 0
+        return (int) ($this->restaurant->monthly_views ?? 0);
+    }
+
     public function dismiss(): void
     {
         session(['upgrade_banner_dismissed_' . $this->restaurant->id => true]);
