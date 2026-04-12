@@ -483,6 +483,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 fontFamily: 'Poppins, sans-serif',
                 borderRadius: '8px',
                 spacingUnit: '4px',
+                colorIconTab: '#9CA3AF',
+                colorIconTabSelected: '#F5F5F5',
+                colorIconTabHover: '#D4AF37',
             },
             rules: {
                 '.Input': {
