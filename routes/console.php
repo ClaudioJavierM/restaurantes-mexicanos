@@ -461,3 +461,6 @@ Schedule::command('famer:send-unclaimed-stats --limit=200')->monthlyOn(1, '11:00
 
 // Unclaimed restaurants — quarterly coupon (1st of Jan, Apr, Jul, Oct at 11:30 UTC)
 Schedule::command('famer:send-unclaimed-coupon --limit=200')->quarterly()->at('11:30');
+
+// Abandoned claim recovery — twice daily (10 AM and 10 PM UTC)
+Schedule::command('famer:send-abandoned-claims --limit=200')->twiceDaily(10, 22);

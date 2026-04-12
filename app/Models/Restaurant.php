@@ -202,6 +202,9 @@ class Restaurant extends Model implements HasMedia
         'onboarding_dismissed_at',
         // Newsletter
         'owner_newsletter',
+        // Abandoned claim recovery
+        'claim_started_at',
+        'claim_abandoned_sent_at',
     ];
 
     protected $casts = [
@@ -269,6 +272,9 @@ class Restaurant extends Model implements HasMedia
         'onboarding_completed'    => 'boolean',
         'onboarding_completed_at' => 'datetime',
         'onboarding_dismissed_at' => 'datetime',
+        // Abandoned claim recovery
+        'claim_started_at'        => 'datetime',
+        'claim_abandoned_sent_at' => 'datetime',
         'subscription_started_at' => 'datetime',
         'subscription_expires_at' => 'datetime',
         'chatbot_settings' => 'array',
