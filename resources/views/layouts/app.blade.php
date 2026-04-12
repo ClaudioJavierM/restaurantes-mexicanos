@@ -661,10 +661,12 @@
                 </div>
             </div>
 
-            <!-- Newsletter Signup -->
+            <!-- Newsletter Signup — solo en páginas públicas, no en flujos de dueños -->
+            @unless(request()->is('claim/*') || request()->is('owner/*') || request()->is('claim'))
             <div class="border-t border-[#2A2A2A] pt-10 pb-6">
                 @livewire('newsletter-signup')
             </div>
+            @endunless
 
             <!-- Bottom Bar -->
             <div class="border-t border-[#2A2A2A] pt-8">
