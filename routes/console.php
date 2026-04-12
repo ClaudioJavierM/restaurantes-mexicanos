@@ -439,3 +439,12 @@ Schedule::command('famer:send-trial-ending-reminders')
         \Log::error('Trial ending reminders dispatch failed');
         notifyN8nFailure('famer:send-trial-ending-reminders', 'Elite trial ending reminders');
     });
+
+// ============================================================================
+// FAMER Weekly Stats Emails — Every Monday at 9:00 AM CST (15:00 UTC)
+// Dispatches SendWeeklyStatsEmailJob for every approved restaurant with an email
+// Staggered at 1/sec to stay within Resend rate limits (~3,600/hr)
+// ============================================================================
+
+// FAMER Weekly Stats — Every Monday at 9:00 AM CST (15:00 UTC)
+Schedule::command('famer:send-weekly-stats')->weeklyOn(1, '15:00');
