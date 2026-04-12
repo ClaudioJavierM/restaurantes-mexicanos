@@ -632,6 +632,7 @@
 
         {{-- STEP 3: SELECT PLAN --}}
         @if($step === 'select_plan')
+        @teleport('body')
         <div style="position:fixed;inset:0;background:rgba(0,0,0,0.92);backdrop-filter:blur(4px);z-index:10000;overflow-y:auto;padding:2rem 1rem;">
             <div style="width:100%;max-width:900px;margin:0 auto;background:#0B0B0B;border:1px solid #2A2A2A;border-radius:1rem;padding:2rem;position:relative;">
 
@@ -833,6 +834,7 @@
                 </div>
             </div>
         </div>
+        @endteleport
         @endif
 
         @if($step === 'payment')
