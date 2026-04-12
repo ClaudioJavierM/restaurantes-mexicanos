@@ -594,8 +594,17 @@
         @endisset
     </main>
 
+    <!-- Newsletter — antes del footer, solo páginas públicas -->
+    @unless(request()->is('claim/*') || request()->is('owner/*') || request()->is('claim'))
+    <div class="bg-[#0B0B0B]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            @livewire('newsletter-signup')
+        </div>
+    </div>
+    @endunless
+
     <!-- Footer -->
-    <footer class="bg-[#0B0B0B] text-[#F5F5F5] mt-20">
+    <footer class="bg-[#0B0B0B] text-[#F5F5F5]">
         <!-- Gold top border -->
         <div class="h-px bg-[#D4AF37]/30"></div>
 
