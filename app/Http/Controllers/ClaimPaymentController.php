@@ -39,6 +39,14 @@ class ClaimPaymentController extends Controller
                     'period'   => 'primer mes',
                     'renewal'  => 'Después $39/mes',
                     'badge'    => 'Más popular',
+                    'features' => [
+                        'Badge Destacado en el directorio',
+                        'Top 3 en búsquedas locales',
+                        'Menú Digital + QR Code',
+                        'Sistema de Reservaciones',
+                        'Dashboard de Analíticas',
+                        'Chatbot AI (ES/EN) 24/7',
+                    ],
                 ],
                 'elite' => [
                     'name'     => 'Elite',
@@ -46,6 +54,15 @@ class ClaimPaymentController extends Controller
                     'period'   => '30 días',
                     'renewal'  => 'Después $79/mes — cancela cuando quieras',
                     'badge'    => '30 días gratis',
+                    'features' => [
+                        'Todo lo de Premium PLUS:',
+                        'App Móvil White Label',
+                        'Website Builder Completo',
+                        'Máxima Prioridad en Búsquedas',
+                        'Account Manager Dedicado',
+                        'Fotografía Profesional Trimestral',
+                        'Cobertura de Medios y PR',
+                    ],
                 ],
             ];
 
