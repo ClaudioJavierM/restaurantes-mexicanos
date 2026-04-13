@@ -1,4 +1,56 @@
 <div class="min-h-screen py-12" style="background:#0B0B0B;" x-data x-init="$watch('$wire.step', () => setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 50))">
+
+    {{-- ✅ Success Modal — shown after free claim completes --}}
+    @if($showSuccessModal)
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4" style="background:rgba(0,0,0,0.85);">
+        <div class="w-full max-w-md rounded-2xl p-8 text-center" style="background:#1A1A1A; border:1px solid #2A2A2A;">
+            {{-- Check icon --}}
+            <div class="flex items-center justify-center w-20 h-20 rounded-full mx-auto mb-6" style="background:#1F3D2B;">
+                <svg class="w-10 h-10" style="color:#4ADE80;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                </svg>
+            </div>
+
+            <h2 class="text-2xl font-black mb-2" style="color:#F5F5F5;">
+                ¡Restaurante Reclamado!
+            </h2>
+            <p class="text-sm mb-2" style="color:#9CA3AF;">
+                <span style="color:#D4AF37; font-weight:600;">{{ $selectedRestaurant?->name }}</span>
+                ya es parte de tu cuenta.
+            </p>
+            <p class="text-xs mb-8" style="color:#6B7280;">
+                Enviamos un email de bienvenida con los siguientes pasos.
+            </p>
+
+            {{-- Primary: Go to dashboard --}}
+            <a href="/owner" class="block w-full py-4 rounded-xl font-bold text-lg mb-3 transition-all"
+               style="background:#D4AF37; color:#0B0B0B;">
+                @if($claimedRestaurantCount > 1)
+                    Ver mis {{ $claimedRestaurantCount }} Restaurantes
+                @else
+                    Ir a mi Dashboard
+                @endif
+            </a>
+
+            {{-- Secondary: View public profile --}}
+            @if($selectedRestaurant?->slug)
+            <a href="/restaurante/{{ $selectedRestaurant->slug }}" target="_blank"
+               class="block w-full py-3 rounded-xl font-semibold text-sm mb-3 transition-all"
+               style="background:#2A2A2A; color:#D4AF37; border:1px solid #D4AF37/30;">
+                Ver Perfil Público
+            </a>
+            @endif
+
+            {{-- Tertiary: Claim another --}}
+            <button wire:click="claimAnother"
+                    class="block w-full py-3 rounded-xl font-semibold text-sm transition-all"
+                    style="background:transparent; color:#6B7280; border:1px solid #2A2A2A;">
+                Reclamar otro restaurante
+            </button>
+        </div>
+    </div>
+    @endif
+
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {{-- Progress Steps --}}

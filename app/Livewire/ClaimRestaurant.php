@@ -20,6 +20,8 @@ class ClaimRestaurant extends Component
     public $searchResults = [];
     public $selectedRestaurant = null;
     public $step = 'search'; // search, verify, verify_code, select_role, create_account, select_plan
+    public bool $showSuccessModal = false;
+    public int $claimedRestaurantCount = 0;
 
     // Owner role (selected in select_role step)
     public string $ownerRole = '';
@@ -361,6 +363,16 @@ class ClaimRestaurant extends Component
         $this->selectedRestaurant = null;
         $this->resumeNotice = '';
         $this->reset(['ownerName', 'ownerEmail', 'ownerPhone', 'verificationCode', 'codeError', 'availableMethods']);
+    }
+
+    public function claimAnother()
+    {
+        $this->showSuccessModal = false;
+        $this->step = 'search';
+        $this->selectedRestaurant = null;
+        $this->resumeNotice = '';
+        $this->reset(['ownerName', 'ownerEmail', 'ownerPhone', 'ownerRole', 'verificationCode', 'codeError', 'availableMethods', 'search', 'password', 'selectedPlan']);
+        $this->dispatch('scroll-top');
     }
 
     public function backToVerify()
@@ -869,8 +881,13 @@ class ClaimRestaurant extends Component
             Log::warning('Could not dispatch FreeClaimFollowUpJob: ' . $e->getMessage());
         }
 
-        session()->flash('success', '¡Felicidades! Tu restaurante ha sido reclamado exitosamente.');
-        return $this->redirect('/owner', navigate: false);
+        // Count how many restaurants this user now has access to
+        $this->claimedRestaurantCount = auth()->user()
+            ->allAccessibleRestaurants()
+            ->count();
+
+        // Show modal instead of hard redirect — user chooses next step
+        $this->showSuccessModal = true;
     }
 
     public function applyCoupon()
