@@ -116,7 +116,7 @@
                 {{-- 2nd place --}}
                 @if($second)
                 <div style="flex:1; min-width:160px; max-width:220px; text-align:center;">
-                    <a href="{{ route('restaurant.show', $second->slug) }}" style="text-decoration:none; display:block;">
+                    <a href="{{ route('restaurants.show', $second->slug) }}" style="text-decoration:none; display:block;">
                         <div style="background:#1A1A1A; border:1px solid rgba(212,175,55,0.2); border-radius:1rem; padding:1.5rem 1rem 1.25rem; transition:border-color 0.2s;"
                              onmouseover="this.style.borderColor='rgba(212,175,55,0.5)'"
                              onmouseout="this.style.borderColor='rgba(212,175,55,0.2)'">
@@ -139,7 +139,7 @@
                 {{-- 1st place (elevated) --}}
                 @if($first)
                 <div style="flex:1; min-width:180px; max-width:260px; text-align:center; margin-bottom:-1rem;">
-                    <a href="{{ route('restaurant.show', $first->slug) }}" style="text-decoration:none; display:block;">
+                    <a href="{{ route('restaurants.show', $first->slug) }}" style="text-decoration:none; display:block;">
                         <div style="background:#1A1A1A; border:2px solid #D4AF37; border-radius:1rem; padding:2rem 1.25rem 1.5rem; box-shadow:0 0 30px rgba(212,175,55,0.2); transition:box-shadow 0.2s;"
                              onmouseover="this.style.boxShadow='0 0 50px rgba(212,175,55,0.35)'"
                              onmouseout="this.style.boxShadow='0 0 30px rgba(212,175,55,0.2)'">
@@ -162,7 +162,7 @@
                 {{-- 3rd place --}}
                 @if($third)
                 <div style="flex:1; min-width:160px; max-width:220px; text-align:center;">
-                    <a href="{{ route('restaurant.show', $third->slug) }}" style="text-decoration:none; display:block;">
+                    <a href="{{ route('restaurants.show', $third->slug) }}" style="text-decoration:none; display:block;">
                         <div style="background:#1A1A1A; border:1px solid rgba(212,175,55,0.2); border-radius:1rem; padding:1.5rem 1rem 1.25rem; transition:border-color 0.2s;"
                              onmouseover="this.style.borderColor='rgba(212,175,55,0.5)'"
                              onmouseout="this.style.borderColor='rgba(212,175,55,0.2)'">
@@ -193,7 +193,7 @@
                 </h3>
                 <div style="display:flex; flex-direction:column; gap:0.5rem;">
                     @foreach($rest as $i => $r)
-                    <a href="{{ route('restaurant.show', $r->slug) }}"
+                    <a href="{{ route('restaurants.show', $r->slug) }}"
                        style="display:flex; align-items:center; gap:1rem; background:#1A1A1A; border:1px solid rgba(255,255,255,0.06); border-radius:0.75rem; padding:0.875rem 1.25rem; text-decoration:none; transition:border-color 0.2s;"
                        onmouseover="this.style.borderColor='rgba(212,175,55,0.3)'"
                        onmouseout="this.style.borderColor='rgba(255,255,255,0.06)'">
