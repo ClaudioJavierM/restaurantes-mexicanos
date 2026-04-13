@@ -194,6 +194,85 @@
         </div>
         @endif
 
+        {{-- Payment History --}}
+        @if(!empty($paymentHistory))
+        <div style="background-color: #111827; border-radius: 0.75rem; border: 1px solid #374151; overflow: hidden;">
+            <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid #374151;">
+                <h3 style="font-size: 1rem; font-weight: 600; color: #ffffff; margin: 0;">Historial de Pagos</h3>
+                <p style="font-size: 0.8rem; color: #6b7280; margin: 0.25rem 0 0 0;">Tus últimos pagos procesados</p>
+            </div>
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid #374151;">
+                            <th style="padding: 0.75rem 1.5rem; text-align: left; color: #6b7280; font-weight: 500;">Fecha</th>
+                            <th style="padding: 0.75rem 1rem; text-align: left; color: #6b7280; font-weight: 500;">Descripción</th>
+                            <th style="padding: 0.75rem 1rem; text-align: left; color: #6b7280; font-weight: 500;">Payment ID</th>
+                            <th style="padding: 0.75rem 1rem; text-align: right; color: #6b7280; font-weight: 500;">Monto</th>
+                            <th style="padding: 0.75rem 1rem; text-align: center; color: #6b7280; font-weight: 500;">Estado</th>
+                            <th style="padding: 0.75rem 1.5rem; text-align: center; color: #6b7280; font-weight: 500;">Factura</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($paymentHistory as $payment)
+                        <tr style="border-bottom: 1px solid #1f2937;">
+                            <td style="padding: 1rem 1.5rem; color: #d1d5db; white-space: nowrap;">{{ $payment['date'] }}</td>
+                            <td style="padding: 1rem; color: #d1d5db; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ $payment['description'] }}">
+                                {{ Str::limit($payment['description'], 40) }}
+                            </td>
+                            <td style="padding: 1rem; font-family: monospace; font-size: 0.75rem;">
+                                @if($payment['payment_intent'])
+                                    <span style="color: #818cf8;" title="{{ $payment['payment_intent'] }}">
+                                        {{ Str::limit($payment['payment_intent'], 22, '…') }}
+                                    </span>
+                                @else
+                                    <span style="color: #4b5563;">—</span>
+                                @endif
+                            </td>
+                            <td style="padding: 1rem; text-align: right; color: #ffffff; font-weight: 600; white-space: nowrap;">
+                                ${{ $payment['amount'] }} {{ $payment['currency'] }}
+                            </td>
+                            <td style="padding: 1rem; text-align: center;">
+                                @php
+                                    $statusColor = match($payment['status']) {
+                                        'paid'   => '#4ade80',
+                                        'open'   => '#facc15',
+                                        'void'   => '#6b7280',
+                                        'uncollectible' => '#f87171',
+                                        default  => '#9ca3af',
+                                    };
+                                    $statusLabel = match($payment['status']) {
+                                        'paid'   => 'Pagado',
+                                        'open'   => 'Pendiente',
+                                        'void'   => 'Anulado',
+                                        'uncollectible' => 'Incobrable',
+                                        default  => $payment['status'],
+                                    };
+                                @endphp
+                                <span style="display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; color: {{ $statusColor }}; background: {{ $statusColor }}22;">
+                                    {{ $statusLabel }}
+                                </span>
+                            </td>
+                            <td style="padding: 1rem 1.5rem; text-align: center;">
+                                @if($payment['pdf_url'])
+                                <a href="{{ $payment['pdf_url'] }}" target="_blank"
+                                   style="color: #6b7280; text-decoration: none;" title="Descargar PDF">
+                                    <svg style="width:1.25rem; height:1.25rem; display:inline;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+                                    </svg>
+                                </a>
+                                @else
+                                <span style="color: #4b5563;">—</span>
+                                @endif
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        @endif
+
         {{-- Help Section --}}
         <div style="background-color: #1f2937; border-radius: 0.75rem; padding: 1.25rem; border: 1px solid #374151;">
             <h3 style="font-size: 1rem; font-weight: 600; color: #ffffff; margin: 0 0 0.75rem 0;">💬 Necesitas Ayuda?</h3>

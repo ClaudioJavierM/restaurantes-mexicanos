@@ -19,6 +19,7 @@ class MySubscription extends Page
     public $restaurant;
     public $currentPlan;
     public $planDetails;
+    public array $paymentHistory = [];
 
     protected $plans = [
         'free' => [
@@ -95,6 +96,39 @@ class MySubscription extends Page
         $this->restaurant = Auth::user()->firstAccessibleRestaurant();
         $this->currentPlan = $this->restaurant?->subscription_tier ?? 'free';
         $this->planDetails = $this->plans[$this->currentPlan] ?? $this->plans['free'];
+        $this->loadPaymentHistory();
+    }
+
+    public function loadPaymentHistory(): void
+    {
+        if (!$this->restaurant?->stripe_customer_id) {
+            return;
+        }
+
+        try {
+            \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+
+            $invoices = \Stripe\Invoice::all([
+                'customer' => $this->restaurant->stripe_customer_id,
+                'limit'    => 12,
+            ]);
+
+            $this->paymentHistory = collect($invoices->data)->map(function ($inv) {
+                return [
+                    'invoice_id'       => $inv->id,
+                    'payment_intent'   => $inv->payment_intent ?? null,
+                    'amount'           => number_format($inv->amount_paid / 100, 2),
+                    'currency'         => strtoupper($inv->currency),
+                    'status'           => $inv->status,
+                    'date'             => \Carbon\Carbon::createFromTimestamp($inv->created)->format('M d, Y'),
+                    'description'      => $inv->lines->data[0]->description ?? 'Subscription',
+                    'pdf_url'          => $inv->invoice_pdf,
+                    'hosted_url'       => $inv->hosted_invoice_url,
+                ];
+            })->toArray();
+        } catch (\Exception $e) {
+            $this->paymentHistory = [];
+        }
     }
 
     public function getPlans(): array
