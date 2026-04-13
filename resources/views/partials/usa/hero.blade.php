@@ -2,8 +2,8 @@
 <div class="relative overflow-hidden" style="background-color: #0B0B0B;">
     {{-- Background image: elegant Mexican restaurant --}}
     <div class="absolute inset-0">
-        <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1920&q=80&auto=format&fit=crop"
-             alt="" class="w-full h-full object-cover" loading="eager">
+        <img src="/images/hero-restaurant.jpg"
+             alt="" class="w-full h-full object-cover" loading="eager" style="object-position: center 40%;">
         {{-- Dark overlay for readability --}}
         <div class="absolute inset-0 bg-gradient-to-b from-[#0B0B0B]/85 via-[#0B0B0B]/75 to-[#0B0B0B]/95"></div>
     </div>
