@@ -14,17 +14,19 @@ class GeoLocationService
      */
     public function getLocationFromIp(?string $ip = null): ?array
     {
-        $ip = $ip ?? request()->ip();
+        // When behind Cloudflare, request()->ip() returns the edge server IP (Dallas, TX).
+        // CF-Connecting-IP contains the real visitor IP.
+        $ip = $ip ?? request()->header('CF-Connecting-IP') ?? request()->ip();
 
         // Skip local/private IPs
         if ($this->isPrivateIp($ip)) {
             return null;
         }
 
-        // Cache for 24 hours per IP
+        // Cache for 6 hours per IP (shorter to avoid stale Cloudflare edge IPs)
         $cacheKey = "geo_location_{$ip}";
 
-        return Cache::remember($cacheKey, 86400, function () use ($ip) {
+        return Cache::remember($cacheKey, 21600, function () use ($ip) {
             try {
                 $response = Http::timeout(5)->get("http://ip-api.com/json/{$ip}", [
                     'fields' => 'status,country,countryCode,region,regionName,city,zip,lat,lon,timezone',
