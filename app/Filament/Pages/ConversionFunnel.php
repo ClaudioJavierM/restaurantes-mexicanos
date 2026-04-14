@@ -82,7 +82,7 @@ class ConversionFunnel extends Page
                 'drop'  => $totalApproved > 0 ? round((1 - $haveEmail / $totalApproved) * 100, 1) : 0.0,
             ];
 
-            $startedClaim = Restaurant::whereNotNull('claim_started_at')->count();
+            $startedClaim = \App\Models\AnalyticsEvent::where('event_type', 'claim_started')->count();
             $steps[] = [
                 'label' => 'Iniciaron Claim',
                 'count' => $startedClaim,
@@ -119,9 +119,9 @@ class ConversionFunnel extends Page
     private function computeAbandonByStep(): array
     {
         try {
-            $startedNotFinished = Restaurant::whereNotNull('claim_started_at')
-                ->where('is_claimed', false)
-                ->count();
+            $claimStartedTotal  = \App\Models\AnalyticsEvent::where('event_type', 'claim_started')->count();
+            $claimCompletedTotal = \App\Models\AnalyticsEvent::where('event_type', 'claim_completed')->count();
+            $startedNotFinished = max(0, $claimStartedTotal - $claimCompletedTotal);
 
             $claimedFree = Restaurant::where('is_claimed', true)
                 ->where(function ($q) {
@@ -248,7 +248,9 @@ class ConversionFunnel extends Page
                 $weekEnd   = $weekStart->copy()->endOfWeek();
                 $label     = $weekStart->format('d/m');
 
-                $initiated = Restaurant::whereBetween('claim_started_at', [$weekStart, $weekEnd])->count();
+                $initiated = \App\Models\AnalyticsEvent::whereBetween('created_at', [$weekStart, $weekEnd])
+                    ->where('event_type', 'claim_started')
+                    ->count();
 
                 $completed = Restaurant::whereBetween('claimed_at', [$weekStart, $weekEnd])
                     ->where('is_claimed', true)
