@@ -248,7 +248,7 @@ class ImportMFImportsRestaurants extends Command
                 'phone' => $this->cleanPhone($data['phone']),
                 'email' => $this->validateEmail($data['email']) ? $data['email'] : null,
                 'category_id' => 17, // Default: Mexican Restaurant
-                'status' => 'pending', // Pending until enriched/verified
+                'status' => 'pending', // Default; may be upgraded below
                 'import_source' => 'mf_imports',
                 'imported_at' => now(),
             ]);
@@ -263,8 +263,10 @@ class ImportMFImportsRestaurants extends Command
                 $this->enrichWithYelp($restaurant, $data);
             }
 
-            // If enriched with either source, mark as approved
+            // Auto-approve if enriched OR if restaurant has sufficient base data
             if ($restaurant->google_place_id || $restaurant->yelp_id) {
+                $restaurant->status = 'approved';
+            } elseif (!empty($restaurant->name) && !empty($restaurant->address) && !empty($restaurant->city)) {
                 $restaurant->status = 'approved';
             }
 

@@ -474,3 +474,21 @@ Schedule::command('famer:send-trial-reminders')->dailyAt('10:00');
 // Subscription Auto-Downgrade — daily 01:00 AM (downgrade expired paid plans)
 // ============================================================================
 Schedule::command('famer:downgrade-expired')->dailyAt('01:00');
+
+// ============================================================================
+// Auto-Approve Pending Restaurants — every Sunday at 04:00 AM
+// Approves pending restaurants that have name + address + city (complete data)
+// ============================================================================
+Schedule::command('famer:approve-pending --limit=500')
+    ->weekly()
+    ->sundays()
+    ->at('04:00')
+    ->timezone('America/New_York')
+    ->description('WEEKLY: Auto-approve pending restaurants with complete data')
+    ->onSuccess(function () {
+        \Log::info('Weekly auto-approve pending restaurants completed');
+    })
+    ->onFailure(function () {
+        \Log::error('Weekly auto-approve pending restaurants failed');
+        notifyN8nFailure('famer:approve-pending', 'Auto-approve pending restaurants');
+    });
