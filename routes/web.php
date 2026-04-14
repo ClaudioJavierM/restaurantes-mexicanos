@@ -64,6 +64,10 @@ Route::get('/blog', [\App\Http\Controllers\BlogController::class, 'index'])->nam
 Route::get('/blog/categoria/{category}', [\App\Http\Controllers\BlogController::class, 'category'])->name('blog.category');
 Route::get('/blog/{post}', [\App\Http\Controllers\BlogController::class, 'show'])->name('blog.show');
 
+// Pricing Page
+Route::get('/precios', \App\Livewire\PricingPage::class)->name('pricing');
+Route::get('/pricing', \App\Livewire\PricingPage::class);
+
 // For Business Owners
 Route::get("/for-owners", \App\Livewire\ForOwners::class)->name("for-owners");
 Route::get('/como-funciona-famer', \App\Http\Controllers\HowItWorksController::class)->name('how-it-works');
