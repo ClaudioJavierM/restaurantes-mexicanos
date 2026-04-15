@@ -295,7 +295,9 @@
                             <a href="{{ route('restaurants.show', $restaurant->slug) }}"
                                class="group"
                                @mouseenter="$dispatch('highlight-marker', { index: {{ $index }} })">
-                                <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow duration-200 relative">
+                                @php $tier = $restaurant->subscription_tier; @endphp
+                                <div class="bg-white rounded-lg overflow-hidden hover:shadow-xl transition-all duration-200 relative
+                                    {{ $tier === 'elite' ? 'border-2 border-[#D4AF37] shadow-[0_2px_12px_rgba(212,175,55,0.25)]' : ($tier === 'premium' ? 'border border-[#D4AF37]/50 shadow-md' : 'border border-gray-200 shadow-sm') }}">
                                     <!-- Numbered Badge -->
                                     <span class="absolute top-3 left-3 z-10 bg-red-600 text-white w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold shadow-lg">
                                         {{ $index + 1 }}
@@ -332,6 +334,16 @@
                                             <span style="font-size:2.5rem;">🍽️</span>
                                             <span style="font-size:0.65rem; color:#4B5563; text-align:center; padding:0 0.5rem; line-height:1.3;">{{ Str::limit($restaurant->name, 22) }}</span>
                                         </div>
+                                        {{-- Tier badge on image --}}
+                                        @if($tier === 'elite')
+                                            <span class="absolute bottom-2 left-2 z-10 inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-bold shadow-lg" style="background:#D4AF37; color:#0B0B0B;">
+                                                &#9830; Elite
+                                            </span>
+                                        @elseif($tier === 'premium')
+                                            <span class="absolute bottom-2 left-2 z-10 inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold shadow" style="background:rgba(212,175,55,0.92); color:#0B0B0B;">
+                                                &#9733; Premium
+                                            </span>
+                                        @endif
                                     </div>
 
                                     <!-- Restaurant Info -->
@@ -408,7 +420,7 @@
                                         <div class="flex flex-wrap gap-1 mt-3">
                                             {{-- Badge: Verificado por plan de suscripcion --}}
                                             @if($restaurant->is_claimed)
-                                                @if($restaurant->subscription_plan === 'elite')
+                                                @if($tier === 'elite')
                                                     {{-- Elite: Diamante dorado premium --}}
                                                     <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 text-amber-900 shadow-lg border border-amber-300 ring-1 ring-amber-400/50" title="Restaurante Elite - Maxima distincion">
                                                         <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
@@ -416,16 +428,16 @@
                                                         </svg>
                                                         Elite Verificado
                                                     </span>
-                                                @elseif($restaurant->subscription_plan === 'premium')
-                                                    {{-- Premium: Estrella azul/morada --}}
-                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-md" title="Restaurante Premium Verificado">
+                                                @elseif($tier === 'premium')
+                                                    {{-- Premium: Estrella dorada --}}
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold shadow-md" style="background:linear-gradient(135deg,#D4AF37,#f0d060); color:#0B0B0B;" title="Restaurante Premium Verificado">
                                                         <svg class="w-3.5 h-3.5 mr-1" fill="currentColor" viewBox="0 0 24 24">
                                                             <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
                                                         </svg>
-                                                        Premium Verificado
+                                                        Premium
                                                     </span>
                                                 @else
-                                                    {{-- Free: Palomita verde --}}
+                                                    {{-- Free claimed: Palomita verde --}}
                                                     <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gradient-to-r from-emerald-400 to-teal-500 text-white shadow-sm" title="Restaurante verificado por su propietario">
                                                         <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                                             <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
