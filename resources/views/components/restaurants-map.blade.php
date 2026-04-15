@@ -46,9 +46,33 @@
     @highlight-marker.window="highlightMarker($event.detail.index)"
     @user-location-updated.window="refreshMapForLocation($event.detail.lat, $event.detail.lng)"
     {{ $attributes->merge(['class' => 'rounded-lg overflow-hidden shadow-lg border border-gray-200 bg-gray-100']) }}
-    style="height: {{ $heightStyle }};"
+    style="height: {{ $heightStyle }}; position: relative;"
 >
     <div id="restaurants-map" style="height: 100%; width: 100%;"></div>
+
+    {{-- "Buscar en esta zona" button — aparece cuando el usuario mueve el mapa --}}
+    <div
+        x-show="mapMoved"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0 -translate-y-1"
+        x-transition:enter-end="opacity-100 translate-y-0"
+        x-transition:leave="transition ease-in duration-150"
+        x-transition:leave-start="opacity-100 translate-y-0"
+        x-transition:leave-end="opacity-0 -translate-y-1"
+        style="position:absolute; top:12px; left:50%; transform:translateX(-50%); z-index:1000; pointer-events:none;"
+    >
+        <button
+            @click="searchInArea()"
+            style="pointer-events:auto; background:white; color:#111827; font-size:0.8125rem; font-weight:600; padding:8px 16px; border-radius:9999px; box-shadow:0 2px 8px rgba(0,0,0,0.18); border:1px solid #E5E7EB; display:flex; align-items:center; gap:6px; cursor:pointer; white-space:nowrap;"
+            onmouseover="this.style.background='#F9FAFB'"
+            onmouseout="this.style.background='white'"
+        >
+            <svg style="width:14px;height:14px;flex-shrink:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            Buscar en esta zona
+        </button>
+    </div>
 </div>
 
 @push('scripts')
@@ -79,6 +103,8 @@ function restaurantsMap() {
         userLng: {{ $userLongitude ?? 'null' }},
         initialized: false,
         _pendingMarkerRefresh: false,
+        mapMoved: false,
+        _firstIdle: true,
 
         initMap() {
             if (typeof google === 'undefined' || !google.maps) {
@@ -124,6 +150,12 @@ function restaurantsMap() {
 
             // Single info window instance
             this.infoWindow = new google.maps.InfoWindow();
+
+            // Search-as-you-move: show button when user pans or zooms
+            this.map.addListener('idle', () => {
+                if (this._firstIdle) { this._firstIdle = false; return; }
+                this.mapMoved = true;
+            });
 
             // Create bounds
             const bounds = new google.maps.LatLngBounds();
@@ -274,6 +306,21 @@ function restaurantsMap() {
             this.markers.forEach(m => m.setMap(null));
             this.markers = [];
             if (this.infoWindow) this.infoWindow.close();
+        },
+
+        searchInArea() {
+            if (!this.map) return;
+            const bounds = this.map.getBounds();
+            if (!bounds) return;
+            const ne = bounds.getNorthEast();
+            const sw = bounds.getSouthWest();
+            this.mapMoved = false;
+            window.Livewire.dispatch('searchInMapArea', {
+                north: ne.lat(),
+                south: sw.lat(),
+                east:  ne.lng(),
+                west:  sw.lng(),
+            });
         },
 
         highlightMarker(index) {

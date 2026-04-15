@@ -279,8 +279,17 @@
                 <!-- Left Column: Restaurant List -->
                 <div class="md:w-3/5 lg:w-2/3">
                     <!-- Results Count -->
-                    <div class="mb-4" style="font-size:0.875rem; color:#9CA3AF;">
-                        Mostrando {{ $restaurants->count() }} de {{ $restaurants->total() }} restaurantes
+                    <div class="mb-4 flex items-center gap-2 flex-wrap" style="font-size:0.875rem; color:#9CA3AF;">
+                        <span>Mostrando {{ $restaurants->count() }} de {{ $restaurants->total() }} restaurantes</span>
+                        @if($filterByMapBounds)
+                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                                <svg style="width:11px;height:11px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                </svg>
+                                Zona del mapa
+                                <button wire:click="clearMapBounds" class="ml-0.5 hover:text-blue-900 font-bold" title="Quitar filtro de mapa">×</button>
+                            </span>
+                        @endif
                     </div>
 
                     <!-- Featured Restaurants (Sponsored) -->

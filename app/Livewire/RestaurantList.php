@@ -11,6 +11,7 @@ use App\Services\GeoLocationService;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\Attributes\On;
 use App\Services\CountryContext;
 
 class RestaurantList extends Component
@@ -74,6 +75,13 @@ class RestaurantList extends Component
     public $userLongitude = null;
     public $locationSource = null;
     public $showLocationBanner = true;
+
+    // Map bounds search
+    public $filterByMapBounds = false;
+    public $mapBoundsNorth = null;
+    public $mapBoundsSouth = null;
+    public $mapBoundsEast = null;
+    public $mapBoundsWest = null;
 
     protected $listeners = ['locationUpdated' => 'setUserLocation'];
 
@@ -155,6 +163,27 @@ class RestaurantList extends Component
 
     public function updatingSelectedCategory()
     {
+        $this->resetPage();
+    }
+
+    #[On('searchInMapArea')]
+    public function searchInMapArea($north, $south, $east, $west): void
+    {
+        $this->mapBoundsNorth = (float) $north;
+        $this->mapBoundsSouth = (float) $south;
+        $this->mapBoundsEast  = (float) $east;
+        $this->mapBoundsWest  = (float) $west;
+        $this->filterByMapBounds = true;
+        $this->resetPage();
+    }
+
+    public function clearMapBounds(): void
+    {
+        $this->filterByMapBounds = false;
+        $this->mapBoundsNorth = null;
+        $this->mapBoundsSouth = null;
+        $this->mapBoundsEast  = null;
+        $this->mapBoundsWest  = null;
         $this->resetPage();
     }
 
@@ -392,6 +421,12 @@ class RestaurantList extends Component
         }
         if ($this->hasImportedProducts) {
             $query->where('has_imported_products', true);
+        }
+
+        // Map bounds filter — restrict to visible map area
+        if ($this->filterByMapBounds && $this->mapBoundsNorth !== null) {
+            $query->whereBetween('latitude',  [$this->mapBoundsSouth, $this->mapBoundsNorth])
+                  ->whereBetween('longitude', [$this->mapBoundsWest,  $this->mapBoundsEast]);
         }
 
         // Sorting
