@@ -497,6 +497,7 @@ class RestaurantList extends Component
             'userLatitude' => $this->userLatitude,
             'userLongitude' => $this->userLongitude,
             'locationSource' => $this->locationSource,
+            'filterByMapBounds' => $this->filterByMapBounds,
         ])->layout('layouts.app', [
             'title'           => $listTitle,
             'metaDescription' => $listDesc,
