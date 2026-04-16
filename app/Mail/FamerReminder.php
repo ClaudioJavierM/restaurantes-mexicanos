@@ -27,7 +27,7 @@ class FamerReminder extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: "Sus clientes se iban en vacaciones. Los turistas empezaron a llegar — caso real",
+            subject: "Cómo un restaurante en Mississippi llenó sus mesas en temporada baja",
         );
     }
 

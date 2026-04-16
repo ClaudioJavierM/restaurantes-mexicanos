@@ -29,7 +29,7 @@ class FamerHowItWorks extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: "De 23 a 247 reseñas en 90 días — así lo hizo un restaurante en Texas",
+            subject: "Cómo un restaurante en Texas triplicó sus clientes sin gastar en publicidad",
         );
     }
 
