@@ -274,13 +274,35 @@ class StripeWebhookController extends Controller
                         'email' => $restaurant->owner_email,
                         'password' => bcrypt($password),
                         'phone' => $restaurant->owner_phone ?? null,
+                        'role' => 'owner',
+                        'email_verified_at' => now(),
                     ]);
                     $isNewUser = true;
+                } else {
+                    // Promote existing user to owner and verify email
+                    $needsSave = false;
+                    if ($user->role !== 'owner' && $user->role !== 'admin') {
+                        $user->role = 'owner';
+                        $needsSave = true;
+                    }
+                    if (!$user->email_verified_at) {
+                        $user->email_verified_at = now();
+                        $needsSave = true;
+                    }
+                    if ($needsSave) $user->save();
                 }
 
-                // Link user to restaurant if not already linked
+                // Link user to restaurant if not already linked, and mark as claimed
+                $restaurantUpdates = [];
                 if (!$restaurant->user_id) {
-                    $restaurant->update(['user_id' => $user->id]);
+                    $restaurantUpdates['user_id'] = $user->id;
+                }
+                if (!$restaurant->is_claimed) {
+                    $restaurantUpdates['is_claimed'] = true;
+                    $restaurantUpdates['claimed_at'] = now();
+                }
+                if (!empty($restaurantUpdates)) {
+                    $restaurant->update($restaurantUpdates);
                 }
 
                 // Log the user in
