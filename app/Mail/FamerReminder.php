@@ -27,7 +27,7 @@ class FamerReminder extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: "Ultima oportunidad: Reclama {$this->restaurant->name} para FAMER Awards 2026",
+            subject: "Sus clientes se iban en vacaciones. Los turistas empezaron a llegar — caso real",
         );
     }
 
