@@ -61,7 +61,7 @@
 
                         <!-- Mensaje principal -->
                         <p style="margin:0 0 24px; font-size:15px; color:#374151; line-height:1.7;">
-                            Tu perfil fue creado con información de Yelp y Google. Al reclamar tu restaurante, tomas el control total de cómo apareces ante los 26,000+ visitantes mensuales que buscan comida mexicana en nuestro directorio.
+                            Tu perfil fue creado con información de Yelp y Google. Al reclamar tu restaurante, tomas el control total de cómo apareces ante los 31,000+ visitantes mensuales que buscan comida mexicana en nuestro directorio.
                         </p>
 
                         <!-- Lista de beneficios -->

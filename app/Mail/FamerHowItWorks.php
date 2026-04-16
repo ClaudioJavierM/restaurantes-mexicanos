@@ -29,7 +29,7 @@ class FamerHowItWorks extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: "Tu restaurante aun puede participar en FAMER Awards 2026",
+            subject: "De 23 a 247 reseñas en 90 días — así lo hizo un restaurante en Texas",
         );
     }
 
