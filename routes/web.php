@@ -8,6 +8,13 @@ use App\Http\Controllers\TeamInvitationController;
 use App\Http\Controllers\StateRestaurantsController;
 use App\Http\Controllers\CityRestaurantsController;
 
+// CSRF token refresh — keeps long-form wizards (claim, onboarding) from
+// hitting 419 "Page Expired" mid-flow. Client pings this every 10 min.
+Route::get('/csrf-token', function () {
+    return response()->json(['token' => csrf_token()])
+        ->header('Cache-Control', 'no-store, private');
+})->name('csrf.token');
+
 // Public Routes
 Route::get('/', \App\Livewire\Home::class)->name('home');
 Route::get('/restaurantes', \App\Livewire\RestaurantList::class)->name('restaurants.index');
