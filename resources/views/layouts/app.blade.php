@@ -703,6 +703,40 @@
 
     @livewireScripts
 
+    {{-- Keep CSRF token fresh so long-form wizards (claim, onboarding)
+         never hit 419 mid-flow. Refreshes every 10 min + on focus. --}}
+    <script data-cfasync="false">
+        (function() {
+            async function refreshCsrf() {
+                try {
+                    const res = await fetch('/csrf-token', {
+                        credentials: 'same-origin',
+                        headers: { 'Accept': 'application/json' }
+                    });
+                    if (!res.ok) return;
+                    const data = await res.json();
+                    if (!data.token) return;
+                    // Update <meta name="csrf-token">
+                    const meta = document.querySelector('meta[name="csrf-token"]');
+                    if (meta) meta.setAttribute('content', data.token);
+                    // Update Livewire's CSRF (used for livewire/update)
+                    if (window.Livewire && typeof window.Livewire.find === 'function') {
+                        const livewireScript = document.querySelector('script[data-csrf]');
+                        if (livewireScript) livewireScript.setAttribute('data-csrf', data.token);
+                    }
+                    // Update any input[name=_token]
+                    document.querySelectorAll('input[name="_token"]').forEach(i => i.value = data.token);
+                } catch(e) { /* silent */ }
+            }
+            // Refresh every 10 minutes
+            setInterval(refreshCsrf, 10 * 60 * 1000);
+            // Refresh on tab focus (user returning after a while)
+            document.addEventListener('visibilitychange', () => {
+                if (!document.hidden) refreshCsrf();
+            });
+        })();
+    </script>
+
     <!-- Dynamic Scripts -->
     @stack('scripts')
 
