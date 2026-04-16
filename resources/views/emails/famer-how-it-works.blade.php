@@ -132,7 +132,7 @@
           </p>
 
           <p style="margin:0 0 16px; font-size:15px; color:#374151; line-height:1.75;">
-            FAMER tiene <strong>26,000+ restaurantes</strong> en el directorio. Los clientes buscan activamente
+            FAMER tiene <strong>31,000+ restaurantes</strong> en el directorio. Los clientes buscan activamente
             "restaurantes mexicanos en [ciudad]" — y los primeros que aparecen son los que tienen perfil completo y verificado.
           </p>
 

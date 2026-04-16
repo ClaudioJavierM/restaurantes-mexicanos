@@ -44,7 +44,7 @@
             @endisset
           </p>
           <p style="margin:0 0 28px; font-size:15px; color:#6B7280; line-height:1.7;">
-            Tu restaurante <strong style="color:#111827;">{{ $restaurantName }}</strong> ya está activo en FAMER — el directorio líder de restaurantes mexicanos en Estados Unidos con más de 26,000 establecimientos.
+            Tu restaurante <strong style="color:#111827;">{{ $restaurantName }}</strong> ya está activo en FAMER — el directorio líder de restaurantes mexicanos en Estados Unidos con más de 31,000 establecimientos.
             Aquí te mostramos cómo sacarle el máximo provecho a tu perfil.
           </p>
 
