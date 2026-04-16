@@ -703,6 +703,22 @@
 
     @livewireScripts
 
+    {{-- Suppress Livewire's "Page Expired" dialog and silently reload --}}
+    <script data-cfasync="false">
+        document.addEventListener('livewire:init', function () {
+            if (window.Livewire && typeof window.Livewire.hook === 'function') {
+                window.Livewire.hook('request', ({ fail }) => {
+                    fail(({ status, preventDefault }) => {
+                        if (status === 419) {
+                            preventDefault();
+                            window.location.reload();
+                        }
+                    });
+                });
+            }
+        });
+    </script>
+
     <!-- Dynamic Scripts -->
     @stack('scripts')
 
