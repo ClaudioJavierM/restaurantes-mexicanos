@@ -237,16 +237,35 @@ class StripeWebhookController extends Controller
 
         try {
             \Stripe\Stripe::setApiKey(config('stripe.secret'));
-            $session = \Stripe\Checkout\Session::retrieve($sessionId);
 
-            $restaurantId = $session->metadata->restaurant_id ?? $session->client_reference_id;
-            $plan = $session->metadata->plan ?? 'premium';
+            // Two flows: ClaimPayment passes a subscription_id (sub_...), Checkout passes cs_...
+            $restaurantId = null;
+            $plan = 'premium';
+            $session = null;
+            $subscriptionFromIntent = null;
+
+            if (str_starts_with($sessionId, 'sub_')) {
+                $sub = \Stripe\Subscription::retrieve($sessionId);
+                $restaurantId = $sub->metadata->restaurant_id ?? null;
+                $plan = $sub->metadata->plan ?? 'premium';
+                $subscriptionFromIntent = $sub->id;
+
+                // If metadata not set, try to find restaurant by stripe_customer_id
+                if (!$restaurantId && $sub->customer) {
+                    $r = Restaurant::where('stripe_customer_id', $sub->customer)->first();
+                    if ($r) $restaurantId = $r->id;
+                }
+            } else {
+                $session = \Stripe\Checkout\Session::retrieve($sessionId);
+                $restaurantId = $session->metadata->restaurant_id ?? $session->client_reference_id;
+                $plan = $session->metadata->plan ?? 'premium';
+            }
 
             $restaurant = Restaurant::find($restaurantId);
 
             if ($restaurant) {
                 // Ensure stripe_subscription_id is set
-                $subscriptionId = $session->subscription;
+                $subscriptionId = $subscriptionFromIntent ?? ($session?->subscription);
                 if (!$subscriptionId && $restaurant->stripe_customer_id) {
                     try {
                         $stripe = new \Stripe\StripeClient(config('stripe.secret'));
@@ -274,13 +293,35 @@ class StripeWebhookController extends Controller
                         'email' => $restaurant->owner_email,
                         'password' => bcrypt($password),
                         'phone' => $restaurant->owner_phone ?? null,
+                        'role' => 'owner',
+                        'email_verified_at' => now(),
                     ]);
                     $isNewUser = true;
+                } else {
+                    // Promote existing user to owner and verify email
+                    $needsSave = false;
+                    if ($user->role !== 'owner' && $user->role !== 'admin') {
+                        $user->role = 'owner';
+                        $needsSave = true;
+                    }
+                    if (!$user->email_verified_at) {
+                        $user->email_verified_at = now();
+                        $needsSave = true;
+                    }
+                    if ($needsSave) $user->save();
                 }
 
-                // Link user to restaurant if not already linked
+                // Link user to restaurant if not already linked, and mark as claimed
+                $restaurantUpdates = [];
                 if (!$restaurant->user_id) {
-                    $restaurant->update(['user_id' => $user->id]);
+                    $restaurantUpdates['user_id'] = $user->id;
+                }
+                if (!$restaurant->is_claimed) {
+                    $restaurantUpdates['is_claimed'] = true;
+                    $restaurantUpdates['claimed_at'] = now();
+                }
+                if (!empty($restaurantUpdates)) {
+                    $restaurant->update($restaurantUpdates);
                 }
 
                 // Log the user in

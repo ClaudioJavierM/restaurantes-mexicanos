@@ -359,6 +359,7 @@ class OnboardingWizard extends Component
     {
         return view('livewire.owner.onboarding-wizard', [
             'restaurant' => $this->getRestaurant(),
+            'progressPercent' => $this->progressPercent,
         ]);
     }
 }

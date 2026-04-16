@@ -49,4 +49,18 @@ return Application::configure(basePath: dirname(__DIR__))
                 ]);
             }
         });
+
+        // Handle CSRF token expiration (419) by silently reloading the page
+        // — common in long-form wizards where the session token rotates while
+        // the user is filling the form (e.g. claim flow plan selection)
+        $exceptions->render(function (\Illuminate\Session\TokenMismatchException $e, \Illuminate\Http\Request $request) {
+            if ($request->expectsJson() || $request->header('X-Livewire')) {
+                return response()->json([
+                    'message' => 'CSRF token expired, please retry',
+                    'redirect' => $request->fullUrl(),
+                ], 419);
+            }
+            return redirect($request->fullUrl())
+                ->withInput($request->except('_token', 'password', 'password_confirmation'));
+        });
     })->create();
