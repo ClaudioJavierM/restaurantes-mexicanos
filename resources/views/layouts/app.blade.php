@@ -703,38 +703,38 @@
 
     @livewireScripts
 
-    {{-- Keep CSRF token fresh so long-form wizards (claim, onboarding)
-         never hit 419 mid-flow. Refreshes every 10 min + on focus. --}}
+    {{-- Handle 419 (CSRF expired): fetch fresh token and retry silently.
+         Prevents "Page Expired" in long-form wizards (claim, onboarding). --}}
     <script data-cfasync="false">
-        (function() {
-            async function refreshCsrf() {
-                try {
-                    const res = await fetch('/csrf-token', {
-                        credentials: 'same-origin',
-                        headers: { 'Accept': 'application/json' }
-                    });
-                    if (!res.ok) return;
-                    const data = await res.json();
-                    if (!data.token) return;
-                    // Update <meta name="csrf-token">
-                    const meta = document.querySelector('meta[name="csrf-token"]');
-                    if (meta) meta.setAttribute('content', data.token);
-                    // Update Livewire's CSRF (used for livewire/update)
-                    if (window.Livewire && typeof window.Livewire.find === 'function') {
-                        const livewireScript = document.querySelector('script[data-csrf]');
-                        if (livewireScript) livewireScript.setAttribute('data-csrf', data.token);
+        document.addEventListener('livewire:init', function () {
+            Livewire.hook('request', ({ fail }) => {
+                fail(({ status, preventDefault }) => {
+                    if (status === 419) {
+                        preventDefault();
+                        fetch('/csrf-token', { credentials: 'same-origin', headers: { 'Accept': 'application/json' } })
+                            .then(r => r.json())
+                            .then(data => {
+                                if (data.token) {
+                                    // Update Livewire's internal CSRF token
+                                    const el = document.querySelector('[data-csrf]');
+                                    if (el) el.setAttribute('data-csrf', data.token);
+                                    const meta = document.querySelector('meta[name="csrf-token"]');
+                                    if (meta) meta.setAttribute('content', data.token);
+                                    document.querySelectorAll('input[name="_token"]').forEach(i => i.value = data.token);
+                                }
+                                // Retry: Livewire re-sends on next user interaction.
+                                // Show subtle toast so user knows to click again.
+                                const toast = document.createElement('div');
+                                toast.textContent = 'Sesión actualizada — haz clic de nuevo';
+                                toast.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#D4AF37;color:#0B0B0B;padding:10px 24px;border-radius:8px;font-size:14px;font-weight:600;z-index:99999;box-shadow:0 4px 12px rgba(0,0,0,0.3);';
+                                document.body.appendChild(toast);
+                                setTimeout(() => toast.remove(), 3000);
+                            })
+                            .catch(() => window.location.reload());
                     }
-                    // Update any input[name=_token]
-                    document.querySelectorAll('input[name="_token"]').forEach(i => i.value = data.token);
-                } catch(e) { /* silent */ }
-            }
-            // Refresh every 10 minutes
-            setInterval(refreshCsrf, 10 * 60 * 1000);
-            // Refresh on tab focus (user returning after a while)
-            document.addEventListener('visibilitychange', () => {
-                if (!document.hidden) refreshCsrf();
+                });
             });
-        })();
+        });
     </script>
 
     <!-- Dynamic Scripts -->
