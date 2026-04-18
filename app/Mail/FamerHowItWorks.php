@@ -15,6 +15,8 @@ class FamerHowItWorks extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
+    public bool $skipAutoLog = true; // Logged manually by SendFamerEmails with proper category + Resend ID
+
     public Restaurant $restaurant;
     public string $claimUrl;
     public string $restaurantName;

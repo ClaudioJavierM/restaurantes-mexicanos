@@ -12,8 +12,13 @@ class LogSentEmail
     public function handle(MessageSent $event): void
     {
         try {
+            // Skip if mailable opts out (it has its own logging with proper category + message_id)
+            if (isset($event->data['mailable']) && property_exists($event->data['mailable'], 'skipAutoLog') && $event->data['mailable']->skipAutoLog) {
+                return;
+            }
+
             $message = $event->message;
-            
+
             // Get recipients
             $to = $message->getTo();
             $toEmail = '';
@@ -96,7 +101,9 @@ class LogSentEmail
                 'status' => EmailLog::STATUS_SENT,
                 'sent_at' => now(),
                 'provider' => config('mail.default'),
-                'message_id' => $message->getHeaders()->get('Message-ID')?->getBodyAsString(),
+                // X-Resend-Email-ID is added by the Resend transport after sending;
+                // it lives on $event->sent->getOriginalMessage(), not on $event->message.
+                'message_id' => $event->sent?->getOriginalMessage()?->getHeaders()?->get('X-Resend-Email-ID')?->getBody(),
                 'restaurant_id' => $restaurantId,
                 'user_id' => $userId,
             ]);
@@ -113,7 +120,8 @@ class LogSentEmail
             
             if (str_contains($className, 'Reservation')) return 'reservation';
             if (str_contains($className, 'Order')) return 'order';
-            if (str_contains($className, 'Claim')) return 'claim';
+            if (str_contains($className, 'AbandonedClaim')) return 'abandoned_claim';
+            if (str_contains($className, 'Claim')) return 'claim_invitation';
             if (str_contains($className, 'Review')) return 'review';
             if (str_contains($className, 'Welcome')) return 'welcome';
             if (str_contains($className, 'Password')) return 'password';
@@ -141,8 +149,8 @@ class LogSentEmail
     protected function detectType(string $category): string
     {
         return match($category) {
-            'marketing', 'famer_email_1', 'famer_email_2', 'famer_email_3' => 'campaign',
-            'famer_email' => 'campaign',
+            'marketing', 'famer_email_1', 'famer_email_2', 'famer_email_3',
+            'claim_invitation', 'abandoned_claim' => 'campaign',
             'notification' => 'notification',
             default => 'transactional',
         };

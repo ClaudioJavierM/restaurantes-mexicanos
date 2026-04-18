@@ -15,6 +15,8 @@ class ClaimInvitation extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
+    public bool $skipAutoLog = true; // Logged manually by SendClaimInvitations with proper category + Resend ID
+
     public Restaurant $restaurant;
     public string $claimUrl;
 

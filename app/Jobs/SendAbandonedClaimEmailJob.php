@@ -3,7 +3,6 @@
 namespace App\Jobs;
 
 use App\Mail\AbandonedClaimMail;
-use App\Models\EmailLog;
 use App\Models\EmailSuppression;
 use App\Models\Restaurant;
 use Illuminate\Bus\Queueable;
@@ -62,21 +61,8 @@ class SendAbandonedClaimEmailJob implements ShouldQueue
             // Update tracking timestamp
             $restaurant->update(['claim_abandoned_sent_at' => now()]);
 
-            // Create EmailLog entry
-            EmailLog::log([
-                'type'           => EmailLog::TYPE_CAMPAIGN,
-                'category'       => 'abandoned_claim',
-                'to_email'       => $email,
-                'from_email'     => 'hello@restaurantesmexicanosfamosos.com',
-                'from_name'      => 'FAMER',
-                'subject'        => "{$restaurant->name} — ¿terminaste de reclamar tu perfil?",
-                'mailable_class' => AbandonedClaimMail::class,
-                'template'       => 'emails.abandoned-claim',
-                'restaurant_id'  => $restaurant->id,
-                'metadata'       => [
-                    'claim_started_at' => $restaurant->claim_started_at?->toIso8601String(),
-                ],
-            ]);
+            // EmailLog is created automatically by the LogSentEmail listener (MessageSent event).
+            // No manual log needed here — avoids duplicate records.
 
             Log::info("SendAbandonedClaimEmailJob: sent abandoned claim email to {$email} for restaurant {$restaurant->id}.");
 
