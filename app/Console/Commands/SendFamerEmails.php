@@ -97,6 +97,9 @@ class SendFamerEmails extends Command
             ->whereNotExists(function ($q) {
                 $q->from('email_suppressions')->whereColumn('email_suppressions.email', 'restaurants.email');
             })
+            ->where(function ($q) {
+                $q->whereNull('email_status')->orWhere('email_status', 'valid');
+            })
             ->limit($limit)
             ->get();
 
@@ -158,6 +161,9 @@ class SendFamerEmails extends Command
             ->whereNotExists(function ($q) {
                 $q->from('email_suppressions')->whereColumn('email_suppressions.email', 'restaurants.email');
             })
+            ->where(function ($q) {
+                $q->whereNull('email_status')->orWhere('email_status', 'valid');
+            })
             ->limit($limit)
             ->get();
 
@@ -218,6 +224,9 @@ class SendFamerEmails extends Command
             ->whereNull("famer_email_3_sent_at")
             ->whereNotExists(function ($q) {
                 $q->from('email_suppressions')->whereColumn('email_suppressions.email', 'restaurants.email');
+            })
+            ->where(function ($q) {
+                $q->whereNull('email_status')->orWhere('email_status', 'valid');
             })
             ->limit($limit)
             ->get();

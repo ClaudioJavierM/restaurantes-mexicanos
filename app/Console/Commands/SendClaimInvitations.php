@@ -43,6 +43,11 @@ class SendClaimInvitations extends Command
             ->whereNotIn('owner_email', \App\Models\EmailSuppression::pluck('email'))
             ->where(function ($q) {
                 $q->whereNull('owner_newsletter')->orWhere('owner_newsletter', true);
+            })
+            ->where(function ($q) {
+                // Excluir emails verificados como inválidos (sin MX, sintaxis rota, bounced)
+                $q->whereNull('email_status')
+                  ->orWhere('email_status', 'valid');
             });
 
         if ($state) {
