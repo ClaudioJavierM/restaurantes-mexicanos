@@ -24,7 +24,9 @@ sudo -u nginx php artisan config:cache
 sudo -u nginx php artisan route:clear  # NO route:cache — closure routes in web.php prevent proper caching
 sudo -u nginx php artisan view:clear
 sudo chown -R nginx:nginx storage bootstrap/cache
+sudo systemctl reload php-fpm  # OBLIGATORIO — limpia OPcache (sin esto, PHP sirve archivos viejos de memoria)
 npm run build  # si hay cambios de assets/tailwind
+sudo chmod -R 777 public/build  # si npm build falla por permisos en sw.js / workbox-*.js
 ```
 
 ## Servidor Staging
