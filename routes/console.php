@@ -412,6 +412,20 @@ Schedule::command('famer:email-health --alert')
     ->description('Email health check — alerta si bounce/complaint rate crítico');
 
 // ============================================================================
+// Resend Status Sync — twice daily (8 AM y 8 PM ET)
+// Queries Resend API for each email_log that has a message_id and updates
+// status, opened_at, clicked_at, delivered_at from the real Resend data.
+// Covers the gap between webhook delivery and stored status.
+// ============================================================================
+Schedule::command('famer:sync-resend-status --limit=1000')
+    ->twiceDaily(8, 20)
+    ->timezone('America/New_York')
+    ->description('Sync email open/click/delivery status from Resend API')
+    ->onFailure(function () {
+        \Log::error('famer:sync-resend-status failed');
+    });
+
+// ============================================================================
 // GSC Sync — datos de keywords, impressiones, CTR y posiciones desde Google
 // Corre diario a las 6 AM ET (GSC tiene retraso de ~3 días en los datos)
 // Requiere GOOGLE_SERVICE_ACCOUNT_JSON en .env — sin credenciales, no crashea
