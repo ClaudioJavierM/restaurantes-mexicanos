@@ -14,6 +14,7 @@ use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Forms\Components\DatePicker;
 use Filament\Infolists\Infolist;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
@@ -282,6 +283,21 @@ class EmailLogResource extends Resource
                     ->label('Con clicks')
                     ->toggle()
                     ->query(fn (Builder $query): Builder => $query->whereNotNull('clicked_at')),
+                SelectFilter::make('month')
+                    ->label('Mes')
+                    ->options(function (): array {
+                        $months = [];
+                        for ($i = 0; $i < 6; $i++) {
+                            $date = now()->subMonths($i)->startOfMonth();
+                            $months[$date->format('Y-m')] = ucfirst($date->locale('es')->isoFormat('MMMM YYYY'));
+                        }
+                        return $months;
+                    })
+                    ->query(function (Builder $query, array $data): Builder {
+                        if (!$data['value']) return $query;
+                        [$year, $month] = explode('-', $data['value']);
+                        return $query->whereYear('sent_at', $year)->whereMonth('sent_at', $month);
+                    }),
                 Tables\Filters\Filter::make('today')
                     ->label('Hoy')
                     ->query(fn (Builder $query): Builder =>
@@ -290,6 +306,31 @@ class EmailLogResource extends Resource
                     ->label('Esta semana')
                     ->query(fn (Builder $query): Builder =>
                         $query->where('sent_at', '>=', now()->startOfWeek())),
+                Tables\Filters\Filter::make('date_range')
+                    ->label('Rango de fechas')
+                    ->form([
+                        DatePicker::make('from')
+                            ->label('Desde')
+                            ->native(false)
+                            ->displayFormat('d/m/Y')
+                            ->placeholder('dd/mm/aaaa'),
+                        DatePicker::make('until')
+                            ->label('Hasta')
+                            ->native(false)
+                            ->displayFormat('d/m/Y')
+                            ->placeholder('dd/mm/aaaa'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when($data['from'],  fn ($q) => $q->whereDate('sent_at', '>=', $data['from']))
+                            ->when($data['until'], fn ($q) => $q->whereDate('sent_at', '<=', $data['until']));
+                    })
+                    ->indicateUsing(function (array $data): array {
+                        $indicators = [];
+                        if ($data['from'])  $indicators[] = 'Desde: ' . \Carbon\Carbon::parse($data['from'])->format('d/m/Y');
+                        if ($data['until']) $indicators[] = 'Hasta: ' . \Carbon\Carbon::parse($data['until'])->format('d/m/Y');
+                        return $indicators;
+                    }),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
