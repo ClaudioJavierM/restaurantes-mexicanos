@@ -164,7 +164,7 @@ Schedule::command('foursquare:enrich-restaurants --limit=160 --delay=1')
         notifyN8nFailure('foursquare:enrich-restaurants', 'Foursquare enrichment (250/day)');
     });
 
-Schedule::command('tripadvisor:enrich-restaurants --limit=80 --delay=2')
+Schedule::command('tripadvisor:enrich-restaurants --limit=160 --delay=2')
     ->cron('0 7 * * *')
     ->timezone('America/New_York')
     ->description('DAILY: Enrich restaurants with TripAdvisor data (80/day, 5K/mes)')

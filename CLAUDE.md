@@ -121,6 +121,17 @@ sudo nginx -t && sudo systemctl reload nginx
 
 ## APIs Externas — Credenciales
 
+### Política de APIs de Enriquecimiento — TODAS son 5,000 calls/mes, use it or lose it
+
+| API | Calls/mes | Calls/día scheduler | Vencimiento |
+|-----|-----------|---------------------|-------------|
+| Yelp (×4 keys) | 5,000 × 4 = 20,000 | ~1,800 (agota en ~11 días) | Trial 30 días — **requiere reactivación manual** (nueva cuenta) |
+| Foursquare | 5,000 | 160 (agota en ~31 días) | Mensual — reset automático |
+| TripAdvisor | 5,000 | 160 (agota en ~31 días) | Mensual — reset automático |
+
+**Yelp es diferente:** las keys son trial que se cancelan y hay que crear nuevas cuentas para reactivar.
+Foursquare y TripAdvisor se resetean solos cada mes.
+
 ### Yelp Fusion API Keys — Trial 30 días, 5,000 calls/key (use it or lose it)
 
 **Estrategia:** Cada key es trial de 30 días. Hay que usar las 5,000 calls antes de que expire.
