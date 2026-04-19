@@ -155,6 +155,7 @@ El `config/services.php` ya itera automáticamente `YELP_PREMIUM_KEY_1..99` y `Y
 | `YELP_API_KEY_US_5` | — | Standard Fusion | — |
 | `YELP_PREMIUM_KEY_3` | admin@vivexa.us | Data Licensing Premium | ~May 2026 |
 | `YELP_PREMIUM_KEY_4` | javier.velazquez@sdv.com.mx / KlRtB6-5TrBEWOPEg-vMig | Data Licensing Premium | ~May 2026 |
+| `YELP_PREMIUM_KEY_5` | admin@fital.us / DkEvrMqiuXC_-CAGV0JreQ | Data Licensing Premium | ~May 2026 |
 
 **Keys agotadas este ciclo (reactivar May 1):** YELP_API_KEY (original), YELP_API_KEY_US_2, YELP_API_KEY_US_3, YELP_PREMIUM_KEY_1, YELP_PREMIUM_KEY_2
 **YELP_MONTHLY_LIMIT** en .env = `20000` (4 keys × 5,000). Actualizar al agregar más keys.
