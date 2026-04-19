@@ -152,7 +152,7 @@ Schedule::command('yelp:rematch --flexible --limit=200')
 /**
  * Enrich restaurants with Foursquare data daily at 6:00 AM
  */
-Schedule::command('foursquare:enrich-restaurants --limit=250 --delay=1')
+Schedule::command('foursquare:enrich-restaurants --limit=160 --delay=1')
     ->cron('0 6 * * *')
     ->timezone('America/New_York')
     ->description('DAILY: Enrich restaurants with Foursquare data (250/day)')

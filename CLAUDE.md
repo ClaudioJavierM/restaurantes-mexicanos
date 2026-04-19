@@ -130,8 +130,18 @@ sudo nginx -t && sudo systemctl reload nginx
 - **Auth v2:** `client_id` + `client_secret` como query params (NO header)
 - **Endpoints:** `/venues/search` (búsqueda) + `/venues/{id}` (detalle)
 - **Config Laravel:** `services.foursquare.client_id` / `client_secret` / `service_key`
-- **Límite diario:** 500 calls (configurable con `FOURSQUARE_DAILY_LIMIT`)
+- **Límite mensual:** 5,000 calls → **160/día** (`FOURSQUARE_DAILY_LIMIT=160` en .env)
 - **NOTA:** La key Legacy "FAMER" del dashboard es la antigua — ya NO está en .env
+
+### TripAdvisor Content API (2026-04-19)
+- **Dashboard:** tripadvisor.com/developers?screen=credentials
+- **Plan:** Free — 5,000 calls/mes (límite para evitar facturación)
+- **API Key activa:** `340C672E9BC54B998663447328186BAD` (generada 2026-04-19, esperar 15 min para activar)
+- **API Key anterior:** `5217A51EFB234701BAC29C116F55F5DD` (da 403 — bloqueada/límite alcanzado)
+- **IP Restriction:** 160.153.183.38/32 (solo VPS puede usar la key)
+- **Endpoint:** `https://api.content.tripadvisor.com/api/v1/location/search?key=KEY&searchQuery=...&category=restaurants`
+- **Límite diario Laravel:** 160 calls/día (configurable con `TRIPADVISOR_DAILY_LIMIT`)
+- **Scheduler:** `tripadvisor:enrich-restaurants --limit=80` diario 7am ET
 
 ### Columnas agregadas manualmente (no en migraciones)
 
