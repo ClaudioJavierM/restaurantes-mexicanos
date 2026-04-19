@@ -134,7 +134,12 @@ Foursquare y TripAdvisor se resetean solos cada mes.
 
 ### Yelp Fusion API Keys — Trial 30 días, 5,000 calls/key (use it or lose it)
 
-**Estrategia:** Cada key es trial de 30 días. Hay que usar las 5,000 calls antes de que expire.
+**YELP_IMPORT_KEY (pagada):** `C2MNlZyew3aDKoSjMdQwBOQPhPqqovmQC7FWbLg7VJhs0ysJ05GCCeoWJyHDEKv14gEHJIfixteiSDsdmSAwGGbEXTOZh1LFvfEerCXb0sfQDXwIZWYNi7HCSDzlaXYx`
+- Client ID: `nA3VCEZvmAomnV2fVHqvtA` | Plan: Base $229/mes | **5,000 calls/DÍA**
+- Usada SOLO por `yelp:import-smart` (descubrir restaurantes nuevos)
+- Las premium trial keys se usan SOLO para `yelp:backfill` (fotos + reseñas)
+
+**Estrategia:** Cada key trial es 30 días. Hay que usar las 5,000 calls antes de que expire.
 El scheduler consume ~1,800/día → agota 4 keys en ~11 días. Meta: 16 keys = 80,000 calls/ciclo.
 
 **Para agregar una key nueva al servidor:**
