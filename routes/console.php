@@ -164,20 +164,9 @@ Schedule::command('foursquare:enrich-restaurants --limit=160 --delay=1')
         notifyN8nFailure('foursquare:enrich-restaurants', 'Foursquare enrichment (250/day)');
     });
 
-/**
- * Enrich restaurants with TripAdvisor data daily at 7:00 AM
- */
-Schedule::command('tripadvisor:enrich-restaurants --limit=80 --delay=2')
-    ->cron('0 7 * * *')
-    ->timezone('America/New_York')
-    ->description('DAILY: Enrich restaurants with TripAdvisor data (80/day)')
-    ->onSuccess(function () {
-        \Log::info('Daily TripAdvisor enrichment completed successfully');
-    })
-    ->onFailure(function () {
-        \Log::error('Daily TripAdvisor enrichment failed');
-        notifyN8nFailure('tripadvisor:enrich-restaurants', 'TripAdvisor enrichment (80/day)');
-    });
+// TripAdvisor — DESACTIVADO 2026-04-19: key 340C672E9BC54B998663447328186BAD pendiente activación (~24h)
+// Re-activar cuando funcione: Schedule::command('tripadvisor:enrich-restaurants --limit=80 --delay=2')
+//     ->cron('0 7 * * *')->timezone('America/New_York');
 
 // ============================================================================
 // Communication Tasks
