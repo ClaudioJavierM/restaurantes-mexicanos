@@ -406,8 +406,10 @@ class YelpFusionService
         }
 
         try {
+            // Premium/enrich mode: up to 7 review excerpts. Base/import: up to 3.
+            $limit = ($this->mode === 'enrich') ? 7 : 3;
             $response = $this->makeRequest('get', "{$this->baseUrl}/businesses/{$businessId}/reviews", [
-                'limit' => 3,
+                'limit'   => $limit,
                 'sort_by' => 'rating',
             ]);
 

@@ -121,6 +121,7 @@ class Restaurant extends Model implements HasMedia
         'yelp_last_sync',
         'yelp_enriched_at',
         'yelp_photos',
+        'yelp_reviews',
         'yelp_hours',
         'yelp_attributes',
         'menu_url',
@@ -258,7 +259,8 @@ class Restaurant extends Model implements HasMedia
         'yelp_rating' => 'decimal:1',
         'yelp_last_sync' => 'datetime',
         'yelp_enriched_at' => 'datetime',
-        'yelp_photos' => 'array',
+        'yelp_photos'   => 'array',
+        'yelp_reviews'  => 'array',
         'yelp_hours' => 'array',
         'yelp_attributes' => 'array',
         // TripAdvisor integration

@@ -15,7 +15,7 @@ class BackfillYelpData extends Command
                             {--dry-run : Show what would be updated without saving}
                             {--state= : Only process restaurants in specific state code}';
 
-    protected $description = 'Backfill Yelp photos, attributes, transactions, and hours for existing restaurants';
+    protected $description = 'Backfill Yelp photos, reviews, attributes, transactions, and hours (premium: 12 photos + 7 reviews)';
 
     protected YelpFusionService $yelpService;
 
@@ -115,6 +115,18 @@ class BackfillYelpData extends Command
                 // Categories (update if more complete)
                 if (!empty($details['categories']) && count($details['categories']) > 0) {
                     $updateData['yelp_categories'] = $details['categories'];
+                }
+
+                // Reviews — premium keys return up to 7 excerpts
+                $reviews = $this->yelpService->getBusinessReviews($restaurant->yelp_id);
+                if (!empty($reviews)) {
+                    $updateData['yelp_reviews'] = array_map(fn($r) => [
+                        'text'    => $r['text'] ?? '',
+                        'rating'  => $r['rating'] ?? null,
+                        'author'  => $r['user']['name'] ?? 'Anonymous',
+                        'url'     => $r['url'] ?? null,
+                        'date'    => $r['time_created'] ?? null,
+                    ], $reviews);
                 }
 
                 if ($this->option('dry-run')) {
