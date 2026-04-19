@@ -9,15 +9,18 @@ use Illuminate\Support\Facades\Cache;
 
 class FoursquareService
 {
-    protected ?string $apiKey = null;
-    protected string $baseUrl = 'https://places-api.foursquare.com';
+    protected string $clientId;
+    protected string $clientSecret;
+    protected string $baseUrl = 'https://api.foursquare.com/v2';
+    protected string $apiVersion = '20231010';
     protected int $dailyLimit;
     protected string $cacheKey = 'foursquare_daily_calls';
 
     public function __construct()
     {
-        $this->apiKey = config('services.foursquare.api_key', '');
-        $this->dailyLimit = (int) config('services.foursquare.daily_limit', 500);
+        $this->clientId     = config('services.foursquare.client_id', '');
+        $this->clientSecret = config('services.foursquare.client_secret', '');
+        $this->dailyLimit   = (int) config('services.foursquare.daily_limit', 500);
     }
 
     public function canMakeCall(): bool
@@ -35,44 +38,38 @@ class FoursquareService
     protected function incrementCallCount(): void
     {
         $calls = Cache::get($this->cacheKey, 0);
-        $secondsUntilMidnight = strtotime('tomorrow') - time();
-        Cache::put($this->cacheKey, $calls + 1, $secondsUntilMidnight);
+        Cache::put($this->cacheKey, $calls + 1, strtotime('tomorrow') - time());
     }
 
-    /**
-     * Log API call to api_call_logs for dashboard visibility
-     */
     protected function logApiCall(string $endpoint, bool $success, ?int $statusCode = null, array $params = [], ?string $error = null): void
     {
         try {
             ApiCallLog::create([
-                'service' => 'foursquare',
-                'endpoint' => $endpoint,
-                'status_code' => $statusCode ?? ($success ? 200 : 500),
-                'success' => $success,
-                'cost' => 0, // Foursquare free tier
-                'params' => $params,
+                'service'       => 'foursquare',
+                'endpoint'      => $endpoint,
+                'status_code'   => $statusCode ?? ($success ? 200 : 500),
+                'success'       => $success,
+                'cost'          => 0,
+                'params'        => $params,
                 'error_message' => $error,
-                'called_at' => now(),
+                'called_at'     => now(),
             ]);
         } catch (\Exception $e) {
-            // Silently fail if logging fails
+            // silent
         }
     }
 
     protected function makeRequest(string $endpoint, array $params = []): ?array
     {
+        $params['client_id']     = $this->clientId;
+        $params['client_secret'] = $this->clientSecret;
+        $params['v']             = $this->apiVersion;
+
         try {
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $this->apiKey,
-                'Accept' => 'application/json',
-                'X-Places-Api-Version' => '2025-06-17',
-            ])->get($this->baseUrl . $endpoint, $params);
+            $response = Http::get($this->baseUrl . $endpoint, $params);
 
             $this->incrementCallCount();
-            
-            // Log to api_call_logs
-            $this->logApiCall($endpoint, $response->successful(), $response->status(), $params);
+            $this->logApiCall($endpoint, $response->successful(), $response->status(), array_except($params, ['client_id', 'client_secret']));
 
             if ($response->successful()) {
                 return $response->json();
@@ -80,14 +77,14 @@ class FoursquareService
 
             Log::warning('Foursquare API error', [
                 'endpoint' => $endpoint,
-                'status' => $response->status(),
-                'body' => $response->body(),
+                'status'   => $response->status(),
+                'body'     => $response->body(),
             ]);
 
             return null;
         } catch (\Exception $e) {
             Log::error('Foursquare API exception: ' . $e->getMessage());
-            $this->logApiCall($endpoint, false, 500, $params, $e->getMessage());
+            $this->logApiCall($endpoint, false, 500, [], $e->getMessage());
             return null;
         }
     }
@@ -100,74 +97,75 @@ class FoursquareService
         }
 
         $params = [
-            'query' => $name,
-            'categories' => '13065', // Restaurants
-            'limit' => 5,
+            'query'      => $name,
+            'categoryId' => '4d4b7105d754a06374d81259', // Food category
+            'limit'      => 5,
+            'intent'     => 'match',
         ];
 
         if ($lat && $lng) {
-            $params['ll'] = "{$lat},{$lng}";
+            $params['ll']     = "{$lat},{$lng}";
             $params['radius'] = 5000;
         } elseif ($city && $state) {
             $params['near'] = "{$city}, {$state}";
         }
 
-        $data = $this->makeRequest('/places/search', $params);
+        $data = $this->makeRequest('/venues/search', $params);
 
-        if ($data && !empty($data['results'])) {
-            return $this->findBestMatch($name, $address, $data['results']);
+        if ($data && !empty($data['response']['venues'])) {
+            return $this->findBestMatch($name, $address, $data['response']['venues']);
         }
 
         return null;
     }
 
-    public function getPlaceDetails(string $fsqId): ?array
+    public function getPlaceDetails(string $venueId): ?array
     {
         if (!$this->canMakeCall()) {
             return null;
         }
 
-        return $this->makeRequest('/places/' . $fsqId, [
-            'fields' => 'fsq_place_id,name,location,rating,stats,price,hours,website,tel,categories',
-        ]);
+        $data = $this->makeRequest('/venues/' . $venueId);
+
+        return $data['response']['venue'] ?? null;
     }
 
-    protected function findBestMatch(string $name, ?string $address, array $results): ?array
+    protected function findBestMatch(string $name, ?string $address, array $venues): ?array
     {
-        $name = strtolower(trim($name));
+        $name      = strtolower(trim($name));
         $bestMatch = null;
         $bestScore = 0;
 
-        foreach ($results as $result) {
-            $score = 0;
-            $resultName = strtolower($result['name'] ?? '');
+        foreach ($venues as $venue) {
+            $score      = 0;
+            $venueName  = strtolower($venue['name'] ?? '');
 
-            if ($resultName === $name) {
+            if ($venueName === $name) {
                 $score += 100;
-            } elseif (str_contains($resultName, $name) || str_contains($name, $resultName)) {
+            } elseif (str_contains($venueName, $name) || str_contains($name, $venueName)) {
                 $score += 50;
             } else {
-                similar_text($name, $resultName, $percent);
+                similar_text($name, $venueName, $percent);
                 if ($percent > 60) {
                     $score += $percent * 0.5;
                 }
             }
 
-            if ($address && isset($result['location']['address'])) {
-                $resultAddr = strtolower($result['location']['address']);
+            if ($address && !empty($venue['location']['address'])) {
+                $venueAddr = strtolower($venue['location']['address']);
                 $addrFirst = strtolower(explode(' ', $address)[0] ?? '');
-                if (str_contains($resultAddr, $addrFirst)) {
+                if (str_contains($venueAddr, $addrFirst)) {
                     $score += 30;
                 }
             }
 
-            if (!empty($result['rating'])) {
+            if (!empty($venue['rating'])) {
                 $score += 10;
             }
 
             if ($score > $bestScore && $score >= 40) {
                 $bestScore = $score;
-                $bestMatch = $result;
+                $bestMatch = $venue;
             }
         }
 
@@ -176,7 +174,7 @@ class FoursquareService
 
     public function enrichRestaurant($restaurant): ?array
     {
-        $place = $this->searchPlace(
+        $venue = $this->searchPlace(
             $restaurant->name,
             $restaurant->address,
             $restaurant->city,
@@ -185,30 +183,30 @@ class FoursquareService
             $restaurant->longitude
         );
 
-        if (!$place) {
+        if (!$venue) {
             return null;
         }
 
-        $fsqId = $place['fsq_place_id'];
-        $details = $this->getPlaceDetails($fsqId);
+        $venueId = $venue['id'];
+        $details = $this->getPlaceDetails($venueId);
 
         $data = [
-            'foursquare_id' => $fsqId,
+            'foursquare_id' => $venueId,
         ];
 
-        if ($details) {
-            $data['foursquare_rating'] = isset($details['rating']) ? round($details['rating'], 1) : null;
-            $data['foursquare_checkins'] = $details['stats']['total_checkins'] ?? null;
-            $data['foursquare_tips_count'] = $details['stats']['total_tips'] ?? null;
-            $data['foursquare_price'] = $details['price'] ?? null;
+        $source = $details ?? $venue;
 
-            if (empty($restaurant->phone) && !empty($details['tel'])) {
-                $data['phone'] = $details['tel'];
-            }
+        $data['foursquare_rating']      = isset($source['rating']) ? round($source['rating'], 1) : null;
+        $data['foursquare_checkins']    = $source['stats']['checkinsCount'] ?? null;
+        $data['foursquare_tips_count']  = $source['stats']['tipCount'] ?? null;
+        $data['foursquare_price']       = $source['price']['tier'] ?? null;
 
-            if (empty($restaurant->website) && !empty($details['website'])) {
-                $data['website'] = $details['website'];
-            }
+        if (empty($restaurant->phone) && !empty($source['contact']['phone'])) {
+            $data['phone'] = $source['contact']['phone'];
+        }
+
+        if (empty($restaurant->website) && !empty($source['url'])) {
+            $data['website'] = $source['url'];
         }
 
         return $data;

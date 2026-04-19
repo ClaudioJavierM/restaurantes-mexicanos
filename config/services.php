@@ -114,6 +114,13 @@ return [
         'api_key' => env('OPENAI_API_KEY'),
     ],
 
+    'foursquare' => [
+        'client_id'     => env('FOURSQUARE_CLIENT_ID'),
+        'client_secret' => env('FOURSQUARE_CLIENT_SECRET'),
+        'service_key'   => env('FOURSQUARE_SERVICE_KEY'), // v3 key (future use)
+        'daily_limit'   => env('FOURSQUARE_DAILY_LIMIT', 500),
+    ],
+
     'listmonk' => [
         'url'           => env('LISTMONK_URL', 'http://localhost:9000'),
         'username'      => env('LISTMONK_USERNAME', 'listmonk'),

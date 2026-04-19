@@ -119,6 +119,20 @@ sudo nginx -t && sudo systemctl reload nginx
 - El `EmailLogResource` ya tiene `getEloquentQuery()` con este filtro — NO removerlo
 - El `EmailStatsOverview` widget también aplica el mismo filtro vía closure `$famer = fn() => EmailLog::whereNotNull('from_email')`
 
+## APIs Externas — Credenciales
+
+### Foursquare Places API v2 (activa — 2026-04-19)
+- **Proyecto:** Famer (`foursquare.com/developers`)
+- **Client ID:** `IICLZWAHDPYBDREQL0BSVVBMK3TIANDI5GJ3VHSUUJ2YZZ4A`
+- **Client Secret:** `4V43C5RSGYNYXW3TCIFPL4D1XSF4SDY1QHA0KLE2BH3O20JI`
+- **Service API Key (v3 — famer1):** `MUNA3W4KVDHC2XGWITQCLXSOJNCYHEJZNQ3BPCMZHP2FZ31P`
+- **API usada:** v2 (`https://api.foursquare.com/v2`) — v3 devuelve 401 (Service Key recién creada, puede activarse después)
+- **Auth v2:** `client_id` + `client_secret` como query params (NO header)
+- **Endpoints:** `/venues/search` (búsqueda) + `/venues/{id}` (detalle)
+- **Config Laravel:** `services.foursquare.client_id` / `client_secret` / `service_key`
+- **Límite diario:** 500 calls (configurable con `FOURSQUARE_DAILY_LIMIT`)
+- **NOTA:** La key Legacy "FAMER" del dashboard es la antigua — ya NO está en .env
+
 ### Columnas agregadas manualmente (no en migraciones)
 
 - `reviews.is_approved` — columna VIRTUAL GENERATED: `IF(status='approved',1,0)`
