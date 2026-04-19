@@ -69,7 +69,7 @@ class FoursquareService
             $response = Http::get($this->baseUrl . $endpoint, $params);
 
             $this->incrementCallCount();
-            $this->logApiCall($endpoint, $response->successful(), $response->status(), array_except($params, ['client_id', 'client_secret']));
+            $this->logApiCall($endpoint, $response->successful(), $response->status(), array_diff_key($params, array_flip(['client_id', 'client_secret'])));
 
             if ($response->successful()) {
                 return $response->json();
