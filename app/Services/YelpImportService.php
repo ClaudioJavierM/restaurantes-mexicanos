@@ -18,7 +18,7 @@ class YelpImportService
 
     public function __construct()
     {
-        $this->yelpService = app(YelpFusionService::class);
+        $this->yelpService = new YelpFusionService('import');
         $this->googlePlacesService = app(GooglePlacesService::class);
     }
 

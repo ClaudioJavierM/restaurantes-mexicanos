@@ -12,28 +12,38 @@ class YelpFusionService
     protected $apiKeys = [];
     protected $currentKeyIndex = 0;
     protected $baseUrl = 'https://api.yelp.com/v3';
+    protected string $mode = 'enrich'; // 'import' | 'enrich'
+    protected int $dailyImportLimit = 5000;
 
-    public function __construct()
+    /**
+     * @param string $mode
+     *   'import' — uses YELP_IMPORT_KEY (paid Base, 5,000 calls/day). For yelp:import-smart.
+     *   'enrich' — uses YELP_PREMIUM_KEY_* (trial Premium, 5,000 calls/month each). For yelp:backfill.
+     */
+    public function __construct(string $mode = 'enrich')
     {
-        $this->apiKeys = config('services.yelp.api_keys', []);
+        $this->mode = $mode;
 
-        if (empty($this->apiKeys)) {
-            $singleKey = config('services.yelp.api_key');
-            if ($singleKey) {
-                $this->apiKeys = [$singleKey];
+        if ($mode === 'import') {
+            $importKey = config('services.yelp.import_key');
+            $this->apiKeys = $importKey ? [$importKey] : [];
+            $this->dailyImportLimit = (int) config('services.yelp.import_daily_limit', 5000);
+        } else {
+            $this->apiKeys = config('services.yelp.api_keys', []);
+            if (empty($this->apiKeys)) {
+                $singleKey = config('services.yelp.api_key');
+                if ($singleKey) $this->apiKeys = [$singleKey];
             }
         }
 
         $this->apiKey = $this->apiKeys[0] ?? null;
 
-        // Always start on the key with most usage (exhaust sequentially, not randomly)
-        // This ensures each key looks like a single independent user to Yelp
-        if (count($this->apiKeys) > 1) {
+        if ($mode === 'enrich' && count($this->apiKeys) > 1) {
             $this->currentKeyIndex = $this->findActiveKeyIndex();
             $this->apiKey = $this->apiKeys[$this->currentKeyIndex];
         }
 
-        Log::debug('YelpFusionService initialized with ' . count($this->apiKeys) . ' API keys, starting at index ' . $this->currentKeyIndex);
+        Log::debug("YelpFusionService [{$mode}] initialized with " . count($this->apiKeys) . ' keys, index ' . $this->currentKeyIndex);
     }
 
     /**
@@ -70,40 +80,46 @@ class YelpFusionService
     }
 
     /**
-     * Guard: checks per-key monthly budget (5,000 per trial key).
-     * Auto-rotates to a key with remaining budget before throwing.
-     * Called before every API request so imports auto-stop at the limit.
+     * Guard: checks budget before every API request.
+     * - import mode: daily limit (5,000/day on paid key)
+     * - enrich mode: monthly limit per trial key (5,000/month each), auto-rotates
      */
     protected function checkMonthlyBudget(): void
     {
-        $perKeyLimit = (int) config('services.yelp.monthly_limit', 5000);
+        if ($this->mode === 'import') {
+            $used = ApiCallLog::where('service', 'yelp')
+                ->where('called_at', '>=', now()->startOfDay())
+                ->where('called_at', '<', now()->endOfDay())
+                ->whereRaw("JSON_EXTRACT(params, '$._mode') = 'import'")
+                ->count();
 
-        // Check current key's usage
+            if ($used >= $this->dailyImportLimit) {
+                throw new \RuntimeException(
+                    "Yelp import key daily limit reached ({$used}/{$this->dailyImportLimit}). Resets tomorrow."
+                );
+            }
+            return;
+        }
+
+        // Enrich mode: monthly per-key budget
+        $perKeyLimit = (int) config('services.yelp.monthly_limit', 5000);
         $used = $this->getKeyUsage($this->currentKeyIndex);
 
         if ($used >= $perKeyLimit) {
-            Log::warning("Yelp key [{$this->currentKeyIndex}] monthly limit reached ({$used}/{$perKeyLimit}), rotating...");
+            Log::warning("Yelp enrich key [{$this->currentKeyIndex}] monthly limit reached ({$used}/{$perKeyLimit}), rotating...");
 
-            // Try to rotate to a key with remaining budget
             if (!$this->rotateToAvailableKey($perKeyLimit)) {
                 $total = count($this->apiKeys) * $perKeyLimit;
                 throw new \RuntimeException(
-                    "All {$this->getApiKeyCount()} Yelp API keys exhausted for this month. " .
+                    "All {$this->getApiKeyCount()} Yelp enrich keys exhausted for this month. " .
                     "Total budget: {$total} calls. Resets on " . now()->startOfNextMonth()->toDateString() . '.'
                 );
             }
-
-            // Re-check the new key
             $used = $this->getKeyUsage($this->currentKeyIndex);
         }
 
-        // Warn at 80%
         if ($used >= (int) ($perKeyLimit * 0.80)) {
-            Log::warning("Yelp key [{$this->currentKeyIndex}] at " . round(($used / $perKeyLimit) * 100) . '%', [
-                'used' => $used,
-                'limit' => $perKeyLimit,
-                'remaining' => $perKeyLimit - $used,
-            ]);
+            Log::warning("Yelp enrich key [{$this->currentKeyIndex}] at " . round(($used / $perKeyLimit) * 100) . '%');
         }
     }
 
@@ -153,14 +169,14 @@ class YelpFusionService
     {
         try {
             ApiCallLog::create([
-                'service' => 'yelp',
-                'endpoint' => $endpoint,
-                'status_code' => $statusCode ?? ($success ? 200 : 500),
-                'success' => $success,
-                'cost' => 0,
-                'params' => array_merge($params, ['_key_index' => $this->currentKeyIndex]),
+                'service'       => 'yelp',
+                'endpoint'      => $endpoint,
+                'status_code'   => $statusCode ?? ($success ? 200 : 500),
+                'success'       => $success,
+                'cost'          => 0,
+                'params'        => array_merge($params, ['_key_index' => $this->currentKeyIndex, '_mode' => $this->mode]),
                 'error_message' => $error,
-                'called_at' => now(),
+                'called_at'     => now(),
             ]);
         } catch (\Exception $e) {
             // Silently fail if logging fails

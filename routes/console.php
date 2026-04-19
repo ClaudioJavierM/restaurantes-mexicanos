@@ -29,53 +29,33 @@ function notifyN8nFailure(string $jobName, string $description): void
 // ============================================================================
 
 /**
- * SMART IMPORT - 4 runs/day × 10 cities = ~600 calls/day
- * Goal: exhaust 7 trial keys (35,000 calls) before they expire ~Apr 28
- * Keys are consumed sequentially (key 1 → 2 → 3...) via findActiveKeyIndex()
+ * SMART IMPORT — paid Base key (YELP_IMPORT_KEY), 5,000 calls/day
+ * 4 runs/day × 30 cities × ~30 calls/city = ~3,600 calls/day (safe under 5K limit)
+ * Goal: import as many new Mexican restaurants as possible this month
  */
-// IMPORT RUN 1 — 1:00 AM
-Schedule::command('yelp:import-smart --cities=10 --limit=50 --min-rating=3.5 --delay=1')
-    ->dailyAt('01:00')
-    ->timezone('America/New_York')
-    ->description('Import run 1/4: 10 cities')
-    ->onSuccess(function () { \Log::info('Yelp import run 1 completed'); })
-    ->onFailure(function () {
-        \Log::error('Yelp import run 1 failed');
-        notifyN8nFailure('yelp:import-smart', 'Import run 1 (10 cities)');
-    });
+Schedule::command('yelp:import-smart --cities=30 --limit=50 --min-rating=3.5 --delay=1')
+    ->dailyAt('01:00')->timezone('America/New_York')
+    ->description('Import run 1/4: 30 cities (paid key)')
+    ->onSuccess(fn() => \Log::info('Yelp import run 1 completed'))
+    ->onFailure(fn() => notifyN8nFailure('yelp:import-smart', 'Import run 1'));
 
-// IMPORT RUN 2 — 7:00 AM
-Schedule::command('yelp:import-smart --cities=10 --limit=50 --min-rating=3.5 --delay=1')
-    ->dailyAt('07:00')
-    ->timezone('America/New_York')
-    ->description('Import run 2/4: 10 cities')
-    ->onSuccess(function () { \Log::info('Yelp import run 2 completed'); })
-    ->onFailure(function () {
-        \Log::error('Yelp import run 2 failed');
-        notifyN8nFailure('yelp:import-smart', 'Import run 2 (10 cities)');
-    });
+Schedule::command('yelp:import-smart --cities=30 --limit=50 --min-rating=3.5 --delay=1')
+    ->dailyAt('07:00')->timezone('America/New_York')
+    ->description('Import run 2/4: 30 cities (paid key)')
+    ->onSuccess(fn() => \Log::info('Yelp import run 2 completed'))
+    ->onFailure(fn() => notifyN8nFailure('yelp:import-smart', 'Import run 2'));
 
-// IMPORT RUN 3 — 1:00 PM
-Schedule::command('yelp:import-smart --cities=10 --limit=50 --min-rating=3.5 --delay=1')
-    ->dailyAt('13:00')
-    ->timezone('America/New_York')
-    ->description('Import run 3/4: 10 cities')
-    ->onSuccess(function () { \Log::info('Yelp import run 3 completed'); })
-    ->onFailure(function () {
-        \Log::error('Yelp import run 3 failed');
-        notifyN8nFailure('yelp:import-smart', 'Import run 3 (10 cities)');
-    });
+Schedule::command('yelp:import-smart --cities=30 --limit=50 --min-rating=3.5 --delay=1')
+    ->dailyAt('13:00')->timezone('America/New_York')
+    ->description('Import run 3/4: 30 cities (paid key)')
+    ->onSuccess(fn() => \Log::info('Yelp import run 3 completed'))
+    ->onFailure(fn() => notifyN8nFailure('yelp:import-smart', 'Import run 3'));
 
-// IMPORT RUN 4 — 7:00 PM
-Schedule::command('yelp:import-smart --cities=10 --limit=50 --min-rating=3.5 --delay=1')
-    ->dailyAt('19:00')
-    ->timezone('America/New_York')
-    ->description('Import run 4/4: 10 cities')
-    ->onSuccess(function () { \Log::info('Yelp import run 4 completed'); })
-    ->onFailure(function () {
-        \Log::error('Yelp import run 4 failed');
-        notifyN8nFailure('yelp:import-smart', 'Import run 4 (10 cities)');
-    });
+Schedule::command('yelp:import-smart --cities=30 --limit=50 --min-rating=3.5 --delay=1')
+    ->dailyAt('19:00')->timezone('America/New_York')
+    ->description('Import run 4/4: 30 cities (paid key)')
+    ->onSuccess(fn() => \Log::info('Yelp import run 4 completed'))
+    ->onFailure(fn() => notifyN8nFailure('yelp:import-smart', 'Import run 4'));
 
 /**
  * BACKFILL — every 2 hours (12 runs/day × 100 restaurants = 1,200 calls/day)
