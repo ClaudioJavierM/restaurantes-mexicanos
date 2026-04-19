@@ -121,6 +121,35 @@ sudo nginx -t && sudo systemctl reload nginx
 
 ## APIs Externas — Credenciales
 
+### Yelp Fusion API Keys — Trial 30 días, 5,000 calls/key (use it or lose it)
+
+**Estrategia:** Cada key es trial de 30 días. Hay que usar las 5,000 calls antes de que expire.
+El scheduler consume ~1,800/día → agota 4 keys en ~11 días. Meta: 16 keys = 80,000 calls/ciclo.
+
+**Para agregar una key nueva al servidor:**
+```bash
+ssh mfgroup@160.153.183.38
+echo 'YELP_PREMIUM_KEY_5=NUEVA_KEY_AQUI' | sudo tee -a /var/www/restaurantesmexicanosfamosos.com.mx/.env
+# o YELP_API_KEY_US_6, YELP_PREMIUM_KEY_6, etc. — numeración secuencial
+sudo -u nginx php artisan config:cache
+```
+
+El `config/services.php` ya itera automáticamente `YELP_PREMIUM_KEY_1..99` y `YELP_API_KEY_US_2..99`.
+
+**Keys activas (2026-04-19) — actualizar al agregar nuevas:**
+
+| Variable | Cuenta | Tipo | Expira aprox |
+|----------|--------|------|-------------|
+| `YELP_API_KEY_US_4` | — | Standard Fusion | — |
+| `YELP_API_KEY_US_5` | — | Standard Fusion | — |
+| `YELP_PREMIUM_KEY_3` | admin@vivexa.us | Data Licensing Premium | ~May 2026 |
+| `YELP_PREMIUM_KEY_4` | javier.velazquez@sdv.com.mx / KlRtB6-5TrBEWOPEg-vMig | Data Licensing Premium | ~May 2026 |
+
+**Keys agotadas este ciclo (reactivar May 1):** YELP_API_KEY (original), YELP_API_KEY_US_2, YELP_API_KEY_US_3, YELP_PREMIUM_KEY_1, YELP_PREMIUM_KEY_2
+**YELP_MONTHLY_LIMIT** en .env = `20000` (4 keys × 5,000). Actualizar al agregar más keys.
+
+---
+
 ### Foursquare Places API v2 (activa — 2026-04-19)
 - **Proyecto:** Famer (`foursquare.com/developers`)
 - **Client ID:** `IICLZWAHDPYBDREQL0BSVVBMK3TIANDI5GJ3VHSUUJ2YZZ4A`
