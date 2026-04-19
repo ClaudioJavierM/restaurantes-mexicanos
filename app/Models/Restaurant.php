@@ -175,6 +175,13 @@ class Restaurant extends Model implements HasMedia
         'premium_featured',
         'premium_coupons',
         'premium_email_marketing',
+        'premium_badge',
+        'premium_menu',
+        'premium_reservations',
+        'premium_chatbot',
+        // Claim verification & scoring
+        'email_verified_for_claim',
+        'mailing_score',
         // Analytics
         'profile_views',
         'phone_clicks',

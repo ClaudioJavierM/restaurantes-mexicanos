@@ -87,6 +87,22 @@ class UpgradeSubscription extends Page
 
         // If downgrading to free
         if ($plan === 'free') {
+            if ($this->restaurant->stripe_subscription_id) {
+                try {
+                    \Stripe\Stripe::setApiKey(config('services.stripe.secret'));
+                    $sub = \Stripe\Subscription::retrieve($this->restaurant->stripe_subscription_id);
+                    $sub->cancel();
+                    \Illuminate\Support\Facades\Log::info('Stripe subscription cancelada por downgrade a free', [
+                        'restaurant_id'   => $this->restaurant->id,
+                        'subscription_id' => $this->restaurant->stripe_subscription_id,
+                    ]);
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::error('Error cancelando Stripe al downgrade', [
+                        'error' => $e->getMessage(),
+                        'restaurant_id' => $this->restaurant->id,
+                    ]);
+                }
+            }
             $this->restaurant->update([
                 'subscription_tier' => 'free',
                 'subscription_status' => 'active',

@@ -43,6 +43,18 @@ class StripeWebhookController extends Controller
             return response()->json(['error' => 'Invalid signature'], 400);
         }
 
+        // Idempotency: evitar procesar el mismo evento dos veces
+        if (\Illuminate\Support\Facades\DB::table('stripe_webhook_events')->where('event_id', $event->id)->exists()) {
+            return response()->json(['status' => 'already_processed']);
+        }
+        \Illuminate\Support\Facades\DB::table('stripe_webhook_events')->insert([
+            'event_id'   => $event->id,
+            'type'       => $event->type,
+            'status'     => 'processed',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
         // Handle the event
         switch ($event->type) {
             case 'checkout.session.completed':
@@ -107,8 +119,11 @@ class StripeWebhookController extends Controller
         }
 
         if (!$subscriptionId) {
-            \Log::error('Webhook: unable to resolve subscription ID for restaurant ' . $restaurantId);
-            return;
+            \Illuminate\Support\Facades\Log::warning('checkout.session.completed sin subscription_id', [
+                'session_id'    => $session->id ?? null,
+                'restaurant_id' => $restaurantId ?? null,
+            ]);
+            // NO hacer return aquí — continuar con el claim
         }
 
         // Update restaurant with subscription info

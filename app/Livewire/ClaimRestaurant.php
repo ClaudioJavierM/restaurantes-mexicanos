@@ -776,7 +776,7 @@ class ClaimRestaurant extends Component
         }
 
         if ($plan === 'free') {
-            return $this->completeFreeClai();
+            return $this->completeFreeClaim();
         }
 
         // Session data (owner info, restaurant id, etc.) was already stored in submitCreateAccount().
@@ -792,7 +792,7 @@ class ClaimRestaurant extends Component
         );
     }
 
-    public function completeFreeClai()
+    public function completeFreeClaim()
     {
         $this->selectedRestaurant->update([
             'is_claimed' => true,

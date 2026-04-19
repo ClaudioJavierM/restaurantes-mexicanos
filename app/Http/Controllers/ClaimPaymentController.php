@@ -26,6 +26,10 @@ class ClaimPaymentController extends Controller
             return redirect()->route('claim.restaurant')->with('error', 'Restaurante no encontrado.');
         }
 
+        if ($restaurant->is_claimed && $restaurant->user_id) {
+            return redirect()->route('claim.restaurant')->with('error', 'Este restaurante ya fue reclamado. Si eres el dueño, inicia sesión.');
+        }
+
         try {
             $stripeService = new StripeService();
             $coupon = session('claim_coupon_code');
@@ -74,7 +78,7 @@ class ClaimPaymentController extends Controller
                 'subscriptionId'  => $result['subscription_id'],
                 'isTrial'         => $result['is_trial'],
                 'trialDays'       => $result['trial_days'],
-                'stripePublicKey' => config('stripe.key'),
+                'stripePublicKey' => config('services.stripe.key'),
                 'returnUrl'       => route('claim.success') . '?session_id=' . $result['subscription_id'],
             ]);
         } catch (\Exception $e) {

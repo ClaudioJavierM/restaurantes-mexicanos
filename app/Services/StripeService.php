@@ -10,6 +10,7 @@ use Stripe\Subscription;
 use Stripe\Price;
 use Stripe\Coupon;
 use Stripe\PromotionCode;
+use Carbon\Carbon;
 use Exception;
 
 class StripeService
@@ -194,15 +195,19 @@ class StripeService
                 'claimed_at' => now(),
                 'subscription_tier' => $plan,
                 'stripe_subscription_id' => $subscriptionId,
-                'subscription_started_at' => now(),
-                'subscription_expires_at' => now()->addMonth(),
+                'subscription_started_at' => Carbon::createFromTimestamp($subscription->current_period_start),
+                'subscription_expires_at' => Carbon::createFromTimestamp($subscription->current_period_end),
                 'subscription_status' => 'active',
                 // Enable premium features based on plan
-                'premium_analytics' => in_array($plan, ['claimed', 'premium', 'elite']),
-                'premium_seo' => in_array($plan, ['premium', 'elite']),
-                'premium_featured' => in_array($plan, ['premium', 'elite']),
-                'premium_coupons' => in_array($plan, ['premium', 'elite']),
-                'premium_email_marketing' => in_array($plan, ['premium', 'elite']),
+                'premium_analytics'        => in_array($plan, ['claimed', 'premium', 'elite']),
+                'premium_seo'              => in_array($plan, ['premium', 'elite']),
+                'premium_featured'         => in_array($plan, ['premium', 'elite']),
+                'premium_coupons'          => in_array($plan, ['premium', 'elite']),
+                'premium_email_marketing'  => in_array($plan, ['premium', 'elite']),
+                'premium_badge'            => in_array($plan, ['premium', 'elite']),
+                'premium_menu'             => in_array($plan, ['premium', 'elite']),
+                'premium_reservations'     => in_array($plan, ['premium', 'elite']),
+                'premium_chatbot'          => $plan === 'elite',
             ]);
 
             // If premium or elite, mark as featured
@@ -517,6 +522,28 @@ class StripeService
     /**
      * Create a subscription using the payment method from a confirmed SetupIntent
      */
+    /**
+     * Handle failed subscription payment (invoice.payment_failed webhook)
+     *
+     * TODO: Este método NO existe aún. Debe crearse para manejar pagos fallidos.
+     * Cuando se implemente, usar este patrón para el envío de email con fallback a owner_email:
+     *
+     *   if ($restaurant->user_id) {
+     *       $user = \App\Models\User::find($restaurant->user_id);
+     *       if ($user) {
+     *           Mail::to($user->email)->send(new PaymentFailedMail($restaurant));
+     *       } elseif ($restaurant->owner_email) {
+     *           Mail::to($restaurant->owner_email)->send(new PaymentFailedMail($restaurant));
+     *       }
+     *   } elseif ($restaurant->owner_email) {
+     *       Mail::to($restaurant->owner_email)->send(new PaymentFailedMail($restaurant));
+     *   }
+     *
+     * El webhook handler (StripeWebhookController) debe llamar a este método
+     * cuando reciba el evento 'invoice.payment_failed'.
+     */
+    // public function handleFailedPayment(Restaurant $restaurant): void { ... }
+
     public function createSubscriptionFromSetupIntent(string $setupIntentId, Restaurant $restaurant, string $plan, ?string $couponCode = null): Subscription
     {
         try {
