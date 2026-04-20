@@ -351,7 +351,9 @@ class SitemapController extends Controller
     }
 
     /**
-     * City+dish combination pages sitemap (/{dish}-en-{citySlug}-{stateCode}).
+     * Dish×city and dish×state sitemap.
+     * - Dish×city: /{dish}-en-{citySlug}-{stateCode} — top cities with ≥3 restaurants
+     * - Dish×state: /{dish}-en-{stateCode} — 6 core dishes × 15 key US states
      */
     public function dishes(): Response
     {
@@ -361,34 +363,56 @@ class SitemapController extends Controller
         $xml = Cache::remember($cacheKey, 3600, function () use ($baseUrl) {
             $xml = $this->openUrlset();
 
-            $dishes = [
+            // Dishes allowed by the dish.city route constraint (18 dishes)
+            $cityDishes = [
                 'birria','tacos','tamales','enchiladas','pozole','carnitas',
-                'chile-relleno','mole','chiles-en-nogada','tortas','burritos',
-                'quesadillas','sopes','tostadas','gorditas','tlayudas','menudo',
-                'barbacoa','huaraches','flautas','chilaquiles','chalupas',
+                'mole','chiles-rellenos','menudo','barbacoa','ceviche',
+                'carne-asada','quesadillas','guacamole','fajitas',
+                'churros','horchata','margaritas',
             ];
 
-            // Top 50 cities × 22 dishes = up to 1,100 URLs
+            // Top 50 city×state combos with ≥3 approved restaurants
             $cityStates = Restaurant::query()
                 ->join('states', 'restaurants.state_id', '=', 'states.id')
+                ->where('restaurants.status', 'approved')
+                ->where('restaurants.is_active', true)
+                ->whereNull('restaurants.deleted_at')
                 ->whereNotNull('restaurants.city')
                 ->where('restaurants.city', '!=', '')
                 ->select('restaurants.city', DB::raw('states.code as state_code'), DB::raw('COUNT(*) as cnt'))
                 ->groupBy('restaurants.city', 'states.code')
+                ->having('cnt', '>=', 3)
                 ->orderByDesc('cnt')
                 ->limit(50)
                 ->get();
 
+            // Dish×city URLs: up to 50 cities × 18 dishes = up to 900 URLs
             foreach ($cityStates as $location) {
-                $citySlug   = Str::slug($location->city);
-                $stateCode  = strtolower($location->state_code);
+                $citySlug  = Str::slug($location->city);
+                $stateCode = strtolower($location->state_code);
 
-                foreach ($dishes as $dish) {
+                foreach ($cityDishes as $dish) {
                     $xml .= $this->addUrl(
                         $baseUrl . '/' . $dish . '-en-' . $citySlug . '-' . $stateCode,
-                        now()->subMonth(),
-                        'monthly',
-                        '0.5'
+                        now()->subWeek(),
+                        'weekly',
+                        '0.6'
+                    );
+                }
+            }
+
+            // Dishes and states allowed by the dish-state route constraint
+            $stateDishes = ['birria', 'tamales', 'pozole', 'carnitas', 'barbacoa', 'mole'];
+            $stateCodes  = ['tx', 'ca', 'il', 'az', 'fl', 'co', 'nv', 'nm', 'ny', 'ga', 'wa', 'nc', 'or', 'ut', 'tn'];
+
+            // Dish×state URLs: 6 dishes × 15 states = 90 URLs
+            foreach ($stateDishes as $dish) {
+                foreach ($stateCodes as $stateCode) {
+                    $xml .= $this->addUrl(
+                        $baseUrl . '/' . $dish . '-en-' . $stateCode,
+                        now()->subWeek(),
+                        'weekly',
+                        '0.6'
                     );
                 }
             }

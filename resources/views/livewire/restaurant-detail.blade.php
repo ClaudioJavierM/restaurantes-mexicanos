@@ -1457,14 +1457,27 @@ echo '<script type="application/ld+json">' . json_encode($breadcrumbSchema, JSON
         </div>
     </div>
 
-    <!-- También te puede gustar / You might also like -->
+    <!-- Nearby Restaurants / Restaurantes Cercanos -->
     @if($nearbyRestaurants->isNotEmpty())
     <div style="background:#0B0B0B; border-top:1px solid #2A2A2A; padding:2.5rem 1rem 3rem;">
         <div class="max-w-6xl mx-auto">
-            <h2 style="font-family:'Playfair Display',serif; font-size:1.5rem; font-weight:700; color:#F5F5F5; margin-bottom:1.5rem;">
-                {{ app()->getLocale() === 'en' ? 'You Might Also Like' : 'También te puede gustar' }}
-            </h2>
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {{-- Section header --}}
+            <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:1.5rem; flex-wrap:wrap; gap:0.5rem;">
+                <h2 style="font-family:'Playfair Display',serif; font-size:1.5rem; font-weight:700; color:#F5F5F5; margin:0;">
+                    {{ $isEnDomain ? 'More Mexican Restaurants Nearby' : 'Más Restaurantes Mexicanos Cerca' }}
+                </h2>
+                @if($restaurant->city)
+                    <span style="color:#9CA3AF; font-size:0.8rem;">
+                        {{ $isEnDomain ? 'In' : 'En' }} {{ $restaurant->city }}
+                        @if(($restaurant->state?->code))
+                            , {{ $restaurant->state->code }}
+                        @endif
+                    </span>
+                @endif
+            </div>
+
+            {{-- Responsive grid: 1 col mobile → 2 tablet → 3 desktop --}}
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 @foreach($nearbyRestaurants as $nr)
                 @php
                     $nrPhoto = null;
@@ -1480,45 +1493,72 @@ echo '<script type="application/ld+json">' . json_encode($breadcrumbSchema, JSON
                     }
                     $nrRating = $nr->google_rating ?? $nr->yelp_rating ?? null;
                     $nrStateCode = $nr->state?->code ?? '';
+                    $nrUrl = $isEnDomain ? '/restaurant/' . $nr->slug : '/restaurante/' . $nr->slug;
+
+                    // Build star display (filled + empty) for rating
+                    $nrStarsFull  = $nrRating ? (int) floor($nrRating) : 0;
+                    $nrHalfStar   = $nrRating && ($nrRating - $nrStarsFull) >= 0.5;
+                    $nrStarsEmpty = 5 - $nrStarsFull - ($nrHalfStar ? 1 : 0);
                 @endphp
-                <a href="/restaurante/{{ $nr->slug }}"
-                   style="display:flex; flex-direction:column; background:#1A1A1A; border:1px solid #2A2A2A; border-radius:12px; overflow:hidden; text-decoration:none; transition:border-color 0.2s;"
-                   onmouseover="this.style.borderColor='#D4AF37'"
-                   onmouseout="this.style.borderColor='#2A2A2A'">
+                <a href="{{ $nrUrl }}"
+                   style="display:flex; flex-direction:column; background:#1A1A1A; border:1px solid #2A2A2A; border-radius:12px; overflow:hidden; text-decoration:none; transition:border-color 0.2s, box-shadow 0.2s;"
+                   onmouseover="this.style.borderColor='#D4AF37'; this.style.boxShadow='0 4px 20px rgba(212,175,55,0.12)'"
+                   onmouseout="this.style.borderColor='#2A2A2A'; this.style.boxShadow='none'">
+
                     {{-- Photo --}}
                     <div style="position:relative; height:160px; overflow:hidden; flex-shrink:0;">
                         @if($nrPhoto)
                             <img src="{{ $nrPhoto }}"
-                                 alt="{{ $nr->name }}"
+                                 alt="{{ $nr->name }} — {{ $isEnDomain ? 'Mexican restaurant in' : 'restaurante mexicano en' }} {{ $nr->city }}"
                                  loading="lazy"
                                  style="width:100%; height:100%; object-fit:cover; transition:transform 0.3s;"
                                  onmouseover="this.style.transform='scale(1.04)'"
                                  onmouseout="this.style.transform='scale(1)'">
                         @else
-                            <div style="width:100%; height:100%; background:linear-gradient(135deg,#1A1A1A 0%,#2A2A2A 100%); display:flex; align-items:center; justify-content:center; font-size:2.5rem;">
-                                🍽️
+                            <div style="width:100%; height:100%; background:linear-gradient(135deg,#1A1A1A 0%,#2A2A2A 100%); display:flex; align-items:center; justify-content:center;">
+                                <svg xmlns="http://www.w3.org/2000/svg" style="width:2.5rem;height:2.5rem;color:#2A2A2A;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3h18v2a9 9 0 01-9 9 9 9 0 01-9-9V3zm0 14h18M9 21h6"/>
+                                </svg>
                             </div>
                         @endif
                         @if($nr->price_range)
-                            <span style="position:absolute; top:0.5rem; right:0.5rem; background:rgba(0,0,0,0.75); color:#F5F5F5; font-size:0.7rem; font-weight:600; padding:0.2rem 0.5rem; border-radius:4px;">
+                            <span style="position:absolute; top:0.5rem; right:0.5rem; background:rgba(0,0,0,0.75); color:#F5F5F5; font-size:0.7rem; font-weight:600; padding:0.2rem 0.5rem; border-radius:4px; backdrop-filter:blur(4px);">
                                 {{ $nr->price_range }}
                             </span>
                         @endif
                     </div>
-                    {{-- Info --}}
-                    <div style="padding:0.875rem 1rem; flex:1; display:flex; flex-direction:column;">
-                        <h3 style="font-weight:700; color:#F5F5F5; font-size:0.9rem; line-height:1.35; margin:0 0 0.25rem; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">
+
+                    {{-- Card body --}}
+                    <div style="padding:0.875rem 1rem 1rem; flex:1; display:flex; flex-direction:column; gap:0.25rem;">
+                        <h3 style="font-weight:700; color:#F5F5F5; font-size:0.9rem; line-height:1.35; margin:0; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">
                             {{ $nr->name }}
                         </h3>
-                        <p style="color:#9CA3AF; font-size:0.75rem; margin:0 0 0.5rem;">
-                            {{ $nr->city }}{{ $nrStateCode ? ', '.$nrStateCode : '' }}
+                        <p style="color:#9CA3AF; font-size:0.75rem; margin:0;">
+                            {{ $nr->city }}{{ $nrStateCode ? ', ' . $nrStateCode : '' }}
                         </p>
+
+                        {{-- Stars + numeric rating --}}
                         @if($nrRating)
-                            <div style="display:flex; align-items:center; gap:0.3rem; margin-top:auto;">
-                                <span style="color:#D4AF37; font-size:0.8rem;">★</span>
-                                <span style="font-size:0.8rem; font-weight:600; color:#F5F5F5;">{{ number_format($nrRating, 1) }}</span>
+                            <div style="display:flex; align-items:center; gap:0.25rem; margin-top:0.25rem;">
+                                @for($s = 0; $s < $nrStarsFull; $s++)
+                                    <span style="color:#D4AF37; font-size:0.8rem; line-height:1;">★</span>
+                                @endfor
+                                @if($nrHalfStar)
+                                    <span style="color:#D4AF37; font-size:0.8rem; line-height:1; opacity:0.6;">★</span>
+                                @endif
+                                @for($s = 0; $s < $nrStarsEmpty; $s++)
+                                    <span style="color:#3A3A3A; font-size:0.8rem; line-height:1;">★</span>
+                                @endfor
+                                <span style="font-size:0.75rem; font-weight:600; color:#F5F5F5; margin-left:0.15rem;">{{ number_format($nrRating, 1) }}</span>
                             </div>
                         @endif
+
+                        {{-- View button --}}
+                        <div style="margin-top:auto; padding-top:0.75rem;">
+                            <span style="display:inline-block; background:#D4AF37; color:#0B0B0B; font-weight:700; font-size:0.75rem; padding:0.375rem 0.875rem; border-radius:6px; letter-spacing:0.02em;">
+                                {{ $isEnDomain ? 'View →' : 'Ver →' }}
+                            </span>
+                        </div>
                     </div>
                 </a>
                 @endforeach

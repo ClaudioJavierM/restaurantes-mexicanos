@@ -141,9 +141,197 @@
                 {{ $stateName }} cuenta con una vibrante comunidad mexicana que mantiene vivas las tradiciones culinarias de México. Los restaurantes de {{ $dishData['name'] }} en {{ $stateName }} ofrecen recetas auténticas preparadas por chefs con raíces mexicanas. Usa FAMER para encontrar el mejor lugar de {{ $dishData['name'] }} cerca de ti en {{ $stateName }}.
             </p>
         </div>
+
+        <!-- FAQ Section -->
+        @php $isEn = app()->getLocale() === 'en'; $count = $restaurants->count(); @endphp
+        <div style="margin-top:4rem; padding-top:3rem; border-top:1px solid #2A2A2A;">
+            <h2 style="font-family:'Playfair Display',serif; font-size:1.5rem; font-weight:700; color:#F5F5F5; margin-bottom:1.5rem;">
+                {{ $isEn ? 'Frequently Asked Questions' : 'Preguntas Frecuentes' }}
+            </h2>
+            <div style="display:flex; flex-direction:column; gap:0.75rem; max-width:800px;">
+
+                <!-- FAQ 1 -->
+                <details style="background:#1A1A1A; border:1px solid #2A2A2A; border-radius:10px; overflow:hidden; cursor:pointer;"
+                         onclick="this.style.borderColor=this.open?'#2A2A2A':'#D4AF37'" onmouseover="this.style.borderColor='#D4AF37'" onmouseout="if(!this.open)this.style.borderColor='#2A2A2A'">
+                    <summary style="padding:1.125rem 1.25rem; font-size:1rem; font-weight:600; color:#F5F5F5; list-style:none; display:flex; justify-content:space-between; align-items:center; user-select:none;">
+                        <span>
+                            @if($isEn)
+                                Where can I find the best {{ $dishData['name'] }} in {{ $stateName }}?
+                            @else
+                                ¿Dónde encontrar el mejor {{ $dishData['name'] }} en {{ $stateName }}?
+                            @endif
+                        </span>
+                        <span style="color:#D4AF37; font-size:1.25rem; line-height:1; flex-shrink:0; margin-left:1rem;">+</span>
+                    </summary>
+                    <div style="padding:0 1.25rem 1.125rem; color:#9CA3AF; line-height:1.75; font-size:0.9375rem;">
+                        @if($isEn)
+                            Our directory lists {{ $count }} restaurants serving {{ $dishData['name'] }} across {{ $stateName }}. Browse by city to find the best {{ $dishData['name'] }} near you.
+                        @else
+                            Nuestro directorio lista {{ $count }} restaurantes que sirven {{ $dishData['name'] }} en todo {{ $stateName }}. Explora por ciudad para encontrar el mejor cerca de ti.
+                        @endif
+                    </div>
+                </details>
+
+                <!-- FAQ 2 -->
+                <details style="background:#1A1A1A; border:1px solid #2A2A2A; border-radius:10px; overflow:hidden; cursor:pointer;"
+                         onmouseover="this.style.borderColor='#D4AF37'" onmouseout="if(!this.open)this.style.borderColor='#2A2A2A'">
+                    <summary style="padding:1.125rem 1.25rem; font-size:1rem; font-weight:600; color:#F5F5F5; list-style:none; display:flex; justify-content:space-between; align-items:center; user-select:none;">
+                        <span>
+                            @if($isEn)
+                                What cities in {{ $stateName }} have great {{ $dishData['name'] }}?
+                            @else
+                                ¿Qué ciudades en {{ $stateName }} tienen buen {{ $dishData['name'] }}?
+                            @endif
+                        </span>
+                        <span style="color:#D4AF37; font-size:1.25rem; line-height:1; flex-shrink:0; margin-left:1rem;">+</span>
+                    </summary>
+                    <div style="padding:0 1.25rem 1.125rem; color:#9CA3AF; line-height:1.75; font-size:0.9375rem;">
+                        @if($isEn)
+                            Top cities for {{ $dishData['name'] }} in {{ $stateName }} include our most-reviewed locations. Check our city-by-city listings for ratings and details.
+                        @else
+                            Las principales ciudades de {{ $stateName }} para {{ $dishData['name'] }} incluyen nuestras ubicaciones con más reseñas. Consulta los listados por ciudad para calificaciones y detalles.
+                        @endif
+                    </div>
+                </details>
+
+                <!-- FAQ 3 -->
+                <details style="background:#1A1A1A; border:1px solid #2A2A2A; border-radius:10px; overflow:hidden; cursor:pointer;"
+                         onmouseover="this.style.borderColor='#D4AF37'" onmouseout="if(!this.open)this.style.borderColor='#2A2A2A'">
+                    <summary style="padding:1.125rem 1.25rem; font-size:1rem; font-weight:600; color:#F5F5F5; list-style:none; display:flex; justify-content:space-between; align-items:center; user-select:none;">
+                        <span>
+                            @if($isEn)
+                                Is {{ $dishData['name'] }} popular in {{ $stateName }}?
+                            @else
+                                ¿Es popular el {{ $dishData['name'] }} en {{ $stateName }}?
+                            @endif
+                        </span>
+                        <span style="color:#D4AF37; font-size:1.25rem; line-height:1; flex-shrink:0; margin-left:1rem;">+</span>
+                    </summary>
+                    <div style="padding:0 1.25rem 1.125rem; color:#9CA3AF; line-height:1.75; font-size:0.9375rem;">
+                        @if($isEn)
+                            Yes — {{ $stateName }} has a strong Mexican food tradition with {{ $count }} restaurants offering {{ $dishData['name'] }} statewide.
+                        @else
+                            Sí — {{ $stateName }} tiene una fuerte tradición de comida mexicana con {{ $count }} restaurantes que ofrecen {{ $dishData['name'] }} en todo el estado.
+                        @endif
+                    </div>
+                </details>
+
+                <!-- FAQ 4 -->
+                <details style="background:#1A1A1A; border:1px solid #2A2A2A; border-radius:10px; overflow:hidden; cursor:pointer;"
+                         onmouseover="this.style.borderColor='#D4AF37'" onmouseout="if(!this.open)this.style.borderColor='#2A2A2A'">
+                    <summary style="padding:1.125rem 1.25rem; font-size:1rem; font-weight:600; color:#F5F5F5; list-style:none; display:flex; justify-content:space-between; align-items:center; user-select:none;">
+                        <span>
+                            @if($isEn)
+                                How do I find authentic {{ $dishData['name'] }} in {{ $stateName }}?
+                            @else
+                                ¿Cómo encontrar {{ $dishData['name'] }} auténtico en {{ $stateName }}?
+                            @endif
+                        </span>
+                        <span style="color:#D4AF37; font-size:1.25rem; line-height:1; flex-shrink:0; margin-left:1rem;">+</span>
+                    </summary>
+                    <div style="padding:0 1.25rem 1.125rem; color:#9CA3AF; line-height:1.75; font-size:0.9375rem;">
+                        @if($isEn)
+                            Browse our {{ $stateName }} directory of {{ $count }} restaurants serving {{ $dishData['name'] }}. Each listing includes address, phone, ratings, and hours.
+                        @else
+                            Navega nuestro directorio de {{ $count }} restaurantes en {{ $stateName }} que sirven {{ $dishData['name'] }}. Cada listado incluye dirección, teléfono, calificaciones y horarios.
+                        @endif
+                    </div>
+                </details>
+
+            </div>
+        </div>
     </div>
 </div>
 @endsection
+
+@push('meta')
+@php
+$isEn = app()->getLocale() === 'en';
+$count = $restaurants->count();
+$dishName = $dishData['name'];
+
+if ($isEn) {
+    $faqSchema = [
+        '@context' => 'https://schema.org',
+        '@type'    => 'FAQPage',
+        'mainEntity' => [
+            [
+                '@type' => 'Question',
+                'name'  => "Where can I find the best {$dishName} in {$stateName}?",
+                'acceptedAnswer' => [
+                    '@type' => 'Answer',
+                    'text'  => "Our directory lists {$count} restaurants serving {$dishName} across {$stateName}. Browse by city to find the best {$dishName} near you.",
+                ],
+            ],
+            [
+                '@type' => 'Question',
+                'name'  => "What cities in {$stateName} have great {$dishName}?",
+                'acceptedAnswer' => [
+                    '@type' => 'Answer',
+                    'text'  => "Top cities for {$dishName} in {$stateName} include our most-reviewed locations. Check our city-by-city listings for ratings and details.",
+                ],
+            ],
+            [
+                '@type' => 'Question',
+                'name'  => "Is {$dishName} popular in {$stateName}?",
+                'acceptedAnswer' => [
+                    '@type' => 'Answer',
+                    'text'  => "Yes — {$stateName} has a strong Mexican food tradition with {$count} restaurants offering {$dishName} statewide.",
+                ],
+            ],
+            [
+                '@type' => 'Question',
+                'name'  => "How do I find authentic {$dishName} in {$stateName}?",
+                'acceptedAnswer' => [
+                    '@type' => 'Answer',
+                    'text'  => "Browse our {$stateName} directory of {$count} restaurants serving {$dishName}. Each listing includes address, phone, ratings, and hours.",
+                ],
+            ],
+        ],
+    ];
+} else {
+    $faqSchema = [
+        '@context' => 'https://schema.org',
+        '@type'    => 'FAQPage',
+        'mainEntity' => [
+            [
+                '@type' => 'Question',
+                'name'  => "¿Dónde encontrar el mejor {$dishName} en {$stateName}?",
+                'acceptedAnswer' => [
+                    '@type' => 'Answer',
+                    'text'  => "Nuestro directorio lista {$count} restaurantes que sirven {$dishName} en todo {$stateName}. Explora por ciudad para encontrar el mejor cerca de ti.",
+                ],
+            ],
+            [
+                '@type' => 'Question',
+                'name'  => "¿Qué ciudades en {$stateName} tienen buen {$dishName}?",
+                'acceptedAnswer' => [
+                    '@type' => 'Answer',
+                    'text'  => "Las principales ciudades de {$stateName} para {$dishName} incluyen nuestras ubicaciones con más reseñas. Consulta los listados por ciudad para calificaciones y detalles.",
+                ],
+            ],
+            [
+                '@type' => 'Question',
+                'name'  => "¿Es popular el {$dishName} en {$stateName}?",
+                'acceptedAnswer' => [
+                    '@type' => 'Answer',
+                    'text'  => "Sí — {$stateName} tiene una fuerte tradición de comida mexicana con {$count} restaurantes que ofrecen {$dishName} en todo el estado.",
+                ],
+            ],
+            [
+                '@type' => 'Question',
+                'name'  => "¿Cómo encontrar {$dishName} auténtico en {$stateName}?",
+                'acceptedAnswer' => [
+                    '@type' => 'Answer',
+                    'text'  => "Navega nuestro directorio de {$count} restaurantes en {$stateName} que sirven {$dishName}. Cada listado incluye dirección, teléfono, calificaciones y horarios.",
+                ],
+            ],
+        ],
+    ];
+}
+echo '<script type="application/ld+json">' . json_encode($faqSchema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . '</script>';
+@endphp
+@endpush
 
 @push('scripts')
 <script type="application/ld+json">
