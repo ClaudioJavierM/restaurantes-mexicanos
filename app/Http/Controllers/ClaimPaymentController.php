@@ -78,7 +78,7 @@ class ClaimPaymentController extends Controller
                 'subscriptionId'  => $result['subscription_id'],
                 'isTrial'         => $result['is_trial'],
                 'trialDays'       => $result['trial_days'],
-                'stripePublicKey' => config('services.stripe.key'),
+                'stripePublicKey' => config('stripe.key'),
                 'returnUrl'       => route('claim.success') . '?session_id=' . $result['subscription_id'],
             ]);
         } catch (\Exception $e) {
