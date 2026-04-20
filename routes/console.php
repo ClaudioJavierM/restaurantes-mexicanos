@@ -566,3 +566,12 @@ Schedule::command('seo:daily-snapshot')
         \Log::error('SEO daily snapshot failed');
         notifyN8nFailure('seo:daily-snapshot', 'Daily SEO metrics snapshot');
     });
+
+Schedule::command('restaurants:generate-descriptions --limit=50')
+    ->dailyAt('03:00')
+    ->timezone('America/New_York')
+    ->withoutOverlapping()
+    ->description('DAILY: AI-generate descriptions for restaurants missing one')
+    ->onSuccess(function () {
+        \Log::info('Restaurant descriptions generated (50 batch)');
+    });
