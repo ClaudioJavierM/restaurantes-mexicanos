@@ -33,27 +33,27 @@ function notifyN8nFailure(string $jobName, string $description): void
  * 4 runs/day × 30 cities × ~30 calls/city = ~3,600 calls/day (safe under 5K limit)
  * Goal: import as many new Mexican restaurants as possible this month
  */
-Schedule::command('yelp:import-smart --cities=30 --limit=50 --min-rating=3.5 --delay=1')
+Schedule::command('yelp:import-smart --cities=1250 --limit=50 --min-rating=3.5 --delay=1')
     ->dailyAt('01:00')->timezone('America/New_York')
-    ->description('Import run 1/4: 30 cities (paid key)')
+    ->description('Import run 1/4: 1,250 cities — 1,250 calls (paid key 5K/day)')
     ->onSuccess(fn() => \Log::info('Yelp import run 1 completed'))
     ->onFailure(fn() => notifyN8nFailure('yelp:import-smart', 'Import run 1'));
 
-Schedule::command('yelp:import-smart --cities=30 --limit=50 --min-rating=3.5 --delay=1')
+Schedule::command('yelp:import-smart --cities=1250 --limit=50 --min-rating=3.5 --delay=1')
     ->dailyAt('07:00')->timezone('America/New_York')
-    ->description('Import run 2/4: 30 cities (paid key)')
+    ->description('Import run 2/4: 1,250 cities — 2,500 calls total')
     ->onSuccess(fn() => \Log::info('Yelp import run 2 completed'))
     ->onFailure(fn() => notifyN8nFailure('yelp:import-smart', 'Import run 2'));
 
-Schedule::command('yelp:import-smart --cities=30 --limit=50 --min-rating=3.5 --delay=1')
+Schedule::command('yelp:import-smart --cities=1250 --limit=50 --min-rating=3.5 --delay=1')
     ->dailyAt('13:00')->timezone('America/New_York')
-    ->description('Import run 3/4: 30 cities (paid key)')
+    ->description('Import run 3/4: 1,250 cities — 3,750 calls total')
     ->onSuccess(fn() => \Log::info('Yelp import run 3 completed'))
     ->onFailure(fn() => notifyN8nFailure('yelp:import-smart', 'Import run 3'));
 
-Schedule::command('yelp:import-smart --cities=30 --limit=50 --min-rating=3.5 --delay=1')
+Schedule::command('yelp:import-smart --cities=1250 --limit=50 --min-rating=3.5 --delay=1')
     ->dailyAt('19:00')->timezone('America/New_York')
-    ->description('Import run 4/4: 30 cities (paid key)')
+    ->description('Import run 4/4: 1,250 cities — 5,000 calls total (daily limit)')
     ->onSuccess(fn() => \Log::info('Yelp import run 4 completed'))
     ->onFailure(fn() => notifyN8nFailure('yelp:import-smart', 'Import run 4'));
 
