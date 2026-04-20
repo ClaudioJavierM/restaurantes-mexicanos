@@ -774,5 +774,8 @@
     <script>
     (function(){var ids={'restaurantesmexicanosfamosos.com.mx':'vhh4lzctxt','restaurantesmexicanosfamosos.com':'vhh5aptees','famousmexicanrestaurants.com':'vhh61fn5an'};var id=ids[window.location.hostname];if(id){(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script",id);}})();
     </script>
+
+    {{-- Carmen — FAMER Global Support Widget --}}
+    @livewire('carmen-widget')
 </body>
 </html>

@@ -460,6 +460,26 @@
                         </p>
                     </div>
 
+                    {{-- Verificar de otra forma --}}
+                    <div class="text-center mt-3">
+                        <button
+                            type="button"
+                            onclick="
+                                window.dispatchEvent(new CustomEvent('open-carmen', {
+                                    detail: {
+                                        restaurantName: '{{ addslashes($selectedRestaurant->name ?? '') }}',
+                                        restaurantSlug: '{{ $selectedRestaurant->slug ?? '' }}',
+                                        issueType: 'verification',
+                                        message: 'Necesito verificar mi restaurante {{ addslashes($selectedRestaurant->name ?? '') }} pero no reconozco el email o teléfono registrado.'
+                                    }
+                                }));
+                            "
+                            style="color:#D4AF37; font-size:0.8rem; text-decoration:underline; background:none; border:none; cursor:pointer; padding:4px 0;"
+                        >
+                            ¿No reconoces este email o teléfono? Verificar de otra forma →
+                        </button>
+                    </div>
+
                     <button
                         type="submit"
                         class="w-full px-8 py-4 rounded-lg font-semibold transition-colors" style="background:#D4AF37;color:#0B0B0B;" onmouseover="this.style.background='#E8C67A'" onmouseout="this.style.background='#D4AF37'"

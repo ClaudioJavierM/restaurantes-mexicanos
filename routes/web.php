@@ -95,6 +95,9 @@ Route::get('/claim/cancel', [\App\Http\Controllers\StripeWebhookController::clas
 Route::get('/claim/pay', [\App\Http\Controllers\ClaimPaymentController::class, 'show'])->name('claim.pay');
 Route::get('/claim/upgrade', fn() => redirect('/owner/upgrade-subscription'))->name('claim.upgrade');
 
+// Support Tickets (Carmen widget)
+Route::post('/soporte/ticket', [\App\Http\Controllers\SupportTicketController::class, 'store'])->name('support.ticket.store');
+
 // Stripe Webhook
 Route::post('/stripe/webhook', [\App\Http\Controllers\StripeWebhookController::class, 'handleWebhook'])->name('stripe.webhook');
 
