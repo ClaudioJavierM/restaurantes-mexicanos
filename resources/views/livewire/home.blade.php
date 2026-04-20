@@ -1,9 +1,9 @@
 @section('title', $isMexico
     ? 'Restaurantes Mexicanos Famosos — El Directorio #1 de México'
-    : 'Restaurantes Mexicanos Famosos en USA — FAMER | 26,000+ Restaurantes')
+    : 'Restaurantes Mexicanos Famosos | FAMER — Directorio #1 USA')
 @section('meta_description', $isMexico
     ? 'Descubre los mejores restaurantes mexicanos en todo México. Reseñas reales, horarios, menús y rankings por estado y ciudad.'
-    : 'Directorio de 26,000+ restaurantes mexicanos auténticos en Estados Unidos. Encuentra el mejor cerca de ti con calificaciones reales, fotos y reseñas.')
+    : 'Descubre los mejores restaurantes mexicanos auténticos en EE.UU. Más de 25,000 listados con calificaciones, menús y horarios verificados.')
 
 @push('meta')
 <meta property="og:type" content="website">
@@ -25,6 +25,49 @@
 <meta name="twitter:title" content="{{ $isMexico ? '🇲🇽 Restaurantes Mexicanos Famosos — El Directorio #1' : '🇲🇽 Los Mejores Restaurantes Mexicanos en USA — FAMER' }}">
 <meta name="twitter:description" content="{{ $isMexico ? 'El directorio más completo de cocina mexicana. Reseñas reales, rankings, fotos y horarios.' : '26,000+ restaurantes mexicanos auténticos en Estados Unidos. Encuentra el mejor cerca de ti.' }}">
 <meta name="twitter:image" content="https://images.unsplash.com/photo-1565299585323-38d6b0865b47?auto=format&fit=crop&w=1200&h=630&q=85">
+@endpush
+
+@push('meta')
+<script type="application/ld+json">
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "FAMER \u2014 Restaurantes Mexicanos Famosos",
+    "url": "https://restaurantesmexicanosfamosos.com.mx",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://restaurantesmexicanosfamosos.com.mx/buscar?q={search_term_string}"
+      },
+      "query-input": "required name=search_term_string"
+    }
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "FAMER",
+    "url": "https://restaurantesmexicanosfamosos.com.mx",
+    "logo": "https://restaurantesmexicanosfamosos.com.mx/images/branding/famer55.png",
+    "sameAs": [
+      "https://famousmexicanrestaurants.com"
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Inicio",
+        "item": "https://restaurantesmexicanosfamosos.com.mx"
+      }
+    ]
+  }
+]
+</script>
 @endpush
 
 <div>

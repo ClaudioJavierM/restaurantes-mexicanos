@@ -20,9 +20,14 @@ class SitemapController extends Controller
     public function index(): Response
     {
         $baseUrl = $this->getBaseUrl();
-        $cacheKey = 'sitemap_index_' . md5($baseUrl);
 
-        $xml = Cache::remember($cacheKey, 3600, function () use ($baseUrl) {
+        // Include restaurant count in cache key so the index auto-invalidates
+        // when restaurants are approved/rejected (prevents stale shard count).
+        $totalRestaurants = Restaurant::approved()->count();
+        $chunks = (int) ceil($totalRestaurants / 5000);
+        $cacheKey = 'sitemap_index_' . md5($baseUrl) . '_r' . $totalRestaurants;
+
+        $xml = Cache::remember($cacheKey, 3600, function () use ($baseUrl, $totalRestaurants, $chunks) {
             $xml = '<?xml version="1.0" encoding="UTF-8"?>';
             $xml .= '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
 
@@ -32,9 +37,6 @@ class SitemapController extends Controller
             $xml .= '</sitemap>';
 
             // Split restaurants into chunks of 5,000
-            $totalRestaurants = Restaurant::approved()->count();
-            $chunks = ceil($totalRestaurants / 5000);
-
             for ($i = 1; $i <= $chunks; $i++) {
                 $xml .= '<sitemap>';
                 $xml .= '<loc>' . $baseUrl . '/sitemap-restaurants-' . $i . '.xml</loc>';
@@ -314,15 +316,28 @@ class SitemapController extends Controller
         $xml = Cache::remember($cacheKey, 3600, function () use ($baseUrl) {
             $xml = $this->openUrlset();
 
+            // Join with restaurants to get the most recent restaurant activity per state
+            // This ensures lastmod reflects actual content changes, not the stale states.updated_at
             $states = State::whereHas('restaurants')
-                ->select('id', 'name', 'updated_at')
+                ->select('states.id', 'states.name')
+                ->selectRaw('MAX(restaurants.updated_at) as last_restaurant_update')
+                ->join('restaurants', function ($join) {
+                    $join->on('restaurants.state_id', '=', 'states.id')
+                         ->where('restaurants.status', 'approved')
+                         ->where('restaurants.is_active', true)
+                         ->whereNull('restaurants.deleted_at');
+                })
+                ->groupBy('states.id', 'states.name')
                 ->get();
 
             foreach ($states as $state) {
                 $stateSlug = Str::slug($state->name);
+                $lastmod = $state->last_restaurant_update
+                    ? Carbon::parse($state->last_restaurant_update)
+                    : now()->subWeek();
                 $xml .= $this->addUrl(
                     $baseUrl . '/restaurantes-mexicanos-en-' . $stateSlug,
-                    $state->updated_at ?? now()->subWeek(),
+                    $lastmod,
                     'weekly',
                     '0.7'
                 );
