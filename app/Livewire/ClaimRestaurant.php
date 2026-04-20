@@ -69,6 +69,11 @@ class ClaimRestaurant extends Component
 
     public function mount()
     {
+        // Pre-fill coupon from URL ?promo= param (e.g. WhatsApp campaigns)
+        if (request()->filled('promo') && empty($this->couponCode)) {
+            $this->couponCode = strtoupper(request()->get('promo'));
+        }
+
         $promo = config('famer-promo');
         if ($promo['active'] && !empty($promo['code'])) {
             // Check expiry
