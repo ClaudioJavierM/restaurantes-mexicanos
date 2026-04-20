@@ -37,7 +37,9 @@ class FindEmailsWithPerplexity extends Command
                 $q->whereNull('perplexity_email_searched_at')
                   ->orWhere('perplexity_email_searched_at', '<', now()->subDays(30));
             })
-            ->whereNotNull('phone') // prioritize restaurants with a phone — easier to find
+            ->whereNotNull('phone')
+            // Prioritize restaurants with Mexican keywords in name
+            ->orderByRaw("CASE WHEN name REGEXP 'taco|taqueria|mexican|burrito|jalisco|cantina|hacienda|mexico|azteca|mariachi|guadalajara|oaxaca|pueblo|rancho' THEN 0 ELSE 1 END")
             ->orderByDesc('profile_views');
 
         if ($state = $this->option('state')) {
