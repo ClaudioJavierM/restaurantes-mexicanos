@@ -16,7 +16,7 @@
         </div>
 
         {{-- Review Platforms Grid --}}
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-16 max-w-5xl mx-auto">
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-16 max-w-5xl mx-auto">
             <div class="bg-[#0B0B0B] rounded-xl p-5 text-center border border-white/5 hover:border-[#D4AF37]/20 transition-colors">
                 <div class="text-2xl font-bold text-white mb-1">Google</div>
                 <div class="text-gray-500 text-xs">Reviews & Ratings</div>
@@ -35,6 +35,10 @@
             </div>
             <div class="bg-[#0B0B0B] rounded-xl p-5 text-center border border-white/5 hover:border-[#D4AF37]/20 transition-colors">
                 <div class="text-2xl font-bold text-white mb-1">Foursquare</div>
+                <div class="text-gray-500 text-xs">Reviews & Ratings</div>
+            </div>
+            <div class="bg-[#0B0B0B] rounded-xl p-5 text-center border border-white/5 hover:border-[#D4AF37]/20 transition-colors">
+                <div class="text-2xl font-bold text-white mb-1">Apple Maps</div>
                 <div class="text-gray-500 text-xs">Reviews & Ratings</div>
             </div>
         </div>
