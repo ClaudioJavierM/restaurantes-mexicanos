@@ -161,6 +161,20 @@ Schedule::command('tripadvisor:enrich-restaurants --limit=160 --delay=2')
 // ============================================================================
 
 /**
+ * Milestone Views — congratulatory email to unclaimed restaurants with 50+ views
+ * Explains Google Ads equivalent value + pitch claim free / premium subscription
+ * Runs daily at 9:30 AM ET, 200/day — 90-day cooldown per restaurant
+ */
+Schedule::command('famer:send-milestone-views --limit=200 --min-views=50')
+    ->dailyAt('09:30')
+    ->timezone('America/New_York')
+    ->description('DAILY: Milestone views congratulatory email (50+ views, unclaimed US)')
+    ->onSuccess(function () { \Log::info('Milestone views emails sent successfully'); })
+    ->onFailure(function () {
+        notifyN8nFailure('famer:send-milestone-views', 'Milestone views email campaign');
+    });
+
+/**
  * Send reminder emails to inactive restaurant owners - Mondays 10:00 AM
  */
 Schedule::command('owners:send-reminders --days=30 --limit=100')
