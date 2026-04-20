@@ -187,6 +187,32 @@ Schedule::command('famer:send-milestone-views --milestone=150 --limit=50')
     ->onFailure(fn() => notifyN8nFailure('famer:send-milestone-views', 'Milestone 150 views'));
 
 /**
+ * MONTHLY Milestone Views — triggers on views THIS MONTH (repeats every month)
+ * Same 4-tier content (unclaimed/claimed/premium/elite), same templates
+ * Runs on the 20th of each month (enough data accumulated mid-month)
+ */
+Schedule::command('famer:send-monthly-milestone-views --milestone=50 --limit=200')
+    ->monthlyOn(20, '10:00')
+    ->timezone('America/New_York')
+    ->description('MONTHLY: Milestone 50 views this month')
+    ->onSuccess(fn() => \Log::info('Monthly milestone 50 sent'))
+    ->onFailure(fn() => notifyN8nFailure('famer:send-monthly-milestone-views', 'Monthly milestone 50'));
+
+Schedule::command('famer:send-monthly-milestone-views --milestone=100 --limit=100')
+    ->monthlyOn(20, '10:15')
+    ->timezone('America/New_York')
+    ->description('MONTHLY: Milestone 100 views this month')
+    ->onSuccess(fn() => \Log::info('Monthly milestone 100 sent'))
+    ->onFailure(fn() => notifyN8nFailure('famer:send-monthly-milestone-views', 'Monthly milestone 100'));
+
+Schedule::command('famer:send-monthly-milestone-views --milestone=150 --limit=50')
+    ->monthlyOn(20, '10:30')
+    ->timezone('America/New_York')
+    ->description('MONTHLY: Milestone 150 views this month')
+    ->onSuccess(fn() => \Log::info('Monthly milestone 150 sent'))
+    ->onFailure(fn() => notifyN8nFailure('famer:send-monthly-milestone-views', 'Monthly milestone 150'));
+
+/**
  * Send reminder emails to inactive restaurant owners - Mondays 10:00 AM
  */
 Schedule::command('owners:send-reminders --days=30 --limit=100')
