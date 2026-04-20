@@ -244,9 +244,152 @@
             </div>
         </section>
 
+        {{-- FAQ SECTION ─────────────────────────────────────────────── --}}
+        <section style="padding:3rem 0; border-top:1px solid #2A2A2A;">
+            <div style="max-width:800px; margin:0 auto;">
+                <h2 style="font-family:'Playfair Display',serif; font-size:1.5rem; font-weight:700; color:#F5F5F5; margin-bottom:1.75rem;">
+                    {{ $isEn ? 'Frequently Asked Questions' : 'Preguntas Frecuentes' }}
+                </h2>
+
+                <div style="display:flex; flex-direction:column; gap:0.75rem;">
+
+                    {{-- Q1 --}}
+                    <details style="background:#1A1A1A; border:1px solid #2A2A2A; border-radius:10px; overflow:hidden;">
+                        <summary style="padding:1.125rem 1.5rem; cursor:pointer; font-weight:600; color:#F5F5F5; font-size:0.9375rem; list-style:none; display:flex; justify-content:space-between; align-items:center; gap:1rem;">
+                            @if($isEn)
+                                How many Mexican restaurants are in {{ $state->name }}?
+                            @else
+                                ¿Cuántos restaurantes mexicanos hay en {{ $state->name }}?
+                            @endif
+                            <span style="color:#D4AF37; font-size:1.25rem; flex-shrink:0;">+</span>
+                        </summary>
+                        <div style="padding:0 1.5rem 1.25rem; color:#9CA3AF; line-height:1.7; font-size:0.9375rem;">
+                            @if($isEn)
+                                There are {{ number_format($total) }} verified Mexican restaurants listed in {{ $state->name }} on FAMER, spanning cities like {{ $topCity }} and surrounding areas.
+                            @else
+                                Hay {{ number_format($total) }} restaurantes mexicanos verificados en {{ $state->name }} en el directorio FAMER, distribuidos en ciudades como {{ $topCity }} y áreas cercanas.
+                            @endif
+                        </div>
+                    </details>
+
+                    {{-- Q2 --}}
+                    <details style="background:#1A1A1A; border:1px solid #2A2A2A; border-radius:10px; overflow:hidden;">
+                        <summary style="padding:1.125rem 1.5rem; cursor:pointer; font-weight:600; color:#F5F5F5; font-size:0.9375rem; list-style:none; display:flex; justify-content:space-between; align-items:center; gap:1rem;">
+                            @if($isEn)
+                                What is the average rating of Mexican restaurants in {{ $state->name }}?
+                            @else
+                                ¿Cuál es la calificación promedio de los restaurantes mexicanos en {{ $state->name }}?
+                            @endif
+                            <span style="color:#D4AF37; font-size:1.25rem; flex-shrink:0;">+</span>
+                        </summary>
+                        <div style="padding:0 1.5rem 1.25rem; color:#9CA3AF; line-height:1.7; font-size:0.9375rem;">
+                            @if($isEn)
+                                @if($avgRating > 0)
+                                    The average rating is {{ $avgRating }}/5 based on reviews from Google, Yelp, and FAMER users.
+                                @else
+                                    Ratings vary by location — browse individual profiles for detailed scores.
+                                @endif
+                            @else
+                                @if($avgRating > 0)
+                                    La calificación promedio es {{ $avgRating }}/5, basada en reseñas de Google, Yelp y usuarios de FAMER.
+                                @else
+                                    Las calificaciones varían por ubicación — explora los perfiles individuales para ver puntuaciones detalladas.
+                                @endif
+                            @endif
+                        </div>
+                    </details>
+
+                    {{-- Q3 --}}
+                    <details style="background:#1A1A1A; border:1px solid #2A2A2A; border-radius:10px; overflow:hidden;">
+                        <summary style="padding:1.125rem 1.5rem; cursor:pointer; font-weight:600; color:#F5F5F5; font-size:0.9375rem; list-style:none; display:flex; justify-content:space-between; align-items:center; gap:1rem;">
+                            @if($isEn)
+                                Which city in {{ $state->name }} has the most Mexican restaurants?
+                            @else
+                                ¿Qué ciudad de {{ $state->name }} tiene más restaurantes mexicanos?
+                            @endif
+                            <span style="color:#D4AF37; font-size:1.25rem; flex-shrink:0;">+</span>
+                        </summary>
+                        <div style="padding:0 1.5rem 1.25rem; color:#9CA3AF; line-height:1.7; font-size:0.9375rem;">
+                            @if($isEn)
+                                {{ $topCity }} has the highest concentration of Mexican restaurants in {{ $state->name }} according to our directory.
+                            @else
+                                {{ $topCity }} tiene la mayor concentración de restaurantes mexicanos en {{ $state->name }} según nuestro directorio.
+                            @endif
+                        </div>
+                    </details>
+
+                    {{-- Q4 --}}
+                    <details style="background:#1A1A1A; border:1px solid #2A2A2A; border-radius:10px; overflow:hidden;">
+                        <summary style="padding:1.125rem 1.5rem; cursor:pointer; font-weight:600; color:#F5F5F5; font-size:0.9375rem; list-style:none; display:flex; justify-content:space-between; align-items:center; gap:1rem;">
+                            @if($isEn)
+                                How do I claim my restaurant listing on FAMER?
+                            @else
+                                ¿Cómo reclamo el perfil de mi restaurante en FAMER?
+                            @endif
+                            <span style="color:#D4AF37; font-size:1.25rem; flex-shrink:0;">+</span>
+                        </summary>
+                        <div style="padding:0 1.5rem 1.25rem; color:#9CA3AF; line-height:1.7; font-size:0.9375rem;">
+                            @if($isEn)
+                                Visit your restaurant's profile page and click "Claim this Restaurant". It's free and gives you access to photos, hours, and menu management.
+                            @else
+                                Visita la página de perfil de tu restaurante y haz clic en "Reclamar este Restaurante". Es gratis y te da acceso a fotos, horarios y gestión del menú.
+                            @endif
+                        </div>
+                    </details>
+
+                </div>
+            </div>
+        </section>
+
     </div>
 </div>
 @endsection
+
+@push('meta')
+@php
+$faqSchema = [
+    '@context' => 'https://schema.org',
+    '@type'    => 'FAQPage',
+    'mainEntity' => [
+        [
+            '@type' => 'Question',
+            'name'  => "How many Mexican restaurants are in {$state->name}?",
+            'acceptedAnswer' => [
+                '@type' => 'Answer',
+                'text'  => "There are " . number_format($total) . " verified Mexican restaurants listed in {$state->name} on FAMER, spanning cities like {$topCity} and surrounding areas.",
+            ],
+        ],
+        [
+            '@type' => 'Question',
+            'name'  => "What is the average rating of Mexican restaurants in {$state->name}?",
+            'acceptedAnswer' => [
+                '@type' => 'Answer',
+                'text'  => $avgRating > 0
+                    ? "The average rating is {$avgRating}/5 based on reviews from Google, Yelp, and FAMER users."
+                    : "Ratings vary by location — browse individual profiles for detailed scores.",
+            ],
+        ],
+        [
+            '@type' => 'Question',
+            'name'  => "Which city in {$state->name} has the most Mexican restaurants?",
+            'acceptedAnswer' => [
+                '@type' => 'Answer',
+                'text'  => "{$topCity} has the highest concentration of Mexican restaurants in {$state->name} according to our directory.",
+            ],
+        ],
+        [
+            '@type' => 'Question',
+            'name'  => 'How do I claim my restaurant listing on FAMER?',
+            'acceptedAnswer' => [
+                '@type' => 'Answer',
+                'text'  => 'Visit your restaurant\'s profile page and click "Claim this Restaurant". It\'s free and gives you access to photos, hours, and menu management.',
+            ],
+        ],
+    ],
+];
+echo '<script type="application/ld+json">' . json_encode($faqSchema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . '</script>';
+@endphp
+@endpush
 
 @push('scripts')
 <script type="application/ld+json">

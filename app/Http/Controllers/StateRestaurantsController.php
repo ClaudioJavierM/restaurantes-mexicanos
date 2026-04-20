@@ -89,14 +89,31 @@ class StateRestaurantsController extends Controller
             ->limit(5)
             ->get();
 
-        // Average rating for stats bar
-        $avgRating = Restaurant::where('state_id', $state->id)
-            ->where('status', 'approved')
-            ->where('is_active', true)
-            ->whereNotNull('google_rating')
-            ->avg('google_rating');
+        // Average rating for stats bar (using average_rating, rounded to 1 decimal)
+        $avgRating = round(
+            DB::table('restaurants')
+                ->where('state_id', $state->id)
+                ->where('status', 'approved')
+                ->whereNotNull('average_rating')
+                ->avg('average_rating') ?? 0,
+            1
+        );
 
-        $topCity = $cities->first()?->city ?? '';
+        // Claimed restaurant count for this state
+        $claimedCount = DB::table('restaurants')
+            ->where('state_id', $state->id)
+            ->where('status', 'approved')
+            ->where('is_claimed', true)
+            ->count();
+
+        // Top city by restaurant count
+        $topCity = DB::table('restaurants')
+            ->where('state_id', $state->id)
+            ->where('status', 'approved')
+            ->whereNotNull('city')
+            ->groupBy('city')
+            ->orderByRaw('COUNT(*) DESC')
+            ->value('city') ?? $state->name;
 
         $isEn = str_contains(request()->getHost(), 'famousmexicanrestaurants.com');
 
@@ -114,6 +131,7 @@ class StateRestaurantsController extends Controller
             'cities',
             'total',
             'avgRating',
+            'claimedCount',
             'topCity',
             'isEn'
         ))->with('title', $seoTitle)

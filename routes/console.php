@@ -356,6 +356,12 @@ Schedule::command('restaurants:merge-yelp-photos --limit=5000')
 // System Maintenance
 // ============================================================================
 
+// IndexNow weekly re-submission — keeps Bing/Yandex index fresh
+Schedule::command('indexnow:submit-all --type=restaurants')
+    ->weeklyOn(2, '05:00') // Tuesdays 5am ET
+    ->timezone('America/New_York')
+    ->description('WEEKLY: Re-submit all restaurant pages to IndexNow');
+
 // verification:cleanup-audio command removed (command no longer exists)
 
 // ============================================================================

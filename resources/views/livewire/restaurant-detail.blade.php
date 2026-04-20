@@ -405,6 +405,54 @@
     @endif
 @endpush
 
+@push('meta')
+@php
+$restaurantSchema = [
+    '@context' => 'https://schema.org',
+    '@type' => 'Restaurant',
+    'name' => $restaurant->name,
+    'url' => url('/restaurante/' . $restaurant->slug),
+    'servesCuisine' => 'Mexican',
+    'priceRange' => '$$',
+    'hasMap' => 'https://www.google.com/maps/search/' . urlencode($restaurant->name . ' ' . $restaurant->city),
+];
+
+// Image — only if not the placeholder
+$placeholderUrl = asset('images/restaurant-placeholder.jpg');
+if ($seoImage && $seoImage !== $placeholderUrl) {
+    $restaurantSchema['image'] = $seoImage;
+}
+
+// Phone
+if (!empty($restaurant->phone)) {
+    $restaurantSchema['telephone'] = $restaurant->phone;
+}
+
+// Address
+$restaurantSchema['address'] = [
+    '@type' => 'PostalAddress',
+    'streetAddress' => $restaurant->address ?? '',
+    'addressLocality' => $restaurant->city ?? '',
+    'addressRegion' => $restaurant->state_code ?? '',
+    'postalCode' => $restaurant->zip ?? '',
+    'addressCountry' => (!empty($restaurant->country) && strtoupper($restaurant->country) === 'MX') ? 'MX' : 'US',
+];
+
+// Aggregate rating — only if we have reviews
+if ($seoCombinedReviews > 0) {
+    $restaurantSchema['aggregateRating'] = [
+        '@type' => 'AggregateRating',
+        'ratingValue' => $seoDisplayRating,
+        'reviewCount' => $seoCombinedReviews,
+        'bestRating' => 5,
+        'worstRating' => 1,
+    ];
+}
+
+echo '<script type="application/ld+json">' . json_encode($restaurantSchema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . '</script>';
+@endphp
+@endpush
+
 <div>
 
     <!-- Cover Image Banner -->
