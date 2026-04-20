@@ -18,7 +18,7 @@ ssh mfgroup@160.153.183.38
 cd /var/www/restaurantesmexicanosfamosos.com.mx
 sudo -u nginx GIT_SSH_COMMAND="ssh -i /var/www/.ssh/id_ed25519 -o IdentitiesOnly=yes" git fetch origin main
 sudo -u nginx git reset --hard origin/main
-sudo -u nginx composer install --no-dev --optimize-autoloader
+sudo -u nginx /usr/local/bin/composer install --no-dev --optimize-autoloader
 sudo -u nginx php artisan migrate --force
 sudo -u nginx php artisan config:cache
 sudo -u nginx php artisan route:clear  # NO route:cache — closure routes in web.php prevent proper caching

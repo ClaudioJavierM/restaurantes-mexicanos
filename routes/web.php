@@ -75,6 +75,11 @@ Route::get('/blog/{post}', [\App\Http\Controllers\BlogController::class, 'show']
 Route::get('/precios', \App\Livewire\PricingPage::class)->name('pricing');
 Route::get('/pricing', \App\Livewire\PricingPage::class);
 
+// Promo Landing Pages — WhatsApp / Partner campaigns
+Route::get('/promo/mf-imports', function () {
+    return view('promo.mf-imports');
+})->name('promo.mf-imports');
+
 // For Business Owners
 Route::get("/for-owners", \App\Livewire\ForOwners::class)->name("for-owners");
 Route::get('/como-funciona-famer', \App\Http\Controllers\HowItWorksController::class)->name('how-it-works');
