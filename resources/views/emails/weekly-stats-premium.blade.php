@@ -25,7 +25,7 @@
                         <table role="presentation" align="center" cellspacing="0" cellpadding="0" border="0">
                             <tr>
                                 <td style="vertical-align:middle; padding-right:10px;">
-                                    <p style="margin:0; color:#D4AF37; font-size:11px; font-weight:700; letter-spacing:3px; text-transform:uppercase; font-family:Arial,Helvetica,sans-serif;">REPORTE SEMANAL</p>
+                                    <p style="margin:0; color:#D4AF37; font-size:11px; font-weight:700; letter-spacing:3px; text-transform:uppercase; font-family:Arial,Helvetica,sans-serif;">Famous Mexican Restaurant | FAMER</p>
                                 </td>
                                 <td style="vertical-align:middle;">
                                     @if($tier === 'elite')
@@ -49,8 +49,11 @@
                     <td style="background-color:#1A1A1A; padding:36px 40px;">
 
                         <!-- GREETING -->
-                        <p style="margin:0 0 28px 0; color:#F5F5F5; font-size:16px; line-height:1.5; font-family:Arial,Helvetica,sans-serif;">
+                        <p style="margin:0 0 6px 0; color:#F5F5F5; font-size:16px; line-height:1.5; font-family:Arial,Helvetica,sans-serif;">
                             Hola {{ $ownerName }}, aquí está tu reporte de esta semana:
+                        </p>
+                        <p style="margin:0 0 28px 0; color:#D4AF37; font-size:20px; font-weight:700; font-family:Arial,Helvetica,sans-serif;">
+                            {{ $restaurant->name }}
                         </p>
 
                         <!-- HERO STAT CARD -->
@@ -67,6 +70,16 @@
                                     @else
                                         <p style="margin:0; color:#9CA3AF; font-size:14px; font-family:Arial,Helvetica,sans-serif;">Sin cambio vs semana anterior</p>
                                     @endif
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- TOTAL VIEWS BANNER -->
+                        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-bottom:16px;">
+                            <tr>
+                                <td style="background-color:#0B0B0B; border:1px solid #D4AF37; border-radius:10px; padding:14px 16px; text-align:center;">
+                                    <p style="margin:0 0 2px 0; color:#9CA3AF; font-size:11px; text-transform:uppercase; letter-spacing:1px; font-family:Arial,Helvetica,sans-serif;">Total de visitas acumuladas</p>
+                                    <p style="margin:0; color:#D4AF37; font-size:28px; font-weight:700; font-family:Arial,Helvetica,sans-serif;">{{ number_format($totalViews) }}</p>
                                 </td>
                             </tr>
                         </table>

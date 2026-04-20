@@ -23,6 +23,7 @@ class WeeklyStatsMail extends Mailable
         public readonly int $monthlyViews,
         public readonly int $monthlyVotes,
         public readonly int $competitorCount,
+        public readonly int $totalViews,
         public readonly ?array $tip,
     ) {}
 

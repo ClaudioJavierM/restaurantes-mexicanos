@@ -47,6 +47,10 @@ class SendWeeklyStatsEmailJob implements ShouldQueue
             ->where('created_at', '>=', now()->startOfMonth())
             ->count();
 
+        $totalViews = AnalyticsEvent::where('restaurant_id', $restaurant->id)
+            ->where('event_type', AnalyticsEvent::EVENT_PAGE_VIEW)
+            ->count();
+
         $monthlyVotes = RestaurantVote::where('restaurant_id', $restaurant->id)
             ->whereMonth('created_at', now()->month)
             ->whereYear('created_at', now()->year)
@@ -79,6 +83,7 @@ class SendWeeklyStatsEmailJob implements ShouldQueue
                 monthlyViews: $monthlyViews,
                 monthlyVotes: $monthlyVotes,
                 competitorCount: $competitorCount,
+                totalViews: $totalViews,
                 tip: $tip,
             ));
             Log::info("Weekly stats email sent to {$email} for restaurant {$restaurant->id} (tier: {$tier})");
