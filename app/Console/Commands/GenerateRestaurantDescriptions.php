@@ -4,212 +4,191 @@ namespace App\Console\Commands;
 
 use App\Models\Restaurant;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class GenerateRestaurantDescriptions extends Command
 {
     protected $signature = 'restaurants:generate-descriptions
-                            {--limit=100 : Maximum number of restaurants to process}
-                            {--source= : Filter by import_source (e.g., mf_imports)}
-                            {--state= : Filter by state code (e.g., TX)}
-                            {--force : Overwrite existing descriptions}
-                            {--test : Test mode - process only 5 restaurants}';
+                            {--limit=50 : Number of restaurants to process per run}
+                            {--dry-run : Print descriptions without saving}
+                            {--force : Process all restaurants, including those with existing descriptions}';
 
-    protected $description = 'Generate personalized descriptions for restaurants without descriptions';
-
-    protected int $generated = 0;
-    protected int $skipped = 0;
-    protected int $errors = 0;
-
-    // Description templates - varied for SEO and uniqueness
-    protected array $templates = [
-        'high_rating' => [
-            "Experience the best of Mexican cuisine at {name} in {city}, {state}. With a stellar {rating}-star rating, this restaurant has earned its reputation for exceptional flavors and warm hospitality.",
-            "Craving authentic Mexican food? {name} in {city}, {state} is a top-rated destination with {rating} stars, known for its delicious dishes and welcoming atmosphere.",
-            "{name} stands out as one of {city}'s finest Mexican restaurants. Located in {state}, this {rating}-star gem offers an unforgettable dining experience.",
-            "Discover why locals love {name} in {city}, {state}. Rated {rating} stars, this Mexican restaurant delivers authentic flavors that keep guests coming back.",
-        ],
-        'mid_rating' => [
-            "Savor traditional Mexican flavors at {name} in {city}, {state}. A local favorite serving delicious, authentic cuisine in a welcoming setting.",
-            "{name} brings the taste of Mexico to {city}, {state}. Enjoy classic dishes prepared with care and authentic recipes passed down through generations.",
-            "Looking for great Mexican food in {city}? {name} offers a delightful dining experience with traditional recipes and friendly service in {state}.",
-            "Visit {name} in {city}, {state} for a taste of authentic Mexican cooking. From sizzling fajitas to homemade salsas, every dish tells a story.",
-        ],
-        'no_rating' => [
-            "Welcome to {name}, your destination for authentic Mexican cuisine in {city}, {state}. Experience traditional flavors in a warm and inviting atmosphere.",
-            "{name} in {city}, {state} serves up classic Mexican dishes made with fresh ingredients and time-honored recipes.",
-            "Discover {name} in {city}, {state} - a Mexican restaurant dedicated to bringing you the authentic taste of Mexico.",
-            "At {name} in {city}, {state}, every meal is a celebration of Mexican culinary traditions. Join us for an authentic dining experience.",
-        ],
-        'with_yelp' => [
-            "{name} in {city}, {state} has earned recognition on Yelp for its authentic Mexican cuisine. Come taste why diners keep returning for more.",
-            "Featured on Yelp, {name} brings exceptional Mexican flavors to {city}, {state}. Discover a menu crafted with passion and authentic ingredients.",
-            "Join the many satisfied diners who have discovered {name} in {city}, {state}. This Yelp-featured restaurant offers genuine Mexican hospitality and cuisine.",
-        ],
-    ];
-
-    // Additional phrases to add variety
-    protected array $specialties = [
-        "Known for its flavorful tacos and enchiladas.",
-        "Featuring homemade tortillas and fresh salsas.",
-        "Specializing in traditional family recipes.",
-        "Offering a menu full of Mexican favorites.",
-        "Serving authentic dishes with a modern twist.",
-        "A perfect spot for family gatherings and celebrations.",
-        "Where every dish is prepared with love and tradition.",
-        "Bringing the flavors of Mexico to your table.",
-    ];
+    protected $description = 'Generate SEO descriptions for restaurants without one using OpenAI';
 
     public function handle(): int
     {
-        $this->info('=== Generating Restaurant Descriptions ===');
-        $this->newLine();
+        $limit  = (int) $this->option('limit');
+        $dryRun = $this->option('dry-run');
+        $force  = $this->option('force');
+        $apiKey = config('services.openai.api_key');
 
-        // Build query
-        $query = Restaurant::where('status', 'approved');
+        if (! $apiKey) {
+            $this->error('OPENAI_API_KEY is not set in .env');
+            return Command::FAILURE;
+        }
 
-        // Only restaurants without descriptions (unless --force)
-        if (!$this->option('force')) {
+        // Build query — description is a Spatie translatable JSON field.
+        // When never set it is NULL, or stored as '{}' / '[]' (empty JSON).
+        $query = Restaurant::approved()
+            ->with(['state', 'category'])
+            ->orderBy('id');
+
+        if (! $force) {
             $query->where(function ($q) {
                 $q->whereNull('description')
-                  ->orWhere('description', '');
+                  ->orWhere('description', '')
+                  ->orWhere('description', '{}')
+                  ->orWhere('description', '[]');
             });
-        }
-
-        // Filter by source if specified
-        if ($source = $this->option('source')) {
-            $query->where('import_source', $source);
-            $this->info("Filtering by source: {$source}");
-        }
-
-        // Filter by state if specified
-        if ($stateCode = $this->option('state')) {
-            $query->whereHas('state', function ($q) use ($stateCode) {
-                $q->where('code', strtoupper($stateCode));
-            });
-            $this->info("Filtering by state: {$stateCode}");
         }
 
         $total = $query->count();
-        $this->info("Restaurants needing descriptions: {$total}");
 
-        // Apply limit
-        $limit = $this->option('test') ? 5 : (int) $this->option('limit');
-        $restaurants = $query->with('state')->limit($limit)->get();
-
-        $this->info("Processing: {$limit}");
-        $this->newLine();
-
-        if ($restaurants->isEmpty()) {
-            $this->info('No restaurants need descriptions.');
+        if ($total === 0) {
+            $this->info('No restaurants need descriptions' . ($force ? '' : ' — all already have one') . '.');
             return Command::SUCCESS;
         }
 
-        $bar = $this->output->createProgressBar($restaurants->count());
-        $bar->start();
+        $label = $dryRun ? ' (dry-run)' : '';
+        $this->info("Processing {$limit} restaurants without descriptions{$label}...");
+        $this->newLine();
+
+        $restaurants = $query->limit($limit)->get();
+        $generated   = 0;
+        $failed      = 0;
+        $index       = 0;
+        $count       = $restaurants->count();
 
         foreach ($restaurants as $restaurant) {
-            $this->generateDescription($restaurant);
-            $bar->advance();
-        }
+            $index++;
+            $cityState = trim(($restaurant->city ?? '') . ', ' . ($restaurant->state?->code ?? $restaurant->state?->name ?? ''));
+            $rowLabel  = "[{$index}/{$count}] {$restaurant->name} ({$cityState})";
 
-        $bar->finish();
-        $this->newLine(2);
+            $isUS   = $restaurant->state?->country === 'US';
+            $lang   = $isUS ? 'en' : 'es';
+            $prompt = $this->buildPrompt($restaurant, $lang);
 
-        // Summary
-        $this->info('=== Summary ===');
-        $this->table(
-            ['Metric', 'Count'],
-            [
-                ['Descriptions Generated', $this->generated],
-                ['Skipped', $this->skipped],
-                ['Errors', $this->errors],
-                ['Remaining', max(0, $total - $limit)],
-            ]
-        );
-
-        // Show samples
-        if ($this->generated > 0) {
-            $this->newLine();
-            $this->info('Sample descriptions:');
-
-            $samples = Restaurant::where('import_source', $this->option('source') ?? 'mf_imports')
-                ->whereNotNull('description')
-                ->where('description', '!=', '')
-                ->orderByDesc('updated_at')
-                ->limit(3)
-                ->get(['name', 'city', 'description']);
-
-            foreach ($samples as $sample) {
+            if ($dryRun) {
+                $this->line($rowLabel . ' — DRY RUN');
+                $this->line('Prompt:');
+                $this->line($prompt);
                 $this->newLine();
-                $this->line("<fg=cyan>{$sample->name}</> ({$sample->city}):");
-                $this->line($sample->description);
+                continue;
             }
+
+            try {
+                $description = $this->callOpenAI($apiKey, $prompt);
+
+                if (empty($description)) {
+                    $this->warn("{$rowLabel} — empty response, skipped");
+                    $failed++;
+                    continue;
+                }
+
+                // setTranslation respects the Spatie HasTranslations trait
+                $restaurant->setTranslation('description', $lang, $description);
+                $restaurant->save();
+
+                $wordCount = str_word_count($description);
+                $this->info("{$rowLabel} — generated ({$wordCount} words)");
+                $generated++;
+
+            } catch (\Exception $e) {
+                $this->warn("{$rowLabel} — failed: " . $e->getMessage());
+                Log::error("GenerateRestaurantDescriptions: restaurant {$restaurant->id} failed — " . $e->getMessage());
+                $failed++;
+            }
+
+            // 100ms between requests to respect rate limits
+            usleep(100000);
         }
+
+        $this->newLine();
+        $this->info("Done: {$generated} generated, {$failed} failed.");
 
         return Command::SUCCESS;
     }
 
-    protected function generateDescription(Restaurant $restaurant): void
+    private function buildPrompt(Restaurant $restaurant, string $lang): string
     {
-        try {
-            // Skip if already has description (and not forcing)
-            if (!$this->option('force') && !empty($restaurant->description)) {
-                $this->skipped++;
-                return;
-            }
+        $name      = $restaurant->name;
+        $city      = $restaurant->city ?? 'Unknown City';
+        $stateName = $restaurant->state?->name ?? '';
+        $stateCode = $restaurant->state?->code ?? $stateName;
+        $price     = $restaurant->price_range ?? 'varies';
+        $rating    = $restaurant->average_rating ?? $restaurant->google_rating ?? null;
+        $ratingStr = $rating ? "{$rating}/5" : 'not yet rated';
+        $category  = $restaurant->category?->name ?? 'Mexican Restaurant';
 
-            $stateCode = $restaurant->state?->code ?? '';
-            $stateName = $restaurant->state?->name ?? $stateCode;
+        if ($lang === 'en') {
+            return <<<PROMPT
+            Write a 2-sentence SEO description for a Mexican restaurant with these details:
+            - Name: {$name}
+            - City: {$city}, {$stateName} ({$stateCode})
+            - Cuisine: Mexican
+            - Price range: {$price}
+            - Rating: {$ratingStr}
+            - Categories: {$category}
 
-            // Determine which template set to use
-            $rating = $restaurant->yelp_rating ?? $restaurant->google_rating ?? $restaurant->average_rating;
-            $hasYelp = !empty($restaurant->yelp_id);
+            Requirements:
+            - 40-60 words total
+            - Mention the city name
+            - Highlight authentic Mexican cuisine
+            - Mention what makes it worth visiting
+            - Write in English
+            - No marketing fluff, factual and helpful tone
 
-            if ($hasYelp && rand(0, 1) === 1) {
-                $templateSet = 'with_yelp';
-            } elseif ($rating && $rating >= 4.0) {
-                $templateSet = 'high_rating';
-            } elseif ($rating && $rating >= 3.0) {
-                $templateSet = 'mid_rating';
-            } else {
-                $templateSet = 'no_rating';
-            }
-
-            // Pick a random template
-            $templates = $this->templates[$templateSet];
-            $template = $templates[array_rand($templates)];
-
-            // Replace placeholders
-            $description = str_replace(
-                ['{name}', '{city}', '{state}', '{rating}'],
-                [$restaurant->name, $restaurant->city, $stateName, number_format((float)$rating, 1)],
-                $template
-            );
-
-            // Add a specialty phrase sometimes (50% chance)
-            if (rand(0, 1) === 1) {
-                $specialty = $this->specialties[array_rand($this->specialties)];
-                $description .= ' ' . $specialty;
-            }
-
-            // Update using direct DB to avoid model events
-            // Description is translatable (JSON format with 'en' key)
-            $translatedDescription = json_encode(['en' => $description]);
-
-            DB::table('restaurants')
-                ->where('id', $restaurant->id)
-                ->update([
-                    'description' => $translatedDescription,
-                    'updated_at' => now(),
-                ]);
-
-            $this->generated++;
-
-        } catch (\Exception $e) {
-            $this->errors++;
-            Log::error("Error generating description for {$restaurant->name}: {$e->getMessage()}");
+            Output ONLY the description text, no quotes, no titles.
+            PROMPT;
         }
+
+        return <<<PROMPT
+        Escribe una descripción SEO de 2 oraciones para un restaurante mexicano con estos datos:
+        - Nombre: {$name}
+        - Ciudad: {$city}, {$stateName} ({$stateCode})
+        - Cocina: Mexicana
+        - Rango de precio: {$price}
+        - Calificación: {$ratingStr}
+        - Categoría: {$category}
+
+        Requisitos:
+        - Total de 40-60 palabras
+        - Menciona el nombre de la ciudad
+        - Destaca la cocina mexicana auténtica
+        - Menciona qué lo hace especial o digno de visita
+        - Escribe en español
+        - Sin frases de marketing vacías, tono informativo y útil
+
+        Devuelve SOLO el texto de la descripción, sin comillas, sin títulos.
+        PROMPT;
+    }
+
+    private function callOpenAI(string $apiKey, string $prompt): string
+    {
+        $response = Http::withHeaders([
+            'Authorization' => "Bearer {$apiKey}",
+            'Content-Type'  => 'application/json',
+        ])->timeout(30)->post('https://api.openai.com/v1/chat/completions', [
+            'model'       => 'gpt-4o-mini',
+            'messages'    => [
+                [
+                    'role'    => 'system',
+                    'content' => 'You write concise, factual restaurant descriptions for SEO.',
+                ],
+                [
+                    'role'    => 'user',
+                    'content' => $prompt,
+                ],
+            ],
+            'max_tokens'  => 120,
+            'temperature' => 0.7,
+        ]);
+
+        if ($response->failed()) {
+            throw new \RuntimeException('OpenAI API error: ' . $response->body());
+        }
+
+        return trim($response->json('choices.0.message.content') ?? '');
     }
 }

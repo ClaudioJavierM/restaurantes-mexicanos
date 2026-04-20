@@ -161,9 +161,198 @@ Mejor {{ $dishData['name'] }} en {{ $cityName }}, {{ $stateName }} | FAMER
                 {{ $cityName }} cuenta con una vibrante comunidad mexicana que mantiene vivas las tradiciones culinarias de México. Los restaurantes de {{ $dishData['name'] }} en {{ $cityName }} ofrecen recetas auténticas preparadas por chefs con raíces mexicanas. Usa FAMER para encontrar el mejor lugar de {{ $dishData['name'] }} en {{ $cityName }}, {{ $stateName }}.
             </p>
         </div>
+
+        <!-- FAQ Section -->
+        @php $isEn = app()->getLocale() === 'en'; $count = $restaurants->count(); @endphp
+        <div style="margin-top:4rem; padding-top:3rem; border-top:1px solid #2A2A2A;">
+            <h2 style="font-family:'Playfair Display',serif; font-size:1.5rem; font-weight:700; color:#F5F5F5; margin-bottom:1.5rem;">
+                {{ $isEn ? 'Frequently Asked Questions' : 'Preguntas Frecuentes' }}
+            </h2>
+            <div style="display:flex; flex-direction:column; gap:0.75rem; max-width:800px;">
+
+                <!-- FAQ 1 -->
+                <details style="background:#1A1A1A; border:1px solid #2A2A2A; border-radius:10px; overflow:hidden; cursor:pointer;"
+                         onclick="this.style.borderColor=this.open?'#2A2A2A':'#D4AF37'" onmouseover="this.style.borderColor='#D4AF37'" onmouseout="if(!this.open)this.style.borderColor='#2A2A2A'">
+                    <summary style="padding:1.125rem 1.25rem; font-size:1rem; font-weight:600; color:#F5F5F5; list-style:none; display:flex; justify-content:space-between; align-items:center; user-select:none;">
+                        <span>
+                            @if($isEn)
+                                Where can I find the best {{ $dishData['name'] }} in {{ $cityName }}, {{ strtoupper($stateCode) }}?
+                            @else
+                                ¿Dónde encontrar el mejor {{ $dishData['name'] }} en {{ $cityName }}, {{ strtoupper($stateCode) }}?
+                            @endif
+                        </span>
+                        <span style="color:#D4AF37; font-size:1.25rem; line-height:1; flex-shrink:0; margin-left:1rem;">+</span>
+                    </summary>
+                    <div style="padding:0 1.25rem 1.125rem; color:#9CA3AF; line-height:1.75; font-size:0.9375rem;">
+                        @if($isEn)
+                            Our directory lists {{ $count }} restaurants serving {{ $dishData['name'] }} in {{ $cityName }}, {{ strtoupper($stateCode) }}. Browse ratings, menus, and contact info to find the best {{ $dishData['name'] }} near you.
+                        @else
+                            Nuestro directorio lista {{ $count }} restaurantes que sirven {{ $dishData['name'] }} en {{ $cityName }}, {{ strtoupper($stateCode) }}. Compara calificaciones, menús y contacto para encontrar el mejor.
+                        @endif
+                    </div>
+                </details>
+
+                <!-- FAQ 2 -->
+                <details style="background:#1A1A1A; border:1px solid #2A2A2A; border-radius:10px; overflow:hidden; cursor:pointer;"
+                         onmouseover="this.style.borderColor='#D4AF37'" onmouseout="if(!this.open)this.style.borderColor='#2A2A2A'">
+                    <summary style="padding:1.125rem 1.25rem; font-size:1rem; font-weight:600; color:#F5F5F5; list-style:none; display:flex; justify-content:space-between; align-items:center; user-select:none;">
+                        <span>
+                            @if($isEn)
+                                How much does {{ $dishData['name'] }} cost in {{ $cityName }}?
+                            @else
+                                ¿Cuánto cuesta {{ $dishData['name'] }} en {{ $cityName }}?
+                            @endif
+                        </span>
+                        <span style="color:#D4AF37; font-size:1.25rem; line-height:1; flex-shrink:0; margin-left:1rem;">+</span>
+                    </summary>
+                    <div style="padding:0 1.25rem 1.125rem; color:#9CA3AF; line-height:1.75; font-size:0.9375rem;">
+                        @if($isEn)
+                            {{ $dishData['name'] }} in {{ $cityName }} typically ranges from $8–$25 depending on the restaurant. Check individual listings for current pricing and menu details.
+                        @else
+                            El {{ $dishData['name'] }} en {{ $cityName }} típicamente cuesta entre $8–$25 según el restaurante. Consulta cada listado para precios y menú actualizados.
+                        @endif
+                    </div>
+                </details>
+
+                <!-- FAQ 3 -->
+                <details style="background:#1A1A1A; border:1px solid #2A2A2A; border-radius:10px; overflow:hidden; cursor:pointer;"
+                         onmouseover="this.style.borderColor='#D4AF37'" onmouseout="if(!this.open)this.style.borderColor='#2A2A2A'">
+                    <summary style="padding:1.125rem 1.25rem; font-size:1rem; font-weight:600; color:#F5F5F5; list-style:none; display:flex; justify-content:space-between; align-items:center; user-select:none;">
+                        <span>
+                            @if($isEn)
+                                Is {{ $dishData['name'] }} popular in {{ $cityName }}, {{ strtoupper($stateCode) }}?
+                            @else
+                                ¿Es popular el {{ $dishData['name'] }} en {{ $cityName }}, {{ strtoupper($stateCode) }}?
+                            @endif
+                        </span>
+                        <span style="color:#D4AF37; font-size:1.25rem; line-height:1; flex-shrink:0; margin-left:1rem;">+</span>
+                    </summary>
+                    <div style="padding:0 1.25rem 1.125rem; color:#9CA3AF; line-height:1.75; font-size:0.9375rem;">
+                        @if($isEn)
+                            Yes — {{ $cityName }} has a strong Mexican food scene with {{ $count }} restaurants offering {{ $dishData['name'] }} and other traditional dishes.
+                        @else
+                            Sí — {{ $cityName }} tiene una gran escena de comida mexicana con {{ $count }} restaurantes que ofrecen {{ $dishData['name'] }} y otros platillos tradicionales.
+                        @endif
+                    </div>
+                </details>
+
+                <!-- FAQ 4 -->
+                <details style="background:#1A1A1A; border:1px solid #2A2A2A; border-radius:10px; overflow:hidden; cursor:pointer;"
+                         onmouseover="this.style.borderColor='#D4AF37'" onmouseout="if(!this.open)this.style.borderColor='#2A2A2A'">
+                    <summary style="padding:1.125rem 1.25rem; font-size:1rem; font-weight:600; color:#F5F5F5; list-style:none; display:flex; justify-content:space-between; align-items:center; user-select:none;">
+                        <span>
+                            @if($isEn)
+                                What other Mexican dishes can I find in {{ $cityName }}?
+                            @else
+                                ¿Qué otros platillos mexicanos hay en {{ $cityName }}?
+                            @endif
+                        </span>
+                        <span style="color:#D4AF37; font-size:1.25rem; line-height:1; flex-shrink:0; margin-left:1rem;">+</span>
+                    </summary>
+                    <div style="padding:0 1.25rem 1.125rem; color:#9CA3AF; line-height:1.75; font-size:0.9375rem;">
+                        @if($isEn)
+                            Beyond {{ $dishData['name'] }}, {{ $cityName }} restaurants serve tacos, burritos, enchiladas, tamales, pozole, and more. Explore our full Mexican restaurant directory for {{ $cityName }}.
+                        @else
+                            Además del {{ $dishData['name'] }}, los restaurantes de {{ $cityName }} sirven tacos, burritos, enchiladas, tamales, pozole y más. Explora nuestro directorio completo.
+                        @endif
+                    </div>
+                </details>
+
+            </div>
+        </div>
     </div>
 </div>
 @endsection
+
+@push('meta')
+@php
+$isEn = app()->getLocale() === 'en';
+$count = $restaurants->count();
+$dishName = $dishData['name'];
+$sc = strtoupper($stateCode);
+
+if ($isEn) {
+    $faqSchema = [
+        '@context' => 'https://schema.org',
+        '@type'    => 'FAQPage',
+        'mainEntity' => [
+            [
+                '@type' => 'Question',
+                'name'  => "Where can I find the best {$dishName} in {$cityName}, {$sc}?",
+                'acceptedAnswer' => [
+                    '@type' => 'Answer',
+                    'text'  => "Our directory lists {$count} restaurants serving {$dishName} in {$cityName}, {$sc}. Browse ratings, menus, and contact info to find the best {$dishName} near you.",
+                ],
+            ],
+            [
+                '@type' => 'Question',
+                'name'  => "How much does {$dishName} cost in {$cityName}?",
+                'acceptedAnswer' => [
+                    '@type' => 'Answer',
+                    'text'  => "{$dishName} in {$cityName} typically ranges from \$8–\$25 depending on the restaurant. Check individual listings for current pricing and menu details.",
+                ],
+            ],
+            [
+                '@type' => 'Question',
+                'name'  => "Is {$dishName} popular in {$cityName}, {$sc}?",
+                'acceptedAnswer' => [
+                    '@type' => 'Answer',
+                    'text'  => "Yes — {$cityName} has a strong Mexican food scene with {$count} restaurants offering {$dishName} and other traditional dishes.",
+                ],
+            ],
+            [
+                '@type' => 'Question',
+                'name'  => "What other Mexican dishes can I find in {$cityName}?",
+                'acceptedAnswer' => [
+                    '@type' => 'Answer',
+                    'text'  => "Beyond {$dishName}, {$cityName} restaurants serve tacos, burritos, enchiladas, tamales, pozole, and more. Explore our full Mexican restaurant directory for {$cityName}.",
+                ],
+            ],
+        ],
+    ];
+} else {
+    $faqSchema = [
+        '@context' => 'https://schema.org',
+        '@type'    => 'FAQPage',
+        'mainEntity' => [
+            [
+                '@type' => 'Question',
+                'name'  => "¿Dónde encontrar el mejor {$dishName} en {$cityName}, {$sc}?",
+                'acceptedAnswer' => [
+                    '@type' => 'Answer',
+                    'text'  => "Nuestro directorio lista {$count} restaurantes que sirven {$dishName} en {$cityName}, {$sc}. Compara calificaciones, menús y contacto para encontrar el mejor.",
+                ],
+            ],
+            [
+                '@type' => 'Question',
+                'name'  => "¿Cuánto cuesta {$dishName} en {$cityName}?",
+                'acceptedAnswer' => [
+                    '@type' => 'Answer',
+                    'text'  => "El {$dishName} en {$cityName} típicamente cuesta entre \$8–\$25 según el restaurante. Consulta cada listado para precios y menú actualizados.",
+                ],
+            ],
+            [
+                '@type' => 'Question',
+                'name'  => "¿Es popular el {$dishName} en {$cityName}, {$sc}?",
+                'acceptedAnswer' => [
+                    '@type' => 'Answer',
+                    'text'  => "Sí — {$cityName} tiene una gran escena de comida mexicana con {$count} restaurantes que ofrecen {$dishName} y otros platillos tradicionales.",
+                ],
+            ],
+            [
+                '@type' => 'Question',
+                'name'  => "¿Qué otros platillos mexicanos hay en {$cityName}?",
+                'acceptedAnswer' => [
+                    '@type' => 'Answer',
+                    'text'  => "Además del {$dishName}, los restaurantes de {$cityName} sirven tacos, burritos, enchiladas, tamales, pozole y más. Explora nuestro directorio completo.",
+                ],
+            ],
+        ],
+    ];
+}
+echo '<script type="application/ld+json">' . json_encode($faqSchema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . '</script>';
+@endphp
+@endpush
 
 @push('scripts')
 <script type="application/ld+json">
