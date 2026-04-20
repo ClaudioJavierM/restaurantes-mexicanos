@@ -412,7 +412,11 @@
                                         </div>
                                         <div>
                                             <p class="text-sm font-semibold" style="color:#F5F5F5;">Correo electrónico</p>
-                                            <p class="text-xs mt-1" style="color:#9CA3AF;">Código enviado al email del restaurante</p>
+                                            @php
+                                                $emailRaw = $selectedRestaurant->email ?? '';
+                                                $emailMasked = $emailRaw ? (substr($emailRaw, 0, 2) . str_repeat('*', max(1, strpos($emailRaw, '@') - 2)) . substr($emailRaw, strpos($emailRaw, '@'))) : '';
+                                            @endphp
+                                            <p class="text-xs mt-1" style="color:#D4AF37; font-weight:600;">{{ $emailMasked ?: 'Email del restaurante' }}</p>
                                         </div>
                                         @if($verificationMethod === 'email')
                                             <svg class="w-5 h-5 ml-auto flex-shrink-0" style="color:#D4AF37;" fill="currentColor" viewBox="0 0 20 20">
@@ -436,7 +440,11 @@
                                         </div>
                                         <div>
                                             <p class="text-sm font-semibold" style="color:#F5F5F5;">Llamada telefónica</p>
-                                            <p class="text-xs mt-1" style="color:#9CA3AF;">Llamada con código al teléfono del restaurante</p>
+                                            @php
+                                                $phoneRaw = $selectedRestaurant->phone ?? '';
+                                                $phoneMasked = $phoneRaw ? (substr($phoneRaw, 0, 3) . str_repeat('*', max(1, strlen($phoneRaw) - 5)) . substr($phoneRaw, -2)) : '';
+                                            @endphp
+                                            <p class="text-xs mt-1" style="color:#D4AF37; font-weight:600;">{{ $phoneMasked ?: 'Teléfono del restaurante' }}</p>
                                         </div>
                                         @if($verificationMethod === 'phone')
                                             <svg class="w-5 h-5 ml-auto flex-shrink-0" style="color:#D4AF37;" fill="currentColor" viewBox="0 0 20 20">
