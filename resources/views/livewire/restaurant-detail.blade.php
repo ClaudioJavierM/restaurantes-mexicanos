@@ -54,11 +54,50 @@
     $totalPhotos = count($allPhotos);
     $displayPhotos = array_slice($allPhotos, 0, 5);
 
+    // Determine restaurant timezone from US state code (DST-safe)
+    $usStateTimezones = [
+        'AL'=>'America/Chicago','AK'=>'America/Anchorage','AZ'=>'America/Phoenix',
+        'AR'=>'America/Chicago','CA'=>'America/Los_Angeles','CO'=>'America/Denver',
+        'CT'=>'America/New_York','DE'=>'America/New_York','FL'=>'America/New_York',
+        'GA'=>'America/New_York','HI'=>'Pacific/Honolulu','ID'=>'America/Boise',
+        'IL'=>'America/Chicago','IN'=>'America/Indiana/Indianapolis','IA'=>'America/Chicago',
+        'KS'=>'America/Chicago','KY'=>'America/New_York','LA'=>'America/Chicago',
+        'ME'=>'America/New_York','MD'=>'America/New_York','MA'=>'America/New_York',
+        'MI'=>'America/Detroit','MN'=>'America/Chicago','MS'=>'America/Chicago',
+        'MO'=>'America/Chicago','MT'=>'America/Denver','NE'=>'America/Chicago',
+        'NV'=>'America/Los_Angeles','NH'=>'America/New_York','NJ'=>'America/New_York',
+        'NM'=>'America/Denver','NY'=>'America/New_York','NC'=>'America/New_York',
+        'ND'=>'America/Chicago','OH'=>'America/New_York','OK'=>'America/Chicago',
+        'OR'=>'America/Los_Angeles','PA'=>'America/New_York','RI'=>'America/New_York',
+        'SC'=>'America/New_York','SD'=>'America/Chicago','TN'=>'America/Chicago',
+        'TX'=>'America/Chicago','UT'=>'America/Denver','VT'=>'America/New_York',
+        'VA'=>'America/New_York','WA'=>'America/Los_Angeles','WV'=>'America/New_York',
+        'WI'=>'America/Chicago','WY'=>'America/Denver','DC'=>'America/New_York',
+    ];
+    $restaurantStateCode = $restaurant->state?->code ?? '';
+    $restaurantTz = $usStateTimezones[$restaurantStateCode] ?? 'America/Chicago';
+
+    // Helper: compare open/close strings (e.g. "11:00 AM") against Carbon now in restaurant's timezone
+    $checkOpenNow = function(string $openStr, string $closeStr) use ($restaurantTz): bool {
+        try {
+            $localNow  = \Carbon\Carbon::now($restaurantTz);
+            $baseDate  = $localNow->format('Y-m-d');
+            $openCarbon  = \Carbon\Carbon::createFromFormat('Y-m-d g:i A', $baseDate . ' ' . trim($openStr), $restaurantTz);
+            $closeCarbon = \Carbon\Carbon::createFromFormat('Y-m-d g:i A', $baseDate . ' ' . trim($closeStr), $restaurantTz);
+            if ($closeCarbon->lte($openCarbon)) {
+                $closeCarbon->addDay(); // overnight hours (e.g. 10 PM – 2 AM)
+            }
+            return $localNow->between($openCarbon, $closeCarbon);
+        } catch (\Exception $e) {
+            return false;
+        }
+    };
+
     // Parse hours for display
     $parsedHours = [];
     $isOpenNow = false;
     $todayHours = null;
-    $today = date('w'); // 0 = Sunday
+    $today = \Carbon\Carbon::now($restaurantTz)->dayOfWeek; // 0 = Sunday, Carbon-aware
 
     if (!empty($restaurant->opening_hours)) {
         // Google Places API format: {weekday_text: [...], open_now: bool}
@@ -79,18 +118,7 @@
             $hoursPart = preg_replace('/^[^:]+:\s*/', '', $todayHours);
             if (stripos($hoursPart, 'closed') === false && stripos($hoursPart, 'cerrado') === false) {
                 if (preg_match('/(\d{1,2}:\d{2}\s*(?:AM|PM))\s*[-–]\s*(\d{1,2}:\d{2}\s*(?:AM|PM))/i', $hoursPart, $hm)) {
-                    // Compare using UTC offset adjusted for US Central (UTC-5/6) as default.
-                    // strtotime() uses server UTC — shift back 6h to approximate restaurant local time.
-                    $utcNow     = time();
-                    $localNow   = $utcNow - (6 * 3600); // approx US Central offset
-                    $baseDate   = date('Y-m-d', $localNow);
-                    $openTime   = strtotime($baseDate . ' ' . $hm[1]);
-                    $closeTime  = strtotime($baseDate . ' ' . $hm[2]);
-                    // Handle overnight hours (e.g. 10 PM – 2 AM)
-                    if ($closeTime <= $openTime) $closeTime += 86400;
-                    if ($openTime && $closeTime) {
-                        $isOpenNow = ($localNow >= $openTime && $localNow <= $closeTime);
-                    }
+                    $isOpenNow = $checkOpenNow($hm[1], $hm[2]);
                 }
             }
         }
@@ -146,12 +174,7 @@
                 $hoursPart = preg_replace('/^[^:]+:\s*/', '', $todayHours);
                 if (stripos($hoursPart, 'cerrado') === false && stripos($hoursPart, 'closed') === false) {
                     if (preg_match('/(\d{1,2}:\d{2}\s*(?:AM|PM))\s*[-–]\s*(\d{1,2}:\d{2}\s*(?:AM|PM))/i', $hoursPart, $m)) {
-                        $openTime = strtotime($m[1]);
-                        $closeTime = strtotime($m[2]);
-                        $now = time();
-                        if ($openTime && $closeTime) {
-                            $isOpenNow = ($now >= $openTime && $now <= $closeTime);
-                        }
+                        $isOpenNow = $checkOpenNow($m[1], $m[2]);
                     }
                 }
             }
