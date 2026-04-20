@@ -567,7 +567,7 @@ Schedule::command('seo:daily-snapshot')
         notifyN8nFailure('seo:daily-snapshot', 'Daily SEO metrics snapshot');
     });
 
-Schedule::command('restaurants:generate-descriptions --limit=1000')
+Schedule::command('restaurants:generate-descriptions --limit=8000')
     ->dailyAt('03:00')
     ->timezone('America/New_York')
     ->withoutOverlapping()
