@@ -62,8 +62,8 @@ Route::get('/{dish}-en-{state}', [\App\Http\Controllers\DishStateController::cla
 // City-level dish pages (SEO: "birria en dallas-tx", "tacos en chicago-il")
 // MUST be before the /{dish} wildcard — more specific pattern
 Route::get('/{dish}-en-{citySlug}-{stateCode}', [\App\Http\Controllers\DishCityController::class, 'show'])
-    ->where('dish', 'birria|tacos|tamales|pozole|enchiladas|mole|chiles-rellenos|menudo|carnitas|barbacoa|ceviche|carne-asada')
-    ->where('stateCode', 'tx|ca|il|az|fl|co|nv|nm|ny|ga|wa|nc|or|ut|tn|mi|oh|pa|nj|md')
+    ->where('dish', 'birria|tacos|tamales|pozole|enchiladas|mole|chiles-rellenos|menudo|carnitas|barbacoa|ceviche|carne-asada|quesadillas|guacamole|fajitas|churros|horchata|margaritas')
+    ->where('stateCode', 'tx|ca|il|az|fl|co|nv|nm|ny|ga|wa|nc|or|ut|tn|mi|oh|pa|nj|md|va|ct|mn|mo|wi|in|ky|la|al|sc|ia|ok|ar|ms|ks|ne|nv|id|mt|nd|sd|wy|hi|ak|ri|de|vt|nh|me|wv')
     ->name('dish.city');
 
 // Blog — Mexican food content & SEO authority

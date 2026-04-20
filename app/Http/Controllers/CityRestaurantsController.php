@@ -55,6 +55,41 @@ class CityRestaurantsController extends Controller
             ->whereNotNull('google_rating')
             ->avg('google_rating');
 
+        // Unique stats per city — make city pages rich, not thin content
+        $topRated = Restaurant::where('city', 'LIKE', $cityName)
+            ->where('status', 'approved')
+            ->where('is_active', true)
+            ->when($state, fn($q) => $q->where('state_id', $state->id))
+            ->whereNotNull('google_rating')
+            ->orderByDesc('google_rating')
+            ->orderByDesc('google_reviews_count')
+            ->first();
+
+        $mostViewed = Restaurant::where('city', 'LIKE', $cityName)
+            ->where('status', 'approved')
+            ->where('is_active', true)
+            ->when($state, fn($q) => $q->where('state_id', $state->id))
+            ->orderByDesc('profile_views')
+            ->first();
+
+        $claimedCount = Restaurant::where('city', 'LIKE', $cityName)
+            ->where('status', 'approved')
+            ->where('is_active', true)
+            ->when($state, fn($q) => $q->where('state_id', $state->id))
+            ->where('is_claimed', true)
+            ->count();
+
+        $withPhotos = Restaurant::where('city', 'LIKE', $cityName)
+            ->where('status', 'approved')
+            ->where('is_active', true)
+            ->when($state, fn($q) => $q->where('state_id', $state->id))
+            ->where(function ($q) {
+                $q->whereNotNull('photos')
+                  ->orWhereNotNull('image')
+                  ->orWhereNotNull('yelp_photos');
+            })
+            ->count();
+
         // Build state slug for back link (e.g. "TX" → look up state name → "texas")
         $stateSlug = $state ? Str::slug($state->name) : strtolower($stateCode);
 
@@ -75,6 +110,10 @@ class CityRestaurantsController extends Controller
             'state',
             'total',
             'avgRating',
+            'topRated',
+            'mostViewed',
+            'claimedCount',
+            'withPhotos',
             'isEn',
             'citySlug',
             'stateSlug'

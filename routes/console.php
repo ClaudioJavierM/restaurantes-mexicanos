@@ -543,3 +543,20 @@ Schedule::command('famer:approve-pending --limit=500')
         \Log::error('Weekly auto-approve pending restaurants failed');
         notifyN8nFailure('famer:approve-pending', 'Auto-approve pending restaurants');
     });
+
+// ============================================================================
+// SEO Daily Snapshot — 4:05 AM ET (just after N8N triggers at 4:00 AM)
+// Captures FAMER business metrics into seo_daily_metrics table
+// GSC and Umami columns are filled later by N8N httpRequest node
+// ============================================================================
+Schedule::command('seo:daily-snapshot')
+    ->dailyAt('04:05')
+    ->timezone('America/New_York')
+    ->description('DAILY: Snapshot FAMER SEO and business metrics')
+    ->onSuccess(function () {
+        \Log::info('SEO daily snapshot completed');
+    })
+    ->onFailure(function () {
+        \Log::error('SEO daily snapshot failed');
+        notifyN8nFailure('seo:daily-snapshot', 'Daily SEO metrics snapshot');
+    });

@@ -3,11 +3,63 @@
   $heading = $isEn
     ? "Mexican Restaurants in {$cityName}, {$stateCode}"
     : "Restaurantes Mexicanos en {$cityName}, {$stateCode}";
+
+  // City stats for unique content
+  $cityAvgRating  = $restaurants->whereNotNull('average_rating')->avg('average_rating');
+  $cityTopRated   = $restaurants->sortByDesc(fn($r) => $r->google_rating ?? $r->average_rating ?? 0)->first();
+  $cityClaimedCount = \App\Models\Restaurant::where('city', 'LIKE', $cityName . '%')
+      ->where('status', 'approved')
+      ->where('is_active', true)
+      ->where('is_claimed', true)
+      ->count();
+  $cityWithPhotos = \App\Models\Restaurant::where('city', 'LIKE', $cityName . '%')
+      ->where('status', 'approved')
+      ->where('is_active', true)
+      ->where(function ($q) {
+          $q->whereNotNull('photos')
+            ->orWhereNotNull('image')
+            ->orWhereNotNull('yelp_photos');
+      })
+      ->count();
 @endphp
 
 @push('head')
 <meta name="description" content="{{ $metaDesc }}">
 <link rel="canonical" href="{{ url()->current() }}">
+<script type="application/ld+json">
+{
+    "@@context": "https://schema.org",
+    "@@type": "FAQPage",
+    "mainEntity": [
+        {
+            "@@type": "Question",
+            "name": "{{ $isEn ? "How many Mexican restaurants are in {$cityName}?" : "¿Cuántos restaurantes mexicanos hay en {$cityName}?" }}",
+            "acceptedAnswer": {
+                "@@type": "Answer",
+                "text": "{{ $isEn ? "There are " . number_format($total) . " Mexican restaurants in {$cityName}, {$stateCode} on FAMER with verified ratings." : "En {$cityName} hay " . number_format($total) . " restaurantes mexicanos registrados en FAMER con calificaciones verificadas." }}"
+            }
+        }
+        @if($cityTopRated)
+        ,{
+            "@@type": "Question",
+            "name": "{{ $isEn ? "What is the best Mexican restaurant in {$cityName}?" : "¿Cuál es el mejor restaurante mexicano en {$cityName}?" }}",
+            "acceptedAnswer": {
+                "@@type": "Answer",
+                "text": "{{ $isEn ? addslashes($cityTopRated->name) . ' is one of the top-rated Mexican restaurants in ' . $cityName . ' with ' . number_format($cityTopRated->google_rating ?? $cityTopRated->average_rating, 1) . '★ on FAMER.' : addslashes($cityTopRated->name) . ' es uno de los mejor calificados en ' . $cityName . ' con ' . number_format($cityTopRated->google_rating ?? $cityTopRated->average_rating, 1) . '★ según FAMER.' }}"
+            }
+        }
+        @endif
+        ,{
+            "@@type": "Question",
+            "name": "{{ $isEn ? "How do I find Mexican restaurants near me in {$cityName}?" : "¿Cómo encuentro restaurantes mexicanos cerca de mí en {$cityName}?" }}",
+            "acceptedAnswer": {
+                "@@type": "Answer",
+                "text": "{{ $isEn ? "Browse FAMER's directory of " . number_format($total) . " Mexican restaurants in {$cityName}, {$stateCode}. Sort by rating, reviews or name." : "Explora el directorio FAMER de " . number_format($total) . " restaurantes mexicanos en {$cityName}, {$stateCode}. Ordena por calificación, reseñas o nombre." }}"
+            }
+        }
+    ]
+}
+</script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -105,6 +157,30 @@
             </div>
         </div>
     </section>
+
+    {{-- CITY STATS GRID — makes page unique per city --}}
+    <div style="max-width:1200px; margin:0 auto; padding:24px 24px 0;">
+        <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:12px;">
+            <div style="background:#1A1A1A; border:1px solid #2A2A2A; border-radius:12px; padding:16px; text-align:center;">
+                <p style="font-family:'Playfair Display',serif; font-size:28px; font-weight:700; color:#D4AF37; margin:0 0 4px;">{{ number_format($total) }}</p>
+                <p style="color:#888; font-size:13px; margin:0;">{{ $isEn ? 'Restaurants' : 'Restaurantes' }}</p>
+            </div>
+            <div style="background:#1A1A1A; border:1px solid #2A2A2A; border-radius:12px; padding:16px; text-align:center;">
+                <p style="font-family:'Playfair Display',serif; font-size:28px; font-weight:700; color:#D4AF37; margin:0 0 4px;">
+                    @if($cityAvgRating) {{ number_format($cityAvgRating, 1) }}★ @else —★ @endif
+                </p>
+                <p style="color:#888; font-size:13px; margin:0;">{{ $isEn ? 'Avg Rating' : 'Calificación promedio' }}</p>
+            </div>
+            <div style="background:#1A1A1A; border:1px solid #2A2A2A; border-radius:12px; padding:16px; text-align:center;">
+                <p style="font-family:'Playfair Display',serif; font-size:28px; font-weight:700; color:#D4AF37; margin:0 0 4px;">{{ number_format($cityClaimedCount) }}</p>
+                <p style="color:#888; font-size:13px; margin:0;">{{ $isEn ? 'Owner-Claimed' : 'Reclamados por dueños' }}</p>
+            </div>
+            <div style="background:#1A1A1A; border:1px solid #2A2A2A; border-radius:12px; padding:16px; text-align:center;">
+                <p style="font-family:'Playfair Display',serif; font-size:28px; font-weight:700; color:#D4AF37; margin:0 0 4px;">{{ number_format($cityWithPhotos) }}</p>
+                <p style="color:#888; font-size:13px; margin:0;">{{ $isEn ? 'With Photos' : 'Con fotos' }}</p>
+            </div>
+        </div>
+    </div>
 
     {{-- SORT BAR --}}
     <div style="background:#111111; border-bottom:1px solid #2A2A2A; padding:16px 24px; position:sticky; top:0; z-index:50;">
@@ -276,6 +352,67 @@
 
         @endif
     </div>
+
+    {{-- CITY FAQ — unique per city, helps AI citation --}}
+    <section style="background:#111111; border-top:1px solid #2A2A2A; padding:48px 24px;">
+        <div style="max-width:800px; margin:0 auto;">
+            <h2 style="font-family:'Playfair Display',Georgia,serif; font-size:24px; color:#D4AF37; margin:0 0 24px; font-weight:700;">
+                @if($isEn)
+                    Frequently Asked Questions about Mexican Restaurants in {{ $cityName }}
+                @else
+                    Preguntas frecuentes sobre restaurantes mexicanos en {{ $cityName }}
+                @endif
+            </h2>
+            <div style="display:flex; flex-direction:column; gap:12px;">
+
+                <div style="background:#1A1A1A; border:1px solid #2A2A2A; border-radius:12px; padding:20px;">
+                    <h3 style="color:#D4AF37; font-weight:700; margin:0 0 8px; font-size:15px;">
+                        @if($isEn) How many Mexican restaurants are in {{ $cityName }}?
+                        @else ¿Cuántos restaurantes mexicanos hay en {{ $cityName }}?
+                        @endif
+                    </h3>
+                    <p style="color:#AAAAAA; margin:0; font-size:14px; line-height:1.7;">
+                        @if($isEn) There are {{ number_format($total) }} Mexican restaurants listed in {{ $cityName }}, {{ $stateCode }} on FAMER with verified ratings and reviews.
+                        @else En {{ $cityName }} hay {{ number_format($total) }} restaurantes mexicanos registrados en FAMER con calificaciones y reseñas verificadas.
+                        @endif
+                    </p>
+                </div>
+
+                @if($cityTopRated)
+                <div style="background:#1A1A1A; border:1px solid #2A2A2A; border-radius:12px; padding:20px;">
+                    <h3 style="color:#D4AF37; font-weight:700; margin:0 0 8px; font-size:15px;">
+                        @if($isEn) What is the best Mexican restaurant in {{ $cityName }}?
+                        @else ¿Cuál es el mejor restaurante mexicano en {{ $cityName }}?
+                        @endif
+                    </h3>
+                    <p style="color:#AAAAAA; margin:0; font-size:14px; line-height:1.7;">
+                        @if($isEn)
+                            Based on verified ratings on FAMER, <a href="/restaurante/{{ $cityTopRated->slug }}" style="color:#D4AF37;">{{ $cityTopRated->name }}</a> is one of the top-rated Mexican restaurants in {{ $cityName }} with {{ number_format($cityTopRated->google_rating ?? $cityTopRated->average_rating, 1) }}★.
+                        @else
+                            Según las calificaciones verificadas en FAMER, <a href="/restaurante/{{ $cityTopRated->slug }}" style="color:#D4AF37;">{{ $cityTopRated->name }}</a> es uno de los mejor calificados en {{ $cityName }} con {{ number_format($cityTopRated->google_rating ?? $cityTopRated->average_rating, 1) }}★.
+                        @endif
+                    </p>
+                </div>
+                @endif
+
+                <div style="background:#1A1A1A; border:1px solid #2A2A2A; border-radius:12px; padding:20px;">
+                    <h3 style="color:#D4AF37; font-weight:700; margin:0 0 8px; font-size:15px;">
+                        @if($isEn) How do I find Mexican restaurants near me in {{ $cityName }}?
+                        @else ¿Cómo encuentro restaurantes mexicanos cerca de mí en {{ $cityName }}?
+                        @endif
+                    </h3>
+                    <p style="color:#AAAAAA; margin:0; font-size:14px; line-height:1.7;">
+                        @if($isEn)
+                            Use the sort bar above to browse {{ number_format($total) }} Mexican restaurants in {{ $cityName }}, {{ $stateCode }}. Filter by best rated, most reviewed or alphabetical order.
+                        @else
+                            Usa la barra de ordenamiento de arriba para explorar {{ number_format($total) }} restaurantes mexicanos en {{ $cityName }}, {{ $stateCode }}. Filtra por mejor calificados, más reseñas u orden alfabético.
+                        @endif
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </section>
 
     {{-- SEO TEXT BLOCK --}}
     <section style="background:#111111; border-top:1px solid #2A2A2A; padding:64px 24px;">

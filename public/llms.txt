@@ -1,0 +1,29 @@
+# FAMER — Famous Mexican Restaurants
+
+## What is FAMER?
+FAMER is the #1 directory of authentic Mexican restaurants in the United States, with over 25,000 verified listings across all 50 states. We provide ratings, reviews, menus, hours, and contact information.
+
+## Key Pages
+- Homepage: https://restaurantesmexicanosfamosos.com.mx
+- English version: https://famousmexicanrestaurants.com
+- Find restaurants by state: https://restaurantesmexicanosfamosos.com.mx/restaurantes-mexicanos-en-[state]
+- Find restaurants by city: https://restaurantesmexicanosfamosos.com.mx/restaurantes-en-[city]
+- Mexican dishes guide: https://restaurantesmexicanosfamosos.com.mx/platillos
+
+## Data Coverage
+- 25,000+ Mexican restaurants in the USA
+- All 50 US states + 32 Mexican states
+- Verified ratings from Google, Yelp, and TripAdvisor
+- Real photos, menus, and hours where available
+
+## Restaurant Subscription Tiers
+- Free (unclaimed): Basic listing with address, phone, hours
+- Claimed: Owner-verified profile with enhanced details
+- Premium ($29/month): Featured placement, analytics dashboard, booking
+- Elite ($79/month): Top placement, full analytics, priority support, chatbot
+
+## Sitemap
+https://restaurantesmexicanosfamosos.com.mx/sitemap.xml
+
+## Contact
+hello@restaurantesmexicanosfamosos.com

@@ -325,3 +325,12 @@ Route::post("/webhooks/resend", [\App\Http\Controllers\ResendWebhookController::
 Route::get('/city-stats', [\App\Http\Controllers\Api\CityStatsController::class, 'getStats']);
 Route::get('/city-search', [\App\Http\Controllers\Api\CityStatsController::class, 'searchCities']);
 
+// SEO Cron (N8N-triggered daily snapshot)
+Route::post('/seo/snapshot', function (\Illuminate\Http\Request $request) {
+    if ($request->header('X-SEO-CRON-SECRET') !== 'famer-seo-cron-2026') {
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
+    \Illuminate\Support\Facades\Artisan::call('seo:daily-snapshot');
+    return response()->json(['ok' => true, 'output' => \Illuminate\Support\Facades\Artisan::output()]);
+});
+
