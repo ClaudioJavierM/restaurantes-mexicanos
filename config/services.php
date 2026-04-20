@@ -109,6 +109,10 @@ return [
         ))),
     ],
 
+    'perplexity' => [
+        'api_key' => env('PERPLEXITY_API_KEY'),
+    ],
+
     'foursquare' => [
         'client_id'     => env('FOURSQUARE_CLIENT_ID'),
         'client_secret' => env('FOURSQUARE_CLIENT_SECRET'),
