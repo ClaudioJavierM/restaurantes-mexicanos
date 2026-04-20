@@ -35,7 +35,7 @@ class MilestoneViewsMail extends Mailable implements ShouldQueue
         $this->claimUrl     = route('claim.restaurant') . '?search=' . urlencode($restaurant->name);
         $this->premiumUrl   = route('claim.restaurant') . '?search=' . urlencode($restaurant->name) . '&plan=premium';
         $this->eliteUrl     = route('claim.restaurant') . '?search=' . urlencode($restaurant->name) . '&plan=elite';
-        $this->dashboardUrl = route('owner.dashboard') ?? config('app.url') . '/owner/dashboard';
+        $this->dashboardUrl = config('app.url') . '/owner/dashboard';
     }
 
     public function envelope(): Envelope
