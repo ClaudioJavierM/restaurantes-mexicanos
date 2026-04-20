@@ -22,6 +22,48 @@
 @endif
 @endpush
 
+@push('meta')
+@php
+$itemListSchema = [
+    '@context' => 'https://schema.org',
+    '@type' => 'ItemList',
+    'name' => ($isEn ? "Best Mexican Restaurants in {$cityName}, {$stateCode}" : "Mejores Restaurantes Mexicanos en {$cityName}, {$stateCode}"),
+    'description' => ($isEn ? "Top verified Mexican restaurants in {$cityName}" : "Los mejores restaurantes mexicanos verificados en {$cityName}"),
+    'numberOfItems' => min(10, $restaurants->count()),
+    'itemListElement' => [],
+];
+$i = 1;
+foreach ($restaurants->take(10) as $r) {
+    $rating = $r->google_rating ?? $r->average_rating ?? 0;
+    $item = [
+        '@type' => 'ListItem',
+        'position' => $i++,
+        'item' => [
+            '@type' => 'Restaurant',
+            'name' => $r->name,
+            'url' => url(($isEn ? '/restaurant/' : '/restaurante/') . $r->slug),
+            'servesCuisine' => 'Mexican',
+            'address' => [
+                '@type' => 'PostalAddress',
+                'addressLocality' => $r->city,
+                'addressRegion' => $r->state_code,
+            ],
+        ],
+    ];
+    if ($rating > 0) {
+        $item['item']['aggregateRating'] = [
+            '@type' => 'AggregateRating',
+            'ratingValue' => round((float)$rating, 1),
+            'bestRating' => 5,
+            'worstRating' => 1,
+        ];
+    }
+    $itemListSchema['itemListElement'][] = $item;
+}
+echo '<script type="application/ld+json">' . json_encode($itemListSchema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . '</script>';
+@endphp
+@endpush
+
 @section('content')
 <div class="min-h-screen" style="background:#0B0B0B; color:#F5F5F5;">
 

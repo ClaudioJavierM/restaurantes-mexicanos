@@ -450,6 +450,34 @@ if ($seoCombinedReviews > 0) {
 }
 
 echo '<script type="application/ld+json">' . json_encode($restaurantSchema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . '</script>';
+
+$breadcrumbSchema = [
+    '@context' => 'https://schema.org',
+    '@type' => 'BreadcrumbList',
+    'itemListElement' => [
+        [
+            '@type' => 'ListItem',
+            'position' => 1,
+            'name' => 'FAMER',
+            'item' => $isEnDomain ? 'https://famousmexicanrestaurants.com' : 'https://restaurantesmexicanosfamosos.com.mx',
+        ],
+        [
+            '@type' => 'ListItem',
+            'position' => 2,
+            'name' => ($isEnDomain ? 'Mexican Restaurants in ' : 'Restaurantes en ') . $restaurant->state_code,
+            'item' => ($isEnDomain
+                ? 'https://famousmexicanrestaurants.com/best-mexican-restaurants-in-' . \Illuminate\Support\Str::slug($restaurant->state?->name ?? $restaurant->state_code)
+                : 'https://restaurantesmexicanosfamosos.com.mx/restaurantes-mexicanos-en-' . \Illuminate\Support\Str::slug($restaurant->state?->name ?? $restaurant->state_code)),
+        ],
+        [
+            '@type' => 'ListItem',
+            'position' => 3,
+            'name' => $restaurant->name,
+            'item' => $canonicalUrl,
+        ],
+    ],
+];
+echo '<script type="application/ld+json">' . json_encode($breadcrumbSchema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . '</script>';
 @endphp
 @endpush
 

@@ -497,3 +497,46 @@ $collectionPageSchema = [
 {!! json_encode($collectionPageSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) !!}
 </script>
 @endpush
+
+@push('meta')
+@php
+$stateItemList = [
+    '@context' => 'https://schema.org',
+    '@type' => 'ItemList',
+    'name' => ($isEn ? "Best Mexican Restaurants in {$state->name}" : "Mejores Restaurantes Mexicanos en {$state->name}"),
+    'description' => ($isEn ? "Top verified Mexican restaurants in {$state->name}, curated by FAMER" : "Los mejores restaurantes mexicanos verificados en {$state->name}, curados por FAMER"),
+    'numberOfItems' => min(10, $restaurants->count()),
+    'itemListElement' => [],
+];
+$pos = 1;
+foreach ($restaurants->take(10) as $r) {
+    $rating = $r->google_rating ?? $r->average_rating ?? 0;
+    $entry = [
+        '@type' => 'ListItem',
+        'position' => $pos++,
+        'item' => [
+            '@type' => 'Restaurant',
+            'name' => $r->name,
+            'url' => url(($isEn ? '/restaurant/' : '/restaurante/') . $r->slug),
+            'servesCuisine' => 'Mexican',
+            'address' => [
+                '@type' => 'PostalAddress',
+                'addressLocality' => $r->city ?? '',
+                'addressRegion' => $r->state_code ?? $state->code,
+                'addressCountry' => $state->country === 'MX' ? 'MX' : 'US',
+            ],
+        ],
+    ];
+    if ($rating > 0) {
+        $entry['item']['aggregateRating'] = [
+            '@type' => 'AggregateRating',
+            'ratingValue' => round((float)$rating, 1),
+            'bestRating' => 5,
+            'worstRating' => 1,
+        ];
+    }
+    $stateItemList['itemListElement'][] = $entry;
+}
+echo '<script type="application/ld+json">' . json_encode($stateItemList, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . '</script>';
+@endphp
+@endpush
