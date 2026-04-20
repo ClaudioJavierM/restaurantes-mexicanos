@@ -125,10 +125,11 @@ class IndexNowSubmitAll extends Command
         $this->info('--- Cities (top 200) ---');
 
         $cities = DB::table('restaurants')
-            ->where('status', 'approved')
-            ->whereNotNull('city')
-            ->groupBy('city', 'state_code')
-            ->selectRaw('city, state_code, COUNT(*) as cnt')
+            ->join('states', 'restaurants.state_id', '=', 'states.id')
+            ->where('restaurants.status', 'approved')
+            ->whereNotNull('restaurants.city')
+            ->groupBy('restaurants.city', 'states.code')
+            ->selectRaw('restaurants.city, states.code as state_code, COUNT(*) as cnt')
             ->orderByDesc('cnt')
             ->limit(200)
             ->get();
