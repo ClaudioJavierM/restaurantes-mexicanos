@@ -112,7 +112,7 @@
                     RECOMENDADO
                   </p>
                   <p style="margin:0 0 6px; font-size:16px; font-weight:700; color:#FFFFFF;">
-                    ⚡ Opción 2 — Suscripción Premium · desde $29/mes
+                    ⚡ Opción 2 — Suscripción Premium · <span style="color:#D4AF37;">$9.99 el primer mes</span>, luego $29/mes
                   </p>
                   <p style="margin:0 0 16px; font-size:14px; color:#9CA3AF; line-height:1.6;">
                     Posiciona tu restaurante en los <strong style="color:#D4AF37;">primeros lugares de {{ $restaurant->city }}</strong> antes que tu competencia. Los restaurantes Premium aparecen destacados en búsquedas, Top 10 y la página principal.

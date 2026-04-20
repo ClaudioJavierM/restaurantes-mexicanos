@@ -13,21 +13,34 @@ use Illuminate\Support\Facades\Mail;
 class SendMilestoneViewsEmails extends Command
 {
     protected $signature = 'famer:send-milestone-views
+                            {--milestone=50 : View milestone to target (50, 100, or 150)}
                             {--limit=200 : Max emails to send per run}
-                            {--min-views=50 : Minimum view count threshold}
                             {--dry-run : Show what would be sent without sending}';
 
-    protected $description = 'Send congratulatory emails to unclaimed restaurants that have reached view milestones';
+    protected $description = 'Send congratulatory emails when restaurants reach 50, 100, or 150 view milestones';
+
+    // Each milestone has its own tracking column so restaurants receive all 3 emails as they grow
+    private const MILESTONE_COLUMNS = [
+        50  => 'milestone_50_sent_at',
+        100 => 'milestone_100_sent_at',
+        150 => 'milestone_150_sent_at',
+    ];
 
     public function handle(): int
     {
-        $limit    = (int) $this->option('limit');
-        $minViews = (int) $this->option('min-views');
-        $dryRun   = $this->option('dry-run');
+        $milestone = (int) $this->option('milestone');
+        $limit     = (int) $this->option('limit');
+        $dryRun    = $this->option('dry-run');
 
-        $this->info("Sending milestone views emails (min: {$minViews} views, limit: {$limit})...");
+        if (!isset(self::MILESTONE_COLUMNS[$milestone])) {
+            $this->error("Invalid milestone. Use 50, 100, or 150.");
+            return Command::FAILURE;
+        }
 
-        // Get restaurants with enough views, unclaimed, with email, not recently emailed
+        $column = self::MILESTONE_COLUMNS[$milestone];
+
+        $this->info("Milestone {$milestone} views emails (limit: {$limit})...");
+
         $restaurants = DB::table('restaurants as r')
             ->join(DB::raw('(SELECT restaurant_id, COUNT(*) as view_count FROM analytics_events WHERE event_type = "page_view" GROUP BY restaurant_id) as v'), 'v.restaurant_id', '=', 'r.id')
             ->where('r.status', 'approved')
@@ -35,22 +48,19 @@ class SendMilestoneViewsEmails extends Command
             ->whereNull('r.subscription_status')
             ->whereNotNull('r.email')
             ->where('r.email', '!=', '')
-            ->where('v.view_count', '>=', $minViews)
-            ->where(function ($q) {
-                $q->whereNull('r.milestone_views_sent_at')
-                  ->orWhere('r.milestone_views_sent_at', '<', now()->subDays(90));
-            })
+            ->where('v.view_count', '>=', $milestone)
+            ->whereNull("r.{$column}")
             ->select('r.id', 'r.name', 'r.email', 'v.view_count')
             ->orderByDesc('v.view_count')
             ->limit($limit)
             ->get();
 
         if ($restaurants->isEmpty()) {
-            $this->info('No restaurants to email.');
+            $this->info("No restaurants pending milestone {$milestone} email.");
             return Command::SUCCESS;
         }
 
-        $this->info("Found {$restaurants->count()} restaurants to email.");
+        $this->info("Found {$restaurants->count()} restaurants.");
 
         $sent = 0;
         $errors = 0;
@@ -60,40 +70,34 @@ class SendMilestoneViewsEmails extends Command
             if (!$restaurant) continue;
 
             if ($dryRun) {
-                $this->line("DRY RUN: {$restaurant->name} <{$restaurant->email}> — {$row->view_count} views");
+                $this->line("DRY RUN [{$milestone}]: {$restaurant->name} <{$restaurant->email}> — {$row->view_count} views");
                 continue;
             }
 
             try {
-                $mailable = new MilestoneViewsMail($restaurant, (int) $row->view_count);
-                $result = Mail::to($restaurant->email)->send($mailable);
-
-                $messageId = null;
-                if (method_exists($result, 'getSymfonyMessage')) {
-                    $messageId = $result->getSymfonyMessage()->generateMessageId();
-                }
+                $mailable = new MilestoneViewsMail($restaurant, (int) $row->view_count, $milestone);
+                Mail::to($restaurant->email)->send($mailable);
 
                 EmailLog::create([
                     'restaurant_id' => $restaurant->id,
                     'from_email'    => config('mail.from.address'),
                     'to_email'      => $restaurant->email,
-                    'subject'       => "🎉 {$restaurant->name} tuvo {$row->view_count} visitas",
-                    'category'      => 'milestone_views',
+                    'subject'       => "🎉 {$restaurant->name} alcanzó {$milestone} visitas en FAMER",
+                    'category'      => "milestone_views_{$milestone}",
                     'status'        => 'sent',
-                    'resend_id'     => $messageId,
                     'sent_at'       => now(),
                 ]);
 
-                $restaurant->update(['milestone_views_sent_at' => now()]);
+                $restaurant->update([$column => now()]);
 
                 $sent++;
-                $this->line("✓ {$restaurant->name} <{$restaurant->email}> ({$row->view_count} views)");
+                $this->line("✓ [{$milestone}] {$restaurant->name} ({$row->view_count} views)");
 
                 sleep(1);
 
             } catch (\Exception $e) {
                 $errors++;
-                Log::error("MilestoneViews email error for {$restaurant->name}: " . $e->getMessage());
+                Log::error("MilestoneViews {$milestone} error for {$restaurant->name}: " . $e->getMessage());
                 $this->error("✗ {$restaurant->name}: " . $e->getMessage());
             }
         }

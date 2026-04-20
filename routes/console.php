@@ -161,18 +161,30 @@ Schedule::command('tripadvisor:enrich-restaurants --limit=160 --delay=2')
 // ============================================================================
 
 /**
- * Milestone Views — congratulatory email to unclaimed restaurants with 50+ views
- * Explains Google Ads equivalent value + pitch claim free / premium subscription
- * Runs daily at 9:30 AM ET, 200/day — 90-day cooldown per restaurant
+ * Milestone Views — 3 triggers: 50, 100, 150 views
+ * Each restaurant receives all 3 emails as it grows (separate tracking columns)
+ * Pitch: Google Ads equivalent value + claim free + Premium $9.99 primer mes
  */
-Schedule::command('famer:send-milestone-views --limit=200 --min-views=50')
+Schedule::command('famer:send-milestone-views --milestone=50 --limit=200')
     ->dailyAt('09:30')
     ->timezone('America/New_York')
-    ->description('DAILY: Milestone views congratulatory email (50+ views, unclaimed US)')
-    ->onSuccess(function () { \Log::info('Milestone views emails sent successfully'); })
-    ->onFailure(function () {
-        notifyN8nFailure('famer:send-milestone-views', 'Milestone views email campaign');
-    });
+    ->description('DAILY: Milestone 50 views — pitch claim + premium')
+    ->onSuccess(fn() => \Log::info('Milestone 50 emails sent'))
+    ->onFailure(fn() => notifyN8nFailure('famer:send-milestone-views', 'Milestone 50 views'));
+
+Schedule::command('famer:send-milestone-views --milestone=100 --limit=100')
+    ->dailyAt('09:45')
+    ->timezone('America/New_York')
+    ->description('DAILY: Milestone 100 views — pitch premium with urgency')
+    ->onSuccess(fn() => \Log::info('Milestone 100 emails sent'))
+    ->onFailure(fn() => notifyN8nFailure('famer:send-milestone-views', 'Milestone 100 views'));
+
+Schedule::command('famer:send-milestone-views --milestone=150 --limit=50')
+    ->dailyAt('10:00')
+    ->timezone('America/New_York')
+    ->description('DAILY: Milestone 150 views — highest urgency pitch')
+    ->onSuccess(fn() => \Log::info('Milestone 150 emails sent'))
+    ->onFailure(fn() => notifyN8nFailure('famer:send-milestone-views', 'Milestone 150 views'));
 
 /**
  * Send reminder emails to inactive restaurant owners - Mondays 10:00 AM

@@ -19,22 +19,27 @@ class MilestoneViewsMail extends Mailable implements ShouldQueue
 
     public Restaurant $restaurant;
     public int $viewCount;
+    public int $milestone;
     public string $claimUrl;
     public string $premiumUrl;
 
-    public function __construct(Restaurant $restaurant, int $viewCount)
+    public function __construct(Restaurant $restaurant, int $viewCount, int $milestone = 50)
     {
         $this->restaurant = $restaurant;
-        $this->viewCount = $viewCount;
-        $this->claimUrl = route('claim.restaurant') . '?search=' . urlencode($restaurant->name);
+        $this->viewCount  = $viewCount;
+        $this->milestone  = $milestone;
+        $this->claimUrl   = route('claim.restaurant') . '?search=' . urlencode($restaurant->name);
         $this->premiumUrl = route('claim.restaurant') . '?search=' . urlencode($restaurant->name) . '&plan=premium';
     }
 
     public function envelope(): Envelope
     {
-        return new Envelope(
-            subject: "🎉 {$this->restaurant->name} tuvo {$this->viewCount} visitas — así puedes ser el #1 de tu ciudad",
-        );
+        $subjects = [
+            50  => "🎉 {$this->restaurant->name} ya tiene {$this->viewCount} visitas — sé el #1 de tu ciudad",
+            100 => "🔥 {$this->viewCount} visitas y subiendo — {$this->restaurant->name} está ganando terreno",
+            150 => "⭐ {$this->restaurant->name} está entre los más visitados — no dejes pasar esta oportunidad",
+        ];
+        return new Envelope(subject: $subjects[$this->milestone] ?? $subjects[50]);
     }
 
     public function headers(): Headers
