@@ -28,12 +28,13 @@
 @endpush
 
 @push('meta')
+@verbatim
 <script type="application/ld+json">
 [
   {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "FAMER \u2014 Restaurantes Mexicanos Famosos",
+    "name": "FAMER — Restaurantes Mexicanos Famosos",
     "url": "https://restaurantesmexicanosfamosos.com.mx",
     "potentialAction": {
       "@type": "SearchAction",
@@ -68,6 +69,7 @@
   }
 ]
 </script>
+@endverbatim
 @endpush
 
 <div>
