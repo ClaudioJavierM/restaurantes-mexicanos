@@ -12,6 +12,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Impersonation middleware alias
+        $middleware->alias([
+            'impersonate.protect' => \Lab404\Impersonate\Middleware\ProtectFromImpersonation::class,
+        ]);
+
         // Exclude webhooks from CSRF verification
         $middleware->validateCsrfTokens(except: [
             "webhooks/*",

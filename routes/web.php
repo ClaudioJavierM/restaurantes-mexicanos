@@ -185,6 +185,9 @@ Route::get('/awards', \App\Livewire\AwardsWinners::class)->name('awards.winners'
 Route::get('/awards/hall-of-fame', \App\Livewire\AwardsHallOfFame::class)->name('awards.hall-of-fame');
 Route::get('/awards/{year}/{month}', \App\Livewire\AwardsWinners::class)->name('awards.month');
 
+// Admin impersonation routes (lab404/laravel-impersonate)
+Route::impersonate();
+
 // Catering
 Route::get('/catering', \App\Livewire\CateringRequest::class)->name('catering');
 

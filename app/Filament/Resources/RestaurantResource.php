@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\RestaurantResource\Pages;
 use App\Filament\Resources\RestaurantResource\RelationManagers;
 use App\Models\Restaurant;
+use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -443,6 +444,22 @@ class RestaurantResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('impersonate_owner')
+                    ->label('Soporte: Entrar como dueño')
+                    ->icon('heroicon-o-arrow-right-on-rectangle')
+                    ->color('warning')
+                    ->visible(fn (Restaurant $record): bool => $record->user_id !== null)
+                    ->requiresConfirmation()
+                    ->modalHeading('Entrar como dueño')
+                    ->modalDescription(fn (Restaurant $record): string => 'Vas a acceder al panel del dueño como ' . (User::find($record->user_id)?->name ?? 'este usuario') . '. Puedes salir en cualquier momento desde el banner amarillo.')
+                    ->modalSubmitActionLabel('Entrar')
+                    ->action(function (Restaurant $record) {
+                        $owner = User::find($record->user_id);
+                        if ($owner && auth()->user()->canImpersonate() && $owner->canBeImpersonated()) {
+                            auth()->user()->impersonate($owner);
+                            return redirect('/owner');
+                        }
+                    }),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([

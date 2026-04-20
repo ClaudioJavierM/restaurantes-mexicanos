@@ -11,11 +11,12 @@ use Laravel\Sanctum\HasApiTokens;
 use Filament\Panel;
 use App\Notifications\BilingualVerifyEmail;
 use App\Notifications\ResetPasswordNotification;
+use Lab404\Impersonate\Models\Impersonate;
 
 class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, Impersonate;
 
     /**
      * The attributes that are mass assignable.
@@ -282,5 +283,21 @@ class User extends Authenticatable implements FilamentUser
     public function sendPasswordResetNotification($token): void
     {
         $this->notify(new ResetPasswordNotification($token));
+    }
+
+    /**
+     * Only admins can impersonate other users.
+     */
+    public function canImpersonate(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    /**
+     * Only non-admin users (owners, team members, etc.) can be impersonated.
+     */
+    public function canBeImpersonated(): bool
+    {
+        return $this->role !== 'admin';
     }
 }

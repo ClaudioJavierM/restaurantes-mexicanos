@@ -11,6 +11,7 @@
         "filament/filament": "^3.2",
         "filament/spatie-laravel-media-library-plugin": "^3.2",
         "firebase/php-jwt": "^6.11",
+        "lab404/laravel-impersonate": "*",
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.3",
         "laravel/socialite": "^5.23",
