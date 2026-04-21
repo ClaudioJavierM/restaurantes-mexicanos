@@ -195,11 +195,13 @@ class StripeService
                 $plan = $subscription->metadata->plan;
             }
 
+            $actualStatus = $subscription?->status ?? 'active';
+
             $updates = [
-                'is_claimed' => true,
-                'claimed_at' => now(),
-                'subscription_tier' => $plan,
-                'subscription_status' => 'active',
+                'is_claimed'          => true,
+                'claimed_at'          => now(),
+                'subscription_tier'   => $plan,
+                'subscription_status' => $actualStatus,
             ];
 
             if ($subscriptionId) {
@@ -210,6 +212,9 @@ class StripeService
             }
             if ($subscription?->current_period_end) {
                 $updates['subscription_expires_at'] = Carbon::createFromTimestamp($subscription->current_period_end);
+            }
+            if ($subscription?->trial_end) {
+                $updates['trial_ends_at'] = Carbon::createFromTimestamp($subscription->trial_end);
             }
 
             $restaurant->update(array_merge($updates, [
