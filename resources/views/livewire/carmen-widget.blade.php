@@ -101,13 +101,16 @@
         .carmen-avatar {
             width: 44px;
             height: 44px;
-            background: linear-gradient(135deg, #D4AF37 0%, #B08A1E 100%);
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
+            overflow: hidden;
             flex-shrink: 0;
+            border: 2px solid rgba(212,175,55,0.4);
+        }
+        .carmen-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
         }
         .carmen-status-dot {
             width: 8px;
@@ -360,7 +363,9 @@
 
             {{-- Header --}}
             <div class="carmen-header">
-                <div class="carmen-avatar">👩‍💼</div>
+                <div class="carmen-avatar">
+                    <img src="/images/carmen-avatar.jpg" alt="Carmen">
+                </div>
                 <div style="flex:1; min-width:0;">
                     <div style="font-size:15px; font-weight:700; color:#F5F5F5; line-height:1.2;">Carmen</div>
                     <div style="font-size:12px; color:#6B7280; margin-top:2px;">
