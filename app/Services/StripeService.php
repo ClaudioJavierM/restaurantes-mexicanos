@@ -388,6 +388,19 @@ class StripeService
 
             $customer = $this->getOrCreateCustomer($restaurant);
 
+            // Cancel any existing incomplete/pending subscription before creating a new one.
+            // This prevents orphan invoices when users retry or change plans.
+            if ($restaurant->stripe_subscription_id) {
+                try {
+                    $existing = \Stripe\Subscription::retrieve($restaurant->stripe_subscription_id);
+                    if ($existing->status === 'incomplete') {
+                        $existing->cancel();
+                    }
+                } catch (\Exception $e) {
+                    // Already cancelled or not found — continue
+                }
+            }
+
             $subscriptionData = [
                 'customer'         => $customer->id,
                 'items'            => [['price' => $priceId]],
