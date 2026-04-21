@@ -162,6 +162,32 @@ class ClaimRestaurant extends Component
                     $this->step = "claimed_options";
                     $this->dispatch('scroll-top');
                 } else {
+                    // If user is already authenticated, they already completed verification —
+                    // send them straight to plan selection (e.g. returning from payment page).
+                    if (auth()->check()) {
+                        try {
+                            $this->restaurantMonthlyViews = \App\Models\AnalyticsEvent::where('restaurant_id', $restaurant->id)
+                                ->where('event_type', \App\Models\AnalyticsEvent::EVENT_PAGE_VIEW)
+                                ->where('created_at', '>=', now()->startOfMonth())
+                                ->count();
+                            $this->restaurantTotalViews = \App\Models\AnalyticsEvent::where('restaurant_id', $restaurant->id)
+                                ->where('event_type', \App\Models\AnalyticsEvent::EVENT_PAGE_VIEW)
+                                ->count();
+                            $this->competitorCount = \App\Models\Restaurant::where('state_id', $restaurant->state_id)
+                                ->where('status', 'approved')
+                                ->where('id', '!=', $restaurant->id)
+                                ->count();
+                            $this->socialProofCount = \App\Models\Restaurant::where('state_id', $restaurant->state_id)
+                                ->whereIn('subscription_tier', ['premium', 'elite'])
+                                ->where('id', '!=', $restaurant->id)
+                                ->count();
+                        } catch (\Exception $e) {}
+
+                        $this->step = 'select_plan';
+                        $this->dispatch('scroll-top');
+                        return;
+                    }
+
                     // Track claim start for abandoned recovery
                     if (!$restaurant->user_id) {
                         try {
