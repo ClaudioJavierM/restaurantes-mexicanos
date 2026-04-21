@@ -380,6 +380,19 @@ class StripeWebhookController extends Controller
                     \Log::warning('ClaimWelcomeMail (paid) failed: ' . $e->getMessage());
                 }
 
+                // Activate subscription tier and premium features immediately on redirect
+                // (webhook may arrive late — this ensures correct state at the moment user lands on success page)
+                try {
+                    $restaurant->refresh();
+                    $this->stripeService->handleSuccessfulSubscription(
+                        $restaurant->stripe_subscription_id ?? null,
+                        $restaurant,
+                        $plan
+                    );
+                } catch (\Exception $e) {
+                    \Log::error('success(): handleSuccessfulSubscription failed: ' . $e->getMessage());
+                }
+
                 // Clean up claim session keys
                 session()->forget(['claim_password', 'claim_owner_email', 'claim_owner_name', 'claim_owner_phone', 'claim_restaurant_id']);
 
@@ -437,7 +450,7 @@ class StripeWebhookController extends Controller
             $restaurant = Restaurant::find($restaurantId);
 
             if ($restaurant) {
-                $this->stripeService->handleSuccessfulSubscription($session->subscription ?? '', $restaurant, $plan);
+                $this->stripeService->handleSuccessfulSubscription($session->subscription ?? null, $restaurant, $plan);
 
                 if ($coupon = $restaurant->subscriberCoupon) {
                     $coupon->update(["tier" => $plan]);
