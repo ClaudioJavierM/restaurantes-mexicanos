@@ -412,8 +412,12 @@ class StripeService
                 ],
             ];
 
-            // Apply intro coupon for premium ($9.99 first month) if no custom coupon
-            // Elite gets a 30-day free trial instead of a coupon
+            // Elite ALWAYS gets 30-day free trial regardless of coupon
+            if ($plan === 'elite') {
+                $subscriptionData['trial_period_days'] = 30;
+            }
+
+            // Apply coupon/discount (independent of trial)
             $resolvedCoupon = null;
             if ($couponCode) {
                 $promo = $this->validatePromotionCode($couponCode);
@@ -422,13 +426,11 @@ class StripeService
                     $resolvedCoupon = $couponCode;
                 }
             } elseif ($plan === 'premium') {
+                // Premium gets $9.99 intro coupon (first month) when no custom coupon
                 $introCouponId = config('stripe.intro_coupon_premium');
                 if ($introCouponId) {
                     $subscriptionData['discounts'] = [['coupon' => $introCouponId]];
                 }
-            } elseif ($plan === 'elite') {
-                // 30-day free trial — no charge today, card collected via SetupIntent
-                $subscriptionData['trial_period_days'] = 30;
             }
 
             $subscription = \Stripe\Subscription::create($subscriptionData);
