@@ -61,7 +61,7 @@ return [
         ],
         'premium' => [
             'name' => 'Premium',
-            'price' => 29.00,
+            'price' => 39.00,
             'currency' => 'usd',
             'interval' => 'month',
             'features' => [
