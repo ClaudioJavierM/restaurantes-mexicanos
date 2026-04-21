@@ -254,7 +254,7 @@
     @endphp
 
     {{-- Open Graph for social sharing --}}
-    <meta property="og:type" content="restaurant">
+    <meta property="og:type" content="website">
     <meta property="og:title" content="{{ $ogTitle }}">
     <meta property="og:description" content="{{ Str::limit($ogFinalDesc, 250) }}">
     <meta property="og:url" content="{{ url()->current() }}">
