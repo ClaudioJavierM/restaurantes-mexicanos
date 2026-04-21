@@ -190,6 +190,19 @@ class StripeService
         try {
             $subscription = $subscriptionId ? Subscription::retrieve($subscriptionId) : null;
 
+            // Cancel any pre-existing different subscription to prevent double-billing
+            if ($subscriptionId && $restaurant->stripe_subscription_id && $restaurant->stripe_subscription_id !== $subscriptionId) {
+                try {
+                    $old = Subscription::retrieve($restaurant->stripe_subscription_id);
+                    if (in_array($old->status, ['active', 'trialing', 'past_due', 'incomplete'])) {
+                        $old->cancel();
+                        \Log::info("Cancelled duplicate subscription {$restaurant->stripe_subscription_id} for restaurant {$restaurant->id}");
+                    }
+                } catch (\Exception $e) {
+                    \Log::warning("Could not cancel old subscription {$restaurant->stripe_subscription_id}: " . $e->getMessage());
+                }
+            }
+
             // Resolve plan from subscription metadata if not passed explicitly
             if ($subscription && $plan === 'premium' && isset($subscription->metadata->plan)) {
                 $plan = $subscription->metadata->plan;
