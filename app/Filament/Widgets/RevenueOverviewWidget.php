@@ -36,7 +36,7 @@ class RevenueOverviewWidget extends StatsOverviewWidget
             $eliteCount = 0;
         }
 
-        $premiumRevenue = $premiumCount * 29;
+        $premiumRevenue = $premiumCount * 39;
         $eliteRevenue = $eliteCount * 79;
         $mrr = $premiumRevenue + $eliteRevenue;
         $arr = $mrr * 12;
@@ -66,7 +66,7 @@ class RevenueOverviewWidget extends StatsOverviewWidget
                 ->color('success'),
 
             Stat::make('Plan Premium', number_format($premiumCount))
-                ->description('$29/mes × ' . $premiumCount . ' = $' . number_format($premiumRevenue))
+                ->description('$39/mes × ' . $premiumCount . ' = $' . number_format($premiumRevenue))
                 ->descriptionIcon('heroicon-m-star')
                 ->color('primary'),
 

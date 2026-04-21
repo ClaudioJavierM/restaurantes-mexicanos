@@ -29,7 +29,7 @@ class SubscriptionFunnelWidget extends StatsOverviewWidget
 
             $claimRate   = $totalApproved > 0 ? round(($totalClaimed / $totalApproved) * 100, 1) : 0;
             $subRate     = $totalClaimed > 0  ? round(($withSub / $totalClaimed) * 100, 1) : 0;
-            $mrr         = ($premium * 29) + ($elite * 79);
+            $mrr         = ($premium * 39) + ($elite * 79);
             $mrrFormatted = '$' . number_format($mrr) . ' USD';
 
             return [
@@ -49,7 +49,7 @@ class SubscriptionFunnelWidget extends StatsOverviewWidget
                     ->color('warning'),
 
                 Stat::make('Premium ⭐ Activos', number_format($premium))
-                    ->description('$29/mes · $' . number_format($premium * 29) . ' MRR')
+                    ->description('$39/mes · $' . number_format($premium * 39) . ' MRR')
                     ->descriptionIcon('heroicon-m-star')
                     ->color('warning'),
 

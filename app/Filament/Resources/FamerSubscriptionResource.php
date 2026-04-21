@@ -72,7 +72,7 @@ class FamerSubscriptionResource extends Resource
                             ->label('Tier')
                             ->options([
                                 'claimed' => 'Reclamado',
-                                'premium' => 'Premium ⭐ ($29/mes)',
+                                'premium' => 'Premium ⭐ ($39/mes)',
                                 'elite'   => 'Elite 👑 ($79/mes)',
                             ])
                             ->nullable()
@@ -185,7 +185,7 @@ class FamerSubscriptionResource extends Resource
                 Tables\Columns\TextColumn::make('mrr_contribution')
                     ->label('MRR')
                     ->state(fn (Restaurant $record): string => match ($record->subscription_tier) {
-                        'premium' => '$29',
+                        'premium' => '$39',
                         'elite'   => '$79',
                         default   => '$0',
                     })

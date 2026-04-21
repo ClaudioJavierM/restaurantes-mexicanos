@@ -66,7 +66,7 @@ class RevenueAnalytics extends Page
                 ->where('subscription_status', 'active')
                 ->count();
 
-            $this->mrr = ($this->premiumActive * 29) + ($this->eliteActive * 79);
+            $this->mrr = ($this->premiumActive * 39) + ($this->eliteActive * 79);
             $this->arr = $this->mrr * 12;
 
             $this->churnRisk = Restaurant::whereNotNull('subscription_tier')
