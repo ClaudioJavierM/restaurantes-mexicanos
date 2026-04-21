@@ -1632,6 +1632,15 @@ echo '<script type="application/ld+json">' . json_encode($breadcrumbSchema, JSON
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                     </button>
                 </div>
+                @if($restaurant->premium_menu)
+                    {{-- Ordering widget: only for premium_menu restaurants --}}
+                    <div style="margin-bottom:1.5rem;">
+                        <a href="{{ route('restaurant.ordering', $restaurant->slug) }}"
+                           style="display:inline-flex;align-items:center;gap:0.5rem;background:#D4AF37;color:#0B0B0B;padding:0.75rem 1.5rem;border-radius:0.5rem;font-weight:700;font-size:0.95rem;text-decoration:none;">
+                            🛒 Ordenar ahora — delivery o para llevar
+                        </a>
+                    </div>
+                @endif
                 <div style="background:#1A1A1A; border:1px solid #2A2A2A; border-radius:0.75rem; padding:1.5rem;">
                     @include('livewire.partials.restaurant-menu')
                 </div>

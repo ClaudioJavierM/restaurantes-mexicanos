@@ -101,6 +101,16 @@ Route::post('/soporte/ticket', [\App\Http\Controllers\SupportTicketController::c
 // Stripe Webhook
 Route::post('/stripe/webhook', [\App\Http\Controllers\StripeWebhookController::class, 'handleWebhook'])->name('stripe.webhook');
 
+// Stripe Order Payments
+Route::post('/orders/{order}/payment-intent', [\App\Http\Controllers\OrderPaymentController::class, 'createIntent'])->name('orders.payment-intent');
+Route::post('/stripe/order-webhook', [\App\Http\Controllers\OrderPaymentController::class, 'handleWebhook'])->name('stripe.order-webhook');
+
+// Nash Delivery Webhook
+Route::post('/nash/webhook', [\App\Http\Controllers\NashWebhookController::class, 'handleWebhook'])->name('nash.webhook');
+
+// Online Ordering (standalone page per restaurant)
+Route::get('/restaurante/{restaurant:slug}/ordenar', \App\Livewire\OnlineOrdering::class)->name('restaurant.ordering');
+
 // Team Invitations
 Route::get('/team/accept/{token}', [TeamInvitationController::class, 'show'])->name('team.invitation.show');
 Route::post('/team/accept/{token}', [TeamInvitationController::class, 'accept'])->name('team.invitation.accept');

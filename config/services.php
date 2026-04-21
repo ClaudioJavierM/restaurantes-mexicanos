@@ -119,6 +119,11 @@ return [
         'api_key' => env('PERPLEXITY_API_KEY'),
     ],
 
+    'nash' => [
+        'api_key'        => env('NASH_API_KEY'),
+        'webhook_secret' => env('NASH_WEBHOOK_SECRET'),
+    ],
+
     'foursquare' => [
         'client_id'     => env('FOURSQUARE_CLIENT_ID'),
         'client_secret' => env('FOURSQUARE_CLIENT_SECRET'),

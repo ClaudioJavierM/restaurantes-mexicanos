@@ -36,6 +36,11 @@ class Order extends Model
         'confirmed_at',
         'completed_at',
         'cancelled_at',
+        'nash_job_id',
+        'nash_status',
+        'nash_provider',
+        'nash_pickup_eta',
+        'nash_dropoff_eta',
     ];
 
     protected $casts = [
@@ -46,9 +51,11 @@ class Order extends Model
         'discount' => 'decimal:2',
         'total' => 'decimal:2',
         'scheduled_for' => 'datetime',
-        'confirmed_at' => 'datetime',
-        'completed_at' => 'datetime',
-        'cancelled_at' => 'datetime',
+        'confirmed_at'    => 'datetime',
+        'completed_at'    => 'datetime',
+        'cancelled_at'    => 'datetime',
+        'nash_pickup_eta' => 'datetime',
+        'nash_dropoff_eta'=> 'datetime',
     ];
 
     // Generate unique order number

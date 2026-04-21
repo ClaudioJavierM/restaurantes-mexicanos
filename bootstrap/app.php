@@ -21,6 +21,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->validateCsrfTokens(except: [
             "webhooks/*",
             "stripe/webhook",
+            "stripe/order-webhook",
+            "nash/webhook",
             "chat/*",
         ]);
         
