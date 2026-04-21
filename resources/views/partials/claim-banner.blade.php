@@ -75,9 +75,9 @@
     {{-- Trust signals below button --}}
     <p style="margin: 0.5rem 0 0 0; color: #6B7280; font-size: 0.775rem; text-align: center;">
         @if($isEn)
-            No credit card required · Verified within 24h · 100% free
+            Verified in seconds · 100% free
         @else
-            Sin tarjeta de crédito · Verificación en 24h · 100% gratis
+            Verificación en segundos · 100% gratis
         @endif
     </p>
 
