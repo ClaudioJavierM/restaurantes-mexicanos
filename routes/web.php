@@ -111,6 +111,11 @@ Route::post('/nash/webhook', [\App\Http\Controllers\NashWebhookController::class
 // Online Ordering (standalone page per restaurant)
 Route::get('/restaurante/{restaurant:slug}/ordenar', \App\Livewire\OnlineOrdering::class)->name('restaurant.ordering');
 
+// Star CloudPRNT — thermal printer polling (no CSRF, printer firmware makes raw HTTP)
+Route::post('/cloudprnt/{token}', [\App\Http\Controllers\CloudPRNTController::class, 'poll'])->name('cloudprnt.poll');
+Route::get('/cloudprnt/{token}', [\App\Http\Controllers\CloudPRNTController::class, 'getJob'])->name('cloudprnt.job');
+Route::delete('/cloudprnt/{token}', [\App\Http\Controllers\CloudPRNTController::class, 'confirmJob'])->name('cloudprnt.confirm');
+
 // Team Invitations
 Route::get('/team/accept/{token}', [TeamInvitationController::class, 'show'])->name('team.invitation.show');
 Route::post('/team/accept/{token}', [TeamInvitationController::class, 'accept'])->name('team.invitation.accept');

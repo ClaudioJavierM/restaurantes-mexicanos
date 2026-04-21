@@ -23,6 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
             "stripe/webhook",
             "stripe/order-webhook",
             "nash/webhook",
+            "cloudprnt/*",
             "chat/*",
         ]);
         

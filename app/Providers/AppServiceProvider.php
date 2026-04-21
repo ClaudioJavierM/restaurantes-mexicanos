@@ -32,10 +32,14 @@ class AppServiceProvider extends ServiceProvider
         // Register Restaurant Observer for automatic cache invalidation
         Restaurant::observe(RestaurantObserver::class);
         
-        // Order events → email notifications
+        // Order events → email notifications + ticket printing
         \Illuminate\Support\Facades\Event::listen(
             \App\Events\NewOrderPlaced::class,
             [\App\Listeners\SendOrderNotifications::class, 'handleOrderPlaced']
+        );
+        \Illuminate\Support\Facades\Event::listen(
+            \App\Events\NewOrderPlaced::class,
+            \App\Listeners\PrintOrderTicket::class
         );
         \Illuminate\Support\Facades\Event::listen(
             \App\Events\OrderStatusUpdated::class,
