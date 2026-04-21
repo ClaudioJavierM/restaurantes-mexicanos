@@ -110,11 +110,8 @@
         $todayIndex = $today == 0 ? 6 : $today - 1;
         $todayHours = $parsedHours[$todayIndex] ?? null;
 
-        // open_now from Google is a real-time field — often not stored or stale.
-        // Compute dynamically when not available.
-        if (isset($hoursData['open_now'])) {
-            $isOpenNow = (bool) $hoursData['open_now'];
-        } elseif ($todayHours) {
+        // open_now stored from Google import is STALE — always compute dynamically.
+        if ($todayHours) {
             $hoursPart = preg_replace('/^[^:]+:\s*/', '', $todayHours);
             if (stripos($hoursPart, 'closed') === false && stripos($hoursPart, 'cerrado') === false) {
                 if (preg_match('/(\d{1,2}:\d{2}\s*(?:AM|PM))\s*[-–]\s*(\d{1,2}:\d{2}\s*(?:AM|PM))/i', $hoursPart, $hm)) {
@@ -144,13 +141,28 @@
             foreach ($ownerHours as $key => $val) {
                 $lookupKey = mb_strtolower(trim($key));
                 $spanishDay = $dayMap[$lookupKey] ?? ucfirst($key);
-                // Value can be array ['11:00 AM - 10:00 PM'] or string '11:00 AM - 10:00 PM'
-                if (is_array($val)) {
-                    $hourStr = implode(', ', $val);
+
+                // Format A: {"open":"07:00","close":"19:00","closed":false} — 24h object
+                if (is_array($val) && isset($val['open'], $val['close'])) {
+                    if (!empty($val['closed'])) {
+                        $hourStr = 'Cerrado';
+                    } else {
+                        try {
+                            $oFmt = \Carbon\Carbon::createFromFormat('H:i', $val['open'])->format('g:i A');
+                            $cFmt = \Carbon\Carbon::createFromFormat('H:i', $val['close'])->format('g:i A');
+                            $hourStr = $oFmt . ' - ' . $cFmt;
+                        } catch (\Exception $e) {
+                            $hourStr = $val['open'] . ' - ' . $val['close'];
+                        }
+                    }
+                // Format B: ['11:00 AM - 10:00 PM'] array or plain string
+                } elseif (is_array($val)) {
+                    $hourStr = implode(', ', array_filter($val, 'is_string'));
                 } else {
                     $hourStr = (string) $val;
                 }
-                // Fix comma-separated format like "8:00 AM, 10:00 PM" to "8:00 AM - 10:00 PM"
+
+                // Fix comma-separated "8:00 AM, 10:00 PM" → "8:00 AM - 10:00 PM"
                 if (preg_match('/^(\d{1,2}:\d{2}\s*(?:AM|PM)?)\s*,\s*(\d{1,2}:\d{2}\s*(?:AM|PM)?)$/i', $hourStr, $m)) {
                     $hourStr = $m[1] . ' - ' . $m[2];
                 }
