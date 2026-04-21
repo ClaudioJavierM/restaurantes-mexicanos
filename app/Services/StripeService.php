@@ -185,19 +185,34 @@ class StripeService
     /**
      * Handle successful subscription payment
      */
-    public function handleSuccessfulSubscription(string $subscriptionId, Restaurant $restaurant, string $plan): void
+    public function handleSuccessfulSubscription(?string $subscriptionId, Restaurant $restaurant, string $plan): void
     {
         try {
-            $subscription = Subscription::retrieve($subscriptionId);
+            $subscription = $subscriptionId ? Subscription::retrieve($subscriptionId) : null;
 
-            $restaurant->update([
+            // Resolve plan from subscription metadata if not passed explicitly
+            if ($subscription && $plan === 'premium' && isset($subscription->metadata->plan)) {
+                $plan = $subscription->metadata->plan;
+            }
+
+            $updates = [
                 'is_claimed' => true,
                 'claimed_at' => now(),
                 'subscription_tier' => $plan,
-                'stripe_subscription_id' => $subscriptionId,
-                'subscription_started_at' => Carbon::createFromTimestamp($subscription->current_period_start),
-                'subscription_expires_at' => Carbon::createFromTimestamp($subscription->current_period_end),
                 'subscription_status' => 'active',
+            ];
+
+            if ($subscriptionId) {
+                $updates['stripe_subscription_id'] = $subscriptionId;
+            }
+            if ($subscription?->current_period_start) {
+                $updates['subscription_started_at'] = Carbon::createFromTimestamp($subscription->current_period_start);
+            }
+            if ($subscription?->current_period_end) {
+                $updates['subscription_expires_at'] = Carbon::createFromTimestamp($subscription->current_period_end);
+            }
+
+            $restaurant->update(array_merge($updates, [
                 // Enable premium features based on plan
                 'premium_analytics'        => in_array($plan, ['claimed', 'premium', 'elite']),
                 'premium_seo'              => in_array($plan, ['premium', 'elite']),
@@ -208,7 +223,7 @@ class StripeService
                 'premium_menu'             => in_array($plan, ['premium', 'elite']),
                 'premium_reservations'     => in_array($plan, ['premium', 'elite']),
                 'premium_chatbot'          => $plan === 'elite',
-            ]);
+            ]));
 
             // If premium or elite, mark as featured
             if (in_array($plan, ['premium', 'elite'])) {
@@ -393,7 +408,8 @@ class StripeService
             if ($restaurant->stripe_subscription_id) {
                 try {
                     $existing = \Stripe\Subscription::retrieve($restaurant->stripe_subscription_id);
-                    if ($existing->status === 'incomplete') {
+                    $cancelable = ['incomplete', 'trialing', 'past_due', 'active'];
+                    if (in_array($existing->status, $cancelable)) {
                         $existing->cancel();
                     }
                 } catch (\Exception $e) {

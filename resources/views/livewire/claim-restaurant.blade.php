@@ -1135,6 +1135,33 @@
             </div>
         @endif
 
+        @if($step === 'claimed_options')
+        <div style="text-align:center; padding: 3rem 1.5rem;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">🏪</div>
+            <h2 style="color: #F5F5F5; font-size: 1.5rem; font-weight: 700; margin-bottom: 0.75rem;">
+                Este restaurante ya fue reclamado
+            </h2>
+            <p style="color: #9CA3AF; font-size: 0.95rem; margin-bottom: 2rem; line-height: 1.6;">
+                {{ $selectedRestaurant->name ?? 'Este restaurante' }} ya tiene un propietario registrado en FAMER.
+                Si eres el dueño, inicia sesión para acceder a tu panel.
+            </p>
+            <div style="display: flex; flex-direction: column; gap: 0.75rem; max-width: 320px; margin: 0 auto;">
+                <a href="/owner/login"
+                   style="display:block; background: linear-gradient(135deg, #D4AF37 0%, #B08A1E 100%); color: #0B0B0B; font-weight: 700; padding: 0.875rem 2rem; border-radius: 8px; text-decoration: none; font-size: 1rem;">
+                    Iniciar sesión como propietario
+                </a>
+                <button wire:click="backToSearch"
+                   style="display:block; background: transparent; border: 1px solid #2A2A2A; color: #9CA3AF; font-weight: 600; padding: 0.75rem 2rem; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-family: inherit;">
+                    Buscar otro restaurante
+                </button>
+            </div>
+            <p style="color: #4B5563; font-size: 0.8rem; margin-top: 1.5rem;">
+                ¿Crees que esto es un error?
+                <a href="#" onclick="document.querySelector('.carmen-bubble')?.click(); return false;" style="color: #D4AF37; text-decoration: none;">Contacta a soporte</a>
+            </p>
+        </div>
+        @endif
+
     </div>
 
     {{-- Support Link --}}
